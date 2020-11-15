@@ -1,0 +1,34 @@
+backend:
+  name: github
+  repo: tonyketcham/puerh.wtf
+  branch: main
+
+media_folder: 'static/images/uploads'
+public_folder: '/images/uploads'
+
+display_url: puerhwtf.netlify.app
+
+collections:
+  - name: 'tastings'
+    label: 'Tastings'
+    folder: 'content/tastings'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    extension: 'md'
+    fields:
+      - label: 'Tea'
+        name: 'tea'
+        widget: 'string'
+
+      - label: 'Excerpt'
+        name: 'excerpt'
+        widget: 'string'
+
+      - label: 'Publish Date'
+        name: 'date'
+        widget: 'date'
+
+      - label: 'Body'
+        name: 'body'
+        widget: 'markdown'
