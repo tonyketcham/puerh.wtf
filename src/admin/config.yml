@@ -11,15 +11,69 @@ display_url: puerhwtf.netlify.app
 collections:
   - name: 'tastings'
     label: 'Tastings'
+    label_singular: 'Tea Tasting'
+    description: 'Personal evaluations of teas'
     folder: 'content/tastings'
     create: true
     delete: true
     slug: '{{slug}}'
+    identifier_field: 'tea_name'
+    summary: '{{excerpt}}'
     extension: 'md'
     fields:
-      - label: 'Tea'
-        name: 'tea'
+      - label: 'Tea Name'
+        name: 'tea_name'
         widget: 'string'
+
+      - label: 'Tea Genre'
+        name: 'genre'
+        widget: 'relation'
+
+      - label: 'Cultivar'
+        name: 'cultivar'
+        widget: 'relation'
+        required: false
+
+      - label: 'Origin'
+        name: 'origin'
+        widget: 'relation'
+        required: false
+
+      - label: 'Season'
+        name: 'season'
+        widget: 'string'
+        required: false
+
+      - label: 'Production Year'
+        name: 'production_year'
+        widget: 'number'
+        default: 2020
+        required: false
+
+      - label: 'Picking'
+        name: 'picking'
+        widget: 'string'
+        required: false
+
+      - label: 'Elevation'
+        name: 'elevation'
+        widget: 'number'
+        required: false
+
+      - label: 'Aging Conditions'
+        name: 'aging_conditions'
+        widget: 'relation'
+        required: false
+
+      - label: 'Vendor'
+        name: 'vendor'
+        widget: 'relation'
+        required: false
+
+      - label: 'Purchase Link'
+        name: 'purchase_link'
+        widget: 'string'
+        required: false
 
       - label: 'Excerpt'
         name: 'excerpt'
@@ -27,7 +81,74 @@ collections:
 
       - label: 'Publish Date'
         name: 'date'
-        widget: 'date'
+        widget: 'datetime'
+
+      - label: 'Flavor Axes'
+        name: 'flavor_axes'
+        widget: 'object'
+        fields:
+          - label: 'Vegetal'
+            name: 'vegetal'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Floral'
+            name: 'floral'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Fruits'
+            name: 'fruits'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Spices'
+            name: 'spices'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Earth'
+            name: 'earth'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Wood'
+            name: 'wood'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Nuts/Roast'
+            name: 'nuts_roast'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Cream'
+            name: 'cream'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
+
+          - label: 'Stone'
+            name: 'stone'
+            widget: 'number'
+            default: 0
+            min: 0
+            max: 10
 
       - label: 'Body'
         name: 'body'
