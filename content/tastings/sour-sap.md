@@ -13,6 +13,8 @@ season: Spring
 production_year: 2019
 picking: Up to 3rd or 4th leaf
 elevation: 2000
+vendor:
+  - 84de34f8-3878-4daf-aa6e-d4925338fbfb
 purchase_link: https://meileaf.com/tea/sour-sap/
 excerpt: Unusually processed TGY with notes of sour gummy candies and a lovely
   floral nature.
