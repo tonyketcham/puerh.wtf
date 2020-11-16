@@ -72,7 +72,10 @@ module.exports = {
     {
       use: `gridsome-plugin-netlify-cms`,
       options: {
-        publicPath: `/admin`,
+        publicPath: '/teatime',
+        htmlTitle: 'Tea Mission Control',
+        configPath: 'src/admin/config.yml',
+        modulePath: 'src/admin/index.js',
       },
     },
   ],

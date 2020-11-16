@@ -412,8 +412,7 @@ collections:
       - label: 'Type:'
         field: parent
     fields:
-      # - { label: 'ID', name: 'id', widget: 'id' }
-
+      - { label: 'ID', name: 'id', widget: 'id' }
       - label: 'Name'
         name: 'name'
         widget: 'string'
