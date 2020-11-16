@@ -21,7 +21,7 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'tea_name'
-    summary: '{{fields.genre.name}}: {{author}} - {{commit_author}}'
+    summary: '{{year}}-{{month}}-{{day}} | {{fields.tea_name}} [{{fields.genre.name}}]'
     extension: 'md'
     fields:
       - label: 'Tea Name'
@@ -43,8 +43,8 @@ collections:
         collection: 'cultivars'
         multiple: true
         value_field: 'slug'
-        search_fields: ['name', 'parent']
-        display_fields: ['name', 'parent']
+        search_fields: ['name']
+        display_fields: ['name']
         required: false
 
       - label: 'Origin'
@@ -86,6 +86,11 @@ collections:
       - label: 'Vendor'
         name: 'vendor'
         widget: 'relation'
+        collection: 'vendors'
+        multiple: true
+        value_field: 'slug'
+        search_fields: ['name', 'location', 'municipality', 'country']
+        display_fields: ['name', 'location', 'municipality', 'country']
         required: false
 
       - label: 'Purchase Link'
@@ -288,34 +293,36 @@ collections:
       - label: 'Experience Notes'
         name: 'notes'
         widget: 'object'
+        summary: '{{taste}} -- {{cha_qi}}'
+        collapsed: true
         fields:
           - label: 'Dry Leaf Nose'
             name: 'dry_leaf_nose'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Wet Leaf Nose'
             name: 'wet_leaf_nose'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Mouthfeel'
             name: 'mouthfeel'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Taste'
             name: 'taste'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Finish'
             name: 'finish'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Cup Nose'
             name: 'cup_nose'
-            widget: 'text'
+            widget: 'string'
 
           - label: 'Cha Qi (body sensation, perspective alteration)'
             name: 'cha_qi'
-            widget: 'text'
+            widget: 'string'
 
       - label: 'Preference Rating (0-100)'
         name: 'rating'
@@ -327,6 +334,7 @@ collections:
       - label: 'Brewing Parameters'
         name: 'brewing'
         widget: 'object'
+        collapsed: true
         fields:
           - label: 'Material Used (g)'
             name: 'material_amount'
@@ -355,14 +363,19 @@ collections:
             widget: 'string'
             default: 'Porcelain Gaiwan'
 
-      - label: 'Gallery'
+      - label: 'Images'
+        label_singular: 'Image'
         name: 'images'
         widget: 'list'
-        summary: '{{fields.image}}'
-        field:
+        summary: '{{fields.image}} - {{fields.alt}}'
+        collapsed: true
+        fields:
           - label: 'Image'
             name: 'image'
             widget: 'image'
+          - label: 'Alt Text'
+            name: 'alt'
+            widget: 'string'
 
       - label: 'Body'
         name: 'body'
@@ -377,20 +390,34 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'name'
-    summary: '{{author}} - {{commit_author}}'
+    summary: '{{fields.name}}'
     extension: 'md'
+    sortable_fields: ['parent', 'color', 'name']
+    view_filters:
+      - label: 'Has Parent Type'
+        field: parent
+        pattern: '[0-9a-zA-Z]' # Match anything with legs
+
+      - label: 'Base Type'
+        field: parent
+        pattern: '^(?![\s\S])' # Create a negative lookahead for any char
+    view_groups:
+      - label: 'Type:'
+        field: parent
     fields:
       - label: 'Name'
         name: 'name'
         widget: 'string'
 
-      - label: 'Parent'
+      - label: 'Category'
         name: 'parent'
         widget: 'relation'
         collection: 'genres'
         search_fields: ['name']
-        value_field: 'slug'
+        value_field: 'name'
         display_fields: ['name']
+        # summary: '{{fields.name}}'
+        default: ''
         required: false
 
       - label: 'Color'
@@ -418,15 +445,6 @@ collections:
       - label: 'Name'
         name: 'name'
         widget: 'string'
-
-      - label: 'Parent'
-        name: 'parent'
-        widget: 'relation'
-        collection: 'cultivars'
-        search_fields: ['name']
-        value_field: 'slug'
-        display_fields: ['name']
-        required: false
 
       - label: 'Description'
         name: 'description'
