@@ -29,7 +29,7 @@ module.exports = {
         typeName: 'Tasting',
         // route: '/tastings/:year/:slug',
         refs: {
-          // author: 'Author',
+          author: 'Author',
           genre: 'Genre',
           cultivar: 'Cultivar',
           origin: 'Origin',
@@ -40,11 +40,27 @@ module.exports = {
     {
       use: '@gridsome/source-filesystem',
       options: {
+        path: 'content/authors/*.md',
+        typeName: 'Author',
+        // route: '/genres/:slug',
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/categories/*.md',
+        typeName: 'Category',
+        // route: '/genres/:slug',
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
         path: 'content/genres/*.md',
         typeName: 'Genre',
         // route: '/genres/:slug',
         refs: {
-          genre: 'Genre',
+          category: 'Category',
         },
       },
     },
@@ -74,8 +90,8 @@ module.exports = {
       options: {
         publicPath: '/teatime',
         htmlTitle: 'Tea Mission Control',
-        configPath: 'src/admin/config.yml',
-        modulePath: 'src/admin/index.js',
+        configPath: './static/admin/config.yml',
+        modulePath: './static/admin/index.js',
       },
     },
   ],

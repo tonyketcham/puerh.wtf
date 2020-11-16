@@ -5,11 +5,9 @@ backend:
 
 media_folder: 'static/images/uploads'
 public_folder: '/images/uploads'
-# media_library:
-#     config:
-#         multiple: true
 
 display_url: puerhwtf.netlify.app
+logo_url: 'https://images.unsplash.com/photo-1599565100439-1805b8483280?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1568&q=80'
 
 collections:
   - label: 'Tastings'
@@ -21,9 +19,22 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'tea_name'
-    summary: '{{year}}-{{month}}-{{day}} | {{fields.tea_name}} | {{fields.season}} {{fields.production_year}}'
+    summary: '{{year}}-{{month}}-{{day}} | {{tea_name}} | {{season}} {{production_year}}'
     extension: 'md'
     fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Author'
+        name: 'author'
+        widget: relation
+        collection: 'authors'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['name', 'instagram']
+        display_fields: ['name']
+
       - label: 'Tea Name'
         name: 'tea_name'
         widget: 'string'
@@ -33,8 +44,8 @@ collections:
         widget: 'relation'
         collection: 'genres'
         multiple: true
-        value_field: 'name'
-        search_fields: ['name', 'parent']
+        value_field: 'id'
+        search_fields: ['name', 'category']
         display_fields: ['name']
 
       - label: 'Cultivar'
@@ -42,7 +53,7 @@ collections:
         widget: 'relation'
         collection: 'cultivars'
         multiple: true
-        value_field: 'name'
+        value_field: 'id'
         search_fields: ['name']
         display_fields: ['name']
         required: false
@@ -52,7 +63,7 @@ collections:
         widget: 'relation'
         collection: 'origins'
         multiple: true
-        value_field: 'location'
+        value_field: 'id'
         search_fields: ['location', 'municipality', 'country']
         display_fields: ['location', 'municipality', 'country']
         required: false
@@ -77,18 +88,20 @@ collections:
         name: 'elevation'
         widget: 'number'
         required: false
+        default: null
 
       - label: 'Aging Conditions'
         name: 'aging_conditions'
         widget: 'string'
         required: false
+        default: null
 
       - label: 'Vendor'
         name: 'vendor'
         widget: 'relation'
         collection: 'vendors'
         multiple: true
-        value_field: 'slug'
+        value_field: 'id'
         search_fields: ['name', 'location', 'municipality', 'country']
         display_fields: ['name', 'location', 'municipality', 'country']
         required: false
@@ -388,6 +401,38 @@ collections:
         name: 'body'
         widget: 'markdown'
 
+  - label: 'Tea Categories'
+    name: 'categories'
+    label_singular: 'Category'
+    description: 'The main tea cornerstones'
+    folder: 'content/categories'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'name'
+    summary: '{{name}}'
+    extension: 'md'
+    sortable_fields: ['name', 'color']
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'name'
+        widget: 'string'
+
+      - label: 'Color'
+        name: 'color'
+        widget: 'color'
+        allowInput: true
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
   - label: 'Tea Genres'
     name: 'genres'
     label_singular: 'Tea Genre'
@@ -399,33 +444,27 @@ collections:
     identifier_field: 'name'
     summary: '{{fields.name}}'
     extension: 'md'
-    sortable_fields: ['parent', 'color', 'name']
-    view_filters:
-      - label: 'Has Parent Type'
-        field: parent
-        pattern: '[0-9a-zA-Z]' # Match anything with legs
-
-      - label: 'Base Type'
-        field: parent
-        pattern: '^(?![\s\S])' # Create a negative lookahead for any char
+    sortable_fields: ['category', 'color', 'name']
     view_groups:
-      - label: 'Type:'
-        field: parent
+      - label: 'Category'
+        field: 'category'
+
     fields:
-      - { label: 'ID', name: 'id', widget: 'id' }
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
       - label: 'Name'
         name: 'name'
         widget: 'string'
 
       - label: 'Category'
-        name: 'parent'
+        name: 'category'
         widget: 'relation'
-        collection: 'genres'
+        collection: 'categories'
+        value_field: 'id'
         search_fields: ['name']
-        value_field: 'name'
         display_fields: ['name']
-        # summary: '{{fields.name}}'
-        default: ''
         required: false
 
       - label: 'Color'
@@ -448,9 +487,13 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'name'
-    summary: '{{author}} - {{commit_author}}'
+    summary: '{{name}} - {{description}}'
     extension: 'md'
     fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
       - label: 'Name'
         name: 'name'
         widget: 'string'
@@ -482,9 +525,13 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'name'
-    summary: '{{author}} - {{commit_author}}'
+    summary: '{{location}} - {{municipality}} - {{country}}'
     extension: 'md'
     fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
       - label: 'Location'
         name: 'location'
         widget: 'string'
@@ -514,9 +561,13 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'name'
-    summary: '{{author}} - {{commit_author}}'
+    summary: '{{name}}'
     extension: 'md'
     fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
       - label: 'Vendor Name'
         name: 'name'
         widget: 'string'
@@ -524,13 +575,13 @@ collections:
       - label: 'Profile Picture'
         name: 'image'
         widget: 'image'
+        required: false
 
       - label: 'Links'
         label_singular: 'Link'
         name: 'links'
-        widget: 'list'
-        summary: '{{fields.website}}'
-        allow_add: false
+        widget: 'object'
+        summary: '{{website}}'
         collapsed: true
         required: false
         fields:
@@ -573,3 +624,59 @@ collections:
         name: 'description'
         widget: 'markdown'
         required: false
+
+  - label: 'Authors'
+    name: 'authors'
+    label_singular: 'Author'
+    folder: 'content/authors'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'name'
+    summary: '{{name}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Author Name'
+        name: 'name'
+        widget: 'string'
+
+      - label: 'Profile Picture'
+        name: 'image'
+        widget: 'image'
+
+      - label: 'Links'
+        label_singular: 'Link'
+        name: 'links'
+        widget: 'object'
+        summary: '{{fields.website}}'
+        collapsed: true
+        required: false
+        fields:
+          - label: 'Website'
+            name: 'website'
+            widget: 'string'
+            required: false
+
+          - label: 'Instagram'
+            name: 'instagram'
+            widget: 'string'
+            required: false
+
+          - label: 'Github'
+            name: 'github'
+            widget: 'string'
+            required: false
+
+          - label: 'YouTube'
+            name: 'youtube'
+            widget: 'string'
+            required: false
+
+          - label: 'Facebook'
+            name: 'facebook'
+            widget: 'string'
+            required: false
