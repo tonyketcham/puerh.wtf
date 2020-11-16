@@ -336,6 +336,13 @@ collections:
         widget: 'object'
         collapsed: true
         fields:
+          - label: 'Temp (°F)'
+            name: 'temperature'
+            widget: 'number'
+            default: 200
+            min: 0
+            max: 705 # Just in case https://en.wikipedia.org/wiki/Superheated_water
+
           - label: 'Material Used (g)'
             name: 'material_amount'
             widget: 'number'
