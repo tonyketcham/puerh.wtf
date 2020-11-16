@@ -1,4 +1,5 @@
 ---
+genre_id: eb975148-c199-42af-ad85-e002de83b3a0
 name: Bi Luo Chun
 parent: Chinese Green
 color: "#a9ce54"
