@@ -17,9 +17,9 @@ module.exports = {
     },
   },
 
-  templates: {
-    Tasting: '/:tea_name',
-  },
+  // templates: {
+  //   Tasting: '/:tea_name',
+  // },
 
   plugins: [
     {
@@ -27,11 +27,46 @@ module.exports = {
       options: {
         path: 'content/tastings/*.md',
         typeName: 'Tasting',
-        remark: {
-          plugins: [
-            // ...local plugins
-          ],
+        // route: '/tastings/:year/:slug',
+        refs: {
+          // author: 'Author',
+          genre: 'Genre',
+          cultivar: 'Cultivar',
+          origin: 'Origin',
+          vendor: 'Vendor',
         },
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/genres/*.md',
+        typeName: 'Genre',
+        // route: '/genres/:slug',
+        refs: {
+          genre: 'Genre',
+        },
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/cultivars/*.md',
+        typeName: 'Cultivar',
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/origins/*.md',
+        typeName: 'Origin',
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/vendors/*.md',
+        typeName: 'Vendor',
       },
     },
     {

@@ -21,7 +21,7 @@ collections:
     delete: true
     slug: '{{slug}}'
     identifier_field: 'tea_name'
-    summary: '{{year}}-{{month}}-{{day}} | {{fields.tea_name}} [{{fields.genre.name}}]'
+    summary: '{{year}}-{{month}}-{{day}} | {{fields.tea_name}} | {{fields.season}} {{fields.production_year}}'
     extension: 'md'
     fields:
       - label: 'Tea Name'
@@ -33,16 +33,16 @@ collections:
         widget: 'relation'
         collection: 'genres'
         multiple: true
-        value_field: 'slug'
+        value_field: 'name'
         search_fields: ['name', 'parent']
-        display_fields: ['name', 'parent']
+        display_fields: ['name']
 
       - label: 'Cultivar'
         name: 'cultivar'
         widget: 'relation'
         collection: 'cultivars'
         multiple: true
-        value_field: 'slug'
+        value_field: 'name'
         search_fields: ['name']
         display_fields: ['name']
         required: false
@@ -52,7 +52,7 @@ collections:
         widget: 'relation'
         collection: 'origins'
         multiple: true
-        value_field: 'slug'
+        value_field: 'location'
         search_fields: ['location', 'municipality', 'country']
         display_fields: ['location', 'municipality', 'country']
         required: false
@@ -73,7 +73,7 @@ collections:
         widget: 'string'
         required: false
 
-      - label: 'Elevation'
+      - label: 'Elevation (Ft)'
         name: 'elevation'
         widget: 'number'
         required: false
@@ -316,8 +316,8 @@ collections:
             name: 'finish'
             widget: 'string'
 
-          - label: 'Cup Nose'
-            name: 'cup_nose'
+          - label: 'Empty Cup'
+            name: 'empty_cup'
             widget: 'string'
 
           - label: 'Cha Qi (body sensation, perspective alteration)'
@@ -388,7 +388,7 @@ collections:
         name: 'body'
         widget: 'markdown'
 
-  - label: 'Genres'
+  - label: 'Tea Genres'
     name: 'genres'
     label_singular: 'Tea Genre'
     description: 'The different teams in the game'
@@ -412,6 +412,8 @@ collections:
       - label: 'Type:'
         field: parent
     fields:
+      # - { label: 'ID', name: 'id', widget: 'id' }
+
       - label: 'Name'
         name: 'name'
         widget: 'string'
