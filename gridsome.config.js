@@ -17,12 +17,16 @@ module.exports = {
     },
   },
 
+  templates: {
+    Tasting: '/:tea_name',
+  },
+
   plugins: [
     {
       use: '@gridsome/source-filesystem',
       options: {
-        path: 'posts/**/*.md',
-        typeName: 'Post',
+        path: 'content/tastings/*.md',
+        typeName: 'Tasting',
         remark: {
           plugins: [
             // ...local plugins
