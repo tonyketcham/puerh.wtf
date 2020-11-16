@@ -4,7 +4,7 @@ author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 tea_name: Sour Sap
 genre:
-  - Tie Guan Yin
+  - 1d3f656f-db1b-4a6a-97ab-81940e17be12
 season: Spring
 production_year: 2019
 picking: Up to 3rd or 4th leaf
