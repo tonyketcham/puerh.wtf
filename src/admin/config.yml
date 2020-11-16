@@ -424,6 +424,7 @@ collections:
         name: 'color'
         widget: 'color'
         allowInput: true
+        required: false
 
       - label: 'Description'
         name: 'description'
