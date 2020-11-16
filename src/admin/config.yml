@@ -460,6 +460,19 @@ collections:
         widget: 'markdown'
         required: false
 
+      - label: 'Videos'
+        name: 'videos'
+        widget: list
+        summary: '{{fields.video}}'
+        collapsed: true
+        required: false
+        fields:
+          - label: 'Video'
+            name: 'video'
+            widget: 'youtube'
+            extraInfo: true
+            APIkey: ''
+
   - label: 'Origins'
     name: 'origins'
     label_singular: 'Tea Origin'

@@ -6138,6 +6138,11 @@ js-sha256@^0.9.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
+js-video-url-parser@^0.2.7:
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/js-video-url-parser/-/js-video-url-parser-0.2.8.tgz#a78cd81ef0f7283d2a520015c7382d544ed5d8f0"
+  integrity sha512-/9KwB+7ESNsLOEsB33ol9OpbHHbP1fqhTulH6/ytEaP7rhURDcXrZBo9Gfd7YQtL7xqZWknTbLusYVOY4EAKZA==
+
 js-yaml@^3.11.0, js-yaml@^3.13.1, js-yaml@^3.5.2:
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.0.tgz#a7a34170f26a21bb162424d8adacb4113a69e482"
@@ -7330,6 +7335,14 @@ netlify-cms-widget-text@^2.3.4:
   integrity sha512-cWSoSxb0+H5F8v1ubn71QabY8zDgSEI83VTAFVzBUkp6MmYp2mulyYy6/ebhHZdCcmik8/clrRwOXgI17N/G3Q==
   dependencies:
     react-textarea-autosize "^8.0.0"
+
+netlify-cms-widget-youtube@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/netlify-cms-widget-youtube/-/netlify-cms-widget-youtube-0.3.1.tgz#72157c0039eec76f19f054f8ba6eae020310cbf5"
+  integrity sha512-HAh2mYbm7K9q/fk0zAI4JK72C1jTFsKlVpkeq1xDgddzksVMwQZeR/9VdtIsdYlQfTLcXtC5U6QbW1TAvWpkIg==
+  dependencies:
+    js-video-url-parser "^0.2.7"
+    prop-types "^15.6.1"
 
 netlify-cms@^2.10.68:
   version "2.10.68"

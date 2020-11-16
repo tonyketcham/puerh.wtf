@@ -1,5 +1,9 @@
 import CMS from 'netlify-cms';
+import youtube from 'netlify-cms-widget-youtube';
 import uuid from 'uuid/v4';
+
+// Register the widget. This lets NetlifyCMS know about our custom widget
+CMS.registerWidget('youtube', youtubeControl, youtubePreview);
 
 /**
  * @see https://jozefm.dev/articles/2019/06/18/gridsome-netlify-cms-collection-relations/

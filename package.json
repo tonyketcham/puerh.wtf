@@ -12,6 +12,7 @@
     "gridsome": "^0.7.0",
     "gridsome-plugin-netlify-cms": "^1.0.9",
     "netlify-cms": "^2.10.68",
+    "netlify-cms-widget-youtube": "^0.3.1",
     "uuid": "^8.3.1"
   }
 }
