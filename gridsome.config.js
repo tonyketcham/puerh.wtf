@@ -88,10 +88,10 @@ module.exports = {
     {
       use: 'gridsome-plugin-netlify-cms',
       options: {
-        publicPath: '/admin',
-        // htmlPath: './static/admin/index.html',
-        // configPath: './static/admin/config.yml',
-        // modulePath: './static/admin/index.js',
+        modulePath: `src/cms/index.js`,
+        configPath: `src/cms/config.yml`,
+        publicPath: `/cms`,
+        htmlTitle: `Tea CMS`,
       },
     },
   ],
