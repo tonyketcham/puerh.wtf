@@ -86,12 +86,12 @@ module.exports = {
       },
     },
     {
-      use: `gridsome-plugin-netlify-cms`,
+      use: 'gridsome-plugin-netlify-cms',
       options: {
-        publicPath: '/teatime',
-        htmlTitle: 'Tea Mission Control',
-        configPath: './static/admin/config.yml',
-        modulePath: './static/admin/index.js',
+        publicPath: '/admin',
+        // htmlPath: './static/admin/index.html',
+        // configPath: './static/admin/config.yml',
+        // modulePath: './static/admin/index.js',
       },
     },
   ],
