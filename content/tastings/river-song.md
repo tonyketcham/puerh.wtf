@@ -53,6 +53,10 @@ notes:
   finish: persisting flavor, lasting light tingle, pleasant + engaging bitterness
   empty_cup: chocolate oat milk, alpine flowers
   cha_qi: happy, warming, grounding, and gently stimulating
+tags:
+  - 7e71f8d3-e51e-4807-be4d-245dee27032d
+  - 5aff9d97-c256-4bf7-9d36-2f43da99599d
+  - 21e82f1f-7568-400e-b151-95639ed3a977
 rating: 89
 brewing:
   temperature: 210
