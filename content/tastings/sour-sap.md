@@ -63,6 +63,10 @@ notes:
   cha_qi: Relaxing the muscles, noticing my ADHD symptoms kind of fading away -
     not bouncing my legs at all, not gritting my teeth, not worrying about time.
     Nice, gentle headspace and body feeling.
+tags:
+  - 07c49409-da16-4cc2-87bf-f84dae0ba418
+  - 16565067-592b-4e62-91aa-f8d2c920b602
+  - eb1d0494-6f02-48bc-8c34-936dda1a1549
 rating: 89
 brewing:
   temperature: 200
