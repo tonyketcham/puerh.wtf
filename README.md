@@ -19,7 +19,7 @@ things r lookin grim if it's come to this
 
 `npm install --global @gridsome/cli`
 
-### 2. Create a Gridsome project
+### 2. Turn the lights on
 
 1. clone 'er down
 2. `cd puerh.wtf` to open the folder
