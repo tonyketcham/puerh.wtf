@@ -1,4 +1,5 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/79932a8f-4ecb-4b1e-a4ed-d75e72bdfb7a/deploy-status)](https://app.netlify.com/sites/puerhwtf/deploys)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_shield)
 
 # Pu-erh, wtf
 
@@ -26,3 +27,7 @@ things r lookin grim if it's come to this
 3. `yarn install` because these node modules don't grow on trees
 4. `gridsome develop` to start a local dev server at `http://localhost:8080`
 5. Put stuff with your little hands 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_large)
