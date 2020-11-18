@@ -122,6 +122,7 @@ collections:
       - label: 'Flavor Axes'
         name: 'flavor_axes'
         widget: 'object'
+        collapsed: true
         fields:
           - label: 'Vegetal'
             name: 'vegetal'
@@ -306,7 +307,7 @@ collections:
       - label: 'Experience Notes'
         name: 'notes'
         widget: 'object'
-        summary: '{{taste}} -- {{cha_qi}}'
+        summary: '{{taste}}'
         collapsed: true
         fields:
           - label: 'Dry Leaf Nose'
@@ -336,6 +337,17 @@ collections:
           - label: 'Cha Qi (body sensation, perspective alteration)'
             name: 'cha_qi'
             widget: 'string'
+
+      - label: 'Tags'
+        label_singular: 'Tag'
+        name: 'tags'
+        widget: 'relation'
+        collection: 'tags'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['name']
+        display_fields: ['name']
+        required: false
 
       - label: 'Preference Rating (0-100)'
         name: 'rating'
@@ -680,3 +692,26 @@ collections:
             name: 'facebook'
             widget: 'string'
             required: false
+
+  - label: 'Tags'
+    label_singular: 'Tag'
+    folder: 'content/tags'
+    create: true
+    delete: true
+    name: 'tags'
+    slug: '{{slug}}'
+    identifier_field: 'name'
+    summary: '{{name}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Tag'
+        name: 'name'
+        widget: string
+
+      - label: 'Color'
+        name: 'color'
+        widget: color
