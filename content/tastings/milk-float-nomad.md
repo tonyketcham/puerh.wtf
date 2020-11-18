@@ -13,6 +13,7 @@ season: Spring
 production_year: 2010
 picking: Bud + up to 3 leaves
 elevation: 5000
+aging_conditions: Bulang, loose for 10 years
 vendor:
   - 84de34f8-3878-4daf-aa6e-d4925338fbfb
 purchase_link: https://meileaf.com/tea/milk-float-nomad/
@@ -45,7 +46,7 @@ flavor_axes:
     finish: 0
   floral:
     start: 0
-    finish: 0
+    finish: 2
   fruits:
     start: 2
     finish: 2
@@ -78,12 +79,12 @@ images:
   - image: /images/uploads/img_5622.jpg
     alt: Liquor after 7 steeps, more transparent and lightened to a pale amber
 ---
-Noteably fine pickings that coincide with the Gong Ting style. A nice, smooth shou with none of the off-flavors that can sometimes occur in the fermentation process or storage.
+Noteably fine pickings that coincide with the Gong Ting style. A nice, smooth shou with none of the off-flavors that can sometimes occur in the fermentation process or storage; cleanly done shou.
 
 A few steeps in, I stepped away to eat something and came back to notice a more coffee-like experience, with some of the bite that exists on a nice, single origin black coffee - couldn't give you much detail on *what* origin/roast that would be similar to since I'm not as familiar there, but it's somethin. Though once you're sippin' again, that bite totally disappears.
 
 Around steep 6, the wet leaf has a more distinctive aged wood, cacao nib smell, and the liquor is much sweeter with more of a lasting sweetness that transforms into a gentle mintiness. The woody notes are more clearly in focus now. Good dessert & digestif tea.
 
-Steep 10, very sweet and minty earthy nuttiness (note: not the soil side of earthiness). Out of curiousity here, I drank the now-cold rinse from the start to see if I could detect more of a dimensional change. That made me realize this would make a killer iced tea. That rinse has a definite creamy vanilla cake going on. The large body on this tea coupled with the heat might cover up some of those higher creams and vanillas, as might the jianshui. Now it's much clearer how far this thing's drifted although it does so slowly. Definitely hold on to your rinse or some of your first steep and give it a direct comparison later on.
+Steep 10, very sweet and minty, earthy nuttiness (note: not the soil side of earthiness). Out of curiousity here, I drank the now-cold rinse from the start to see if I could detect more of a dimensional change. That made me realize this would make a killer iced tea. That rinse has a definite creamy vanilla cake going on. The large body on this tea coupled with the heat might cover up some of those higher creams and vanillas, as might the jianshui. Now it's much clearer how far this thing's drifted although it does so slowly. Definitely hold on to your rinse or some of your first steep and give it a direct comparison later on.
 
 Pretty nice shou, but I think giving this one some even more age would really let it shine - not sure how this stacks up against other mid-aged Gong Tings in this class yet, so I'll have to keep drinking to find out!
