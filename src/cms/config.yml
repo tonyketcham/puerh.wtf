@@ -433,10 +433,10 @@ collections:
         widget: 'markdown'
         required: false
 
-  - label: 'Tea Genres'
+  - label: 'Tea Styles'
     name: 'genres'
-    label_singular: 'Tea Genre'
-    description: 'The different teams in the game'
+    label_singular: 'Tea Styles'
+    description: 'The different variations within a category'
     folder: 'content/genres'
     create: true
     delete: true
