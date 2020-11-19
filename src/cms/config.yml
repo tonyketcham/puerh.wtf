@@ -39,10 +39,10 @@ collections:
         name: 'tea_name'
         widget: 'string'
 
-      - label: 'Tea Genre'
-        name: 'genre'
+      - label: 'Style'
+        name: 'style'
         widget: 'relation'
-        collection: 'genres'
+        collection: 'styles'
         multiple: true
         value_field: 'id'
         search_fields: ['name', 'category']
@@ -103,7 +103,7 @@ collections:
         multiple: true
         value_field: 'id'
         search_fields: ['name', 'location', 'municipality', 'country']
-        display_fields: ['name', 'location', 'municipality', 'country']
+        display_fields: ['name']
         required: false
 
       - label: 'Purchase Link'
@@ -446,10 +446,10 @@ collections:
         required: false
 
   - label: 'Tea Styles'
-    name: 'genres'
+    name: 'styles'
     label_singular: 'Tea Styles'
     description: 'The different variations within a category'
-    folder: 'content/genres'
+    folder: 'content/styles'
     create: true
     delete: true
     slug: '{{slug}}'
@@ -509,6 +509,16 @@ collections:
       - label: 'Name'
         name: 'name'
         widget: 'string'
+
+      - label: 'Related Styles'
+        name: 'styles'
+        widget: relation
+        collection: 'styles'
+        value_field: 'id'
+        search_fields: ['name']
+        display_fields: ['name']
+        multiple: true
+        required: false
 
       - label: 'Description'
         name: 'description'

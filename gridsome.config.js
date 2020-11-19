@@ -30,7 +30,7 @@ module.exports = {
         // route: '/tastings/:year/:slug',
         refs: {
           author: 'Author',
-          genre: 'Genre',
+          style: 'Style',
           cultivar: 'Cultivar',
           origin: 'Origin',
           vendor: 'Vendor',
@@ -42,7 +42,7 @@ module.exports = {
       options: {
         path: 'content/authors/*.md',
         typeName: 'Author',
-        // route: '/genres/:slug',
+        // route: '/styles/:slug',
       },
     },
     {
@@ -50,15 +50,15 @@ module.exports = {
       options: {
         path: 'content/categories/*.md',
         typeName: 'Category',
-        // route: '/genres/:slug',
+        // route: '/styles/:slug',
       },
     },
     {
       use: '@gridsome/source-filesystem',
       options: {
-        path: 'content/genres/*.md',
-        typeName: 'Genre',
-        // route: '/genres/:slug',
+        path: 'content/styles/*.md',
+        typeName: 'Style',
+        // route: '/styles/:slug',
         refs: {
           category: 'Category',
         },
