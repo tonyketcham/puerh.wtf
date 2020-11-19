@@ -6,6 +6,12 @@ tea_name: Paradise Snapper
 genre:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
+cultivar:
+  - 976cb22c-fe00-40e5-8949-f0f3a791ce26
+  - eea29f1f-ec7b-40c7-9831-9bc53b2a10b3
+origin:
+  - aa7fe22e-c86f-4318-ba17-55361a79eb30
+  - 008ec9cc-0c87-4e83-a1fc-8d9cd22a1ba3
 season: Spring
 production_year: 2020
 picking: Bud & up to 3 leaves
