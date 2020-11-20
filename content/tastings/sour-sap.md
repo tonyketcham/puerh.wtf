@@ -3,7 +3,7 @@ id: a0941b88-324c-4d28-9c08-33ef8660431d
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 tea_name: Sour Sap
-genre:
+style:
   - 1d3f656f-db1b-4a6a-97ab-81940e17be12
 cultivar:
   - fc3f963c-9a67-4320-9557-681500f5c215
@@ -63,11 +63,6 @@ notes:
   cha_qi: Relaxing the muscles, noticing my ADHD symptoms kind of fading away -
     not bouncing my legs at all, not gritting my teeth, not worrying about time.
     Nice, gentle headspace and body feeling.
-tags:
-  - 07c49409-da16-4cc2-87bf-f84dae0ba418
-  - 16565067-592b-4e62-91aa-f8d2c920b602
-  - eb1d0494-6f02-48bc-8c34-936dda1a1549
-rating: 89
 brewing:
   temperature: 200
   material_amount: 6
@@ -75,6 +70,13 @@ brewing:
   vessel: Porcelain Gaiwan
   first_infusion_duration: 25
   infusion_increment: 5
+genre:
+  - 1d3f656f-db1b-4a6a-97ab-81940e17be12
+tags:
+  - 07c49409-da16-4cc2-87bf-f84dae0ba418
+  - 16565067-592b-4e62-91aa-f8d2c920b602
+  - eb1d0494-6f02-48bc-8c34-936dda1a1549
+rating: 89
 images:
   - image: /images/uploads/img_5596.jpg
     alt: Dry leaves in the cup, curled up in tight balls, duotone with gunmetal and
