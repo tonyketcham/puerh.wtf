@@ -3,7 +3,7 @@ id: cb7094b7-3359-4bcb-9f14-8a914cc993b7
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 tea_name: Milk Float Nomad
-genre:
+style:
   - d881f184-5372-406a-a47f-421cbacf58bf
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
@@ -61,7 +61,6 @@ notes:
     custard, miscellaneous soft wood and sweets
   cha_qi: Warming, focusing + creative
   empty_cup: Woody cologne, cake
-rating: 79
 brewing:
   temperature: 210
   material_amount: 5
@@ -69,6 +68,9 @@ brewing:
   vessel: Jianshui Zitao Teapot
   first_infusion_duration: 15
   infusion_increment: 5
+genre:
+  - d881f184-5372-406a-a47f-421cbacf58bf
+rating: 79
 images:
   - image: /images/uploads/img_5609.jpg
     alt: First infusion, deep chocolate color liquor
