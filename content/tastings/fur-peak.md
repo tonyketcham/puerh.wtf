@@ -57,6 +57,8 @@ notes:
   taste: toasty roasty vegetables, french fries, green peas, tamari, nori
   empty_cup: popcorn, tamari, creamed corn
   cha_qi: calm and loose with a humbling curiosity
+tags:
+  - 799e7654-d553-4e18-b128-4d4a3e29c7e5
 rating: 84
 brewing:
   temperature: 185
