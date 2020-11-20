@@ -58,7 +58,7 @@ notes:
     one may be the jianshui speaking), a bit of a minty throat after it opens up
     with more steeps
   taste: Warm baked goods, soft minerals, oak whiskey cask, milk chocolate,
-    custard, miscellaneous soft wood and sweets
+    custard, miscellaneous softwood, and sweets
   cha_qi: Warming, focusing + creative
   empty_cup: Woody cologne, cake
 brewing:
@@ -70,7 +70,7 @@ brewing:
   infusion_increment: 5
 genre:
   - d881f184-5372-406a-a47f-421cbacf58bf
-rating: 79
+rating: 75
 images:
   - image: /images/uploads/img_5609.jpg
     alt: First infusion, deep chocolate color liquor
