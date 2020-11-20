@@ -3,8 +3,9 @@ id: 377525b0-ae6e-49cd-8c10-45d4a5a0764c
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 tea_name: Paradise Snapper
-genre:
+style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
+  - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
   - eea29f1f-ec7b-40c7-9831-9bc53b2a10b3
@@ -62,10 +63,6 @@ notes:
   empty_cup: minerals, multigrain toast that doesn't suck (a lot of multigrain
     toast sucks I'll fuckin say it), pomegranate
   cha_qi: zoomin full funky monkey Friday on a god damn Thursday
-tags:
-  - ec7956dd-39db-40a0-b8d6-326811515c9d
-  - eb1d0494-6f02-48bc-8c34-936dda1a1549
-rating: 90
 brewing:
   temperature: 200
   material_amount: 5
@@ -73,6 +70,12 @@ brewing:
   vessel: Jianshui Zitao Teapot
   first_infusion_duration: 20
   infusion_increment: 25
+genre:
+  - 0ce2be99-ac41-40e5-b68d-92609daaf809
+tags:
+  - ec7956dd-39db-40a0-b8d6-326811515c9d
+  - eb1d0494-6f02-48bc-8c34-936dda1a1549
+rating: 90
 images:
   - image: /images/uploads/paradise-snapper-img_5655.jpg
     alt: First infusion's light yellow liquor
