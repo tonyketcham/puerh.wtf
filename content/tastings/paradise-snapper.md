@@ -75,6 +75,7 @@ genre:
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
+  - dc360789-6d18-449f-83e2-6cbad9b49035
 rating: 90
 images:
   - image: /images/uploads/paradise-snapper-img_5655.jpg
