@@ -5,7 +5,6 @@ author:
 tea_name: Paradise Snapper
 genre:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
-  - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
   - eea29f1f-ec7b-40c7-9831-9bc53b2a10b3
