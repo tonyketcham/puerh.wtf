@@ -17,9 +17,9 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "autoprefixer": "10.0.2",
     "gridsome-plugin-tailwindcss": "^4.1.0",
-    "postcss-import": "^13.0.0",
-    "postcss-preset-env": "^6.7.0",
-    "tailwindcss": "^2.0.1"
+    "tailwindcss": "^2.0.1",
+    "postcss": "8"
   }
 }
