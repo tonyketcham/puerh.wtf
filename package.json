@@ -14,5 +14,11 @@
     "netlify-cms": "^2.10.68",
     "netlify-cms-widget-youtube": "^0.3.1",
     "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "gridsome-plugin-tailwindcss": "^4.1.0",
+    "postcss-import": "^13.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "tailwindcss": "^2.0.1"
   }
 }
