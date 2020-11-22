@@ -8,15 +8,25 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import Header from "../components/Header.vue";
-import granularDarkMode from "../dark-mode";
 
 export default {
   components: {
     Header,
   },
   beforeMount() {
-    granularDarkMode();
+    this.$store.dispatch("initTheme");
+  },
+  computed: {
+    ...mapGetters({ theme: "getTheme" }),
+  },
+  watch: {
+    theme(newTheme, oldTheme) {
+      newTheme === "light"
+        ? document.querySelector("html").classList.remove("dark")
+        : document.querySelector("html").classList.add("dark");
+    },
   },
 };
 </script>
