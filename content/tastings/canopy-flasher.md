@@ -7,6 +7,8 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
+origin:
+  - da6f3abe-cbeb-4409-8971-13dd08fb468f
 season: Spring
 production_year: 2019
 picking: Bud & up to 3 leaves
@@ -57,7 +59,8 @@ notes:
   cha_qi: vibing out the wazoo
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
-rating: 89
+  - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
+rating: 87
 brewing:
   temperature: 200
   material_amount: 5
@@ -78,3 +81,4 @@ The wet leaf smells like steppin out of the airport on vacation to somewhere tro
 6. More sweet doughiness, smoothing feeling on the tongue that lasts throughout the mouth.
 7. mmmmm good i'd say Nice    i would say: nice + mineral finish with subdued flowers
 8. Getting more into the milky territory for sure
+9. A little thin and pootering out, but still background drinkable
