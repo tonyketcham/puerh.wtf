@@ -53,7 +53,7 @@ notes:
   dry_leaf_nose: pomelo zest, candied lemons, passionfruit, mango, dandelion
   wet_leaf_nose: starfruit, passionfruit rum cocktail, fresh squeezed OJ
   mouthfeel: a bit juicy and drying
-  taste: mango sherbet, mochi, grapefruit
+  taste: mango sherbet, mochi, grapefruit, passionfruit adult beverage
   finish: mineral dryness, passionfruit, floral bouquet, peppercorn
   empty_cup: bright aromatic bitters
   cha_qi: vibing out the wazoo

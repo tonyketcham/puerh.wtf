@@ -9,10 +9,11 @@ I developed a site just so I could talk about tea
 things r lookin grim if it's come to this
 
 ## Features
-- Gridsome for SSG
-- TailwindCSS for UI (frontend coming soon)
-- NetlifyCMS for saying tea words, headlessly
-- mmm.. JAMstack for: I spent all my money on tea now I can't afford hosting
+- [Gridsome](https://gridsome.org/) for SSG
+- [Tailwind 2.0](https://tailwindcss.com/) for UI (frontend dev in progress)
+- Progressive light/dark mode toggling
+- [NetlifyCMS](https://www.netlifycms.org/) for saying tea words, headlessly
+- mmm.. [JAMstack](https://jamstack.org/) for: I spent all my money on tea now I can't afford hosting
 
 ## Wanna collab?
 ### 1. Install Gridsome CLI tool if you don't have
