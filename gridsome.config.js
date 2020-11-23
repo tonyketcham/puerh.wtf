@@ -16,22 +16,12 @@ module.exports = {
       ],
     },
   },
-
-  // templates: {
-  //   Tasting: '/:tea_name',
-  // },
-
   plugins: [
     {
       use: "gridsome-plugin-tailwindcss",
-
       options: {
         tailwindConfig: './tailwind.config.js',
-        presetEnvConfig: {},
-        shouldImport: false,
-        shouldTimeTravel: true
       }
-
     },
     {
       use: '@gridsome/source-filesystem',
