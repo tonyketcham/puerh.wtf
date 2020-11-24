@@ -493,13 +493,13 @@ collections:
   - label: 'Cultivars'
     name: 'cultivars'
     label_singular: 'Tea Cultivar'
-    description: 'The different teams in the game'
+    description: 'The different strains in the game'
     folder: 'content/cultivars'
     create: true
     delete: true
     slug: '{{slug}}'
     identifier_field: 'name'
-    summary: '{{name}} - {{description}}'
+    summary: '{{name}}'
     extension: 'md'
     fields:
       - label: 'ID'
