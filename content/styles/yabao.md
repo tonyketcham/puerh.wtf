@@ -9,5 +9,6 @@ description: A more controversially categorized tea - some consider this a raw
   usually then processed in much the same way as a white tea, primarily
   whithered and sun-dried without the kill-green frying process that is
   commonplace in sheng making. In my opinion, the taste is much more in white
-  tea territory than sheng.
+  tea territory than sheng as well, featuring a predominately floral and
+  delicate tea that has beauty in its elegance rather than its depth and body.
 ---
