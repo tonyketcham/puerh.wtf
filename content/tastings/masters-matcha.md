@@ -74,6 +74,7 @@ brewing:
   vessel: Clay Chawan
   first_infusion_duration: 0
   infusion_increment: 0
+images: []
 ---
 We did two rounds cuz this stuff is good as a bear.
 
