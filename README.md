@@ -1,4 +1,4 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/79932a8f-4ecb-4b1e-a4ed-d75e72bdfb7a/deploy-status)](https://app.netlify.com/sites/puerhwtf/deploys) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_shield)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/79932a8f-4ecb-4b1e-a4ed-d75e72bdfb7a/deploy-status)](https://app.netlify.com/sites/puerhwtf/deploys) ![CodeQL](https://github.com/tonyketcham/puerh.wtf/workflows/CodeQL/badge.svg?branch=main) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_shield)
 
 # Pu-erh, wtf
 
