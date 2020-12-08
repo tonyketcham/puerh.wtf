@@ -5069,10 +5069,10 @@ gridsome-plugin-netlify-cms@^1.0.9:
     webpack "^4.29.0"
     webpack-dev-middleware "^3.5.1"
 
-gridsome-plugin-tailwindcss@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/gridsome-plugin-tailwindcss/-/gridsome-plugin-tailwindcss-4.1.0.tgz#3f1eb98ba1f3151d102749a6e32d722a24008ae2"
-  integrity sha512-xcrB61TWEtTeYTVXpAe9EY9/3BM0TzBV9zjwHWgGuT6EmpI4p0JRr5rftF8gXQU5RcqueKZDf45/1FrhY5GH8Q==
+gridsome-plugin-tailwindcss@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/gridsome-plugin-tailwindcss/-/gridsome-plugin-tailwindcss-4.1.1.tgz#fd167f6f4ffec6c2400b5a3011200761b72f4ec4"
+  integrity sha512-PlCY1oSdfrQ/DpLN8xK0oz4KYOA1Be6x34BiemhpF1X1JZ9FjnpR4bmQtv1HCvRQZM/UbZPso836UNTqKh/yCw==
 
 gridsome@^0.7.0:
   version "0.7.22"
