@@ -5,7 +5,7 @@ author:
 tea_name: 2019 Dripd O'Bitters
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
-production_year: 2020
+production_year: 2019
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2019-dripd-obitters?_pos=16&_sid=2c5c8c9e8&_ss=r
