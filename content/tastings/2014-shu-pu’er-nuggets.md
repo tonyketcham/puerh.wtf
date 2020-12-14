@@ -10,7 +10,7 @@ cultivar:
 origin:
   - a6060fae-eee1-4d8d-920d-3eeae937db1a
 season: Spring
-production_year: 2020
+production_year: 2014
 elevation: 1900
 vendor:
   - 93e05747-797d-42a3-8456-e8cde0c2f9ae
