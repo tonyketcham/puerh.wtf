@@ -9,7 +9,6 @@ I developed a site just so I could talk about tea
 things r lookin grim if it's come to this
 
 ## Features
-- Vue 2
 - [Gridsome](https://gridsome.org/) for SSG
 - [Tailwind 2.0](https://tailwindcss.com/) for UI (frontend dev in progress)
 - Progressive light/dark mode toggling
