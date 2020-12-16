@@ -2,7 +2,7 @@
 
 # Pu-erh, wtf
 
-So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet you on the checkout page of [white2tea](https://white2tea.com),,,,, see ya there (have a safe voyage through HTTP)
+So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet ya in the cart on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that bitch with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
 
 ## Features
 - [Gridsome](https://gridsome.org/) for SSG
