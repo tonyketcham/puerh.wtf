@@ -2,11 +2,7 @@
 
 # Pu-erh, wtf
 
-This is where I talk about tea
-
-I developed a site just so I could talk about tea
-
-things r lookin grim if it's come to this
+So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet you on the checkout page of [white2tea](https://white2tea.com),,,,, see ya there (have a safe voyage through HTTP)
 
 ## Features
 - [Gridsome](https://gridsome.org/) for SSG
