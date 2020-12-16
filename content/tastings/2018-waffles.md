@@ -5,7 +5,7 @@ author:
 tea_name: 2018 Waffles
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
-production_year: ""
+production_year: 2018
 aging_conditions: 2 years Guangzhao
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
