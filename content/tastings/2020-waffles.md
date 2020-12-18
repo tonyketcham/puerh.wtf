@@ -45,7 +45,7 @@ flavor_axes:
 notes:
   dry_leaf_nose: raisin bran, honey, indeterministic moist cakes, dry chocolate
   wet_leaf_nose: wet wood, miso, waffles hot off the griddle, dessert grapes raisinified
-  finish: drawn out, sweet & savory umami, a little drying
+  finish: drawn-out, sweet & savory umami, a little drying
   taste: cream & sugar, pancake batter, spiced coffee cake, wood-fired breads,
     cherries
   mouthfeel: smooth and viscous, transforming into an evaporating grip throughout
