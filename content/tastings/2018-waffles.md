@@ -47,8 +47,8 @@ notes:
   dry_leaf_nose: inside of a cereal box, banana bread, sweet & nutty baked goods
   wet_leaf_nose: cookie dough, vanilla, ripe banana purée, maple syrup, pancakes
   mouthfeel: smooth and oily, disperses in a way that feels like how evaporation looks
-  finish: coupled with the mouthfeel in that it has more textural motion, taste
-    wise it's like a mineral dessert bread - Irish soda bread
+  finish: coupled with the mouthfeel in that it has more textural motion,
+    taste-wise it's like a mineral dessert bread - Irish soda bread
   taste: vanilla, banana, pancakes, oat clusters, berry jam, rum cake
   empty_cup: molasses, vanilla, florals in a wider shallow cup, roasted spice and
     bread crust in a deeper sniffer
