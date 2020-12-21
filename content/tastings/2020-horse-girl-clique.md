@@ -52,7 +52,7 @@ notes:
   dry_leaf_nose: honey, dark chocolate, red dates
   mouthfeel: stupid smooth, medium thickness, a light syrup that's coating but not
     too imposing
-  finish: lifting floral fruits, retronasal olfaction
+  finish: lifting floral fruits
   taste: chocolate, mineral ambrosial honey, sweet muddled flower syrup
   empty_cup: burnt caramel, oud, chocolate, brown butter
   wet_leaf_nose: non-binary perfume, bright woods, warming spices, heavily floral
