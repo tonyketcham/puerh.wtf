@@ -7,7 +7,7 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring 2020 (April)
+season: Spring (April)
 production_year: 2020
 vendor:
   - 4279ab9e-2bba-4bd2-99c4-954cfc8aa10d
