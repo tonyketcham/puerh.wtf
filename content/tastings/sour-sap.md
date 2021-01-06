@@ -55,7 +55,8 @@ notes:
   wet_leaf_nose: plumerias, a bit of dank funk, butter, salt, mashed potatoes
   taste: orchid, plumeria, the sour sugar on a watermelon gummy, a bit of
     restaurant mashed potatoes
-  mouthfeel: lightly coating, medium thickness, nice initial strike on the tongue;
+  mouthfeel:
+    lightly coating, medium thickness, nice initial strike on the tongue;
     sour candy in the roof of the mouth, back, and sides of the tongue
   finish: slight dryness, that pleasant aftertaste on a sour gummy, long-lasting
     flavor, lightly cooling breath & throat feel
@@ -67,7 +68,7 @@ brewing:
   temperature: 200
   material_amount: 6
   liquid_amount: 110
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 25
   infusion_increment: 5
 genre:
@@ -79,7 +80,8 @@ tags:
 rating: 89
 images:
   - image: /images/uploads/img_5596.jpg
-    alt: Dry leaves in the cup, curled up in tight balls, duotone with gunmetal and
+    alt:
+      Dry leaves in the cup, curled up in tight balls, duotone with gunmetal and
       vibrant green
   - image: /images/uploads/img_5599.jpg
     alt: Leaves after first infusion, unfurled and expanded
@@ -88,6 +90,7 @@ images:
   - image: /images/uploads/img_5605.jpg
     alt: Completely expanded leaves taking up the whole gaiwan
 ---
+
 On first infusion, I was taken aback by the amount of expansion on the leaves. They fully unfurled from their dry state. The taste was also incredibly pleasant with heavy floral notes, sour gummy action, and a sweet umami. I got pulled into a meeting after finishing the first cup, and noticed that I can still taste the ghost of that sour note more than 30 minutes later - very nice.
 
 Second infusion, that sourness sneaks up in a really fuckin cool way. Haven’t had a TGY with anything near this much sourness before, and I’m very into it - it’s done right; not at all overwhelming, but rather an interesting layer to the experience that allows you to appreciate all the floral notes and the body of the tea outside of that sourness. Long sentences aside, I can’t help but keep coming back to smelling the wet leaf between sips.

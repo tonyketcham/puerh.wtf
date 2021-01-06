@@ -54,7 +54,8 @@ notes:
   wet_leaf_nose: wakame, spring meadows, salted + roasted vegetables
   mouthfeel: very thick and heavy
   taste: heavy vegetable body, wakame, mystery flavor, pumpkin seeds
-  finish: floral & lifting, refreshing & cooling, aroma of fresh snow, Mexican hot
+  finish:
+    floral & lifting, refreshing & cooling, aroma of fresh snow, Mexican hot
     chocolate
   cha_qi: warming and comforting, mildly couch-locked stoney
   empty_cup: white miso, lavender
@@ -67,7 +68,7 @@ brewing:
   temperature: 160
   material_amount: 5
   liquid_amount: 120
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 120
   infusion_increment: 15
 images:
@@ -78,9 +79,11 @@ images:
   - image: /images/uploads/diamond-peak-img_5757.jpg
     alt: Leaves after first infusion, about double in size of dry
   - image: /images/uploads/diamond-peak-img_5760.jpg
-    alt: Leaves after 6 infusions, about 2.5x the size of dry. More yellow and much
+    alt:
+      Leaves after 6 infusions, about 2.5x the size of dry. More yellow and much
       like anji bai cha in color
 ---
+
 When pouring the water for the first infusion, the leaves were incredibly buoyant and floated in a group above the surface level, outside of the water for a few seconds. I had to give them a little nudge with the lid to submerge the top-half of the leaf.
 
 ### Infusions

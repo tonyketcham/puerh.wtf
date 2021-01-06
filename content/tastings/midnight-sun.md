@@ -67,17 +67,16 @@ brewing:
   temperature: 210
   material_amount: 6
   liquid_amount: 100
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 20
   infusion_increment: 5
 ---
-So the first thing I noticed is that the material supplied in the taster looked way less than the 8g it's supposed to be. Weighed it and found 5.7g was supplied in the pouch. Kinda lame. The recommendation for a standard session at 100mL *is* 6g though, so if they were to advertise the taster as 6g I wouldn't mind. Maybe it was a fluke for me. But whatever, I'll try to look past that and judge the tea for what it is. I'm sure it would be interesting to start weighing all of the teas I get instead of just trusting the lump sum on the packaging.
 
-
+So the first thing I noticed is that the material supplied in the taster looked way less than the 8g it's supposed to be. Weighed it and found 5.7g was supplied in the pouch. Kinda lame. The recommendation for a standard session at 100mL _is_ 6g though, so if they were to advertise the taster as 6g I wouldn't mind. Maybe it was a fluke for me. But whatever, I'll try to look past that and judge the tea for what it is. I'm sure it would be interesting to start weighing all of the teas I get instead of just trusting the lump sum on the packaging.
 
 ### Infusions
 
-1. The wet leaf gives off an immediate charcoal-roasted floral note followed by a creamy baked goods smell. The roast on this is apparent already. The flavor is kind of mellow with a nice roasted grab over everything.  Perhaps the aftertaste of cream of corn, the savory aromatic note of shiitake, a gentle creamy sweetness, and a woody roast. There's a certain bright sweetness that I can't put my finger on but it has a certain type of floral aroma that's quite subdued.
+1. The wet leaf gives off an immediate charcoal-roasted floral note followed by a creamy baked goods smell. The roast on this is apparent already. The flavor is kind of mellow with a nice roasted grab over everything. Perhaps the aftertaste of cream of corn, the savory aromatic note of shiitake, a gentle creamy sweetness, and a woody roast. There's a certain bright sweetness that I can't put my finger on but it has a certain type of floral aroma that's quite subdued.
 2. Much heavier on the roasted flavor. Bamboo and eucalyptus, charcoal, dried tangerine zest, very smooth. An interestingly unique, dry coating in the back of the tongue and throat on the finish.
 3. Even stronger on the charcoal, reaching a point that's quite intense. Tiki torches, blackened grill marks. A sweet & sour, vegetal-fruity funk sitting center backstage. Some light cream seeping through it all.
 4. Lighter and more rounded with the central focus still being on the roast. A bit delicate and much thinner than the previous. Gonna torch it harder next round. Cha qi is very light and this oolong is easy on the stomach, unlike my experience with some Tie Guan Yins.

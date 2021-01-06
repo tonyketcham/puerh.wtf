@@ -64,21 +64,24 @@ brewing:
   temperature: 185
   material_amount: 3
   liquid_amount: 100
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 30
   infusion_increment: 5
 images:
   - image: /images/uploads/fur-peak-img_5673.jpg
     alt: Pale, almost clear liquor in a wide-mouth cup after first infusion.
   - image: /images/uploads/fur-peak-img_5667.jpg
-    alt: Dry leaves (quite fine pickings with covered in light, white downey) in a
+    alt:
+      Dry leaves (quite fine pickings with covered in light, white downey) in a
       pile before placing in the gaiwan.
   - image: /images/uploads/fur-peak-img_5675.jpg
-    alt: After 4 infusions, the liquor with a tad more vibrant, darker color. Still
+    alt:
+      After 4 infusions, the liquor with a tad more vibrant, darker color. Still
       in the same cup.
   - image: /images/uploads/fur-peak-img_5676.jpg
     alt: Wet leaf that has opened up after a few infusions.
 ---
+
 Welcome to my first time with Maofeng. Happily not sure what to expect, which makes sampling without expectations so fun.
 
 The picking and processing both appear visually similar to that of Anji bai cha - young bud and leaf, rolled parallel to the stem with a Y-shape.

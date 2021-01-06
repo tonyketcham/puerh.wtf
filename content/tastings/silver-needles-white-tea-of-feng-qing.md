@@ -10,7 +10,7 @@ origin:
 season: Spring
 production_year: 2020
 picking: Buds
-elevation: ""
+elevation: ''
 vendor:
   - 4279ab9e-2bba-4bd2-99c4-954cfc8aa10d
 purchase_link: https://yunnansourcing.com/products/silver-needles-white-tea-of-feng-qing
@@ -65,10 +65,11 @@ brewing:
   temperature: 190
   material_amount: 5
   liquid_amount: 100
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 10
   infusion_increment: 5
 ---
+
 The buds felt velvety and soft like holding a little bunny while I was weighin em out on the scale.
 
 ### Infusions

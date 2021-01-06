@@ -59,10 +59,11 @@ brewing:
   temperature: 200
   material_amount: 5
   liquid_amount: 100
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 10
   infusion_increment: 5
 ---
+
 yeEeaaaaaaaaa.a,a,a.,...aa.,a.a,a..,.,.,.,.,.,,
 
 i am SAYING. This is floral as a bear. In a lot of ways, this is similar to a very good eastern beauty. If your impression of lapsang is that it's this smokey ass deep and dark thing, then try this. It's like making out with flowers and expensive face cream - no smoke to be found.

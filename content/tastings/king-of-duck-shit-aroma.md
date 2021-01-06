@@ -54,7 +54,8 @@ notes:
   wet_leaf_nose: charcoal roast, rose, evergreen, spring flowers
   taste: white grape, honey, charcoal roast, rambutan, ice wine, oat milk
   mouthfeel: oily
-  finish: long, roasted honey aromas and a cooling sensation in the sides/back of
+  finish:
+    long, roasted honey aromas and a cooling sensation in the sides/back of
     mouth and throat
   empty_cup: wheat, summer grass, sugarcane
   cha_qi: calming and lightly mood-enhancing
@@ -65,10 +66,11 @@ brewing:
   temperature: 190
   material_amount: 6
   liquid_amount: 100
-  vessel: Porcelain Gaiwan
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 10
 ---
+
 This is a single-family production of Duck Shit Dan Cong from naturally growing 80yr old+ trees.
 
 ### Infusions

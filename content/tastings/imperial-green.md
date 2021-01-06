@@ -64,11 +64,12 @@ rating: 86
 brewing:
   temperature: 185
   material_amount: 5
-  liquid_amount: 140
-  vessel: Porcelain Gaiwan
+  liquid_amount: 120
+  vessel: Glazed Shiboridashi
   first_infusion_duration: 20
   infusion_increment: 5
 ---
+
 The wet leaf has a tip-of-the-tongue similarity that I can't put my finger on. The initial strike was much different than how it develops the more you smell it. It's nice and changing, incredibly aromatic, has that buttery fried kind of jade Chinese green characteristic with more floral, nutty, and controlled zesty/savory notes.
 
 ### Infusions
@@ -79,7 +80,5 @@ The wet leaf has a tip-of-the-tongue similarity that I can't put my finger on. T
 4. Still downy in this bitch. The body has thinned a bit and given way to a broader bouquet of unidentifiable fruits and flowers with the backbone or ghosted presence of its original flavor structure which is making it hard for me to place how the tea transforms in flavor axes since it opened up a ton after the first and second steep then mutated into this different experience. Very sweet presence.
 5. STILL downy man what they hell that's kinda cool. Roasted lentils this time around, paving the way for a soft mineral hug of umami and fun. Getting some roasted corn, too.
 6. Very sweet, smooth, and floral. Getting more to the light chocolate milk land.
-
-
 
 This was a very pleasing introduction to Long Jing that'll serve as a solid point of comparison - the first that I've knowingly had.
