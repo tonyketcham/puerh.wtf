@@ -5,6 +5,7 @@ backend:
 
 media_folder: 'static/images/uploads'
 public_folder: '/images/uploads'
+publish_mode: editorial_workflow
 
 display_url: puerhwtf.netlify.app
 logo_url: 'https://images.unsplash.com/photo-1599565100439-1805b8483280?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1568&q=80'
@@ -84,7 +85,7 @@ collections:
         widget: 'string'
         required: false
 
-      - label: 'Elevation (Ft)'
+      - label: 'Elevation (Meters)'
         name: 'elevation'
         widget: 'number'
         required: false
@@ -355,6 +356,8 @@ collections:
         default: 50
         min: 0
         max: 100
+        value_type: 'float'
+        step: 0.5
 
       - label: 'Brewing Parameters'
         name: 'brewing'
@@ -373,6 +376,8 @@ collections:
             widget: 'number'
             default: 5
             min: 0
+            value_type: 'float'
+            step: 0.1
 
           - label: 'Liquid Amount (mL)'
             name: 'liquid_amount'
@@ -393,7 +398,7 @@ collections:
           - label: 'Vessel Type'
             name: 'vessel'
             widget: 'string'
-            default: 'Porcelain Gaiwan'
+            default: 'Jianshui Zitao Xishi pot'
 
       - label: 'Images'
         label_singular: 'Image'
