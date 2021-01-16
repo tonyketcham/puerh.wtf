@@ -9,7 +9,7 @@ cultivar:
   - 5762bc4f-df2c-41b9-9848-7fb8652d8d96
 origin:
   - 0c420030-b53f-4f7c-8841-5c34dfcd3085
-season: ''
+season: ""
 production_year: 2020
 picking: Buds
 vendor:
@@ -51,8 +51,7 @@ flavor_axes:
 notes:
   dry_leaf_nose: tangy custard, Turkish delight, caramelized cream, lychee, rose, cocoa
   wet_leaf_nose: charred fruit, roasted rose hips, almond extract, sweet hard candies
-  taste:
-    rosewater, Turkish delight, plum, assorted chocolate covered biscuits (+
+  taste: rosewater, Turkish delight, plum, assorted chocolate covered biscuits (+
     cream filled ones)
   empty_cup: brown sugar, cookies fresh out the oven
   cha_qi: head rush, warming of the extremities
@@ -71,12 +70,11 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 5
 ---
-
 The dry leaf has an aroma very unique to quality jin jun mei that sets it far apart from something like a Dian Hong. It's got a tangy, roasted cream note with lychee and rose to top it off.
 
 ### Infusions
 
-1. The wet leaf has a complex aroma that's difficult to describe. It's very almondy, with a charred fruit and roasted floral aspect. There's definitely a ton there with some sour, sweet, savory, and vegetal notes that I'm not experienced enough to map. The flavor is almost like a fruity herbal tisane, it's quite intense. There's a really intriguing chocolatey note, kind of like those fancy assorted chocolate-covered mystery boxes with solid and cream-filled biscuit things. A bit of strawberry and plum. I'm also getting a bittersweet almond finish wrapped in florals. That strawberry plum stays with the aftertaste for quite a long time. There's a lot of life to this and it's incredibly cheap.
+1. The wet leaf has a complex aroma that's difficult to describe. It's very almondy, with a charred fruit and roasted floral aspect. There's definitely a ton there with some sour, sweet, savory, and vegetal notes that I'm not experienced enough to map (Update: little gf identified green bean and she is so true). The flavor is almost like a fruity herbal tisane, it's quite intense. There's a really intriguing chocolatey note, kind of like those fancy assorted chocolate-covered mystery boxes with solid and cream-filled biscuit things. A bit of strawberry and plum. I'm also getting a bittersweet almond finish wrapped in florals. That strawberry plum stays with the aftertaste for quite a long time. There's a lot of life to this and it's incredibly cheap.
 2. The wet leaf has an even stronger almond, Turkish delight scent. The flavor carries a large portion of that smell as well. You could probably get away with a bit less leaf than what I've done - it's pretty intense but not overbrewed.
 3. Tangy rosewater with a hint of vegetation and fleeting sweetness that is all consumed by rose and plum.
 4. Upped to 125mL water. A 5g leaf/100mL water would be a fine ratio for this one. The experience is quite consistent with the previous brews.
