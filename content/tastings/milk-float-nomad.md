@@ -70,15 +70,17 @@ brewing:
   infusion_increment: 5
 genre:
   - d881f184-5372-406a-a47f-421cbacf58bf
+tags:
+  - 799e7654-d553-4e18-b128-4d4a3e29c7e5
 rating: 75
 images:
-  - image: /images/uploads/img_5609.jpg
+  - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,w_800/v1611034721/tea/2020/Milk%20Float%20Nomad/img_5609_do0z8b.jpg
     alt: First infusion, deep chocolate color liquor
-  - image: /images/uploads/img_5620.jpg
+  - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,w_800/v1611034724/tea/2020/Milk%20Float%20Nomad/img_5620_wnpbzi.jpg
     alt: Leaves after first infusion, fine pickings
-  - image: /images/uploads/img_5618.jpg
+  - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,h_1018/v1611034723/tea/2020/Milk%20Float%20Nomad/img_5618_edblfc.jpg
     alt: Leaves after 5 or 6 steeps, more evened out in the pot
-  - image: /images/uploads/img_5622.jpg
+  - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,w_790/v1611034724/tea/2020/Milk%20Float%20Nomad/img_5622_neekqk.jpg
     alt: Liquor after 7 steeps, more transparent and lightened to a pale amber
 ---
 Noteably fine pickings that coincide with the Gong Ting style. A nice, smooth shou with none of the off-flavors that can sometimes occur in the fermentation process or storage; cleanly done shou.
