@@ -3,11 +3,17 @@ backend:
   repo: tonyketcham/puerh.wtf
   branch: main
 
+media_library:
+  name: cloudinary
+  config:
+    cloud_name: pu-erh
+    api_key: 532164973571635
+
 media_folder: 'static/images/uploads'
 public_folder: '/images/uploads'
 publish_mode: editorial_workflow
 
-display_url: puerhwtf.netlify.app
+display_url: puerh.wtf
 logo_url: 'https://images.unsplash.com/photo-1599565100439-1805b8483280?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1568&q=80'
 
 collections:
