@@ -69,6 +69,7 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 20
   infusion_increment: 15
+images: []
 ---
 ### Infusions
 
