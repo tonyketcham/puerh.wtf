@@ -12,7 +12,7 @@
     "@tailwindcss/forms": "^0.2.1",
     "gridsome": "^0.7.23",
     "gridsome-plugin-netlify-cms": "^1.0.9",
-    "netlify-cms": "^2.10.82",
+    "netlify-cms": "^2.10.84",
     "netlify-cms-widget-youtube": "^0.3.1",
     "uuid": "^8.3.2"
   },
