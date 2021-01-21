@@ -91,3 +91,4 @@ The smell in the bag is particularly spicy and camphor-y; uniquely different fro
 5. Rubber and spices, kind of like the smell of new sneakers. The mouthfeel is intense and ties well into the flavor with a strong cream-like sensation. Granite, petrichor, mint.
 6. Intense mineral/stone smell on the leaf and brew which translates to the taste. Very pleasant with a clearer brightness than previous infusions. Rose bush.
 7. Long brew times leading to incredibly viscous mouthfeel, creamy. More floral notes.
+8. I kept chuggin on these brews many times more and they are: good
