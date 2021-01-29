@@ -24,8 +24,8 @@
             blur="40"
             class="object-cover w-full h-full"
           />
-          <div v-else class="w-full h-full bg-white">
-            <h3>Placeholder Image</h3>
+          <div v-else class="flex w-full h-full bg-white">
+            <h3 class="m-auto text-gray-600">Coming Soon...</h3>
           </div>
         </div>
       </div>
