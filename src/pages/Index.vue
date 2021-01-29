@@ -24,6 +24,9 @@
             blur="40"
             class="object-cover w-full h-full"
           />
+          <div v-else class="w-full h-full bg-white">
+            <h3>Placeholder Image</h3>
+          </div>
         </div>
       </div>
     </div>
