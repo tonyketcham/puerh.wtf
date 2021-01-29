@@ -1,23 +1,21 @@
 <template>
-  <Layout>
-    <div>
-      <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
-      <span>{{ $page.tasting.date }}</span>
-      <!-- <div>
-        <h2>{{ $page.tasting.author[0].name }}</h2>
-        <img :src="$page.tasting.author[0].image" alt="Author" />
-      </div>
-
-      <div>
-        <ul class="m-3 space-y-2">
-          <li v-for="note of $page.tasting.notes" :key="note">
-            {{ note }}
-          </li>
-        </ul>
-      </div>
-      <div class="body" v-html="$page.tasting.content" /> -->
+  <div>
+    <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
+    <span>{{ $page.tasting.date }}</span>
+    <!-- <div>
+      <h2>{{ $page.tasting.author[0].name }}</h2>
+      <img :src="$page.tasting.author[0].image" alt="Author" />
     </div>
-  </Layout>
+
+    <div>
+      <ul class="m-3 space-y-2">
+        <li v-for="note of $page.tasting.notes" :key="note">
+          {{ note }}
+        </li>
+      </ul>
+    </div>
+    <div class="body" v-html="$page.tasting.content" /> -->
+  </div>
 </template>
 
 <page-query>
