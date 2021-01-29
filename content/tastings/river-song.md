@@ -2,7 +2,7 @@
 id: 268aaac0-d138-4ef3-967e-3907655f0d0d
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: River Song
+title: River Song
 genre:
   - d881f184-5372-406a-a47f-421cbacf58bf
 production_year: 1998
@@ -66,6 +66,7 @@ brewing:
   first_infusion_duration: 5
   infusion_increment: 5
 ---
+
 ## Infusion log
 
 On the rinse and first steep, I'm noticing the liquor is quite cloudy and visually thick. This thing packs a punch with such a stupid complexity I'm still trying to decipher what all was going on in that first cup. There're so many levels to this shit, I think I found Meek Mill barkin on it. One cup in and you can already notice the body feeling, too. There's a broad range of nice things in here which makes for a fantastic introduction, especially since it hasn't even opened up all the way yet.
@@ -80,13 +81,13 @@ You can easily keep drinking this all day and go through a few liters of water a
 
 ## Age claims
 
-Some of Living Tea's price-to-claimed age ratios are pretty outlandish unless they've either landed some impeccable deals or been misled by the processor/seller. So unless verifiable, I would generally take age claims on high-grade, famous teas that are unusually cheap with a grain of salt. 
+Some of Living Tea's price-to-claimed age ratios are pretty outlandish unless they've either landed some impeccable deals or been misled by the processor/seller. So unless verifiable, I would generally take age claims on high-grade, famous teas that are unusually cheap with a grain of salt.
 
-That being said, completely ignoring age claims and just focusing on: 
+That being said, completely ignoring age claims and just focusing on:
 
 1. the tea for what it is
 2. the experience you get out of it, and
-3. the price you're paying for that experience 
+3. the price you're paying for that experience
 
 opens you up to just realizing you're drinking a damn fucking good tea for a very palatable price, and that's what really matters. This is without a doubt more aged than Mei Leaf's Milk Float Nomad (2010), so I'd be leaning towards more trusting of the age claims on this one. If you have the chance to pick this tea up, get it. It's good.
 

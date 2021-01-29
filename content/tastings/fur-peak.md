@@ -2,7 +2,7 @@
 id: 2fdca302-e4d8-4f5d-b579-da68eb36a1ad
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Fur Peak
+title: Fur Peak
 style:
   - f4a7586d-1e7e-4e83-bf6b-c5ffe0bf2e07
 cultivar:

@@ -2,7 +2,7 @@
 id: 74a93a7a-7276-4253-a785-530141ea6f7e
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2005 Old Tree (Yiwu) Yang Qing Hao
+title: 2005 Old Tree (Yiwu) Yang Qing Hao
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -48,11 +48,13 @@ flavor_axes:
     start: 6
     finish: 5
 notes:
-  dry_leaf_nose: AAAAAA I forgot to do this and hit it with the water I'm actually
+  dry_leaf_nose:
+    AAAAAA I forgot to do this and hit it with the water I'm actually
     gonna lose it
   wet_leaf_nose: lots of leather tons of leather, kinda smells like a cowboy,
     sweet varnished hardwood
-  mouthfeel: juicy, lightly oily, very quick to travel throughout the mouth, and a
+  mouthfeel:
+    juicy, lightly oily, very quick to travel throughout the mouth, and a
     bit creamy
   empty_cup: crusty french bread, fall leaves, slight bit of wood
   cha_qi: gentle and almost unnoticeable alteration
@@ -70,12 +72,13 @@ brewing:
   first_infusion_duration: 20
   infusion_increment: 10
 ---
+
 Sample from an unmarked cake of 2005 YQH Yiwu gushu from LP's December tea club. Pleased to be able to try this. The pickings are quite stemmy with a mix of very young pickings and more mature leaves.
 
 ### Infusions
 
 1. The wet leaf has become a bit more fruity than after the rinse. Initially it smelled like cow leather but now it's a different type of leather smell that I'm not familiar with. There's also a smoked cherry/blueberry aroma coming from the wet leaf. The mouthfeel is lightly oily, very quick to travel throughout the mouth, and a bit creamy. The finish is minty. There's a lot of fruit and wood in the body, as well as light leathery aromas - almost like a fruit leather; specifically reminiscent of the taste of 'leather' made from kombucha scoby. There's a subtle cherry tang, and some sweet hardwood notes. The finish has a medium dryness and is sustained for a few minutes. The woody tang notes stick to the finish and take on kind of a white bread aftertaste. The finish also has a slight scratchy feeling in the throat. Leaves the teeth with a chalky coated feeling.
-2. The wet leaf has a more damp fall leaves smell to it, a bit like decaying wood on fallen hardwood in the forest, and still leathery but not as prominent. The taste is much fuller in the body with a shiitake and woodear mushroom broth* aspect to it. Sweet hardwood with a bit of a coffee cherry flavor. A bit of an Oreo filling-like taste. The cooler it gets, the creamier and more floral this tea is - kind of like oats. I suspect it would make a fantastic iced tea with a totally different profile than serving it hot.
+2. The wet leaf has a more damp fall leaves smell to it, a bit like decaying wood on fallen hardwood in the forest, and still leathery but not as prominent. The taste is much fuller in the body with a shiitake and woodear mushroom broth\* aspect to it. Sweet hardwood with a bit of a coffee cherry flavor. A bit of an Oreo filling-like taste. The cooler it gets, the creamier and more floral this tea is - kind of like oats. I suspect it would make a fantastic iced tea with a totally different profile than serving it hot.
 3. Oh Jesus fuck I got real into coding and forgot this was infusing. It could've been going for 5 minutes. Please save me I hope I didn't fuck this session up. Ok doesn't look tooooo dark, and the leaves don't smell like they've been killed. Now for the taste: Yea I god damn nuked it. It's bitter as a dog, but honestly isn't bad. It shows off that cascara coffee cherry note really nicely, the varnish of the wood, and that throat feel that I'm not fond of. But interestingly brings out a bit of a smooth aged whiskey note, definitely an alcoholic taste. This definitely places the fruit as the dominant note over the wood. Kind of like punching you with the good and the bad.
 4. Back on track but the body is a little hollow - very likely my fault because of the above. There's a sweet lentil-like flavor now sitting squished between the fruity woody notes. The empty gong dao bei has a real nice cookie dough smell!
 5. Wet leaf smells like mulch. Body is sweet and fuller than previous, found the sweet spot again. Woody cascara. Tangy and sparkly on the finish with an upward swinging kind of feeling in the mouth. Fruitier aftertaste.

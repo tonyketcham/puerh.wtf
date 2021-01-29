@@ -2,7 +2,7 @@
 id: 44a9d48c-7de1-4b0b-9718-1222ad38f9d4
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2020 Wild Crassicolumna Sheng Pu'er
+title: 2020 Wild Crassicolumna Sheng Pu'er
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -72,18 +72,20 @@ brewing:
   first_infusion_duration: 8
   infusion_increment: 4
 ---
+
 Crassicolumna grabbed my attention the first time I read about it. The type of tea is actually an entirely separate species from Camellia Sinensis. It uniquely contains no caffeine, but can be processed in much the same styles as what we're used to with Sinensis and Taliensis. The result, from what I've read, is a stark departure in flavor and aroma with much more spice and herbaceous notes. Naturally pulled in, I impulsively ordered a shit ton of it.
 
-So first up is this 2020 Crassicolumna sheng and I hope to God it doesn't have caffeine cuz it's a work night. 
+So first up is this 2020 Crassicolumna sheng and I hope to God it doesn't have caffeine cuz it's a work night.
 
 ### Infusions
 
-1. The hit on the tongue and relief into the finish here is quite unique. It hits notably in the front/middle of the tongue then moves to the sides and top of the mouth to finish, slowly dragging a cooling feeling towards the throat that lingers for a really long time. Really refreshing. 
+1. The hit on the tongue and relief into the finish here is quite unique. It hits notably in the front/middle of the tongue then moves to the sides and top of the mouth to finish, slowly dragging a cooling feeling towards the throat that lingers for a really long time. Really refreshing.
 
    The taste comes with a focused but nice complexity, centered in the delicate, high-pitched aromatic region. Super soft, fruity, and floral. Think strawberries, apricot sherbet, marigold, vanilla pod, and watermelon. The initial flavor ramps off quickly into this hard to describe lingering aftertaste. That ramp kind of took me by surprise but it's still very enjoyable and there's quite a good deal of personality and nuance to the lingering flavor.
+
 2. The liquor and flavor are more pervasive in the mouth with a now-camphor/mintiness on top of the cooling finish. This reminds me of Mei Leaf's Purple Bud in a really nice way. The sweetness level is perfect and compliments the florals and fruits. There's a bit more spice and minerality coming to play now. The body is more solid and doesn't drop off as fast, trending more towards a linear drop in flavor as opposed to the first infusion's quadratic drop.
 3. Apricot and tropical flowers.
 4. Guava and mountain snow, a tiny tinge of pine or similarly spicy wood. Very easy to drink. A bit of cream is noticeable.
 5. Cinnamon, nutmeg, and some beautiful lightly sour notes. More creaminess towards the bottom of the cup. There's a wonderful nuance of complexity hidden within the focused flavor group of this tea. It has the illusion of simplicity with such a nice aftertaste and transformation within the body and volatile flavors. The wet leaves are mostly a deep olive color with some purple and reds. They also smell great, with that same apricot fruitiness.
-6. Quite creamy, almost like an apricot creamsicle with light notes of spicy aromas like nutmeg, cardamom, coriander, and pine. The body is a little larger, still a bit towards the front of the mouth in the initial flavor with that relatively fast dissipation into the aftertaste, but the aftertaste is still long and lingering. I would say the dissipation is slower than the beginning. 
+6. Quite creamy, almost like an apricot creamsicle with light notes of spicy aromas like nutmeg, cardamom, coriander, and pine. The body is a little larger, still a bit towards the front of the mouth in the initial flavor with that relatively fast dissipation into the aftertaste, but the aftertaste is still long and lingering. I would say the dissipation is slower than the beginning.
 7. Brewed this one for about 10 minutes and it's incredibly clean without any detectible bitterness. Very creamy with a bit of white chocolate.

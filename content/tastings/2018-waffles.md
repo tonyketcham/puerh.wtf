@@ -2,7 +2,7 @@
 id: ddc8f6b8-a3e6-4b52-b170-9bc88d192db1
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2018 Waffles
+title: 2018 Waffles
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2018
@@ -50,7 +50,8 @@ notes:
   finish: coupled with the mouthfeel in that it has more textural motion,
     taste-wise it's like a mineral dessert bread - Irish soda bread
   taste: vanilla, banana, pancakes, oat clusters, berry jam, rum cake
-  empty_cup: molasses, vanilla, florals in a wider shallow cup, roasted spice and
+  empty_cup:
+    molasses, vanilla, florals in a wider shallow cup, roasted spice and
     bread crust in a deeper sniffer
   cha_qi: warmed up all over, makes me want to play Minecraft
 tags:
@@ -65,6 +66,7 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 10
 ---
+
 The identifiable baked goods in the nose of the leaf are neat. There's a solid banana aspect but on the other side backed up against it you get this pancakey syrupiness, which goes with the name.
 
 ### Infusions

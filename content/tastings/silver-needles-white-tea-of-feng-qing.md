@@ -2,7 +2,7 @@
 id: 8d1f7f10-b159-4454-9e68-a429b54ba5f4
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Silver Needles White Tea of Feng Qing
+title: Silver Needles White Tea of Feng Qing
 style:
   - 48a134ed-94b4-419a-9cca-af434cc4677f
 origin:

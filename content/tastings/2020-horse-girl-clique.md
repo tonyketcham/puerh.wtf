@@ -2,7 +2,7 @@
 id: d1b02655-9211-467f-a8a7-ef2150514f21
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2020 Horse Girl Clique
+title: 2020 Horse Girl Clique
 style:
   - 65819530-dd2c-4df0-9906-baf9e34e6d39
 cultivar:
@@ -50,7 +50,8 @@ flavor_axes:
     finish: 5
 notes:
   dry_leaf_nose: honey, dark chocolate, red dates
-  mouthfeel: stupid smooth, medium thickness, a light syrup that's coating but not
+  mouthfeel:
+    stupid smooth, medium thickness, a light syrup that's coating but not
     too imposing
   finish: lifting floral fruits
   taste: chocolate, mineral ambrosial honey, sweet muddled flower syrup
@@ -69,13 +70,14 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 5
 ---
+
 Initial impressions are that this is quite tippy - there's a nice amount of fuzzy, golden buds in the mix. Also this has more of a chocolate note in the nose than any unscented black tea I've had so far.
 
 ### Infusions
 
-1. A pleasant perfume on the wet leaf nose: floral chocolates and assorted sweets; honey and lilacs; a subtle degree of spice. Smells like a very lovely, gender-neutral cologne or perfume. The taste is quite chocolatey and sweet with mineral honey notes and elusive flowers. 
+1. A pleasant perfume on the wet leaf nose: floral chocolates and assorted sweets; honey and lilacs; a subtle degree of spice. Smells like a very lovely, gender-neutral cologne or perfume. The taste is quite chocolatey and sweet with mineral honey notes and elusive flowers.
 2. Brighter woods and warming spices in the nose. A roasted mixture of fruits, chocolates, and flowers, combined with ambrosial honey.
-3. The smell on the lid of the gaiwan each infusion has been lovely and consistent - super perfumey and floral with a complex mix of aromas.  Has a signature Dian Hong-style body and core flavor profile along with a similar picking, so I'm making my guess that that's the style on this one - but I could be completely wrong (Paul, please let me into the clique). I'm really intrigued by that chocolate note and predict I'm gonna blow through this sample pretty quickly.
+3. The smell on the lid of the gaiwan each infusion has been lovely and consistent - super perfumey and floral with a complex mix of aromas. Has a signature Dian Hong-style body and core flavor profile along with a similar picking, so I'm making my guess that that's the style on this one - but I could be completely wrong (Paul, please let me into the clique). I'm really intrigued by that chocolate note and predict I'm gonna blow through this sample pretty quickly.
 4. Stupid smooth, like I'm drinking a velvet blanket.
 5. Notably more mineral with an all-around pleasant profile. Still holding at the same amount of floral notes but a bit pulled back on some of the bottom flavor categories on the chart. Some more umami. Leaves a pleasant almost sweetened soy sauce flavor in the mouth.
 6. Not a ton of change & it's starting to die back. Still super enjoyable and will continue drinkin it into the ground, but I figure I've already documented the best slice of life this tea has to offer

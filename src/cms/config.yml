@@ -14,7 +14,6 @@ public_folder: '/images/uploads'
 publish_mode: editorial_workflow
 
 display_url: puerh.wtf
-logo_url: 'https://images.unsplash.com/photo-1599565100439-1805b8483280?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1568&q=80'
 
 collections:
   - label: 'Tastings'
@@ -25,8 +24,8 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'tea_name'
-    summary: '{{year}}-{{month}}-{{day}} | {{tea_name}} | {{season}} {{production_year}}'
+    identifier_field: 'title'
+    summary: '{{year}}-{{month}}-{{day}} | {{title}} | {{season}} {{production_year}}'
     extension: 'md'
     fields:
       - label: 'ID'
@@ -43,7 +42,7 @@ collections:
         display_fields: ['name']
 
       - label: 'Tea Name'
-        name: 'tea_name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Style'

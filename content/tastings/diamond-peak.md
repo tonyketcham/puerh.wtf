@@ -2,7 +2,7 @@
 id: 53fb0c5a-3e8f-42b4-be05-6f3f3f4a635e
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Diamond Peak
+title: Diamond Peak
 style:
   - 73b1b7c8-29eb-4a16-a3b2-bc23442946d5
 cultivar:

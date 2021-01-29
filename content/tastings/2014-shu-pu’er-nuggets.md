@@ -2,7 +2,7 @@
 id: 09359e55-254b-4e6a-b8d1-416be1963ef0
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2014 Shu Pu’er Nuggets
+title: 2014 Shu Pu’er Nuggets
 style:
   - 86055bdc-7461-429a-9a47-11d9b2b8af0a
 cultivar:
@@ -67,7 +67,8 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 20
 ---
-There's a fantastic fruity bread smell on the dry and wet leaf after the rinse. 
+
+There's a fantastic fruity bread smell on the dry and wet leaf after the rinse.
 
 ### Infusions
 

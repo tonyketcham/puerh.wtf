@@ -2,7 +2,7 @@
 id: 2e993e5e-3ccc-4a27-b8de-948143faaca5
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2020 Hot Brandy
+title: 2020 Hot Brandy
 style:
   - 0461196f-0cc4-4ad6-9616-509269629761
   - 45fb7b01-c16e-429a-8539-3c902176a5c6
@@ -62,6 +62,7 @@ brewing:
   first_infusion_duration: 25
   infusion_increment: 15
 ---
+
 This is specifically for the 2020 Hot Brandy Minis - they may open up differently than the cake version since I'm just gonna throw the ball in and hit it with water.
 
 ### Infusions

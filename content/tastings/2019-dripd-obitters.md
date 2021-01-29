@@ -2,7 +2,7 @@
 id: aabc48c0-a616-4bf2-b9d9-28284b7d41e9
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2019 Dripd O'Bitters
+title: 2019 Dripd O'Bitters
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2019
@@ -65,6 +65,7 @@ brewing:
   first_infusion_duration: 7
   infusion_increment: 5
 ---
+
 Yea this is a funky smellin one.
 
 ### Infusions
@@ -72,6 +73,7 @@ Yea this is a funky smellin one.
 1. Incredibly, incredibly smooth. Almost tastes like a cookie dough milkshake. Some woods and an integrated bitterness when looking beside the cookie dough. The smell hasn't really come through to the brew surprisingly. It's got some of that dank woodsiness but it doesn't taste like an elder farmer yet. As it cooled, more of a medicinal bitterness but a gentle, soft one.
 
    Separated this steep into two cups and the one that the tail-end of the pour contained was WAY more bitter, but slathered on top of the smoothness. Funky monkey Friday
+
 2. Medicinal & creamy soft bitterness that coats the mouth. Kind of like angostura. A bit of that old flavor is coming through. Still sweet cookie dough. Impressively smooth. Nice bits of spice and umbery things. Gentle, old wood.
 3. Same as the last round but even smoother. Deep, thick, and dope.
 4. Think it's getting even smoother. Tastes like summer and winter at the same time. A bit of camphor on the finish.

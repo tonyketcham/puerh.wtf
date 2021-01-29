@@ -2,7 +2,7 @@
 id: d02bce3b-0d12-4e02-b1f8-e9be46134228
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Tai Ping Hou Kui Green Tea from Anhui
+title: Tai Ping Hou Kui Green Tea from Anhui
 style:
   - dd8237f7-0644-442f-b14f-898930d5f599
 cultivar:
@@ -57,7 +57,8 @@ notes:
   finish: minty, warming, tingly on the tongue, mineral greens, miso soup,
     honeydew, bit drying
   mouthfeel: juicy, light, and refreshing - very cooling
-  taste: crab, watermelon rind, Mediterranean food, flowers, umami out the wazoo,
+  taste:
+    crab, watermelon rind, Mediterranean food, flowers, umami out the wazoo,
     butter
 tags:
   - 799e7654-d553-4e18-b128-4d4a3e29c7e5
@@ -71,6 +72,7 @@ brewing:
   infusion_increment: 15
 images: []
 ---
+
 ### Infusions
 
 1. Mouthfeel is juicy, light, and refreshing - very cooling. The taste is packed with umami and savory notes of crab and a warm ocean breeze with flowers. The finish is minty and warming, leading to a mineral green bean-like flavor. It's rather short and also has a slight melon flavor like honeydew. A bit tingly on the tongue.

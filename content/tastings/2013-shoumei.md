@@ -2,12 +2,12 @@
 id: 1d264f9b-a435-4f2b-ba9d-8ea355334005
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2013 Shoumei
+title: 2013 Shoumei
 style:
   - 18f824ae-afc2-47d5-9255-27c345fbe0c1
 origin:
   - 983b2971-0260-4437-a5bf-8e8e80a9483a
-season: ""
+season: ''
 production_year: 2013
 picking: a mix of tips and large, mature leaves; Da Bai (large white leaves)
 aging_conditions: dry/natural conditions in Fujian from 2013-2018, Guangzhou til 2020
@@ -67,6 +67,7 @@ brewing:
   infusion_increment: 10
   first_infusion_duration: 25
 ---
+
 ### Infusions
 
 1. Noticing Thai basil right off the bat followed by a more resting galangal - kind of a fruity/floral spiciness with a grounding aspect. The first infusion came out enjoyable but a bit light. This could've been because I kinda eye-balled the leaf since I forgot my scale at home today. Still a good time.

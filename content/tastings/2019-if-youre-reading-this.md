@@ -2,7 +2,7 @@
 id: d96b1085-349d-4f29-9154-6fede97bad05
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2019 If You're Reading This
+title: 2019 If You're Reading This
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 production_year: 2019
@@ -63,13 +63,14 @@ brewing:
   first_infusion_duration: 20
   infusion_increment: 10
 ---
+
 ### Infusions
 
-1. The first run came out quite light because of the compression of the sampler disk, even after a pretty aggressive rinse to open things up.  Super smooth mouthfeel, creaminess, and light minerality -- needs to open up to get a proper read.
-2. Light bitterness on the sides of the tongue leading to a gentle *huigan*. Very creamy and smoothly mineral. Still need to infuse heavier. Tingle on the tongue and mouth in the finish. Long-lasting, smooth finish.
-3. Bumped it to 45 seconds infusion time. Medium intensity pleasant upfront bitterness - that government-registered *huigan* slap. Astringent with a sweet floral & fruit. A mixture of green and overripe bananas. The finish has a returning sweetness and that taste squats for the foreseeable future.
+1. The first run came out quite light because of the compression of the sampler disk, even after a pretty aggressive rinse to open things up. Super smooth mouthfeel, creaminess, and light minerality -- needs to open up to get a proper read.
+2. Light bitterness on the sides of the tongue leading to a gentle _huigan_. Very creamy and smoothly mineral. Still need to infuse heavier. Tingle on the tongue and mouth in the finish. Long-lasting, smooth finish.
+3. Bumped it to 45 seconds infusion time. Medium intensity pleasant upfront bitterness - that government-registered _huigan_ slap. Astringent with a sweet floral & fruit. A mixture of green and overripe bananas. The finish has a returning sweetness and that taste squats for the foreseeable future.
 4. Fully opened up. Real intense bitterness leading to a large resting sweetness. Some saran wrap and smokiness in the bitters. Similar to angostura.
 5. Bitter buttery slap on my ass. Banana cream, starfruit, complex fruity sweetness that's at the same time subtle like a little box of things tightly packed and obfuscated by packing peanuts and clear packing tape that you can't find where to pry up.
 6. Just like a toned-down version of the last one - no noticeable change otherwise. Kind of a standard, nice young sheng taste.
-7. Tastes like zesty tea augmented with *huigan*, plain and simple. More savory mineral aftertaste.
+7. Tastes like zesty tea augmented with _huigan_, plain and simple. More savory mineral aftertaste.
 8. A rather iron-like taste

@@ -2,7 +2,7 @@
 id: 9e09270e-01f8-41d1-bf58-9e66c5d207b9
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2000 Yiwu Maocha
+title: 2000 Yiwu Maocha
 style:
   - 4fb4bf27-c491-4b3a-b29a-339ef7984a86
 cultivar:
@@ -47,7 +47,8 @@ flavor_axes:
     finish: 2
 notes:
   dry_leaf_nose: savory stuff, granite, morels, moss, wood oven
-  wet_leaf_nose: mushrooms and vegetables, decaying flower petals, varnish that's
+  wet_leaf_nose:
+    mushrooms and vegetables, decaying flower petals, varnish that's
     become organic matter, brown paper towels
   mouthfeel: light and astringent
   finish: drying, peat, geosmin, tang
@@ -66,12 +67,14 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 5
 ---
+
 ### Infusions
 
 1. The wet leaf is earthy, papery and hard for me to describe. The mouthfeel is light and astringent. Taste is quite earthy and true to the wet leaf. Lots of paper pulp and some earthy bitters. The bitterness is lifting and doesn't hit immediately but waits for the astringency then begins to lift into the bitterness all within a few seconds. There's camphor and dirt notes, some cigar, then as the liquid cools it brings a bit of a tang to the table. There's a limestone aspect as well as some dry wood boxes, like a cigar humidor. A flavor profile that a whiskey/cigar person would dig. The aftertaste is pretty interesting with this boxy, bright flavor that has a dry nature to it.
 2. The liquor has a bit of a magenta hue to it and brews dark comparatively quicker than similarly old sheng. The difference in storage conditions coupled with this tea being stored loose versus aged sheng that's been caked up probably has a significant impact on the rates and differences in the fermentation and oxidation process which contributes to how easily the compounds in the leaves diffuse into a solvent.
 
    Right away, this has more of a body and a punch to it than the first infusion. More balance against the bitterness with a body better suited for it. Some iron-like mineral tang in there as well. A bit of a chalkiness or grip in the top/back of the throat for a few moments after swallowing. This tea might pair with or infuse well into something like an old fashioned. Some fertilizer-like, nitrogen-heavy aromas as it cools - definitely in line with the kind of aroma that comes off a freshly opened bag of black topsoil.
+
 3. The leaves look of high quality and like they were picked predominately young. From parsing through the wet leaf, I'm finding nothing larger than bud and 2 leaves. Much more of a fruity earthy sweetness. The bitterness has transformed to concentrated spice. Definitely transformed a lot from the first two infusions. Still has that nitrogen flavor but now more of a camphor tang. Fall leaves.
 4. Smokey bitters, very peaty. scotch vibes. Tastes real nice n old. Aftertaste is a resting tang.
 5. Nutrient rich dirt but still palatable for me (I'm not a fan of that flavor but I can appreciate it in this tea so far). There's also a freshly cut stem kind of taste, like the smell of the sap that comes out of green vegetation when a stem is cut. Fresh cut grass. Sichuan peppercorns.

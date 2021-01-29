@@ -2,7 +2,7 @@
 id: d0c28b0a-4c37-4c78-8ec5-bf96e2b78214
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: King of Duck Shit Aroma
+title: King of Duck Shit Aroma
 style:
   - 8ec24a26-3c55-436e-8d8b-2055f39c731c
 cultivar:

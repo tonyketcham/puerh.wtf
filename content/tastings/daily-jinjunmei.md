@@ -2,14 +2,14 @@
 id: 0d4b4f80-aa6e-4e47-b564-9011343731a3
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Daily Jinjunmei
+title: Daily Jinjunmei
 style:
   - fa7ac435-b919-4bf4-9343-662dd996bfd2
 cultivar:
   - 5762bc4f-df2c-41b9-9848-7fb8652d8d96
 origin:
   - 0c420030-b53f-4f7c-8841-5c34dfcd3085
-season: ""
+season: ''
 production_year: 2020
 picking: Buds
 vendor:
@@ -51,7 +51,8 @@ flavor_axes:
 notes:
   dry_leaf_nose: tangy custard, Turkish delight, caramelized cream, lychee, rose, cocoa
   wet_leaf_nose: charred fruit, roasted rose hips, almond extract, sweet hard candies
-  taste: rosewater, Turkish delight, plum, assorted chocolate covered biscuits (+
+  taste:
+    rosewater, Turkish delight, plum, assorted chocolate covered biscuits (+
     cream filled ones)
   empty_cup: brown sugar, cookies fresh out the oven
   cha_qi: head rush, warming of the extremities
@@ -70,6 +71,7 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 5
 ---
+
 The dry leaf has an aroma very unique to quality jin jun mei that sets it far apart from something like a Dian Hong. It's got a tangy, roasted cream note with lychee and rose to top it off.
 
 ### Infusions

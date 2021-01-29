@@ -2,7 +2,7 @@
 id: 5662bf04-d3ec-47dc-875e-88859f15f08c
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Canopy Flasher
+title: Canopy Flasher
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -69,16 +69,17 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 5
 ---
+
 The wet leaf smells like steppin out of the airport on vacation to somewhere tropical.
 
 ### Infusions
 
 1. Lotsa fuzzy floaters from the downy on the leaf, a bit of a hazy liquor. Some miscellaneous ish on the bottom of the cup on this one but I'm down to get dirty. Very creamy onset without aggression. A mellow bitter follow up. Reminds me of mango sherbet and mochi. Faint flowers behind citrus and tropical fruits. Mineral nature is there and comes out more as the cup cools.
-2. Verbena on the leaf, like a floral face cream or lotion. First hit was full *huigan*. Even harder on the passionfruit and mango sherbet. It's wild that tea can have such a wide spectrum. Bit of a saran wrap in the mineral mix to be honest (which is a touch odd) but everything else going on makes that a moot point in my book. The wrapper art for this cake is spot on.  
+2. Verbena on the leaf, like a floral face cream or lotion. First hit was full _huigan_. Even harder on the passionfruit and mango sherbet. It's wild that tea can have such a wide spectrum. Bit of a saran wrap in the mineral mix to be honest (which is a touch odd) but everything else going on makes that a moot point in my book. The wrapper art for this cake is spot on.
 3. Creamier sherbet, more doughy - the body has more of a floury dough. Feels like she's on the precipice of modulating.
 4. Warm summer rain. Nut milk, leather, river rocks & dry stone
 5. Getting almost like what I would expect out of a ben shan in how the cream aspect is coming forward juxtaposed with a high aromatic. Black pepper on the finish. Grapefruit + grapefruit bitterness. Each sip is as if I'm being tugged in a different direction between the prominent axes of cool shit goin on.
 6. More sweet doughiness, smoothing feeling on the tongue that lasts throughout the mouth.
-7. mmmmm good i'd say Nice    i would say: nice + mineral finish with subdued flowers
+7. mmmmm good i'd say Nice i would say: nice + mineral finish with subdued flowers
 8. Getting more into the milky territory for sure
 9. A little thin and pootering out, but still background drinkable

@@ -2,7 +2,7 @@
 id: 377525b0-ae6e-49cd-8c10-45d4a5a0764c
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Paradise Snapper
+title: Paradise Snapper
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
@@ -54,11 +54,13 @@ flavor_axes:
     finish: 5
 notes:
   dry_leaf_nose: zest, apricot jam, tangerine
-  wet_leaf_nose: caramelized apricot jam on toast, pomegranate, intense rockiness,
+  wet_leaf_nose:
+    caramelized apricot jam on toast, pomegranate, intense rockiness,
     bright tangerine
   mouthfeel: lightly oily and mineral coating
   finish: mineral dryness, lasting huigan
-  taste: slate and limestone, tangerine + mandarin peel, grenadine, floral fruits,
+  taste:
+    slate and limestone, tangerine + mandarin peel, grenadine, floral fruits,
     funk
   empty_cup: minerals, multigrain toast that doesn't suck (a lot of multigrain
     toast sucks I'll fuckin say it), pomegranate
@@ -87,12 +89,13 @@ images:
   - image: /images/uploads/paradise-snapper-img_5651.jpg
     alt: Leaves in da pot, post-brewing up a storm
 ---
+
 The leaves are incredibly aromatic on top of a distinctive mineral sharpness often found in young gushu. This is the most citrusy, apricoty smell I've ever gotten out of a non-scented tea. Lots of brightness on top of that minerality.
 
 ### Infusions
 
-1. Reminds me of Mei Leaf's Young Gushu 2020 with a pleasant mineral astringency that journeys into a drawn-out *huigan*, a quality I've grown very fond of. Though it departs from that by giving much more brightness featuring apricots, tangerine zest, and floral fruits. This is a fun one to try and split all the complexity off into groups of flavor notes. There's as much spice as there is vegetal and umami goin on, but then trying to split that off from the intense minerality is a challenge for me. Smelling the cooled wet leaves is revealing a clear grenadine syrup - Mei Leaf was pretty spot on with the experience on this so far.
-2. More intense *huigan* but also juicier. Still a more mineral astringency that has that grape-skin, mouth-coating quality to it. Some soft bitterness hanging out too but not upfront, more so a calm bitterness that ties into the astringency - something that would be much more sought after than just straight-up "bitterness". English kind of fails to categorically differentiate between the types of bitterness that exists. Here's a [good article](https://redblossomtea.com/blogs/red-blossom-blog/tasting-notes-bitterness-vs-astringency) on that whole ordeal. Back to the damn tea: it's good. Got that apricot after the astringency and hanging out in the *huigan*.
+1. Reminds me of Mei Leaf's Young Gushu 2020 with a pleasant mineral astringency that journeys into a drawn-out _huigan_, a quality I've grown very fond of. Though it departs from that by giving much more brightness featuring apricots, tangerine zest, and floral fruits. This is a fun one to try and split all the complexity off into groups of flavor notes. There's as much spice as there is vegetal and umami goin on, but then trying to split that off from the intense minerality is a challenge for me. Smelling the cooled wet leaves is revealing a clear grenadine syrup - Mei Leaf was pretty spot on with the experience on this so far.
+2. More intense _huigan_ but also juicier. Still a more mineral astringency that has that grape-skin, mouth-coating quality to it. Some soft bitterness hanging out too but not upfront, more so a calm bitterness that ties into the astringency - something that would be much more sought after than just straight-up "bitterness". English kind of fails to categorically differentiate between the types of bitterness that exists. Here's a [good article](https://redblossomtea.com/blogs/red-blossom-blog/tasting-notes-bitterness-vs-astringency) on that whole ordeal. Back to the damn tea: it's good. Got that apricot after the astringency and hanging out in the _huigan_.
 3. Vegetal umami notes more prominent. An all-around good time.
 4. Sweeter, still very rocky in the mineral world, still apricotty and all that jazz.
 5. The cream side of things is much more apparent now, with a supporting minerality.
@@ -101,4 +104,4 @@ The leaves are incredibly aromatic on top of a distinctive mineral sharpness oft
 8. Bitterness and astringency have largely faded out, bringing forth more of a light floral cream and umami. It still maintains that strong minerality and has some bright fruity notes. A little more doughy.
 9. Smooth ride following that same path towards a light floral cream.
 
-This tea doesn't veer off in its path too much but strongly excels in what it offers. It has a ton of complexity towards the start that benefits from taking the time to give it your full attention. The clarity of the apricot jam is wonderful and unexpected. The *huigan* is fantastic. All around a good time.
+This tea doesn't veer off in its path too much but strongly excels in what it offers. It has a ton of complexity towards the start that benefits from taking the time to give it your full attention. The clarity of the apricot jam is wonderful and unexpected. The _huigan_ is fantastic. All around a good time.

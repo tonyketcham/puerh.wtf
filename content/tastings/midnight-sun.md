@@ -2,7 +2,7 @@
 id: fddaaf15-a5f3-4627-b82b-b20784a3c5b2
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Midnight Sun
+title: Midnight Sun
 style:
   - ddb3ad24-7d9b-4179-ba13-9c110e2e9fbe
 cultivar:

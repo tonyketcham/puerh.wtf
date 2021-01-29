@@ -2,7 +2,7 @@
 id: cb7094b7-3359-4bcb-9f14-8a914cc993b7
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Milk Float Nomad
+title: Milk Float Nomad
 style:
   - d881f184-5372-406a-a47f-421cbacf58bf
 cultivar:
@@ -83,9 +83,10 @@ images:
   - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,w_790/v1611034724/tea/2020/Milk%20Float%20Nomad/img_5622_neekqk.jpg
     alt: Liquor after 7 steeps, more transparent and lightened to a pale amber
 ---
+
 Noteably fine pickings that coincide with the Gong Ting style. A nice, smooth shou with none of the off-flavors that can sometimes occur in the fermentation process or storage; cleanly done shou.
 
-A few steeps in, I stepped away to eat something and came back to notice a more coffee-like experience, with some of the bite that exists on a nice, single origin black coffee - couldn't give you much detail on *what* origin/roast that would be similar to since I'm not as familiar there, but it's somethin. Though once you're sippin' again, that bite totally disappears.
+A few steeps in, I stepped away to eat something and came back to notice a more coffee-like experience, with some of the bite that exists on a nice, single origin black coffee - couldn't give you much detail on _what_ origin/roast that would be similar to since I'm not as familiar there, but it's somethin. Though once you're sippin' again, that bite totally disappears.
 
 Around steep 6, the wet leaf has a more distinctive aged wood, cacao nib smell, and the liquor is much sweeter with more of a lasting sweetness that transforms into a gentle mintiness. The woody notes are more clearly in focus now. Good dessert & digestif tea.
 

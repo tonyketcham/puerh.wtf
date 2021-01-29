@@ -2,7 +2,7 @@
 id: 48a38017-7acd-4916-8452-bcfe456a893c
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Camphor Lao Cha Tou
+title: Camphor Lao Cha Tou
 style:
   - 86055bdc-7461-429a-9a47-11d9b2b8af0a
 production_year: 2018
@@ -46,7 +46,8 @@ flavor_axes:
 notes:
   dry_leaf_nose: rich topsoil, mulch, camphor, potatoes, roasted corn, grass, wood oven
   mouthfeel: stupid smooth and coating like cream
-  wet_leaf_nose: barrel-aged whiskey, maraschino cherry, museum b2b ship, butter,
+  wet_leaf_nose:
+    barrel-aged whiskey, maraschino cherry, museum b2b ship, butter,
     earthy woods, rubber
   cha_qi: positive and relaxing
   empty_cup: wood chips, varnish, hazelnut
@@ -76,6 +77,7 @@ images:
   - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,h_1031/v1611170610/tea/2021/Camphor%20Lao%20Cha%20Tou/F2FF2E91-4176-49A6-9A1C-30BE842F6080_reuttu.jpg
     alt: Wetty leaf
 ---
+
 The smell in the bag is particularly spicy and camphor-y; uniquely different from all the other teas I've tried so far.
 
 ### Infusions

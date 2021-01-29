@@ -2,7 +2,7 @@
 id: eac12cda-5e42-451a-9f1e-3ede4b942f51
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Imperial Green
+title: Imperial Green
 style:
   - 39e7d9ff-2757-4789-bebf-7d3d14e9ca48
 cultivar:

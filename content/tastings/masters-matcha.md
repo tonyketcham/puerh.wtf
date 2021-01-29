@@ -3,7 +3,7 @@ id: 2ec5f5a1-bd12-400e-83f0-d6ed3724a705
 author:
   - bbec234d-2b4a-4f6c-be3d-ef003f4148fa
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Master's Matcha
+title: Master's Matcha
 style:
   - 984ad797-2060-4eb5-b0f3-317dbaf812b9
 cultivar:
@@ -76,8 +76,9 @@ brewing:
   infusion_increment: 0
 images: []
 ---
+
 We did two rounds cuz this stuff is good as a bear.
 
-First round was at 165 degrees big F. After making the crema, we diluted with a bit more water. That was super pistachio, with tons of wacky and wild stuff goin on. Notably not bitter. So far on both of our limited matcha experiences (coming from matcha lattes) this is the best we've ever had. 
+First round was at 165 degrees big F. After making the crema, we diluted with a bit more water. That was super pistachio, with tons of wacky and wild stuff goin on. Notably not bitter. So far on both of our limited matcha experiences (coming from matcha lattes) this is the best we've ever had.
 
 Second round we used the water that had been cooling since last round, so probably more around 100 degrees big F. We also did not dilute this time. There's a bit of bitterness now but it's desirable bitterness. Even creamier and the aftertaste is longer-lasting. Much more butteriness and 'green' in the finish. Some green apple peels on the finish as well.

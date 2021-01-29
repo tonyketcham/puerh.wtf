@@ -2,7 +2,7 @@
 id: 66ea0526-7e1b-4e43-b466-f215c4fb6730
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2020 Ecce Puer
+title: 2020 Ecce Puer
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
@@ -63,11 +63,12 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 10
 ---
+
 The cake has a wonderfully light compression that you can pick large leaves apart from individually, just using your hands and minimal force.
 
 ### Infusions
 
-1. A light *huigan* with a bit of astringency. Light floral and nutty notes with citrus and apricot in the low-midrange of the body if you think in terms of audio. There's also a creamy/sour duality in the blend that gives me a flash of Tie Guan Yin. The finish is mid-length with the floral side of citrus with apricot, drying.
+1. A light _huigan_ with a bit of astringency. Light floral and nutty notes with citrus and apricot in the low-midrange of the body if you think in terms of audio. There's also a creamy/sour duality in the blend that gives me a flash of Tie Guan Yin. The finish is mid-length with the floral side of citrus with apricot, drying.
 2. Feels like it's brewed appropriately but rather light in flavor impact. Nice complexity, but feels like the volume knob is turned down. Will brew it harder next round to see if I can push it.
 3. Tried harder brewing and it's much more bitter, diving consumptively into that dimension, with the let-up bringing very light floral fruitiness. The finish has an herbaceous, floral, liquory cocktail taste to it like an Aviation.
 4. This has a similar flavor profile to the 2018 Crassicolumna Sheng I tasted from Verdant Tea, but with a lot more body + a punchy cha qi. Quite a bit pulled back on the fruity and floral notes though, while still a notable trait of this tea. Just seems kind of thin overall.

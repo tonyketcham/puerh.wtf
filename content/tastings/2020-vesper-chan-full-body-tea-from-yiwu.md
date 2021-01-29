@@ -2,7 +2,7 @@
 id: 7c114fa3-51f8-4fae-a22e-b089d3c7a8f7
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: "2020 Vesper Chan: Full Body Tea from Yiwu"
+title: '2020 Vesper Chan: Full Body Tea from Yiwu'
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -68,6 +68,7 @@ brewing:
   first_infusion_duration: 5
   infusion_increment: 10
 ---
+
 I had previously heard the name Vesper Chan in my exploration of the pu-erh world, but did not know much behind it. Seeing LP was featuring some Vesper Chan teas over the holiday sales, I picked it up out of curiosity. Just before opening the sample and creating this entry, I decided to read up on Vesper Chan and was delighted with learning about his journey into created what some call the 'Best Teahouse in Hong Kong', featuring a selection of teas he's carefully kept over the years in dry conditions. His philosophy behind tea is intriguing and I urge others with a similar interest in tea to [give this interview a read](http://www.puerh.fr/en/article/vesper_chan.htm).
 
 ### Infusions
@@ -79,7 +80,8 @@ I had previously heard the name Vesper Chan in my exploration of the pu-erh worl
    There's a strong focus on the body of this tea for sure. It's a floral pu-erh but has a very strong and lasting body to support those volatile aspects. I typically find that a lot of floral pu-erhs have a weak finish or void in the body where the focus is all on the volatiles. This tea is not that. It's more like the focus has been on crafting a wonderful body to enjoy, and then pushing the experience into the floral direction. The body lasts deep into the aftertaste. I suspect it'd stay in your mouth for over half an hour.
 
    If you can tell from all these damb words, I'm into this one.
-2. A bit of a medicinal bitter upfront that disperses into mouthfeel and sweetness. It's worth noting that the bitterness doesn't have the typical flavor profile I'm used to in young *huigan*-y sheng, but more of a toasted and salted gourd or bittermelon kind of tone. It's a very pleasant bitterness that is quickly fleeting and replaced by sweet fruits - most discernably watermelon with a pinch of salt. The mouthfeel and taste is real crisp. I could see this tea pairing well with more delicate Mexican food that wouldn't incapacitate your taste buds' ability to detect lighter aromas. The finish is more vegetal, kind of like an arugula. \
+
+2. A bit of a medicinal bitter upfront that disperses into mouthfeel and sweetness. It's worth noting that the bitterness doesn't have the typical flavor profile I'm used to in young _huigan_-y sheng, but more of a toasted and salted gourd or bittermelon kind of tone. It's a very pleasant bitterness that is quickly fleeting and replaced by sweet fruits - most discernably watermelon with a pinch of salt. The mouthfeel and taste is real crisp. I could see this tea pairing well with more delicate Mexican food that wouldn't incapacitate your taste buds' ability to detect lighter aromas. The finish is more vegetal, kind of like an arugula. \
    \
    This has already expressed much more intensely and differently in select areas than the first infusion. The balance is great. I wouldn't mind drinking this everyday. There's a delicate fresh linen floral blanket on top of the vegetation, softening it down and actually collabing with a light peanut aroma to the comedown. They've been in a studio for hours licking the knobs on a Neve 88RS, balancing two 16" Macbook Pros (maxed out) on the console with 47 Waves plugins active somehow not maxing out the CPU and the playback is artifact-free.
 3. White chocolate, orchids, tropical flowers. A bit crisper with more tang - not a sour tang but a more clicky or latching one - more of a tactile feeling.

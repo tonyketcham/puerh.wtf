@@ -2,7 +2,7 @@
 id: 601a613d-6a44-49e7-ba1d-b203e12c9ea1
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2000 Yi Wu "Huang Pian"
+title: 2000 Yi Wu "Huang Pian"
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -73,6 +73,7 @@ brewing:
   first_infusion_duration: 5
   infusion_increment: 5
 ---
+
 ### Infusions
 
 1. Has a strong sweet & sour tang coupled with a buttery smooth mouthfeel. The tang is engaging and gives an experience similar to eating a sour gummy bear. There's a woody hay body that leads to a mid-level drying & complex finish. The finish is pulpy with some earthy vegetation.
