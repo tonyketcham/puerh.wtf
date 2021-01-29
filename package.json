@@ -12,19 +12,19 @@
     "@tailwindcss/forms": "^0.2.1",
     "gridsome": "^0.7.23",
     "gridsome-plugin-netlify-cms": "^1.0.9",
-    "netlify-cms": "^2.10.82",
+    "netlify-cms": "^2.10.84",
     "netlify-cms-widget-youtube": "^0.3.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "autoprefixer": "10.2.1",
+    "autoprefixer": "10.2.3",
     "gridsome-plugin-tailwindcss": "^4.1.1",
     "postcss": "8",
     "postcss-preset-env": "^6.7.0",
-    "sass": "^1.32.4",
+    "sass": "^1.32.5",
     "sass-loader": "^10.1.1",
     "stylelint-config-recommended": "^3.0.0",
     "tailwindcss": "^2.0.2",
-    "vuex": "^3.6.0"
+    "vuex": "^3.6.2"
   }
 }

@@ -1,5 +1,3 @@
-const colors = require('tailwindcss/colors');
-
 module.exports = {
   purge: {
     enabled: process.env.NODE_ENV === 'production',

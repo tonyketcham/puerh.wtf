@@ -1,6 +1,6 @@
 <template>
   <header
-    class="w-full bg-gray-100 dark:bg-gray-800 flex place-content-between p-3"
+    class="fixed flex w-full h-16 p-3 bg-gray-200 bg-opacity-75 dark:bg-gray-800 place-content-between"
   >
     <g-link to="/">{{ $static.metadata.siteName }}</g-link>
 
@@ -16,7 +16,7 @@
 
     <button
       @click="toggleTheme"
-      class="focus:outline-none text-gray-700 dark:text-gray-100"
+      class="text-gray-700 focus:outline-none dark:text-gray-100"
     >
       <svg
         v-if="theme === 'dark'"
