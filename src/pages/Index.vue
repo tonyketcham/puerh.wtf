@@ -17,11 +17,10 @@
           </p>
         </div>
         <div class="w-1/3">
-          <g-image
+          <img
             v-if="edge.node.images[0]"
             :src="edge.node.images[0].image"
             :alt="edge.node.images[0].alt"
-            blur="40"
             class="object-cover w-full h-full"
           />
           <div v-else class="flex w-full h-full bg-white">
@@ -56,6 +55,11 @@ query {
 export default {
   metaInfo: {
     title: 'Pu-erh, wtf?',
+  },
+  computed: {
+    name() {
+      return;
+    },
   },
 };
 </script>
