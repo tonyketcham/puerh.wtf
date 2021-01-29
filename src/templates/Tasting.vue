@@ -47,7 +47,6 @@ query Tasting ($id: ID!) {
           municipality
           country
         }
-        elevation
         brewing {
           temperature
           material_amount
