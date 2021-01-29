@@ -14,26 +14,26 @@ query {
 </static-query>
 
 <script>
-import { mapGetters } from 'vuex';
-import Layout from "~/layouts/Layout.vue";
+  import { mapGetters } from 'vuex';
+  import Layout from '~/layouts/Layout.vue';
 
-export default {
-  metaInfo() {
-    return {
-      title: this.$static.metadata.siteName,
-      meta: [
-        {
-          key: 'description',
-          name: 'description',
-          content: this.$static.metadata.siteDescription
-        }
-      ]
-    }
-  },
+  export default {
+    metaInfo() {
+      return {
+        title: this.$static.metadata.siteName,
+        meta: [
+          {
+            key: 'description',
+            name: 'description',
+            content: this.$static.metadata.siteDescription,
+          },
+        ],
+      };
+    },
     components: {
-    Layout,
-  },
-   beforeMount() {
+      Layout,
+    },
+    created() {
       this.$store.dispatch('initTheme');
     },
     computed: {
@@ -46,5 +46,5 @@ export default {
           : document.querySelector('html').classList.add('dark');
       },
     },
-}
+  };
 </script>

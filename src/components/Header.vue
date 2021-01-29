@@ -7,7 +7,9 @@
     <nav class="space-x-3">
       <g-link class="" to="/">Home</g-link>
       <g-link class="" to="/about/">About</g-link>
-            <g-link class="" to="/sessions/2021/01/2015-zsl-wa-long/">Single Session Route Test</g-link>
+      <g-link class="" to="/sessions/2021/01/2015-zsl-wa-long/"
+        >Single Session Route Test</g-link
+      >
     </nav>
 
     <button
