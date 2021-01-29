@@ -1,8 +1,10 @@
 <template> </template>
 
 <page-query>
-query allTasting {
-    
+query ($id: ID!) {
+    tasting(id: $id){
+        tea_name
+    }
 }
 </page-query>
 

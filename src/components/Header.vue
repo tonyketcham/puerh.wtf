@@ -1,12 +1,10 @@
 <template>
-  <header class="w-full bg-gray-800 flex place-content-around">
-    <g-link to="/">{{ $static.metadata.siteName }}</g-link>
-
-    <nav class="nav">
-      <g-link class="nav__link" to="/">Home</g-link>
-      <g-link class="nav__link" to="/about/">About</g-link>
-    </nav>
-    <button @click="toggleTheme" class="dark:text-red-400 text-cyan-200">
+  <header
+    class="fixed flex w-full h-16 bg-gray-200 bg-opacity-75 dark:bg-gray-800 place-content-around"
+  >
+    <g-link to="/" class="my-auto">{{ $static.metadata.siteName }}</g-link>
+    <g-link to="/about/" class="my-auto">About</g-link>
+    <button @click="toggleTheme" class="my-auto">
       Theme Toggle
     </button>
   </header>
@@ -24,11 +22,8 @@ query {
 export default {
   methods: {
     toggleTheme() {
-      this.$store.dispatch("toggleTheme");
+      this.$store.dispatch('toggleTheme');
     },
   },
 };
 </script>
-
-<style>
-</style>
