@@ -7,9 +7,11 @@
         class="box-border flex justify-between w-2/3 overflow-hidden border-2 border-gray-900 rounded-lg bg-gray-50 dark:bg-gray-700 h-72"
       >
         <div class="w-1/2 m-4">
-          <h2 class="text-3xl">
-            {{ edge.node.tea_name }}
-          </h2>
+          <g-link :to="edge.node.path">
+            <h2 class="text-3xl">
+              {{ edge.node.title }}
+            </h2>
+          </g-link>
           <p>
             {{ edge.node.excerpt }}
           </p>
@@ -33,7 +35,8 @@ query {
   sessions: allTasting {
   	edges {
       node {
-        tea_name
+        title
+        path
         id
         excerpt
         images {

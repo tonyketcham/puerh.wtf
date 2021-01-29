@@ -1,11 +1,11 @@
 <template>
   <Layout>
     <section>
-      <h1 class="text-6xl">{{ $page.tasting.tea_name }}</h1>
+      <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
       <span>{{ $page.tasting.date }}</span>
       <div>
-        <h2>{{ $page.tasting.author.name }}</h2>
-        <img :src="$page.tasting.author.image" alt="Author" />
+        <h2>{{ $page.tasting.author[0].name }}</h2>
+        <img :src="$page.tasting.author[0].image" alt="Author" />
       </div>
 
       <div>
@@ -21,7 +21,7 @@
 </template>
 
 <page-query>
-query ($id: ID!) {
+query Tasting ($id: ID!) {
   tasting(id: $id) {
         id
         date
@@ -29,7 +29,7 @@ query ($id: ID!) {
           name
           image
         }
-        tea_name
+        title
         rating
         style {
           name
@@ -48,10 +48,6 @@ query ($id: ID!) {
           country
         }
         elevation
-        images {
-          image
-          alt
-        }
         brewing {
           temperature
           material_amount
