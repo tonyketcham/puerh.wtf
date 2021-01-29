@@ -1,15 +1,17 @@
 <template>
   <header
-    class="fixed flex w-full h-16 p-3 bg-gray-200 bg-opacity-75 dark:bg-gray-800 place-content-between"
+    class="fixed flex w-full h-16 p-4 transition-colors duration-150 ease-in-out bg-gray-200 border-b border-gray-300 shadow bg-opacity-40 border-opacity-20 dark:bg-gray-800 dark:border-gray-700 place-content-between"
+    style="backdrop-filter: blur(4px)"
   >
-    <g-link to="/">{{ $static.metadata.siteName }}</g-link>
+    <g-link
+      to="/"
+      class="font-mono text-xl font-medium tracking-tight transition duration-200 ease-in-out hover:text-yellow-800 dark:hover:text-yellow-300 transform-gpu hover:scale-90 -rotate-2 hover:rotate-0"
+      >🌱 {{ $static.metadata.siteName }} 🍵</g-link
+    >
 
-    <nav class="space-x-3">
+    <nav class="space-x-6">
       <g-link class="" to="/">Home</g-link>
       <g-link class="" to="/about/">About</g-link>
-      <g-link class="" to="/sessions/2021/01/2015-zsl-wa-long/"
-        >Single Session Route Test</g-link
-      >
     </nav>
 
     <button
