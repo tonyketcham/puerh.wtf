@@ -2,18 +2,21 @@
   <div>
     <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
     <span>{{ $page.tasting.date }}</span>
-    <div>
-      <h2>{{ $page.tasting.author[0].name }}</h2>
-      <img :src="$page.tasting.author[0].image" alt="Author" />
-    </div>
 
-    <div>
-      <ul class="m-3 space-y-2">
-        <li v-for="note of $page.tasting.notes" :key="note">
-          {{ note }}
-        </li>
-      </ul>
-    </div>
+    <Author
+      :name="$page.tasting.author[0].name"
+      :image="$page.tasting.author[0].image"
+    />
+    <template v-if="$page.tasting.images">
+      <g-image
+        v-for="node in $page.tasting.images"
+        :key="node.image"
+        :src="node.image"
+        :alt="node.alt"
+      />
+    </template>
+
+    <Experience-Notes :notes="$page.tasting.notes" />
     <div class="body" v-html="$page.tasting.content" />
   </div>
 </template>
@@ -28,6 +31,10 @@ query Tasting ($id: ID!) {
           image
         }
         title
+        images {
+          image
+          alt
+        }
         rating
         style {
           name
@@ -110,10 +117,20 @@ query Tasting ($id: ID!) {
 </page-query>
 
 <script>
-  export default {};
+  import ExperienceNotes from '@/components/tea/Experience-Notes.vue';
+  import Author from '../components/Author.vue';
+  export default {
+    components: {
+      Author,
+      ExperienceNotes,
+    },
+  };
 </script>
 
 <style lang="scss">
+  dd {
+    @apply text-gray-600 dark:text-gray-300;
+  }
   .body {
     h3 {
       @apply text-3xl;
