@@ -6,6 +6,15 @@
 
 module.exports = {
   siteName: 'Puerh.wtf',
+  templates: {
+    Tasting: '/session/:year/:month/:slug',
+    Category: '/category/:id',
+    Author: '/drinker/:id',
+    Style: '/category/:category/:id',
+    Cultivar: '/cultivar/:id',
+    Origin: '/origin/:id',
+    Vendor: '/vendor/:id',
+  },
   transformers: {
     remark: {
       externalLinksTarget: '_blank',
@@ -18,10 +27,10 @@ module.exports = {
   },
   plugins: [
     {
-      use: "gridsome-plugin-tailwindcss",
+      use: 'gridsome-plugin-tailwindcss',
       options: {
         tailwindConfig: './tailwind.config.js',
-      }
+      },
     },
     {
       use: '@gridsome/source-filesystem',
@@ -70,6 +79,9 @@ module.exports = {
       options: {
         path: 'content/cultivars/*.md',
         typeName: 'Cultivar',
+        refs: {
+          style: 'Style',
+        },
       },
     },
     {
