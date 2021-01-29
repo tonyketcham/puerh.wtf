@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <section>
+    <fragment>
       <h1>About us</h1>
       <p>
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error
@@ -8,7 +8,7 @@
         rerum illum odit fugit assumenda rem dolores inventore iste
         reprehenderit maxime! Iusto.
       </p>
-    </section>
+    </fragment>
   </Layout>
 </template>
 
