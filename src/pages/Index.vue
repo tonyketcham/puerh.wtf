@@ -1,7 +1,7 @@
 <template>
   <Layout>
-    <div class="flex flex-row flex-wrap w-full gap-8">
-      <div
+    <!-- <div class="flex flex-row flex-wrap w-full gap-8"> -->
+    <!-- <div
         v-for="edge in $page.sessions.edges"
         :key="edge.node.id"
         class="box-border flex justify-between w-2/3 overflow-hidden border-2 border-gray-900 rounded-lg bg-gray-50 dark:bg-gray-700 h-72"
@@ -28,7 +28,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </Layout>
 </template>
 
@@ -52,9 +52,9 @@ query {
 </page-query>
 
 <script>
-export default {
-  metaInfo: {
-    title: 'Pu-erh, wtf?',
-  },
-};
+  export default {
+    metaInfo: {
+      title: 'Pu-erh, wtf?',
+    },
+  };
 </script>

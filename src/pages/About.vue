@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <fragment>
+    <div>
       <h1>About us</h1>
       <p>
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error
@@ -8,14 +8,14 @@
         rerum illum odit fugit assumenda rem dolores inventore iste
         reprehenderit maxime! Iusto.
       </p>
-    </fragment>
+    </div>
   </Layout>
 </template>
 
 <script>
-export default {
-  metaInfo: {
-    title: 'About us',
-  },
-};
+  export default {
+    metaInfo: {
+      title: 'About us',
+    },
+  };
 </script>

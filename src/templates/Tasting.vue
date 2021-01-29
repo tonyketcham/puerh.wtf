@@ -1,9 +1,9 @@
 <template>
   <Layout>
-    <fragment>
+    <div>
       <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
       <span>{{ $page.tasting.date }}</span>
-      <div>
+      <!-- <div>
         <h2>{{ $page.tasting.author[0].name }}</h2>
         <img :src="$page.tasting.author[0].image" alt="Author" />
       </div>
@@ -15,8 +15,8 @@
           </li>
         </ul>
       </div>
-      <div class="body" v-html="$page.tasting.content" />
-    </fragment>
+      <div class="body" v-html="$page.tasting.content" /> -->
+    </div>
   </Layout>
 </template>
 
@@ -112,19 +112,19 @@ query Tasting ($id: ID!) {
 </page-query>
 
 <script>
-export default {};
+  export default {};
 </script>
 
 <style lang="scss">
-.body {
-  h3 {
-    @apply text-3xl;
-  }
-  ol {
-    @apply p-5 space-y-3;
-    li {
-      @apply list-decimal list-outside;
+  .body {
+    h3 {
+      @apply text-3xl;
+    }
+    ol {
+      @apply p-5 space-y-3;
+      li {
+        @apply list-decimal list-outside;
+      }
     }
   }
-}
 </style>

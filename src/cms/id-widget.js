@@ -6,10 +6,10 @@ import { v4 as uuid } from 'uuid';
  * Create the control widget, this will add a form element to the cms UI
  */
 const IdControl = window.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {};
   },
-  componentDidMount: function() {
+  componentDidMount: function () {
     // If this widget doesn't have an ID yet we create one using the UUID package
     if (!this.props.value) {
       this.props.onChange(uuid());
@@ -18,7 +18,7 @@ const IdControl = window.createClass({
   handleChange() {
     this.props.onChange(uuid());
   },
-  render: function() {
+  render: function () {
     return window.h('p', null, `${this.props.value}`);
   },
 });
@@ -27,11 +27,11 @@ const IdControl = window.createClass({
  * Create the preview widget, this will display the widgets value in the NetlifyCMS preview pane
  */
 const IdPreview = window.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     console.log(this.props);
     return {};
   },
-  render: function() {
+  render: function () {
     return window.h('p', null, `ID: ${this.props.value}`);
   },
 });
