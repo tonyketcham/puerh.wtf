@@ -16,17 +16,7 @@
             {{ edge.node.excerpt }}
           </p>
         </div>
-        <div class="w-1/3">
-          <img
-            v-if="edge.node.images[0]"
-            :src="edge.node.images[0].image"
-            :alt="edge.node.images[0].alt"
-            class="object-cover w-full h-full"
-          />
-          <div v-else class="flex w-full h-full bg-white">
-            <h3 class="m-auto text-gray-600">Coming Soon...</h3>
-          </div>
-        </div>
+        <div class="w-1/3"></div>
       </div>
     </div>
   </Layout>
