@@ -5,6 +5,7 @@
 So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet ya in the cart on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that bitch with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
 
 ## Features
+
 - [Gridsome](https://gridsome.org/) for SSG
 - [Tailwind 2.0](https://tailwindcss.com/) for UI (frontend dev in progress)
 - Progressive light/dark mode toggling
@@ -12,6 +13,7 @@ So I decided to develop a site just so I could document all the damn teas I drin
 - mmm.. [JAMstack](https://jamstack.org/) for: I spent all my money on tea now I can't afford hosting
 
 ## Wanna collab?
+
 ### 1. Install Gridsome CLI tool if you don't have
 
 `npm install --global @gridsome/cli`
@@ -22,7 +24,17 @@ So I decided to develop a site just so I could document all the damn teas I drin
 2. `cd puerh.wtf` to open the folder
 3. `yarn install` because these node modules don't grow on trees
 4. `gridsome develop` to start a local dev server at `http://localhost:8080`
-5. Put stuff with your little hands 
+5. Put stuff with your little hands
+
+### 3. Test local build
+
+This is important to debug and troubleshoot bugs that may not be well documented with Gridsome yet, particularly routing side effects. Otherwise you may be left with something that works perfectly in development but is buggy on deployment.
+
+1. `npm install -g http-server`
+2. `gridsome build`
+3. `http-server dist/` and go to one of the live servers it's given you
+4. Clear cache and hard reload
+5. Hop around
 
 ## License
 
