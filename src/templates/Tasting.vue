@@ -3,10 +3,10 @@
     <section>
       <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
       <span>{{ $page.tasting.date }}</span>
-      <div>
+      <!-- <div>
         <h2>{{ $page.tasting.author[0].name }}</h2>
         <img :src="$page.tasting.author[0].image" alt="Author" />
-      </div>
+      </div> -->
 
       <div>
         <ul class="m-3 space-y-2">
