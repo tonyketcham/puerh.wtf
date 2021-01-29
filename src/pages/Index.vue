@@ -7,11 +7,11 @@
         class="box-border flex justify-between w-2/3 overflow-hidden border-2 border-gray-900 rounded-lg bg-gray-50 dark:bg-gray-700 h-72"
       >
         <div class="w-1/2 m-4">
-          <g-link :to="edge.node.path">
-            <h2 class="text-3xl">
+          <h2 class="text-3xl">
+            <g-link :to="edge.node.path">
               {{ edge.node.title }}
-            </h2>
-          </g-link>
+            </g-link>
+          </h2>
           <p>
             {{ edge.node.excerpt }}
           </p>

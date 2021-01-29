@@ -7,11 +7,6 @@
     <nav class="space-x-3">
       <g-link class="" to="/">Home</g-link>
       <g-link class="" to="/about/">About</g-link>
-      <g-link
-        class=""
-        to="/session/2021/01/d02bce3b-0d12-4e02-b1f8-e9be46134228"
-        >Test Sesh</g-link
-      >
     </nav>
 
     <button
