@@ -1,5 +1,5 @@
 <template>
-  <nav class="space-y-3 text-lg">
+  <nav class="p-16 pr-0 space-y-3 text-lg">
     <g-link to="/about/" class="link"><span>🗿</span>Stone</g-link>
     <g-link to="/about/" class="link"><span>🧤</span>Excalibur</g-link>
     <g-link to="/about/" class="link"><span>😻</span>Tickle</g-link>
