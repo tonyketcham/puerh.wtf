@@ -13,6 +13,7 @@ module.exports = {
     Cultivar: '/cultivar/:id',
     Origin: '/origin/:id',
     Vendor: '/vendor/:id',
+    Tags: '/tags/:title',
   },
   transformers: {
     remark: {
@@ -43,6 +44,7 @@ module.exports = {
           cultivar: 'Cultivar',
           origin: 'Origin',
           vendor: 'Vendor',
+          tags: 'Tags',
         },
       },
     },
@@ -88,6 +90,13 @@ module.exports = {
       options: {
         path: 'content/origins/*.md',
         typeName: 'Origin',
+      },
+    },
+    {
+      use: '@gridsome/source-filesystem',
+      options: {
+        path: 'content/tags/*.md',
+        typeName: 'Tags',
       },
     },
     {
