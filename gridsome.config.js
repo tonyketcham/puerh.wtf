@@ -7,9 +7,9 @@
 module.exports = {
   siteName: 'Puerh.wtf',
   templates: {
-    Category: '/category/:id',
-    Author: '/drinker/:id',
-    Style: '/category/:category/:id',
+    Category: '/categories/:title',
+    Author: '/drinker/:title',
+    Style: '/categories/:category/:title',
     Cultivar: '/cultivar/:id',
     Origin: '/origin/:id',
     Vendor: '/vendor/:id',

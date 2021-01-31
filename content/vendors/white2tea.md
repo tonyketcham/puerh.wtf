@@ -1,6 +1,6 @@
 ---
 id: 81d86379-bf51-47ed-8d2f-6997e057ced7
-name: white2tea
+title: white2tea
 image: /images/uploads/white2logo.png
 links:
   website: https://white2tea.com/

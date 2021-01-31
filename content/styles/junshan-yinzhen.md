@@ -1,6 +1,6 @@
 ---
 id: 73b1b7c8-29eb-4a16-a3b2-bc23442946d5
-name: Junshan Yinzhen
+title: Junshan Yinzhen
 category: eb5e2475-19e2-434b-92ed-067cc41278ff
 description: >-
   This style is most typically associated with material from a small island

@@ -1,10 +1,10 @@
 ---
 genre_id: eb975148-c199-42af-ad85-e002de83b3a0
-name: Bi Luo Chun
+title: Bi Luo Chun
 parent: Chinese Green
 id: 1b2fcfcf-f7ac-46d6-a1f1-15a6d72c8158
 category: 64373a78-908c-4016-84af-c09666c8704f
-color: "#a9ce54"
+color: '#a9ce54'
 description: >-
   A highly sought-after Chinese green made from incredibly young pickings (one
   bud, one leaf). One of the earliest picked greens of the Spring, when it's

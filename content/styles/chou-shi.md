@@ -1,6 +1,6 @@
 ---
 id: d65e8670-3097-4ee5-93d6-fb7b2fe41ee3
-name: Chou Shi
+title: Chou Shi
 category: 3442d784-04b7-4019-8e5c-5b37b00fe7d1
 description: This processing style involves dehydrating Dan Cong early on to
   stop oxidation of the leaves. The material is quickly fried after picking

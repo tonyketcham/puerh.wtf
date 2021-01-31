@@ -1,5 +1,5 @@
 ---
 id: eb5e2475-19e2-434b-92ed-067cc41278ff
-name: Yellow
-color: "#fff65a"
+title: Yellow
+color: '#fff65a'
 ---

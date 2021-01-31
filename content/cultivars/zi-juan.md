@@ -1,6 +1,6 @@
 ---
 id: a025dcf0-3b5b-44f8-a439-18564d2b1864
-name: Zi Juan
+title: Zi Juan
 styles:
   - d881f184-5372-406a-a47f-421cbacf58bf
 description: >-

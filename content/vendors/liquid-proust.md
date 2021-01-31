@@ -1,6 +1,6 @@
 ---
 id: 6247aeca-512f-4a22-8352-67551cfa92ad
-name: Liquid Proust
+title: Liquid Proust
 image: /images/uploads/liquidproust.jpg
 links:
   website: https://liquidproust.com

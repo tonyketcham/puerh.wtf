@@ -1,6 +1,6 @@
 ---
 id: 555dfab5-d760-4863-8143-3fd9c1a7d14b
-name: Living Tea
+title: Living Tea
 image: /images/uploads/living-tea.webp
 links:
   website: https://www.livingtea.net/

@@ -1,6 +1,6 @@
 ---
 id: 84de34f8-3878-4daf-aa6e-d4925338fbfb
-name: Mei Leaf
+title: Mei Leaf
 links:
   website: https://meileaf.com
 location: London
