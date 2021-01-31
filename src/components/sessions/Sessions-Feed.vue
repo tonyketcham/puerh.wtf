@@ -6,8 +6,8 @@
         <nav class="space-x-2 tabs">
           <g-link to="/sessions/top/">Top</g-link>
           <g-link to="/sessions/latest/">Latest</g-link>
-          <g-link>Month</g-link>
-          <g-link>Year</g-link>
+          <g-link to="/sessions/month/">Month</g-link>
+          <g-link to="/sessions/year/">Year</g-link>
         </nav>
       </header>
       <Session-Card
