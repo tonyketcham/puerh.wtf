@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex w-full h-full gap-8 p-6 overflow-y-scroll bg-gray-200 dark:bg-gray-800 lg:p-12"
+    class="flex w-full h-full gap-8 overflow-y-auto bg-gray-200 dark:bg-gray-800"
   >
     <aside class="hidden w-64 h-full flex-0 lg:block">
       <Sidebar-Nav />

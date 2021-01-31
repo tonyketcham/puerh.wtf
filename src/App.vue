@@ -48,3 +48,10 @@ query {
     },
   };
 </script>
+
+<style>
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  /* ::-webkit-scrollbar {
+    @apply hidden;
+  } */
+</style>
