@@ -1,9 +1,10 @@
 <template>
   <div
-    class="box-border flex justify-between h-56 overflow-hidden border-2 border-gray-900 rounded-lg bg-gray-50 dark:bg-gray-700"
+    class="flex justify-between h-56 overflow-hidden rounded-lg rim border-opacity-20 bg-gray-50 dark:bg-gray-700"
+    :style="`border-left: solid 3.5px ${color}`"
   >
     <div class="w-1/2 m-4">
-      <h2 class="text-3xl">
+      <h2 class="text-2xl md:text-3xl">
         <g-link :to="info.path">
           {{ info.title }}
         </g-link>
@@ -12,7 +13,7 @@
         {{ info.excerpt }}
       </p>
     </div>
-    <div class="w-1/2 md:w-1/3">
+    <div class="w-1/2 h-full overflow-hidden shadow-md md:w-1/3">
       <img
         v-if="info.images[0]"
         :src="info.images[0].image"
@@ -30,6 +31,11 @@
   export default {
     props: {
       info: Object,
+    },
+    computed: {
+      color() {
+        return this.info.style[0]?.category.color;
+      },
     },
   };
 </script>
