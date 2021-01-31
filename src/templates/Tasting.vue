@@ -127,7 +127,7 @@ query Tasting ($id: ID!) {
   };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   dd {
     @apply text-gray-600 dark:text-gray-300;
   }
