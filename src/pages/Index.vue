@@ -5,50 +5,21 @@
     <aside class="hidden w-64 h-full flex-0 lg:block">
       <Sidebar-Nav />
     </aside>
-    <div class="flex-col flex-wrap flex-1 space-y-2">
-      <header class="flex justify-between">
-        <h1 class="text-2xl">Sessions</h1>
-        <nav class="space-x-2 tabs">
-          <g-link>Top</g-link>
-          <g-link>Latest</g-link>
-          <g-link>Month</g-link>
-          <g-link>Year</g-link>
-        </nav>
-      </header>
-      <Session-Card
-        v-for="edge in $page.sessions.edges"
-        :key="edge.node.id"
-        :info="edge.node"
-      />
+    <div class="flex-1">
+      <Sessions-Feed />
     </div>
   </div>
 </template>
 
 <page-query>
-query {
-  sessions: allTasting {
-  	edges {
-      node {
-        title
-        path
-        id
-        excerpt
-        images {
-          image
-          alt
-        }
-      }
-    }
-  }
-}
 </page-query>
 
 <script>
   import SidebarNav from '@/components/Sidebar-Nav.vue';
-  import SessionCard from '@/components/Session-Card.vue';
+  import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
 
   export default {
-    components: { SidebarNav, SessionCard },
+    components: { SidebarNav, SessionsFeed },
     metaInfo: {
       title: 'A tea log',
     },
