@@ -26,6 +26,9 @@ So I decided to develop a site just so I could document all the damn teas I drin
 4. `gridsome develop` to start a local dev server at `http://localhost:8080`
 5. Put stuff with your little hands
 
+Is eslint telling you to fix a bunch of shit on the end of every line?
+(Then look no further!)[https://developpaper.com/solution-to-delete-%E2%90%8Deslint-prettier-prettier-error/]
+
 ### 3. Test local build
 
 This is important to debug and troubleshoot bugs that may not be well documented with Gridsome yet, particularly routing side effects. Otherwise you may be left with something that works perfectly in development but is buggy on deployment.
