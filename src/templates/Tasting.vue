@@ -4,7 +4,7 @@
     <span>{{ $page.tasting.date }}</span>
 
     <Author
-      :name="$page.tasting.author[0].name"
+      :name="$page.tasting.author[0].title"
       :image="$page.tasting.author[0].image"
     />
     <template v-if="$page.tasting.images">
@@ -28,7 +28,7 @@ query Tasting ($id: ID!) {
         id
         date
         author {
-          name
+          title
           image
         }
         title
@@ -38,13 +38,13 @@ query Tasting ($id: ID!) {
         }
         rating
         style {
-          name
+          title
           category {
-            name
+            title
           }
         }
         cultivar {
-          name
+          title
         }
         season
         production_year

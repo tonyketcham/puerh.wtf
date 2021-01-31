@@ -32,6 +32,11 @@ query {
             color
           }
         }
+        tags {
+    			title
+          path
+          color
+        }
         images {
           image
           alt

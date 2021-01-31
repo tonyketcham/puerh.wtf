@@ -1,11 +1,15 @@
 <template>
-  <span
-    class="px-1.5 text-xs font-medium rounded-md text-black"
-    :class="{ 'text-white': isBackgroundDark }"
+  <g-link
+    :to="tag.path"
+    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded-lg transition-all transform hover:scale-95 hover:rotate-1 shadow-sm opacity-90 hover:opacity-100"
+    :class="[isBackgroundDark ? 'text-white' : 'text-gray-800']"
     :style="`background-color: ${tag.color}`"
   >
-    {{ tag.title }}
-  </span>
+    <span class="blend-luminosity">
+      <span class="opacity-40">#</span>
+      {{ tag.title }}
+    </span>
+  </g-link>
 </template>
 
 <script>
@@ -16,6 +20,7 @@
         default: function () {
           return {
             title: 'Tag',
+            path: '/tags/gushu',
             color: '#ffffff',
           };
         },
@@ -33,17 +38,12 @@
        */
       isColorDark(r, g, b) {
         let a = 1 - (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        console.group('tag');
-        console.log(this.tag.title);
-        console.log(a);
-        console.groupEnd('tag');
         return a > 0.5;
       },
       /**
        * @see https://gist.github.com/comficker/871d378c535854c1c460f7867a191a5a#file-hex2rgb-js
        */
       hex2RGB(hex) {
-        console.log(hex);
         const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
         const [, short, long] = String(hex).match(RGB_HEX) || [];
 
@@ -59,3 +59,9 @@
     },
   };
 </script>
+
+<style lang="css" scoped>
+  .blend-luminosity {
+    mix-blend-mode: luminosity;
+  }
+</style>
