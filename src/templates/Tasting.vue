@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full h-full p-6 overflow-y-scroll">
     <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
     <span>{{ $page.tasting.date }}</span>
 
@@ -17,7 +17,8 @@
     </template>
 
     <Experience-Notes :notes="$page.tasting.notes" />
-    <div class="body" v-html="$page.tasting.content" />
+    <!-- white-space: break-spaces; -->
+    <div class="body" v-html="insertLineBreaks($page.tasting.content)" />
   </div>
 </template>
 
@@ -124,10 +125,17 @@ query Tasting ($id: ID!) {
       Author,
       ExperienceNotes,
     },
+    methods: {
+      insertLineBreaks(content) {
+        if (!content) return '';
+        const stringifiedContent = content.toString();
+        return stringifiedContent.replaceAll('\\', '<br/>');
+      },
+    },
   };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
   dd {
     @apply text-gray-600 dark:text-gray-300;
   }
