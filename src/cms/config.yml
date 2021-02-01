@@ -108,8 +108,8 @@ collections:
         collection: 'vendors'
         multiple: true
         value_field: 'id'
-        search_fields: ['name', 'location', 'municipality', 'country']
-        display_fields: ['name']
+        search_fields: ['title', 'location', 'municipality', 'country']
+        display_fields: ['title']
         required: false
 
       - label: 'Purchase Link'
@@ -351,8 +351,8 @@ collections:
         collection: 'tags'
         multiple: true
         value_field: 'id'
-        search_fields: ['name']
-        display_fields: ['name']
+        search_fields: ['title']
+        display_fields: ['title']
         required: false
 
       - label: 'Preference Rating (0-100)'
@@ -431,17 +431,17 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{name}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
     extension: 'md'
-    sortable_fields: ['name', 'color']
+    sortable_fields: ['title', 'color']
     fields:
       - label: 'ID'
         name: 'id'
         widget: 'id'
 
       - label: 'Name'
-        name: 'name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Color'
@@ -463,10 +463,10 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{fields.name}}'
+    identifier_field: 'title'
+    summary: '{{fields.title}}'
     extension: 'md'
-    sortable_fields: ['category', 'color', 'name']
+    sortable_fields: ['category', 'color', 'title']
     view_groups:
       - label: 'Category'
         field: 'category'
@@ -477,7 +477,7 @@ collections:
         widget: 'id'
 
       - label: 'Name'
-        name: 'name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Category'
@@ -485,8 +485,8 @@ collections:
         widget: 'relation'
         collection: 'categories'
         value_field: 'id'
-        search_fields: ['name']
-        display_fields: ['name']
+        search_fields: ['title']
+        display_fields: ['title']
         required: false
 
       - label: 'Color'
@@ -508,8 +508,8 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{name}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
     extension: 'md'
     fields:
       - label: 'ID'
@@ -517,7 +517,7 @@ collections:
         widget: 'id'
 
       - label: 'Name'
-        name: 'name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Related Styles'
@@ -592,8 +592,8 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{name}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
     extension: 'md'
     fields:
       - label: 'ID'
@@ -601,7 +601,7 @@ collections:
         widget: 'id'
 
       - label: 'Vendor Name'
-        name: 'name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Profile Picture'
@@ -664,8 +664,8 @@ collections:
     create: true
     delete: true
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{name}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
     extension: 'md'
     fields:
       - label: 'ID'
@@ -673,7 +673,7 @@ collections:
         widget: 'id'
 
       - label: 'Author Name'
-        name: 'name'
+        name: 'title'
         widget: 'string'
 
       - label: 'Profile Picture'
@@ -720,8 +720,8 @@ collections:
     delete: true
     name: 'tags'
     slug: '{{slug}}'
-    identifier_field: 'name'
-    summary: '{{name}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
     extension: 'md'
     fields:
       - label: 'ID'
@@ -729,7 +729,7 @@ collections:
         widget: 'id'
 
       - label: 'Tag'
-        name: 'name'
+        name: 'title'
         widget: string
 
       - label: 'Color'
