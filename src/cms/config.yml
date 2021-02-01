@@ -38,8 +38,8 @@ collections:
         collection: 'authors'
         multiple: true
         value_field: 'id'
-        search_fields: ['name', 'instagram']
-        display_fields: ['name']
+        search_fields: ['title', 'instagram']
+        display_fields: ['title']
 
       - label: 'Tea Name'
         name: 'title'
@@ -51,8 +51,8 @@ collections:
         collection: 'styles'
         multiple: true
         value_field: 'id'
-        search_fields: ['name', 'category']
-        display_fields: ['name']
+        search_fields: ['title', 'category']
+        display_fields: ['title']
 
       - label: 'Cultivar'
         name: 'cultivar'
@@ -60,8 +60,8 @@ collections:
         collection: 'cultivars'
         multiple: true
         value_field: 'id'
-        search_fields: ['name']
-        display_fields: ['name']
+        search_fields: ['title']
+        display_fields: ['title']
         required: false
 
       - label: 'Origin'
@@ -525,8 +525,8 @@ collections:
         widget: relation
         collection: 'styles'
         value_field: 'id'
-        search_fields: ['name']
-        display_fields: ['name']
+        search_fields: ['title']
+        display_fields: ['title']
         multiple: true
         required: false
 
