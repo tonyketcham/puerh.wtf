@@ -9,6 +9,14 @@
   </main>
 </template>
 
+<static-query>
+query {
+  metadata {
+    siteName
+  }
+}
+</static-query>
+
 <script>
   import Header from '../components/header/Header.vue';
 

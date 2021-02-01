@@ -4,10 +4,14 @@
       v-for="edge in $static.categories.edges"
       :key="edge.node.title"
       :to="edge.node.path"
-      class="link"
-      ><span>{{ randomEmoji() }}</span
-      >{{ edge.node.title }}</g-link
+      class="relative z-10 space-x-2 link"
     >
+      <dt
+        class="inline-block w-3 h-3 rounded"
+        :style="`background-color: ${edge.node.color}`"
+      />
+      <dd class="inline">{{ edge.node.title }}</dd>
+    </g-link>
   </nav>
 </template>
 
@@ -18,31 +22,20 @@ query Categories {
       node {
         title
         path
+        color
       }
     }
   }
 }
 </static-query>
 
-<script>
-  const emojis = require('emojis-list');
-  export default {
-    methods: {
-      randomEmoji() {
-        return emojis[Math.floor(Math.random() * (emojis.length - 2)) + 320];
-      },
-    },
-  };
-</script>
+<script></script>
 
 <style scoped>
-  span {
-    @apply mr-2 text-2xl;
-  }
   .link {
-    @apply block;
+    @apply block rounded px-2 transition-all ease-out duration-200;
   }
   .link:hover {
-    @apply bg-indigo-200 text-gray-900;
+    @apply bg-indigo-200 text-gray-900 font-medium;
   }
 </style>

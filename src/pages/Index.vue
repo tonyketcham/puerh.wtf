@@ -21,7 +21,7 @@
   export default {
     components: { SidebarNav, SessionsFeed },
     metaInfo: {
-      title: 'A tea log',
+      title: 'Tea Time',
     },
   };
 </script>
