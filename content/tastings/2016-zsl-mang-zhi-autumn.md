@@ -15,7 +15,7 @@ elevation: 1400
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21
 purchase_link: https://web.archive.org/web/20201026181003/https://www.tea-encounter.com/product/2016-mang-zhi-autumn/
-excerpt: everybody clap
+excerpt: a complex traversal of the flavor spectrum with an incredibly body
 date: 2021-02-01T15:08:19.271Z
 flavor_axes:
   cream:
