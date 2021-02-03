@@ -7,6 +7,7 @@
 module.exports = {
   siteName: 'Puerh.wtf',
   templates: {
+    Tasting: '/sessions/:year/:month/:title',
     Category: '/categories/:title',
     Author: '/drinker/:title',
     Style: '/categories/:category/:title',
@@ -36,7 +37,6 @@ module.exports = {
       use: '@gridsome/source-filesystem',
       options: {
         path: 'content/tastings/*.md',
-        route: '/sessions/:year/:month/:title',
         typeName: 'Tasting',
         refs: {
           author: 'Author',
