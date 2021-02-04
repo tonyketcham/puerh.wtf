@@ -5,11 +5,19 @@ module.exports = {
   },
   darkMode: 'class', // manually trigger
   theme: {
-    extend: {},
+    extend: {
+      width: {
+        112: '28rem',
+      },
+    },
   },
   variants: {
     extend: {
       strokeWidth: ['hover', 'focus'],
     },
   },
+  plugins: [
+    require('tailwindcss-textshadow'),
+    require('tailwind-filter-utilities'),
+  ],
 };
