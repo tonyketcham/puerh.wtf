@@ -1,6 +1,6 @@
 <template>
   <simplebar class="h-full">
-    <section class="flex-col flex-wrap p-6 lg:p-16">
+    <section class="flex-col p-6 lg:p-16">
       <header class="flex justify-between mb-6">
         <h1 class="text-2xl">Sessions</h1>
         <nav class="space-x-2 tabs">
@@ -10,11 +10,12 @@
           <g-link to="/sessions/year/">Year</g-link>
         </nav>
       </header>
-      <div class="space-y-4">
+      <div class="flex flex-wrap gap-4">
         <Session-Card
           v-for="edge in sessions.edges"
           :key="edge.node.id"
           :info="edge.node"
+          class="w-full sm:w-112"
         />
       </div>
     </section>

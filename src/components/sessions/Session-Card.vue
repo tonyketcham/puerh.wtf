@@ -1,7 +1,6 @@
 <template>
   <div
-    class="relative flex justify-between h-64 overflow-hidden rounded shadow-md rim bg-gray-50 dark:bg-gray-700"
-    :style="`border-left: solid 6px ${color}`"
+    class="relative flex justify-between h-64 overflow-hidden rounded shadow-md bg-gray-50 dark:bg-gray-700 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
   >
     <div class="flex flex-col w-1/2 h-full lg:w-7/12">
       <!-- <simplebar class="absolute z-30 m-2 mb-0 mr-0 h-9"> -->
@@ -9,31 +8,46 @@
         <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />
       </div> -->
       <!-- </simplebar> -->
-      <div class="m-4 leading-5">
-        <h2 class="mb-4 text-2xl font-medium md:text-4xl dark:text-gray-50">
+      <div
+        v-if="info.images[0]"
+        class="absolute overflow-hidden rounded-sm inset-2"
+      >
+        <img
+          :src="info.images[0].image"
+          :alt="info.images[0].alt"
+          class="object-cover w-full h-full"
+        />
+        <div
+          class="absolute inset-0 w-3/4 opacity-60 bg-gradient-to-br from-gray-900 to-transparent via-transparent h-3/4"
+        />
+      </div>
+      <div class="w-10 h-1" :style="`background-color: ${color}`" />
+      <div
+        class="absolute bottom-0 right-0 w-10 h-1"
+        :style="`background-color: ${color}`"
+      />
+
+      <div class="absolute m-4 leading-5">
+        <h2
+          class="mb-2 text-4xl font-medium"
+          :class="[info.images[0] ? 'text-gray-50' : 'text-gray-700']"
+        >
           <g-link :to="info.path">
             {{ info.title }}
           </g-link>
         </h2>
-        <p class="text-gray-600 dark:text-gray-300">
+        <p
+          class="text-lg tracking-wide"
+          :class="[
+            info.images[0] ? 'text-gray-200 text-shadow-md' : 'text-gray-600',
+          ]"
+        >
           {{ info.excerpt }}
         </p>
       </div>
-    </div>
-    <div class="relative w-1/2 h-full overflow-hidden lg:w-5/12">
-      <div v-if="info.images[0]">
-        <img
-          :src="info.images[0].image"
-          :alt="info.images[0].alt"
-          class="absolute object-cover w-full h-full"
-        />
+      <div class="absolute bottom-3 right-3 h-6 flex flex-nowrap space-x-1.5">
+        <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />
       </div>
-      <div v-else class="absolute flex w-full h-full bg-white">
-        <h3 class="m-auto text-gray-600">Coming Soon...</h3>
-      </div>
-    </div>
-    <div class="absolute bottom-3 right-3 h-6 flex flex-nowrap space-x-1.5">
-      <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />
     </div>
   </div>
 </template>
