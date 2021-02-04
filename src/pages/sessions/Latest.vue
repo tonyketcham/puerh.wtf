@@ -6,12 +6,38 @@
       <Sidebar-Nav />
     </aside>
     <div class="flex-1">
-      <Sessions-Feed />
+      <Sessions-Feed :sessions="$page.sessions" />
     </div>
   </div>
 </template>
 
 <page-query>
+query {
+  sessions: allTasting {
+  	edges {
+      node {
+        title
+        path
+        id
+        excerpt
+        style {
+          category {
+            color
+          }
+        }
+        tags {
+    			title
+          path
+          color
+        }
+        images {
+          image
+          alt
+        }
+      }
+    }
+  }
+}
 </page-query>
 
 <script>
