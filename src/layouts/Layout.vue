@@ -1,6 +1,6 @@
 <template>
   <main
-    class="h-screen overflow-hidden text-gray-700 transition-colors duration-150 ease-in-out dark:text-gray-50"
+    class="h-screen overflow-hidden text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50"
   >
     <Header />
     <div class="h-full pt-14">

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex justify-between h-64 overflow-hidden rounded shadow-md bg-gray-50 dark:bg-gray-700 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
+    class="relative flex justify-between h-64 overflow-hidden transition-colors duration-100 ease-in-out rounded shadow-md bg-gray-50 dark:bg-gray-200 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
   >
     <div class="flex flex-col w-1/2 h-full lg:w-7/12">
       <!-- <simplebar class="absolute z-30 m-2 mb-0 mr-0 h-9"> -->
@@ -36,8 +36,13 @@
             {{ info.title }}
           </g-link>
         </h2>
+        <small
+          class="font-semibold tracking-wider"
+          :class="[info.images[0] ? 'text-gray-300' : 'text-gray-400']"
+          >{{ info.date }}
+        </small>
         <p
-          class="text-lg tracking-wide"
+          class="mt-2 text-lg tracking-wide"
           :class="[
             info.images[0] ? 'text-gray-200 text-shadow-md' : 'text-gray-600',
           ]"
