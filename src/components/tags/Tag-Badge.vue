@@ -1,9 +1,9 @@
 <template>
   <g-link
     :to="tag.path"
-    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded-lg transition-all transform hover:scale-95 hover:rotate-1 shadow-sm opacity-90 hover:opacity-100"
+    :style="`background-color: ${tag.color}; background-opacity: 0.7`"
+    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded-lg transition-all transform hover:scale-95 hover:rotate-1 shadow-sm hover:opacity-90"
     :class="[isBackgroundDark ? 'text-white' : 'text-gray-800']"
-    :style="`background-color: ${tag.color}`"
   >
     <span class="blend-luminosity">
       <span class="opacity-40">#</span>
