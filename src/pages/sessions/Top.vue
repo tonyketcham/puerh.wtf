@@ -17,6 +17,7 @@ query {
   	edges {
       node {
         title
+        date (format: "MMM DD, YYYY")
         path
         id
         excerpt
