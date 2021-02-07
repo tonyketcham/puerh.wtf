@@ -1,5 +1,5 @@
 <template>
-  <dl class="w-1/2 p-10 m-3 space-y-4">
+  <dl class="w-1/2 m-3 space-y-4">
     <div>
       <dt class="w-full font-semibold border-b-2">Wet leaf nose</dt>
       <dd>{{ notes.wet_leaf_nose }}</dd>
