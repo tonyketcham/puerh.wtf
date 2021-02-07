@@ -1,32 +1,60 @@
 <template>
-  <div class="w-full h-full p-6 overflow-y-scroll">
-    <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
-    <span>{{ $page.tasting.date }}</span>
-
-    <Author
-      :name="$page.tasting.author[0].title"
-      :image="$page.tasting.author[0].image"
-    />
-    <template v-if="$page.tasting.images">
-      <g-image
-        v-for="node in $page.tasting.images"
-        :key="node.image"
-        :src="node.image"
-        :alt="node.alt"
+  <article
+    class="grid w-full h-full grid-flow-row grid-cols-12 gap-6 p-6 overflow-y-scroll grid-rows"
+  >
+    <div class="col-span-12 md:col-span-8">
+      <div class="flex">
+        <Author
+          :name="$page.tasting.author[0].title"
+          :image="$page.tasting.author[0].image"
+          :date="$page.tasting.date"
+          class="ml-1 max-w-max"
+        />
+        <h3 class="font-mono text-xs font-light opacity-30">
+          {{ $page.tasting.date }}
+        </h3>
+      </div>
+      <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
+      <template v-if="$page.tasting.images.length > 0">
+        <div
+          class="relative w-full mt-6 overflow-hidden rounded-lg shadow h-96"
+        >
+          <g-image
+            v-for="node in $page.tasting.images"
+            :key="node.image"
+            :src="node.image"
+            :alt="node.alt"
+            class="absolute inset-0 object-cover w-full h-full"
+          />
+        </div>
+      </template>
+    </div>
+    <aside
+      class="relative flex flex-col h-full col-span-4 row-span-2 md:flex-row"
+    >
+      <Flavor-Chart
+        class="mt-2.5 md:sticky md:top-0 align-middle self-start"
+        :flavor_axes="$page.tasting.flavor_axes"
       />
-    </template>
+      <Experience-Notes
+        class="self-start w-2/3 align-middle md:sticky md:top-0"
+        :notes="$page.tasting.notes"
+      />
+    </aside>
 
-    <Experience-Notes :notes="$page.tasting.notes" />
     <!-- white-space: break-spaces; -->
-    <div class="body" v-html="insertLineBreaks($page.tasting.content)" />
-  </div>
+    <div
+      class="col-span-8 row-start-2 pt-5 border-t-2 border-gray-600 border-dashed dark:border-gray-400 body border-opacity-40"
+      v-html="insertLineBreaks($page.tasting.content)"
+    />
+  </article>
 </template>
 
 <page-query>
 query Tasting ($id: ID!) {
   tasting(id: $id) {
         id
-        date
+        date (format: "MM/DD/YYYY")
         author {
           title
           image
@@ -120,10 +148,12 @@ query Tasting ($id: ID!) {
 <script>
   import ExperienceNotes from '@/components/tea/Experience-Notes.vue';
   import Author from '../components/Author.vue';
+  import FlavorChart from '@/components/tea/Flavor-Chart.vue';
   export default {
     components: {
       Author,
       ExperienceNotes,
+      FlavorChart,
     },
     methods: {
       insertLineBreaks(content) {
