@@ -1,14 +1,16 @@
 <template>
-  <div class="flex space-x-2 align-middle">
+  <div class="relative flex items-baseline">
     <g-image
       :src="image"
       blur="40"
-      width="50"
-      height="50"
       alt="Author"
-      class="rounded-full w-9 h-9"
+      class="z-10 rounded-lg shadow h-7 w-7"
     />
-    <h2 class="m-auto">{{ name }}</h2>
+    <h2
+      class="bg-gray-700 dark:bg-gray-300 text-gray-200 dark:text-gray-700 px-1.5 rounded pl-5 -ml-4 mr-0.5 text-base font-medium"
+    >
+      {{ name }}
+    </h2>
   </div>
 </template>
 
@@ -22,6 +24,10 @@
       image: {
         type: String,
         default: '#',
+      },
+      date: {
+        type: String,
+        default: '',
       },
     },
   };
