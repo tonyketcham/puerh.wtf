@@ -8840,10 +8840,10 @@ neo-async@^2.5.0, neo-async@^2.6.0, neo-async@^2.6.1, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-netlify-cms-app@^2.14.18:
-  version "2.14.18"
-  resolved "https://registry.yarnpkg.com/netlify-cms-app/-/netlify-cms-app-2.14.18.tgz#224b6bdac1bccd919f958a8566d138c86a2def2f"
-  integrity sha512-08fwQlXGOdGe3ayFTc28mta33+SPJc+kPkPUaycZgVIW6E3wuH4Xva6MR6zHX4aLnVcYjqssEBQ6eYNYZYXtzQ==
+netlify-cms-app@^2.14.20:
+  version "2.14.20"
+  resolved "https://registry.yarnpkg.com/netlify-cms-app/-/netlify-cms-app-2.14.20.tgz#e8a87847fab0a0d61d9e6444527f9aa068ce5d40"
+  integrity sha512-eDBXNuag7kbIQybaSVvE9d1Zzpxuj+JiN6bvN7yNJkUan6ois4HgFgFIB1yA+jG0gAvjTMKl7qAXS7Snoa0J7Q==
   dependencies:
     "@emotion/core" "^10.0.35"
     "@emotion/styled" "^10.0.27"
@@ -8856,11 +8856,11 @@ netlify-cms-app@^2.14.18:
     netlify-cms-backend-github "^2.11.7"
     netlify-cms-backend-gitlab "^2.9.7"
     netlify-cms-backend-test "^2.10.5"
-    netlify-cms-core "^2.37.0"
+    netlify-cms-core "^2.37.2"
     netlify-cms-editor-component-image "^2.6.7"
     netlify-cms-lib-auth "^2.3.0"
     netlify-cms-lib-util "^2.12.2"
-    netlify-cms-locales "^1.25.0"
+    netlify-cms-locales "^1.26.0"
     netlify-cms-ui-default "^2.12.0"
     netlify-cms-widget-boolean "^2.3.4"
     netlify-cms-widget-code "^1.2.5"
@@ -8938,10 +8938,10 @@ netlify-cms-backend-test@^2.10.5:
   resolved "https://registry.yarnpkg.com/netlify-cms-backend-test/-/netlify-cms-backend-test-2.10.5.tgz#b06cf3adc425841d89689c1bf0c0658949fc48c9"
   integrity sha512-YHuMfAuzmDKd89YvMNfZh4F0DhGYGJVBVEV5H/MgOkPQcREG9SdLNjDyBcr/Y7mpjlu6MwR3s71BgMWIlFGpJg==
 
-netlify-cms-core@^2.37.0:
-  version "2.37.0"
-  resolved "https://registry.yarnpkg.com/netlify-cms-core/-/netlify-cms-core-2.37.0.tgz#74c2e4c8b9b80711f8cdbcb1ecd05a320a4944c1"
-  integrity sha512-vV8NEMPHtguNufAeO1QLHSsiatrEfo7b3yA+6T4VQlYHBIbPiaZwBVi5OaP6edSD5iZPDF6pS8zABGdasi+kEQ==
+netlify-cms-core@^2.37.2:
+  version "2.37.2"
+  resolved "https://registry.yarnpkg.com/netlify-cms-core/-/netlify-cms-core-2.37.2.tgz#2e5c6ae0c20d8e576919b917bb884f9245dd07e2"
+  integrity sha512-8xlSRfG8R7M6lyEBRXA/4J+r7WjuDuyH4yrBm5a+iYZEkHBIB0aKPDam2BsHZmkAlEuJx4sHGgtNQVxrGrPP3g==
   dependencies:
     "@iarna/toml" "2.2.5"
     ajv "^7.0.0"
@@ -9009,10 +9009,10 @@ netlify-cms-lib-util@^2.12.2:
     localforage "^1.7.3"
     semaphore "^1.1.0"
 
-netlify-cms-locales@^1.25.0:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/netlify-cms-locales/-/netlify-cms-locales-1.25.0.tgz#1efe229ac3e977b601f6d240dca29b73c17918c3"
-  integrity sha512-xUO0IkPQoeWBwTBZiJ+VUX1WxmjWH4bKJfjtJxmTy7s1xTSIgHQaIoBvJ7DLnLGiF+7nQ2rZWVDT42XgRFT4og==
+netlify-cms-locales@^1.26.0:
+  version "1.26.0"
+  resolved "https://registry.yarnpkg.com/netlify-cms-locales/-/netlify-cms-locales-1.26.0.tgz#1e0d520dd203d55328b55c8d12d723bfd5d500b4"
+  integrity sha512-j5i+7jIrlcYf+bDqyh6p9YAszle+zMp19GKkxw/U0uz3ab6vFYW0SMZGccuu/xZEFVBUmqNiGFVHH3UZMd4LnQ==
 
 netlify-cms-media-library-cloudinary@^1.3.8:
   version "1.3.8"
@@ -9167,13 +9167,13 @@ netlify-cms-widget-youtube@^0.3.1:
     js-video-url-parser "^0.2.7"
     prop-types "^15.6.1"
 
-netlify-cms@^2.10.88:
-  version "2.10.88"
-  resolved "https://registry.yarnpkg.com/netlify-cms/-/netlify-cms-2.10.88.tgz#188c829829ada00ba6159ba93f4bd821d53dde5f"
-  integrity sha512-bFVr7y9YdLrLbkJiOGLixcTSNU0+6u2CokqmlXA/HjnF4BKcKx3wdwrjf1YmLETXyZ1cuwcNg2fXQ7bNjE3OXw==
+netlify-cms@^2.10.90:
+  version "2.10.90"
+  resolved "https://registry.yarnpkg.com/netlify-cms/-/netlify-cms-2.10.90.tgz#b534498e434c9744344deaeae6056c58a4ce92c2"
+  integrity sha512-E3oNDhrOu1aWBlpV6fyD1jJzZfOQ4O6E/cg3LQtukaHCqUdyszcBmJWwNUldN6tTR3MhE6mA6upnhvWsSUG6pQ==
   dependencies:
     codemirror "^5.46.0"
-    netlify-cms-app "^2.14.18"
+    netlify-cms-app "^2.14.20"
     netlify-cms-media-library-cloudinary "^1.3.8"
     netlify-cms-media-library-uploadcare "^0.5.9"
     react "^16.8.4"
