@@ -6,7 +6,11 @@
       <Sidebar-Nav />
     </aside>
     <div class="flex-auto">
-      <Sessions-Feed :sessions="$page.sessions" />
+      <Sessions-Feed-Mobile
+        :sessions="$page.sessions"
+        class="block md:hidden"
+      />
+      <Sessions-Feed :sessions="$page.sessions" class="hidden md:block" />
     </div>
   </div>
 </template>
@@ -44,9 +48,10 @@ query {
 <script>
   import SidebarNav from '@/components/Sidebar-Nav.vue';
   import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
+  import SessionsFeedMobile from '@/components/sessions/Sessions-Feed-Mobile.vue';
 
   export default {
-    components: { SidebarNav, SessionsFeed },
+    components: { SidebarNav, SessionsFeed, SessionsFeedMobile },
     metaInfo: {
       title: 'Tea Time',
     },
