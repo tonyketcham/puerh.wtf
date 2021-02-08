@@ -9,7 +9,7 @@
         <g-link to="/sessions/year/">Year</g-link>
       </nav>
     </header>
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-wrap">
       <Session-Card
         v-for="edge in sessions.edges"
         :key="edge.node.id"

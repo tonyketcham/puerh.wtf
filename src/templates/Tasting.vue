@@ -2,7 +2,7 @@
   <article
     class="grid w-full h-full grid-flow-row grid-cols-12 gap-6 p-6 overflow-y-scroll grid-rows"
   >
-    <div class="col-span-12 md:col-span-8">
+    <div class="col-span-12 row-start-1 md:col-span-8">
       <div class="flex">
         <Author
           :name="$page.tasting.author[0].title"
@@ -30,21 +30,21 @@
       </template>
     </div>
     <aside
-      class="relative flex flex-col h-full col-span-4 row-span-2 md:flex-row"
+      class="relative flex flex-row h-full col-span-12 row-span-2 row-start-2 md:row-start-1 md:col-span-4"
     >
       <Flavor-Chart
         class="mt-2.5 md:sticky md:top-0 align-middle self-start"
         :flavor_axes="$page.tasting.flavor_axes"
       />
       <Experience-Notes
-        class="self-start w-2/3 align-middle md:sticky md:top-0"
+        class="self-start w-full align-middle md:w-2/3 md:sticky md:top-0"
         :notes="$page.tasting.notes"
       />
     </aside>
 
     <!-- white-space: break-spaces; -->
     <div
-      class="col-span-8 row-start-2 pt-5 border-t-2 border-gray-600 border-dashed dark:border-gray-400 body border-opacity-40"
+      class="col-span-12 row-start-4 pt-5 border-t-2 border-gray-600 border-dashed md:row-start-2 md:col-span-8 dark:border-gray-400 body border-opacity-40"
       v-html="insertLineBreaks($page.tasting.content)"
     />
   </article>
