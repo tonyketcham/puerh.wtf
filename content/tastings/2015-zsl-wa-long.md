@@ -70,6 +70,15 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 10
+images:
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612896143/tea/2021/2015%20ZSL%20Wa%20Long/20070843-1FF9-45D9-BD11-2D1F83608485_yqhalu.jpg
+    alt: Tea in beaker
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612896144/tea/2021/2015%20ZSL%20Wa%20Long/07A8F8DA-99FB-4D6F-B7F1-40BDE928698A_tlcvgd.jpg
+    alt: Dry leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612896144/tea/2021/2015%20ZSL%20Wa%20Long/261AE875-279C-46CE-BB75-3638BEB832E1_yzhytl.jpg
+    alt: Wet leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612896143/tea/2021/2015%20ZSL%20Wa%20Long/70A854C7-78E3-4527-BCCA-6EBB922B55B0_isfkql.jpg
+    alt: Tea in cup
 ---
 
 The pickings are very fuzzy and have a mix of real young and more established young material. Came across a decent sprinkle of golden buds in there too.
