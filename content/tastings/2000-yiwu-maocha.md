@@ -47,8 +47,7 @@ flavor_axes:
     finish: 2
 notes:
   dry_leaf_nose: savory stuff, granite, morels, moss, wood oven
-  wet_leaf_nose:
-    mushrooms and vegetables, decaying flower petals, varnish that's
+  wet_leaf_nose: mushrooms and vegetables, decaying flower petals, varnish that's
     become organic matter, brown paper towels
   mouthfeel: light and astringent
   finish: drying, peat, geosmin, tang
@@ -66,6 +65,15 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 5
+images:
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897406/tea/2021/2000%20Yiwu%20Maocha/55ABDB10-A266-4A70-B9F6-3A6F23170EAF_hh40z3.jpg
+    alt: Dry leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897406/tea/2021/2000%20Yiwu%20Maocha/85F0C426-78D5-45D7-8CF1-0C472EDF79FD_b6bsld.jpg
+    alt: Wet leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897407/tea/2021/2000%20Yiwu%20Maocha/AC9A54BD-DB1A-4929-9943-ED600A4786B5_du8ebw.jpg
+    alt: Tea in beaker
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897407/tea/2021/2000%20Yiwu%20Maocha/F44B219E-0F05-4EF4-B963-2610FD68EF40_f1jwua.jpg
+    alt: Tea in cup
 ---
 
 ### Infusions
