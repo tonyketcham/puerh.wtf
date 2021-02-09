@@ -53,8 +53,7 @@ notes:
   empty_cup: caramel, burnt sugar, sugarcane
   mouthfeel: intensely thick and steady, sparkly like carbonation
   finish: very long and persisting before dropping off, a bit dry
-  taste:
-    oatmeal raisin cookie, cardamom, lemongrass, orchid, white pepper, clay,
+  taste: oatmeal raisin cookie, cardamom, lemongrass, orchid, white pepper, clay,
     slow-cooked citrus
   cha_qi: heady similar to a light weed high
 tags:
@@ -69,6 +68,15 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897269/tea/2021/2014%20ZSL%20Ding%20Jai%20Zhai/FB651F8F-2580-4C19-8D85-F9D63A98185C_pk6l9s.jpg
+    alt: Dry leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897269/tea/2021/2014%20ZSL%20Ding%20Jai%20Zhai/5F9942C5-DFC7-4BE4-842F-F02ECC2EC8AD_qaxx7r.jpg
+    alt: Wet leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612897269/tea/2021/2014%20ZSL%20Ding%20Jai%20Zhai/AA0194DA-704A-4E52-A12C-30E8D78ECE96_ilkt4c.jpg
+    alt: Tea in beaker
+  - alt: Tea in cup
+    image: https://res.cloudinary.com/pu-erh/image/upload/v1612897269/tea/2021/2014%20ZSL%20Ding%20Jai%20Zhai/62031422-7F91-49AE-BD92-5D36A2B46E76_xstpnl.jpg
 ---
 
 My first impression was that this is a very generous free sample. Enough for 2-3 sessions, and this stuff definitely ain't cheap at \$0.79/g. My order was only 3 samples, too, so that's dope as a dog of them.
