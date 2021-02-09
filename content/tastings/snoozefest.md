@@ -68,6 +68,19 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 15
+images:
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612895806/tea/2021/Snoozefest/63B60F99-5C28-4C00-9818-633EBA3A259D_iytjc2.jpg
+    alt: Cake - front
+  - alt: Cake - back
+    image: https://res.cloudinary.com/pu-erh/image/upload/v1612895804/tea/2021/Snoozefest/58DF6F28-CC6A-44D3-8220-0F7458159BBD_bckmij.jpg
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612895804/tea/2021/Snoozefest/92E33272-8D29-4936-BD84-323C2F13A887_tjbf02.jpg
+    alt: Dry leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612895804/tea/2021/Snoozefest/37A179E6-963F-4C72-BDA8-B8177C59BC0B_bm3ci0.jpg
+    alt: Wet leaf
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612895806/tea/2021/Snoozefest/D43DB424-FD7B-42E8-8AAF-9F1F8902241A_lewu8k.jpg
+    alt: Tea in beaker
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1612895804/tea/2021/Snoozefest/615E9D56-79E0-4992-B308-631C0E771BD4_bw3slb.jpg
+    alt: Tea in cup
 ---
 At last, its 2-month long journey to my house plus an 18-day buffer to air it out with a Boveda in the sheng palace (a double ziplock freezer bag) is complete. I couldn't wait any longer or I'd itch my damn skin off. The Snoozefest is here.
 
