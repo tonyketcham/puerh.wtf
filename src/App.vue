@@ -14,9 +14,6 @@ query {
 </static-query>
 
 <script>
-  import { mapGetters } from 'vuex';
-  import Layout from '~/layouts/Layout.vue';
-
   export default {
     metaInfo() {
       return {
@@ -31,20 +28,7 @@ query {
       };
     },
     components: {
-      Layout,
-    },
-    created() {
-      this.$store.dispatch('initTheme');
-    },
-    computed: {
-      ...mapGetters({ theme: 'getTheme' }),
-    },
-    watch: {
-      theme(newTheme) {
-        newTheme === 'light'
-          ? document.querySelector('html').classList.remove('dark')
-          : document.querySelector('html').classList.add('dark');
-      },
+      Layout: () => import('~/layouts/Layout.vue'),
     },
   };
 </script>
