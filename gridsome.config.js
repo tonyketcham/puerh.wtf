@@ -6,6 +6,15 @@
 
 module.exports = {
   siteName: 'Puerh.wtf',
+  icon: {
+    favicon: {
+      src: './src/android-chrome-512x512.png',
+    },
+    touchicon: {
+      src: './src/apple-touch-icon.png',
+      precomposed: true,
+    },
+  },
   templates: {
     Tasting: '/sessions/:year/:month/:title',
     Category: '/categories/:title',
