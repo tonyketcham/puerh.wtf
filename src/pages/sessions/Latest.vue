@@ -42,11 +42,11 @@ query {
 </page-query>
 
 <script>
-  import SidebarNav from '@/components/Sidebar-Nav.vue';
-  import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
-
   export default {
-    components: { SidebarNav, SessionsFeed },
+    components: {
+      SidebarNav: () => import('@/components/Sidebar-Nav.vue'),
+      SessionsFeed: () => import('@/components/sessions/Sessions-Feed.vue'),
+    },
     metaInfo: {
       title: 'A tea log',
     },

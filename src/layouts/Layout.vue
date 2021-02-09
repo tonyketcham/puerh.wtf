@@ -18,11 +18,9 @@ query {
 </static-query>
 
 <script>
-  import Header from '../components/header/Header.vue';
-
   export default {
     components: {
-      Header,
+      Header: () => import('../components/header/Header.vue'),
     },
   };
 </script>

@@ -23,13 +23,12 @@
 </template>
 
 <script>
-  import SessionCard from './Session-Card.vue';
-  import simplebar from 'simplebar-vue';
   import 'simplebar/dist/simplebar.min.css';
+
   export default {
     components: {
-      SessionCard,
-      simplebar,
+      SessionCard: () => import('./Session-Card.vue'),
+      simplebar: () => import('simplebar-vue'),
     },
     props: {
       sessions: null,

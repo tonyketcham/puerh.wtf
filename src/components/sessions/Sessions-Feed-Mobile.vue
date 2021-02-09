@@ -21,11 +21,9 @@
 </template>
 
 <script>
-  import SessionCard from './Session-Card.vue';
-  import 'simplebar/dist/simplebar.min.css';
   export default {
     components: {
-      SessionCard,
+      SessionCard: () => import('./Session-Card.vue'),
     },
     props: {
       sessions: null,

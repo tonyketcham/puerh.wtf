@@ -146,14 +146,11 @@ query Tasting ($id: ID!) {
 </page-query>
 
 <script>
-  import ExperienceNotes from '@/components/tea/Experience-Notes.vue';
-  import Author from '../components/Author.vue';
-  import FlavorChart from '@/components/tea/Flavor-Chart.vue';
   export default {
     components: {
-      Author,
-      ExperienceNotes,
-      FlavorChart,
+      Author: () => import('../components/Author.vue'),
+      ExperienceNotes: () => import('@/components/tea/Experience-Notes.vue'),
+      FlavorChart: () => import('@/components/tea/Flavor-Chart.vue'),
     },
     methods: {
       insertLineBreaks(content) {

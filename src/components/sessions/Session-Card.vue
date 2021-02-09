@@ -38,7 +38,7 @@
         </h2>
         <small
           class="font-semibold tracking-wider"
-          :class="[info.images[0] ? 'text-gray-300' : 'text-gray-400']"
+          :class="[info.images[0] ? 'text-gray-300' : 'text-gray-600']"
           >{{ info.date }}
         </small>
         <p
@@ -58,13 +58,9 @@
 </template>
 
 <script>
-  import TagBadge from '../tags/Tag-Badge.vue';
-  // import simplebar from 'simplebar-vue';
-  import 'simplebar/dist/simplebar.min.css';
   export default {
     components: {
-      TagBadge,
-      // simplebar,
+      TagBadge: () => import('../tags/Tag-Badge.vue'),
     },
     props: {
       info: Object,

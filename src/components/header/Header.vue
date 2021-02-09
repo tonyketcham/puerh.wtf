@@ -32,9 +32,10 @@ query {
 </static-query>
 
 <script>
-  import NavHead from './modules/Nav-Head.vue';
-  import ThemeToggle from './modules/Theme-Toggle.vue';
   export default {
-    components: { ThemeToggle, NavHead },
+    components: {
+      ThemeToggle: () => import('./modules/Theme-Toggle.vue'),
+      NavHead: () => import('./modules/Nav-Head.vue'),
+    },
   };
 </script>

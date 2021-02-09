@@ -46,14 +46,15 @@ query {
 </page-query>
 
 <script>
-  import SidebarNav from '@/components/Sidebar-Nav.vue';
-  import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
-  import SessionsFeedMobile from '@/components/sessions/Sessions-Feed-Mobile.vue';
-
   export default {
-    components: { SidebarNav, SessionsFeed, SessionsFeedMobile },
+    components: {
+      SidebarNav: () => import('@/components/Sidebar-Nav.vue'),
+      SessionsFeed: () => import('@/components/sessions/Sessions-Feed.vue'),
+      SessionsFeedMobile: () =>
+        import('@/components/sessions/Sessions-Feed-Mobile.vue'),
+    },
     metaInfo: {
-      title: 'Tea Time',
+      title: 'Tea',
     },
   };
 </script>
