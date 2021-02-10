@@ -14,11 +14,12 @@
       >
         <img
           :src="info.images[0].image"
+          :loading="index > 5 ? 'lazy' : 'eager'"
           :alt="info.images[0].alt"
           class="object-cover w-full h-full"
         />
         <div
-          class="absolute inset-0 w-3/4 opacity-60 bg-gradient-to-br from-gray-900 to-transparent via-transparent h-3/4"
+          class="absolute inset-0 w-full h-full opacity-60 bg-gradient-to-br from-gray-900 to-transparent"
         />
       </div>
       <div class="w-10 h-1" :style="`background-color: ${color}`" />
@@ -64,6 +65,7 @@
     },
     props: {
       info: Object,
+      index: Number,
     },
     computed: {
       color() {
