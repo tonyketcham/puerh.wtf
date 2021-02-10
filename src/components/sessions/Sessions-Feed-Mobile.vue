@@ -13,6 +13,7 @@
       <lazy-component
         v-for="(edge, index) in sessions.edges"
         :key="edge.node.id"
+        class="w-full"
       >
         <Session-Card
           :info="edge.node"
