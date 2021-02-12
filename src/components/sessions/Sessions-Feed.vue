@@ -11,12 +11,16 @@
         </nav>
       </header>
       <div class="flex flex-wrap gap-4">
-        <Session-Card
-          v-for="edge in sessions.edges"
+        <lazy-component
+          v-for="(edge, index) in sessions.edges"
           :key="edge.node.id"
-          :info="edge.node"
-          class="w-full sm:w-112"
-        />
+        >
+          <Session-Card
+            :info="edge.node"
+            :index="index"
+            class="w-full sm:w-112"
+          />
+        </lazy-component>
       </div>
     </section>
   </simplebar>

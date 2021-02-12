@@ -10,12 +10,17 @@
       </nav>
     </header>
     <div class="flex flex-wrap">
-      <Session-Card
-        v-for="edge in sessions.edges"
+      <lazy-component
+        v-for="(edge, index) in sessions.edges"
         :key="edge.node.id"
-        :info="edge.node"
-        class="w-full mb-4 sm:w-112"
-      />
+        class="w-full"
+      >
+        <Session-Card
+          :info="edge.node"
+          :index="index"
+          class="w-full mb-4 sm:w-112"
+        />
+      </lazy-component>
     </div>
   </section>
 </template>
