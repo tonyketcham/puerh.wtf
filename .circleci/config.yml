@@ -1,0 +1,22 @@
+jobs:
+  build:
+    executor:
+      name: node/default
+      tag: '15.2'
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn lint
+          name: Run eslint
+      - run:
+          command: yarn build
+          name: Run Gridsome build
+orbs:
+  node: circleci/node@4.1.0
+version: 2.1
+workflows:
+  liaison:
+    jobs:
+      - build
