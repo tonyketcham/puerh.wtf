@@ -57,6 +57,9 @@ notes:
   finish: slow dryness that evaporates a strong juiciness, nice savory and sweet finish
   empty_cup: nice cigarette smoker house
   cha_qi: calm and not that strong
+tags:
+  - 799e7654-d553-4e18-b128-4d4a3e29c7e5
+  - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 79.12
 brewing:
   temperature: 180
