@@ -30,6 +30,9 @@ query {
     components: {
       Layout: () => import('~/layouts/Layout.vue'),
     },
+    created() {
+      this.$store.dispatch('initTheme');
+    },
   };
 </script>
 
