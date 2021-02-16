@@ -60,7 +60,7 @@ notes:
   finish: tangy, sparkly, lifting, and slightly drying
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
-rating: 74
+rating: 81
 brewing:
   temperature: 205
   material_amount: 7.11
