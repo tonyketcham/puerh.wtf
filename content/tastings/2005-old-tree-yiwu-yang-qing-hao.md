@@ -48,13 +48,10 @@ flavor_axes:
     start: 6
     finish: 5
 notes:
-  dry_leaf_nose:
-    AAAAAA I forgot to do this and hit it with the water I'm actually
-    gonna lose it
+  dry_leaf_nose: aged leather, chocolate milk, brie cheese
   wet_leaf_nose: lots of leather tons of leather, kinda smells like a cowboy,
     sweet varnished hardwood
-  mouthfeel:
-    juicy, lightly oily, very quick to travel throughout the mouth, and a
+  mouthfeel: juicy, lightly oily, very quick to travel throughout the mouth, and a
     bit creamy
   empty_cup: crusty french bread, fall leaves, slight bit of wood
   cha_qi: gentle and almost unnoticeable alteration
@@ -63,7 +60,7 @@ notes:
   finish: tangy, sparkly, lifting, and slightly drying
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
-rating: 74
+rating: 81
 brewing:
   temperature: 205
   material_amount: 7.11
@@ -71,6 +68,11 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 20
   infusion_increment: 10
+images:
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1613073571/tea/2021/2005%20Old%20Tree%20YQH/C1208BA2-E24F-4D93-854A-81F0B3935E6F_erouuz.jpg
+    alt: Cake shot
+  - image: https://res.cloudinary.com/pu-erh/image/upload/v1613073571/tea/2021/2005%20Old%20Tree%20YQH/726F7BDD-5D89-486F-9638-324E89064BE2_aexvvc.jpg
+    alt: Cuppy leaf
 ---
 
 Sample from an unmarked cake of 2005 YQH Yiwu gushu from LP's December tea club. Pleased to be able to try this. The pickings are quite stemmy with a mix of very young pickings and more mature leaves.
