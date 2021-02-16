@@ -27,7 +27,7 @@ So I decided to develop a site just so I could document all the damn teas I drin
 5. Put stuff with your little hands
 
 Is eslint telling you to fix a bunch of shit on the end of every line?
-(Then look no further!)[https://developpaper.com/solution-to-delete-%E2%90%8Deslint-prettier-prettier-error/]
+[Then look no further!](https://developpaper.com/solution-to-delete-%E2%90%8Deslint-prettier-prettier-error/)
 
 ### 3. Test local build
 
