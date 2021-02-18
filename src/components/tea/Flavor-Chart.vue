@@ -77,7 +77,7 @@
     },
     filters: {
       formatText(string) {
-        return string.replaceAll('_', '/');
+        return string.replace(/_/g, '/');
       },
     },
   };

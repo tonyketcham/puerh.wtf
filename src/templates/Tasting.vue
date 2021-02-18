@@ -156,7 +156,7 @@ query Tasting ($id: ID!) {
       insertLineBreaks(content) {
         if (!content) return '';
         const stringifiedContent = content.toString();
-        return stringifiedContent.replaceAll('\\', '<br/>');
+        return stringifiedContent.replace(/\\/g, '<br/>');
       },
     },
   };
