@@ -7,6 +7,10 @@
     "develop": "gridsome develop",
     "explore": "gridsome explore"
   },
+  "browserslist": [
+    "last 4 versions",
+    "ie 11"
+  ],
   "dependencies": {
     "@gridsome/source-filesystem": "^0.6.2",
     "@gridsome/transformer-remark": "^0.6.4",
