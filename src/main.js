@@ -4,9 +4,9 @@ import VueLazyload from 'vue-lazyload';
 
 export default function (Vue) {
   // Set default layout as a global component
-  Vue.config.errorHandler = function (err, vm) {
-    console.log(err, vm.$options);
-  };
+  // Vue.config.errorHandler = function (err, vm) {
+  //   console.log(err, vm.$options);
+  // };
 
   // const cdn = 'res.cloudinary.com/';
   // const mediaGlobals = 'pu-erh/image/upload/';
