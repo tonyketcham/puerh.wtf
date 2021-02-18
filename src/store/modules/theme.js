@@ -9,7 +9,7 @@ export default {
     },
   },
   actions: {
-    initTheme({ commit }) {
+    initTheme({ commit, getters }) {
       const cachedTheme = localStorage.theme ? localStorage.theme : false;
       const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)')
         .matches;
@@ -17,15 +17,18 @@ export default {
       if (cachedTheme) commit('SET_THEME', cachedTheme);
       else if (userPrefersDark) commit('SET_THEME', 'dark');
       else commit('SET_THEME', 'light');
+
+      applyDOMTheme(getters.getTheme);
     },
     toggleTheme({ commit }) {
       switch (localStorage.theme) {
         case 'light':
           commit('SET_THEME', 'dark');
+          applyDOMTheme('dark');
           break;
-
         default:
           commit('SET_THEME', 'light');
+          applyDOMTheme('light');
           break;
       }
     },
@@ -36,3 +39,9 @@ export default {
     },
   },
 };
+
+function applyDOMTheme(newTheme) {
+  newTheme === 'light'
+    ? document.querySelector('html').classList.remove('dark')
+    : document.querySelector('html').classList.add('dark');
+}
