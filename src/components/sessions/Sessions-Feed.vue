@@ -10,7 +10,7 @@
           <g-link to="/sessions/year/">Year</g-link>
         </nav>
       </header>
-      <div class="flex flex-wrap gap-4">
+      <div class="flex flex-col flex-wrap md:gap-4 md:flex-row">
         <lazy-component
           v-for="(edge, index) in sessions.edges"
           :key="edge.node.id"
@@ -18,7 +18,7 @@
           <Session-Card
             :info="edge.node"
             :index="index"
-            class="w-full sm:w-112"
+            class="w-full mb-4 sm:w-112 md:mb-0"
           />
         </lazy-component>
       </div>
