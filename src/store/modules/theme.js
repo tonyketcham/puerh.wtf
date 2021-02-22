@@ -41,7 +41,11 @@ export default {
 };
 
 function applyDOMTheme(newTheme) {
-  newTheme === 'light'
-    ? document.querySelector('html').classList.remove('dark')
-    : document.querySelector('html').classList.add('dark');
+  if (newTheme === 'light') {
+    document.querySelector('html').classList.remove('dark');
+    document.querySelector('html').classList.add('light');
+  } else {
+    document.querySelector('html').classList.remove('light');
+    document.querySelector('html').classList.add('dark');
+  }
 }
