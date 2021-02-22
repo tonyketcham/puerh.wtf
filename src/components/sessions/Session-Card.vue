@@ -30,8 +30,8 @@
 
       <div class="absolute m-4 leading-5">
         <h2
-          tw="mb-2 text-4xl font-medium"
-          :tw="[isTrue ? 'text-indigo-700' : 'text-gray-800']"
+          class="mb-2 text-4xl font-medium"
+          :class="[isTrue ? 'text-indigo-700' : 'text-gray-800']"
         >
           <g-link :to="info.path">
             {{ info.title }}
