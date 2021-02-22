@@ -1,6 +1,8 @@
 <template>
   <Layout>
-    <router-view />
+    <transition name="fade" appear>
+      <router-view />
+    </transition>
   </Layout>
 </template>
 
@@ -41,4 +43,11 @@ query {
   /* ::-webkit-scrollbar {
     @apply hidden;
   } */
+  .fade-enter-active {
+    transition: opacity 0.5s;
+  }
+
+  .fade-enter {
+    opacity: 0;
+  }
 </style>
