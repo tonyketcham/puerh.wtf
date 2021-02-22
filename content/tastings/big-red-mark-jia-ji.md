@@ -8,7 +8,7 @@ style:
 production_year: 2001
 picking: Predominately high quality, buds and young growth but very broken up
   and shake-like
-aging_conditions: ~20yrs in Guangzhou
+aging_conditions: ~20yrs dry in Guangzhou
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2001-big-red-mark-jia-ji?_pos=1&_sid=7a5d9192d&_ss=r
