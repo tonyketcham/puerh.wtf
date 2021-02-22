@@ -54,7 +54,7 @@ notes:
   finish: astringent with a medium tangy bitterness that moves towards spicy as
     the session progresses
   taste: sweet wooden cabinets, cookie dough, peanut brittle, fall leaves, roasted
-    pumpkin seeds, an OId Fashioned
+    pumpkin seeds, an Old Fashioned
 tags:
   - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
   - bce623b4-e571-462a-b95b-988beb6dce4c
