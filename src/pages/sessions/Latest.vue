@@ -52,13 +52,3 @@ query {
     },
   };
 </script>
-<style lang="scss" scoped>
-  .tabs {
-    a {
-      @apply p-2 rounded-md transition-all;
-    }
-    a:hover {
-      @apply dark:bg-gray-700 bg-gray-300 text-gray-600 dark:text-gray-300;
-    }
-  }
-</style>

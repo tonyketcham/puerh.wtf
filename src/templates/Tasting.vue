@@ -163,9 +163,6 @@ query Tasting ($id: ID!) {
 </script>
 
 <style lang="scss">
-  dd {
-    @apply text-gray-600 dark:text-gray-300;
-  }
   .body {
     h3 {
       @apply text-3xl;

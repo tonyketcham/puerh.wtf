@@ -1,12 +1,12 @@
 <template>
-  <main
-    class="h-screen overflow-hidden text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50"
+  <div
+    class="text-gray-700 transition-all duration-200 ease-in-out bg-gray-100 dark:text-gray-50 dark:bg-gray-900"
   >
-    <Header />
-    <div class="h-full pt-14">
+    <Header class="z-30" />
+    <main class="h-full pt-14">
       <slot />
-    </div>
-  </main>
+    </main>
+  </div>
 </template>
 
 <static-query>
@@ -26,8 +26,8 @@ query {
 </script>
 
 <style lang="css">
-  html,
+  /* html,
   body {
     @apply bg-gray-200 dark:bg-gray-800 overscroll-none;
-  }
+  } */
 </style>

@@ -24,14 +24,14 @@
       </div>
       <div class="w-10 h-1" :style="`background-color: ${color}`" />
       <div
-        class="absolute bottom-0 right-0 w-10 h-1"
+        class="absolute bottom-0 right-0 w-10 h-1 text-indigo-700"
         :style="`background-color: ${color}`"
       />
 
       <div class="absolute m-4 leading-5">
         <h2
-          class="mb-2 text-4xl font-medium"
-          :class="[info.images[0] ? 'text-gray-50' : 'text-gray-700']"
+          tw="mb-2 text-4xl font-medium"
+          :tw="[isTrue ? 'text-indigo-700' : 'text-gray-800']"
         >
           <g-link :to="info.path">
             {{ info.title }}
@@ -71,6 +71,12 @@
       color() {
         return this.info.style[0]?.category.color;
       },
+    },
+    data() {
+      return {
+        isTrue: true,
+        isFalse: false,
+      };
     },
   };
 </script>

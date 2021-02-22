@@ -4,7 +4,7 @@
       v-for="edge in $static.categories.edges"
       :key="edge.node.title"
       :to="edge.node.path"
-      class="relative z-10 space-x-2 link"
+      class="relative z-10 space-x-2 w-max-w link"
     >
       <dt
         class="inline-block w-3 h-3 rounded"

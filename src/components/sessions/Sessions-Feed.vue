@@ -1,5 +1,5 @@
 <template>
-  <simplebar class="h-full">
+  <div class="h-full">
     <section class="flex-col p-6 lg:p-16">
       <header class="flex justify-between mb-6">
         <h1 class="text-2xl">Sessions</h1>
@@ -23,16 +23,13 @@
         </lazy-component>
       </div>
     </section>
-  </simplebar>
+  </div>
 </template>
 
 <script>
-  import 'simplebar/dist/simplebar.min.css';
-
   export default {
     components: {
       SessionCard: () => import('./Session-Card.vue'),
-      simplebar: () => import('simplebar-vue'),
     },
     props: {
       sessions: null,

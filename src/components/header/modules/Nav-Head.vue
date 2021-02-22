@@ -1,6 +1,11 @@
 <template>
   <div class="justify-center hidden space-x-6 md:flex">
-    <g-link v-for="link in links" :key="link.title" :to="link.to" class="link">
+    <g-link
+      v-for="link in links"
+      :key="link.title"
+      :to="link.to"
+      class="text-gray-500 dark:text-gray-400 transition-all duration-500 ease-out hover:(text-gray-600 dark:text-gray-300)"
+    >
       {{ link.title }}
     </g-link>
   </div>
@@ -20,15 +25,3 @@
     },
   };
 </script>
-
-<style scoped>
-  .link {
-    @apply text-gray-500 dark:text-gray-400 transition-all duration-500 ease-out;
-  }
-  .link:hover {
-    @apply text-gray-600 dark:text-gray-300;
-  }
-  .active {
-    @apply dark:text-white text-black;
-  }
-</style>
