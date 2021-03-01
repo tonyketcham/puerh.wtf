@@ -6,7 +6,7 @@
       <Sidebar-Nav />
     </aside>
     <div class="flex-1">
-      <Sessions-Feed :sessions="flattenedSessions" />
+      <Sessions-Feed :sessions="flattenedSessions" title="Top Sessions" />
     </div>
   </div>
 </template>

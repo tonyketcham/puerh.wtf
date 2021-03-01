@@ -51,7 +51,7 @@ query {
       SessionsFeed,
     },
     metaInfo: {
-      title: 'Tea',
+      title: 'A Tea Log',
     },
     computed: {
       flattenedSessions() {
