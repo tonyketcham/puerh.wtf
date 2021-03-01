@@ -44,7 +44,12 @@
 
     <!-- white-space: break-spaces; -->
     <div
-      class="col-span-12 row-start-4 pt-5 border-t-2 border-gray-600 border-dashed md:row-start-2 md:col-span-8 dark:border-gray-400 body border-opacity-40"
+      class="col-span-12 row-start-4 md:row-start-2 md:col-span-8 body"
+      :class="[
+        $page.tasting.images.length === 0
+          ? 'pt-5 border-t-2 border-gray-400 dark:border-gray-500 border-dashed'
+          : '',
+      ]"
       v-html="insertLineBreaks($page.tasting.content)"
     />
   </article>
@@ -168,12 +173,24 @@ query Tasting ($id: ID!) {
   }
   .body {
     h3 {
-      @apply text-3xl;
+      @apply text-4xl pt-3 pb-2 text-gray-700 dark:text-white border-b-2 border-dashed border-gray-400 dark:border-gray-500;
+    }
+    a {
+      @apply border-b-2 border-dashed border-indigo-500 transition-colors duration-300 ease-in-out font-semibold tracking-wide;
+    }
+    a:hover {
+      @apply border-yellow-500 dark:border-yellow-400 text-indigo-700 dark:text-indigo-300;
+    }
+    blockquote {
+      @apply my-4 pl-3 pr-1 py-1 border-l-2 rounded-r-lg border-yellow-600 bg-gray-50 dark:bg-gray-900 dark:border-yellow-400;
     }
     ol {
       @apply p-5 space-y-3;
       li {
-        @apply list-decimal list-outside;
+        @apply list-decimal list-outside px-2;
+      }
+      li::marker {
+        @apply text-yellow-600 dark:text-yellow-300 text-xl;
       }
     }
   }
