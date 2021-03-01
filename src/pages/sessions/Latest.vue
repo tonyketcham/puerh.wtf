@@ -6,7 +6,7 @@
       <Sidebar-Nav />
     </aside>
     <div class="flex-1">
-      <Sessions-Feed :sessions="$page.sessions" />
+      <Sessions-Feed :sessions="flattenedSessions" />
     </div>
   </div>
 </template>
@@ -49,6 +49,13 @@ query {
     },
     metaInfo: {
       title: 'A tea log',
+    },
+    computed: {
+      flattenedSessions() {
+        return this.$page.sessions.edges.flatMap((session) => {
+          return session.node;
+        });
+      },
     },
   };
 </script>
