@@ -1,5 +1,5 @@
 <template>
-  <div class="justify-center hidden space-x-6 md:flex">
+  <div v-if="false" class="justify-center hidden space-x-6 md:flex">
     <g-link v-for="link in links" :key="link.title" :to="link.to" class="link">
       {{ link.title }}
     </g-link>
