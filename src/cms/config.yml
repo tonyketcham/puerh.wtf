@@ -3,11 +3,11 @@ backend:
   repo: tonyketcham/puerh.wtf
   branch: main
 
-media_library:
-  name: cloudinary
-  config:
-    cloud_name: pu-erh
-    api_key: 532164973571635
+# media_library:
+#   name: cloudinary
+#   config:
+#     cloud_name: pu-erh
+#     api_key: 532164973571635
 
 media_folder: 'static/images/uploads'
 public_folder: '/images/uploads'
@@ -555,8 +555,8 @@ collections:
     folder: 'content/origins'
     create: true
     delete: true
-    slug: '{{slug}}'
-    identifier_field: 'name'
+    slug: '{{location}}-{{municipality}}-{{country}}'
+    identifier_field: 'id'
     summary: '{{location}} - {{municipality}} - {{country}}'
     extension: 'md'
     fields:
@@ -591,7 +591,7 @@ collections:
     folder: 'content/vendors'
     create: true
     delete: true
-    slug: '{{slug}}'
+    slug: '{{title}}'
     identifier_field: 'title'
     summary: '{{title}}'
     extension: 'md'
@@ -663,7 +663,7 @@ collections:
     folder: 'content/authors'
     create: true
     delete: true
-    slug: '{{slug}}'
+    slug: '{{title}}'
     identifier_field: 'title'
     summary: '{{title}}'
     extension: 'md'
