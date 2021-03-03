@@ -33,11 +33,11 @@
       class="relative flex flex-row h-full col-span-12 row-span-2 row-start-2 md:row-start-1 md:col-span-4"
     >
       <Flavor-Chart
-        class="mt-2.5 md:sticky md:top-0 align-middle self-start"
+        class="self-start align-middle md:sticky md:top-0"
         :flavor_axes="$page.tasting.flavor_axes"
       />
       <Experience-Notes
-        class="self-start w-full align-middle md:w-2/3 md:sticky md:top-0"
+        class="self-start mx-3 align-middle md:w-2/3 md:sticky md:top-0"
         :notes="$page.tasting.notes"
       />
     </aside>

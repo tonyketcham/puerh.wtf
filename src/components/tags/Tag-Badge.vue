@@ -1,11 +1,13 @@
 <template>
   <a
     :href="tag.path"
-    :style="`background-color: ${tag.color}; background-opacity: 0.7`"
-    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded-lg transition-all transform hover:scale-95 hover:rotate-1 shadow-sm hover:opacity-90"
+    :style="`background-color: ${tag.color}; background-opacity: 0.7; min-width: 1.5rem;`"
+    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded transition-all transform hover:scale-95 drop-shadow hover:opacity-90"
     :class="[isBackgroundDark ? 'text-white' : 'text-gray-800']"
+    @mouseover="mouseEnter"
+    @mouseleave="mouseLeave"
   >
-    <span class="blend-luminosity">
+    <span key="tag" class="w-10 blend-luminosity">
       <span class="opacity-40">#</span>
       {{ tag.title }}
     </span>
@@ -13,7 +15,11 @@
 </template>
 
 <script>
+  // import { ZoomCenterTransition } from 'vue2-transitions';
   export default {
+    components: {
+      // ZoomCenterTransition,
+    },
     props: {
       tag: {
         type: Object,
@@ -30,6 +36,12 @@
       isBackgroundDark() {
         return this.isColorDark(...this.hex2RGB(this.tag.color));
       },
+    },
+    data() {
+      return {
+        hover: false,
+        expand: false,
+      };
     },
     methods: {
       /**
@@ -55,6 +67,18 @@
             (n) => (n << 4) | n
           );
         }
+      },
+      mouseEnter() {
+        this.hover = true;
+        setTimeout(() => {
+          if (this.hover) this.expand = true;
+        }, 50);
+      },
+      mouseLeave() {
+        this.hover = false;
+        setTimeout(() => {
+          if (!this.hover) this.expand = false;
+        }, 10);
       },
     },
   };

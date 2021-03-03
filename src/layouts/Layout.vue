@@ -1,9 +1,9 @@
 <template>
   <main
-    class="h-screen overflow-hidden text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50"
+    class="flex flex-row h-screen overflow-hidden text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50"
   >
-    <Header />
-    <div class="h-full pt-14">
+    <Sidebar class="w-60" />
+    <div class="flex-1 h-full">
       <slot />
     </div>
   </main>
@@ -18,9 +18,10 @@ query {
 </static-query>
 
 <script>
+  import Sidebar from '../components/sidebar/Sidebar.vue';
   export default {
     components: {
-      Header: () => import('../components/header/Header.vue'),
+      Sidebar,
     },
   };
 </script>
