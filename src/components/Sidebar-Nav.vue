@@ -1,16 +1,23 @@
 <template>
-  <nav class="p-16 pr-0 space-y-2.5 text-lg">
+  <nav
+    class="flex flex-col p-4 space-y-2.5 text-lg dark:bg-gray-800 border-r-2 dark:border-gray-700 border-gray-200 shadow-md bg-gray-50 h-full transition-all duration-200 ease-in-out"
+  >
+    <h2
+      class="py-0.5 max-w-max mt-4 text-xl border-b-2 border-yellow-400 text-gray-600 dark:text-gray-300 transition-all duration-200 ease-in-out"
+    >
+      Categories
+    </h2>
     <g-link
       v-for="edge in $static.categories.edges"
       :key="edge.node.title"
       :to="edge.node.path"
-      class="relative z-10 space-x-2 link"
+      class="z-10 block px-2 space-x-2 text-base text-gray-700 transition-all duration-200 ease-out rounded dark:text-gray-200 group hover:bg-indigo-200"
     >
       <dt
-        class="inline-block w-3 h-3 rounded"
+        class="inline-block w-3 h-3 rounded-full shadow-md"
         :style="`background-color: ${edge.node.color}`"
       />
-      <dd class="inline">{{ edge.node.title }}</dd>
+      <dd class="inline group-hover:text-gray-900">{{ edge.node.title }}</dd>
     </g-link>
   </nav>
 </template>
@@ -29,13 +36,8 @@ query Categories {
 }
 </static-query>
 
-<script></script>
-
 <style scoped>
-  .link {
-    @apply block rounded px-2 transition-all ease-out duration-200;
-  }
-  .link:hover {
-    @apply bg-indigo-200 text-gray-900 font-medium;
+  nav {
+    height: calc(100vh - 3.5rem);
   }
 </style>

@@ -1,14 +1,5 @@
 <template>
-  <div
-    class="flex w-full h-full gap-8 overflow-y-auto bg-gray-200 dark:bg-gray-800"
-  >
-    <aside class="hidden w-64 h-full flex-0 lg:block">
-      <Sidebar-Nav />
-    </aside>
-    <div class="flex-1">
-      <Sessions-Feed :sessions="flattenedSessions" title="Top Sessions" />
-    </div>
-  </div>
+  <Sessions-Feed :sessions="flattenedSessions" title="Top Sessions" />
 </template>
 
 <page-query>
@@ -43,7 +34,6 @@ query {
 <script>
   export default {
     components: {
-      SidebarNav: () => import('@/components/Sidebar-Nav.vue'),
       SessionsFeed: () => import('@/components/sessions/Sessions-Feed.vue'),
     },
     metaInfo: {
