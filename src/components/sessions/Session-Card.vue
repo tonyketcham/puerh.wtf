@@ -1,8 +1,8 @@
 <template>
   <div
-    class="relative flex justify-between h-64 overflow-hidden transition-colors duration-100 ease-in-out rounded shadow-md bg-gray-50 dark:bg-gray-200 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
+    class="relative flex justify-between w-full h-32 overflow-hidden transition-colors duration-100 ease-in-out rounded shadow-md bg-gray-50 dark:bg-gray-200 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
   >
-    <div class="flex flex-col w-1/2 h-full lg:w-7/12">
+    <div class="flex flex-col h-full lg:w-7/12">
       <!-- <simplebar class="absolute z-30 m-2 mb-0 mr-0 h-9"> -->
       <!-- <div class="h-6 flex flex-nowrap space-x-1.5">
         <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />

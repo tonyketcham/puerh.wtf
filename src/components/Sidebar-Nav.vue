@@ -11,10 +11,10 @@
       v-for="edge in $static.categories.edges"
       :key="edge.node.title"
       :to="edge.node.path"
-      class="z-10 block px-2 space-x-2 text-base text-gray-700 transition-all duration-200 ease-out rounded dark:text-gray-200 group hover:bg-indigo-200"
+      class="z-10 block px-2 space-x-1.5 text-base text-gray-700 transition-all duration-200 ease-out rounded dark:text-gray-200 group hover:bg-indigo-200"
     >
       <dt
-        class="inline-block w-3 h-3 rounded-full shadow-md"
+        class="inline-block w-4 h-1 align-middle transform -rotate-45 rounded shadow-md"
         :style="`background-color: ${edge.node.color}`"
       />
       <dd class="inline group-hover:text-gray-900">{{ edge.node.title }}</dd>
