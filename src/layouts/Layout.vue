@@ -1,10 +1,14 @@
 <template>
-  <main
-    class="h-screen overflow-hidden text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50"
-  >
-    <Header />
-    <div class="h-full pt-14">
-      <slot />
+  <main>
+    <Header class="sticky top-0 z-30" />
+
+    <div class="relative flex w-full h-full">
+      <aside class="sticky hidden h-full w-60 top-14 lg:flex">
+        <Sidebar-Nav />
+      </aside>
+      <div class="relative w-full h-full">
+        <slot />
+      </div>
     </div>
   </main>
 </template>
@@ -18,9 +22,12 @@ query {
 </static-query>
 
 <script>
+  import SidebarNav from '@/components/Sidebar-Nav.vue';
+
   export default {
     components: {
-      Header: () => import('../components/header/Header.vue'),
+      Header: () => import('@/components/header/Header.vue'),
+      SidebarNav,
     },
   };
 </script>
@@ -28,6 +35,6 @@ query {
 <style lang="css">
   html,
   body {
-    @apply bg-gray-200 dark:bg-gray-800 overscroll-none;
+    @apply text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50 dark:bg-gray-800;
   }
 </style>

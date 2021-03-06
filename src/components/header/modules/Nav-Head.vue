@@ -25,7 +25,7 @@
 
 <style scoped>
   .link {
-    @apply text-gray-500 dark:text-gray-400 transition-all duration-500 ease-out;
+    @apply text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 rounded dark:text-gray-400 transition-all duration-500 ease-out;
   }
   .link:hover {
     @apply text-gray-600 dark:text-gray-300;

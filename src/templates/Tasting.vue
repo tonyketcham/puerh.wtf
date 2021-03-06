@@ -30,14 +30,14 @@
       </template>
     </div>
     <aside
-      class="relative flex flex-row h-full col-span-12 row-span-2 row-start-2 md:row-start-1 md:col-span-4"
+      class="flex flex-row h-full col-span-12 row-span-2 row-start-2 md:sticky md:top-0 md:row-start-1 md:col-span-4"
     >
       <Flavor-Chart
-        class="mt-2.5 md:sticky md:top-0 align-middle self-start"
+        class="mt-2.5 self-start align-middle"
         :flavor_axes="$page.tasting.flavor_axes"
       />
       <Experience-Notes
-        class="self-start w-full align-middle md:w-2/3 md:sticky md:top-0"
+        class="self-start w-full align-middle md:w-2/3"
         :notes="$page.tasting.notes"
       />
     </aside>

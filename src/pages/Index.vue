@@ -1,14 +1,5 @@
 <template>
-  <div
-    class="flex w-full h-full gap-8 overflow-y-auto bg-gray-200 dark:bg-gray-800"
-  >
-    <aside class="hidden w-64 h-full flex-0 lg:block">
-      <Sidebar-Nav />
-    </aside>
-    <div class="flex-auto">
-      <Sessions-Feed :sessions="flattenedSessions" />
-    </div>
-  </div>
+  <Sessions-Feed :sessions="flattenedSessions" />
 </template>
 
 <page-query>
@@ -43,11 +34,9 @@ query {
 
 <script>
   import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
-  import SidebarNav from '@/components/Sidebar-Nav.vue';
 
   export default {
     components: {
-      SidebarNav,
       SessionsFeed,
     },
     metaInfo: {
@@ -62,13 +51,3 @@ query {
     },
   };
 </script>
-<style lang="scss" scoped>
-  .tabs {
-    a {
-      @apply p-2 rounded-md transition-all;
-    }
-    a:hover {
-      @apply dark:bg-gray-700 bg-gray-300 text-gray-600 dark:text-gray-300;
-    }
-  }
-</style>
