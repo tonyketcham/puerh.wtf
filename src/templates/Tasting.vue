@@ -65,6 +65,7 @@ query Tasting ($id: ID!) {
           image
         }
         title
+        excerpt
         images {
           image
           alt
@@ -151,7 +152,33 @@ query Tasting ($id: ID!) {
 </page-query>
 
 <script>
+  import { imagePathReducer } from '@/lib/reducers/images';
   export default {
+    metaInfo() {
+      return {
+        title: this.$page.tasting.title,
+        meta: [
+          {
+            property: 'og:title',
+            content: this.$page.tasting.title,
+            vmid: 'og:title',
+          },
+          {
+            property: 'og:image',
+            content: imagePathReducer(this.$page.tasting.images[0].image),
+            vmid: 'og:image',
+          },
+          {
+            name: 'author',
+            content: this.$page.tasting.author[0].title,
+          },
+          {
+            name: 'description',
+            content: this.$page.tasting.excerpt,
+          },
+        ],
+      };
+    },
     components: {
       Author: () => import('../components/Author.vue'),
       ExperienceNotes: () => import('@/components/tea/Experience-Notes.vue'),
