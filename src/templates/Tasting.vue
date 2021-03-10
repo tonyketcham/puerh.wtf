@@ -175,7 +175,7 @@ query Tasting ($id: ID!) {
           },
           {
             property: 'og:image',
-            content: imagePathReducer(this.$page.tasting.images[0].image),
+            content: imagePathReducer(this.$page.tasting.images[0]?.image),
             vmid: 'og:image',
           },
           {
@@ -186,10 +186,6 @@ query Tasting ($id: ID!) {
             property: 'og:article:tag',
             content: this.$page.tasting.tags.flatMap((tag) => tag.title),
             vmid: 'og:article:tag',
-          },
-          {
-            name: 'author',
-            content: this.$page.tasting.author[0].title,
           },
           {
             name: 'author',
