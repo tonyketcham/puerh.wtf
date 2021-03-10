@@ -158,6 +158,8 @@ query Tasting ($id: ID!) {
 
 <script>
   import { imagePathReducer } from '@/lib/reducers/images';
+  import { SITE_BRAND, SITE_EMOJI } from '@/lib/constants/brand';
+
   export default {
     metaInfo() {
       return {
@@ -165,7 +167,7 @@ query Tasting ($id: ID!) {
         meta: [
           {
             property: 'og:title',
-            content: this.$page.tasting.title,
+            content: `Tasting ${this.$page.tasting.title} - ${SITE_BRAND} ${SITE_EMOJI}`,
             vmid: 'og:title',
           },
           {
