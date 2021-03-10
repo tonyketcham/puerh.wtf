@@ -87,6 +87,11 @@ query Tasting ($id: ID!) {
           municipality
           country
         }
+        tags {
+    			title
+          path
+          color
+        }
         brewing {
           temperature
           material_amount
@@ -164,9 +169,27 @@ query Tasting ($id: ID!) {
             vmid: 'og:title',
           },
           {
+            property: 'og:type',
+            content: 'article',
+            vmid: 'og:type',
+          },
+          {
             property: 'og:image',
             content: imagePathReducer(this.$page.tasting.images[0].image),
             vmid: 'og:image',
+          },
+          {
+            property: 'og:article:published_time',
+            content: new Date(this.$page.tasting.date).toISOString(),
+          },
+          {
+            property: 'og:article:tag',
+            content: this.$page.tasting.tags.flatMap((tag) => tag.title),
+            vmid: 'og:article:tag',
+          },
+          {
+            name: 'author',
+            content: this.$page.tasting.author[0].title,
           },
           {
             name: 'author',
