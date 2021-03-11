@@ -72,7 +72,15 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 10
-images: []
+images:
+  - image: /images/uploads/f446fcc7-e6ae-48a8-af5b-d2f3454c985c.jpg
+    alt: She's in the damn cup
+  - image: /images/uploads/3f1fbbcb-3310-45b0-abb5-df5d7399e345.jpg
+    alt: She's in the damn gaiwan
+  - image: /images/uploads/7e542baa-d3ee-4eb3-9005-df07f798942c.jpg
+    alt: She's in the damn beaker (liquid mode)
+  - image: /images/uploads/875e3c65-0f83-4b1f-8a31-788f9f7301b3.jpg
+    alt: She's in the damn cup again (liquid mode)
 ---
 The smell from the warm and wet leaf is so incredibly different from anything I've had. Stupidly bright and fruity, even candy-like. The fermentation method produced some incredible differences from your typical heicha/shou. The rinse is super thick and cloudy, and given how sterile they treat this fermentation process - I'm gonna drink it.
 
