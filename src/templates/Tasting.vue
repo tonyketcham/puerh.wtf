@@ -59,6 +59,7 @@
 query Tasting ($id: ID!) {
   tasting(id: $id) {
         id
+        path
         date (format: "MM/DD/YYYY")
         author {
           title
@@ -158,7 +159,7 @@ query Tasting ($id: ID!) {
 
 <script>
   import { imagePathReducer } from '@/lib/reducers/images';
-  import { SITE_BRAND, SITE_EMOJI } from '@/lib/constants/brand';
+  import { SITE_EMOJI, SITE_URL } from '@/lib/constants/brand';
 
   export default {
     metaInfo() {
@@ -167,7 +168,12 @@ query Tasting ($id: ID!) {
         meta: [
           {
             property: 'og:title',
-            content: `Tasting ${this.$page.tasting.title} - ${SITE_BRAND} ${SITE_EMOJI}`,
+            content: `Tasting ${this.$page.tasting.title} ${SITE_EMOJI}`,
+            vmid: 'og:title',
+          },
+          {
+            property: 'og:url',
+            content: SITE_URL + this.$page.tasting.path,
             vmid: 'og:title',
           },
           {
@@ -181,13 +187,18 @@ query Tasting ($id: ID!) {
             vmid: 'og:image',
           },
           {
-            property: 'og:article:published_time',
+            property: 'og:description',
+            content: this.$page.tasting.excerpt,
+            vmid: 'og:description',
+          },
+          {
+            property: 'article:published_time',
             content: new Date(this.$page.tasting.date).toISOString(),
           },
           {
-            property: 'og:article:tag',
+            property: 'article:tag',
             content: this.$page.tasting.tags.flatMap((tag) => tag.title),
-            vmid: 'og:article:tag',
+            vmid: 'article:tag',
           },
           {
             name: 'author',
@@ -196,6 +207,12 @@ query Tasting ($id: ID!) {
           {
             name: 'description',
             content: this.$page.tasting.excerpt,
+          },
+        ],
+        link: [
+          {
+            rel: 'canonical',
+            href: SITE_URL + this.$page.tasting.path,
           },
         ],
       };
