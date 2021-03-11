@@ -183,7 +183,9 @@ query Tasting ($id: ID!) {
           },
           {
             property: 'og:image',
-            content: imagePathReducer(this.$page.tasting.images[0]?.image),
+            content:
+              `https://og-image-navy.vercel.app/${this.$page.tasting.title}.jpeg?theme=light&md=1&fontSize=150px&images=https%3A%2F%2Fpuerh.wtf%2Fassets%2Fstatic%2Fapple-touch-icon.7b22250.d6c38f098e4cfe7492d30929042211dd.png&widths=undefined&heights=undefined` +
+              this.ogImageInjection(),
             vmid: 'og:image',
           },
           {
@@ -223,6 +225,13 @@ query Tasting ($id: ID!) {
       FlavorChart: () => import('@/components/tea/Flavor-Chart.vue'),
     },
     methods: {
+      ogImageInjection() {
+        return this.$page.tasting.images[0]
+          ? `&images=${imagePathReducer(
+              this.$page.tasting.images[0]?.image
+            )}&widths=350&heights=350`
+          : '';
+      },
       insertLineBreaks(content) {
         if (!content) return '';
         const stringifiedContent = content.toString();
