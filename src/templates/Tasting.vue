@@ -59,12 +59,14 @@
 query Tasting ($id: ID!) {
   tasting(id: $id) {
         id
+        path
         date (format: "MM/DD/YYYY")
         author {
           title
           image
         }
         title
+        excerpt
         images {
           image
           alt
@@ -85,6 +87,11 @@ query Tasting ($id: ID!) {
           location
           municipality
           country
+        }
+        tags {
+    			title
+          path
+          color
         }
         brewing {
           temperature
@@ -151,13 +158,80 @@ query Tasting ($id: ID!) {
 </page-query>
 
 <script>
+  import { imagePathReducer } from '@/lib/reducers/images';
+  import { SITE_EMOJI, SITE_URL } from '@/lib/constants/brand';
+
   export default {
+    metaInfo() {
+      return {
+        title: this.$page.tasting.title,
+        meta: [
+          {
+            property: 'og:title',
+            content: `Tasting ${this.$page.tasting.title} ${SITE_EMOJI}`,
+            vmid: 'og:title',
+          },
+          {
+            property: 'og:url',
+            content: SITE_URL + this.$page.tasting.path,
+            vmid: 'og:title',
+          },
+          {
+            property: 'og:type',
+            content: 'article',
+            vmid: 'og:type',
+          },
+          {
+            property: 'og:image',
+            content:
+              `https://og-image-navy.vercel.app/${this.$page.tasting.title}.jpeg?theme=light&md=1&fontSize=150px&images=https%3A%2F%2Fpuerh.wtf%2Fassets%2Fstatic%2Fapple-touch-icon.7b22250.d6c38f098e4cfe7492d30929042211dd.png&widths=undefined&heights=undefined` +
+              this.ogImageInjection(),
+            vmid: 'og:image',
+          },
+          {
+            property: 'og:description',
+            content: this.$page.tasting.excerpt,
+            vmid: 'og:description',
+          },
+          {
+            property: 'article:published_time',
+            content: new Date(this.$page.tasting.date).toISOString(),
+          },
+          {
+            property: 'article:tag',
+            content: this.$page.tasting.tags.flatMap((tag) => tag.title),
+            vmid: 'article:tag',
+          },
+          {
+            name: 'author',
+            content: this.$page.tasting.author[0].title,
+          },
+          {
+            name: 'description',
+            content: this.$page.tasting.excerpt,
+          },
+        ],
+        link: [
+          {
+            rel: 'canonical',
+            href: SITE_URL + this.$page.tasting.path,
+          },
+        ],
+      };
+    },
     components: {
       Author: () => import('../components/Author.vue'),
       ExperienceNotes: () => import('@/components/tea/Experience-Notes.vue'),
       FlavorChart: () => import('@/components/tea/Flavor-Chart.vue'),
     },
     methods: {
+      ogImageInjection() {
+        return this.$page.tasting.images[0]
+          ? `&images=${imagePathReducer(
+              this.$page.tasting.images[0]?.image
+            )}&widths=350&heights=350`
+          : '';
+      },
       insertLineBreaks(content) {
         if (!content) return '';
         const stringifiedContent = content.toString();
