@@ -51,9 +51,9 @@
           {{ info.excerpt }}
         </p>
       </div>
-      <div class="absolute bottom-3 right-3 h-6 flex flex-nowrap space-x-1.5">
+      <!-- <div class="absolute bottom-3 right-3 h-6 flex flex-nowrap space-x-1.5">
         <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -61,7 +61,7 @@
 <script>
   export default {
     components: {
-      TagBadge: () => import('../tags/Tag-Badge.vue'),
+      // TagBadge: () => import('../tags/Tag-Badge.vue'),
     },
     props: {
       info: Object,
