@@ -1,6 +1,6 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/79932a8f-4ecb-4b1e-a4ed-d75e72bdfb7a/deploy-status)](https://app.netlify.com/sites/puerhwtf/deploys) ![CodeQL](https://github.com/tonyketcham/puerh.wtf/workflows/CodeQL/badge.svg?branch=main) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_shield)
 
-# Pu-erh, wtf
+# 🌱 Pu-erh, wtf? 🍵
 
 So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet ya in the cart on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that bitch with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
 
