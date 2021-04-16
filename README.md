@@ -1,6 +1,6 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/79932a8f-4ecb-4b1e-a4ed-d75e72bdfb7a/deploy-status)](https://app.netlify.com/sites/puerhwtf/deploys) ![CodeQL](https://github.com/tonyketcham/puerh.wtf/workflows/CodeQL/badge.svg?branch=main) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftonyketcham%2Fpuerh.wtf?ref=badge_shield)
 
-# Pu-erh, wtf
+# 🌱 Pu-erh, wtf? 🍵
 
 So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet ya in the cart on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that bitch with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
 
@@ -11,6 +11,17 @@ So I decided to develop a site just so I could document all the damn teas I drin
 - Progressive light/dark mode toggling
 - [NetlifyCMS](https://www.netlifycms.org/) for saying tea words, headlessly
 - mmm.. [JAMstack](https://jamstack.org/) for: I spent all my money on tea now I can't afford hosting
+
+## Status & Roadmap
+
+Right now we're in what you could consider the alpha state. The CMS is put together and experience tested well (a few updates still to come). 
+The frontend of the site is usable but definitely a stand-in for what's to come. I've been designing a prototype in Adobe XD that's a complete departure from what's currently live, and I'm excited to finish that up and get to coding on it. A preview of that next UI overhaul can be messed around with [here](https://xd.adobe.com/view/fa29a55d-2e5c-4f65-84de-3584a426b30e-af7a/).
+
+After that, I'm going to add in data visualization components, vendor/author pages, and more tea info that exists in the backend but not yet on the front. 
+
+I think this project has some neat potential to show the trends of what I like and what terroirs I tend to gravitate towards. I'm also curious about the potential to work with some interactive map ideas down the line. Here, I could place context to terroir, displaying geo-tagged teas along with an average tasting chart for single origin teas of similar vintages.
+
+To keep up with the status, check in to the issues pannel and the projects tab!
 
 ## Wanna collab?
 
