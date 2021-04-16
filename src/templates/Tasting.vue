@@ -1,6 +1,6 @@
 <template>
   <article
-    class="grid w-full h-full grid-flow-row grid-cols-12 gap-6 p-6 overflow-y-scroll grid-rows"
+    class="grid w-full h-full grid-flow-row grid-cols-12 gap-6 p-6 grid-rows"
   >
     <div class="col-span-12 row-start-1 md:col-span-8">
       <div class="flex">

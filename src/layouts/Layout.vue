@@ -35,6 +35,6 @@ query {
 <style lang="css">
   html,
   body {
-    @apply text-gray-700 transition-all duration-200 ease-in-out dark:text-gray-50 dark:bg-gray-800;
+    @apply text-gray-700 bg-gray-200 transition-all duration-200 ease-in-out dark:text-gray-50 dark:bg-gray-900;
   }
 </style>

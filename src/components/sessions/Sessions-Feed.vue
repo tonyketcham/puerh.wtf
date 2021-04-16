@@ -1,26 +1,17 @@
 <template>
-  <section class="flex-col p-6 lg:p-16">
-    <header class="flex justify-between mb-6">
-      <h1 class="text-2xl">{{ title }}</h1>
-      <nav class="space-x-2 tabs">
-        <g-link v-if="false" to="/sessions/month/">Month</g-link>
-        <g-link v-if="false" to="/sessions/year/">Year</g-link>
-      </nav>
-    </header>
-    <div class="flex flex-col flex-wrap md:gap-4">
-      <lazy-component v-for="(session, index) in sessions" :key="session.id">
-        <Session-Card :info="session" :index="index" class="" />
-      </lazy-component>
-    </div>
-  </section>
+  <Sessions-Feed-Desktop
+    v-if="viewport === 'desktop'"
+    :title="title"
+    :sessions="sessions"
+  />
+  <Sessions-Feed-Desktop v-else :title="title" :sessions="sessions" />
 </template>
 
 <script>
-  import 'simplebar/dist/simplebar.min.css';
-
+  import SessionsFeedDesktop from './desktop/Sessions-Feed-Desktop.vue';
   export default {
     components: {
-      SessionCard: () => import('./Session-Card.vue'),
+      SessionsFeedDesktop,
     },
     props: {
       title: {
@@ -28,6 +19,27 @@
         default: 'Sessions',
       },
       sessions: null,
+    },
+    data() {
+      return {
+        viewport: 'mobile',
+      };
+    },
+    mounted() {
+      this.handleResize();
+      window.addEventListener('resize', this.handleResize);
+    },
+    destroyed() {
+      window.removeEventListener('resize', this.handleResize);
+    },
+    methods: {
+      handleResize() {
+        this.viewport = window.matchMedia('(max-width: 600px)').matches
+          ? 'mobile'
+          : window.matchMedia('(max-width: 800px)').matches
+          ? 'tablet'
+          : 'desktop';
+      },
     },
   };
 </script>
