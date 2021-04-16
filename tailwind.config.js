@@ -1,4 +1,5 @@
 module.exports = {
+  mode: 'jit',
   purge: {
     enabled: process.env.NODE_ENV === 'production',
     content: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
@@ -9,11 +10,6 @@ module.exports = {
       width: {
         112: '28rem',
       },
-    },
-  },
-  variants: {
-    extend: {
-      strokeWidth: ['hover', 'focus'],
     },
   },
   plugins: [
