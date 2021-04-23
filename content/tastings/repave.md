@@ -68,6 +68,17 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+images:
+  - image: /images/uploads/e889689c-9037-4d81-93e6-5d89e8a73429-min.jpg
+    alt: compressed leaf
+  - image: /images/uploads/feb7bb95-1892-426f-9f85-64b8df555537-min.jpg
+    alt: broken up leaf
+  - image: /images/uploads/6c3de3ef-3880-4eed-a70d-ce2aa996309e-min.jpg
+    alt: rinsed leaf
+  - image: /images/uploads/4f130e1b-1846-4baa-85bf-6313f4d861a6-min.jpg
+    alt: liquor in the beaker
+  - image: /images/uploads/71c3e00f-92a2-4992-aff1-129acba73fc7-min.jpg
+    alt: liquor in the cup
 ---
 Aged 7 years as maocha before being pressed in 2014.
 
@@ -79,8 +90,8 @@ Aged 7 years as maocha before being pressed in 2014.
 4. Quite smokey and burly with a strong smokiness.
 5. Juicier with some banana-like fruitiness.
 6. Back to the corn smut with sweet smokiness now featuring gasoline.
-7. Smoother with loam more noticable.
+7. Smoother with loam more noticeable.
 8. ...
 9. ...
-10. Noticably creamier like soy milk
+10. Noticeably creamier like soy milk
 11. Even creamier and smoother, starting to thin and take a long ass time to brew
