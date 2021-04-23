@@ -9,6 +9,7 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 008ec9cc-0c87-4e83-a1fc-8d9cd22a1ba3
+season: Spring
 production_year: 2007
 aging_conditions: Menghai for 7.5 years, Guangzhou for 7 years
 vendor:
@@ -68,6 +69,8 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 5
 ---
+Aged 7 years as maocha before being pressed in 2014.
+
 ### Infusions
 
 1. The mouthfeel is substantially oily and followed by a smooth bitter taste. Corn smut holds through in the flavor with some aged wood and sweetness. The finish is a bit reminiscent of tahini in throatfeel and taste.
