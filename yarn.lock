@@ -3857,15 +3857,10 @@ core-js-compat@^3.6.2, core-js-compat@^3.6.5:
     browserslist "^4.14.6"
     semver "7.0.0"
 
-core-js@^3.0.1:
+core-js@^3.0.1, core-js@^3.6.4, core-js@^3.6.5:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.8.3.tgz#c21906e1f14f3689f93abcc6e26883550dd92dd0"
   integrity sha512-KPYXeVZYemC2TkNEkX/01I+7yd+nX3KddKwZ1Ww7SKWdI2wQprSgLmrTddT8nw92AjEklTsPBoSdQBhbI1bQ6Q==
-
-core-js@^3.6.4, core-js@^3.6.5:
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.7.0.tgz#b0a761a02488577afbf97179e4681bf49568520f"
-  integrity sha512-NwS7fI5M5B85EwpWuIwJN4i/fbisQUwLwiSNUWeXlkAZ0sbBjLEvLvFLf1uzAUV66PcEPt4xCGCmOZSxVf3xzA==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -12502,18 +12497,18 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar-vue@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.0.tgz#e64bed8d553b4731e73f85f41d0add9ebdac1988"
-  integrity sha512-O43JuN0eeI2kfspm+BME8DmfFKLkiOYRaMlGoTOExjiUHVrrGdXnyxRjewCWCSTfBTKy4tACv+mdrYfVxLZdBQ==
+simplebar-vue@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.2.tgz#e5fd4ddad56503eb11738855fc4baaf96f40893e"
+  integrity sha512-FKDCuHEl4IS1F1scRL22R0R/9b3hxCYLvknSjIzadGjCQlRBBHe0BkZnNXcheabdnP/UP5m2+0iZd0X5b+DzCA==
   dependencies:
     core-js "^3.0.1"
-    simplebar "^5.3.0"
+    simplebar "^5.3.2"
 
-simplebar@^5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.3.0.tgz#857de63296401ed0c3026845514fe5db69795be5"
-  integrity sha512-LgrGdIWpwHLLlI9HqfnGql62H/iZlF0KDZ7w3ZNbd2ZLwh9NKsODLHPzQgUlqQ8aZe7Y6/1xJMXK1PU5e810+w==
+simplebar@^5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.3.2.tgz#4a3c07493f029056396f231d64bfbb8c6c9dd940"
+  integrity sha512-z43AVhLPoERlilEi+4o4ED4yHAckhEw0uCeR9SUS0fh07PjUfPtfMcGed8P8zb0YO3t+w2tUe1/RJnV4y0wjeA==
   dependencies:
     can-use-dom "^0.1.0"
     core-js "^3.0.1"
