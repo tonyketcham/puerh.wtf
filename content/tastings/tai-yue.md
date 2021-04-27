@@ -7,50 +7,56 @@ style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-production_year: 2006
+production_year: 2005
 aging_conditions: Wistaria's funky Taiwanese storage ~15 years
 excerpt: ok
 date: 2021-04-27T00:15:46.014Z
 flavor_axes:
   cream:
     start: 1
-    finish: 0
+    finish: 3
   umami:
     start: 5
-    finish: 0
+    finish: 6
   stone:
     start: 3
-    finish: 0
+    finish: 6
   spices:
     start: 7
-    finish: 0
+    finish: 5
   earth:
     start: 4
-    finish: 0
+    finish: 5
   nuts_roast:
     start: 3
-    finish: 0
+    finish: 1
   wood:
     start: 7
-    finish: 0
+    finish: 6
   vegetal:
     start: 5
-    finish: 0
+    finish: 6
   floral:
     start: 7
-    finish: 0
+    finish: 3
   fruits:
     start: 3
-    finish: 0
+    finish: 3
 notes:
   dry_leaf_nose: cedar, pine, fresh + dry mulch, very old leather, hay
   wet_leaf_nose: intense cedar wood + sap, drying flowers, old + verdant forests, bamboo
-  cha_qi: ok
-  empty_cup: ok
+  cha_qi: extremely positive and full-body relaxing
+  empty_cup: hay, alfalfa
   finish: ok
   taste: ok
   mouthfeel: ok
-rating: 50
+tags:
+  - 815c4584-1559-468f-9e65-794f079f0af2
+  - 21e82f1f-7568-400e-b151-95639ed3a977
+  - eb1d0494-6f02-48bc-8c34-936dda1a1549
+  - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
+  - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
+rating: 89.3
 brewing:
   temperature: 210
   material_amount: 6.23
@@ -78,3 +84,4 @@ I've held back, but it's finally time to indulge in the tea I've been eyeing mos
 7. Very similar to the last one, just really noticing the aromatic finish.
 8. Some vanilla in the wet leaf. Still holding out without change from the past couple of infusions.
 9. Mineral bitterness kicking in - noticing a metallic-like bitter.
+10. Creamy minerals with a papery bittersweetness.
