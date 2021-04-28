@@ -39,7 +39,7 @@
     "prettier": "^2.2.1",
     "sass": "^1.32.10",
     "sass-loader": "^10.1.1",
-    "simplebar-vue": "^1.6.0",
+    "simplebar-vue": "^1.6.2",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-recommended": "^5.0.0",
     "tailwind-filter-utilities": "^2.0.0",
