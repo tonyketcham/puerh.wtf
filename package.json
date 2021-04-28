@@ -38,7 +38,7 @@
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.1",
     "sass": "^1.32.10",
-    "sass-loader": "^10.1.1",
+    "sass-loader": "^11.0.1",
     "simplebar-vue": "^1.6.2",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-recommended": "^5.0.0",
