@@ -1,0 +1,45 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: simplebar-vue
+    versions:
+    - 1.6.2
+  - dependency-name: tailwindcss
+    versions:
+    - 2.1.2
+  - dependency-name: sass
+    versions:
+    - 1.32.11
+    - 1.32.8
+  - dependency-name: netlify-cms
+    versions:
+    - 2.10.105
+    - 2.10.111
+    - 2.10.112
+    - 2.10.114
+    - 2.10.85
+    - 2.10.87
+    - 2.10.91
+    - 2.10.95
+    - 2.10.98
+  - dependency-name: eslint-plugin-vue
+    versions:
+    - 7.9.0
+  - dependency-name: chart.js
+    versions:
+    - 3.0.2
+  - dependency-name: sass-loader
+    versions:
+    - 11.0.0
+  - dependency-name: postcss
+    versions:
+    - 8.2.5
+  - dependency-name: eslint
+    versions:
+    - 7.19.0
