@@ -36,7 +36,7 @@
     "gridsome-plugin-tailwindcss": "^4.1.1",
     "postcss": "8",
     "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.0",
     "sass": "^1.32.12",
     "sass-loader": "^10.1.1",
     "simplebar-vue": "^1.6.3",
