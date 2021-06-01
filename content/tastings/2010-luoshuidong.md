@@ -67,6 +67,15 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 12
   infusion_increment: 10
+images:
+  - image: /images/uploads/5e475bc0-0ad9-461a-9449-4836da9bd255-min.jpg
+    alt: Broken tea leaf
+  - image: /images/uploads/144fda9c-cf2d-42b3-829c-4fed7134baa7-min.jpg
+    alt: Prior to breaking apart the tea leaf from the cake
+  - image: /images/uploads/2d6e1395-507e-4a4d-8995-13b6532c158b-min.jpg
+    alt: Wet leaf in the gaiwan
+  - image: /images/uploads/02c298ed-31fe-43fc-bb9d-72a68042821b-min.jpg
+    alt: Liquor in the beaker
 ---
 Hittin' the morning with 7.65g of this is gonna mess me up on 4 hours of sleep. Godspeed.
 
