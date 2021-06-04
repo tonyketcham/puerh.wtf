@@ -713,6 +713,10 @@ collections:
             widget: 'string'
             required: false
 
+      - label: 'Excerpt'
+        name: 'excerpt'
+        widget: 'string'
+
   - label: 'Tags'
     label_singular: 'Tag'
     folder: 'content/tags'
