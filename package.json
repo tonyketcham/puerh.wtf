@@ -4,12 +4,11 @@
   "scripts": {
     "build": "gridsome build",
     "lint": "vue-cli-service lint",
-    "develop": "gridsome develop",
+    "dev": "gridsome develop",
     "explore": "gridsome explore"
   },
   "browserslist": [
-    "last 4 versions",
-    "ie 11"
+    "last 4 versions"
   ],
   "dependencies": {
     "@gridsome/source-filesystem": "^0.6.2",
