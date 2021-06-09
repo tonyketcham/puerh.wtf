@@ -1,15 +1,27 @@
 <template>
   <div class="relative flex items-baseline">
-    <g-image
-      :src="image"
-      blur="40"
-      alt="Author"
-      class="z-10 rounded-lg shadow h-7 w-7"
-    />
+    <g-link :to="path" class="z-10">
+      <g-image :src="image" blur="40" alt="Author" class="rounded-lg shadow h-7 w-7" />
+    </g-link>
+
     <h2
-      class="bg-gray-700 dark:bg-gray-300 text-gray-200 dark:text-gray-700 px-1.5 rounded pl-5 -ml-4 mr-0.5 text-base font-medium"
+      class="
+        bg-gray-700
+        dark:bg-gray-300
+        text-gray-200
+        dark:text-gray-700
+        px-1.5
+        rounded
+        pl-5
+        -ml-4
+        mr-0.5
+        text-base
+        font-medium
+      "
     >
-      {{ name }}
+      <g-link :to="path">
+        {{ name }}
+      </g-link>
     </h2>
   </div>
 </template>
@@ -28,6 +40,10 @@
       date: {
         type: String,
         default: '',
+      },
+      path: {
+        type: String,
+        default: '/',
       },
     },
   };
