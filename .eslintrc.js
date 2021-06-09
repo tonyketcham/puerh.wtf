@@ -1,33 +1,20 @@
 module.exports = {
   root: true,
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    ecmaVersion: 2020,
+  },
+  extends: ['plugin:gridsome/recommended', 'plugin:tailwind/recommended'],
 
   env: {
     node: true,
   },
 
-  extends: [
-    'plugin:vue/essential',
-    'plugin:prettier/recommended',
-    'eslint:recommended',
-    '@vue/prettier',
-  ],
-
-  parserOptions: {
-    parser: 'babel-eslint',
-    ecmaVersion: 2020,
-  },
+  plugins: ['gridsome'],
 
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'vue/html-self-closing': [
-      'error',
-      {
-        html: {
-          void: 'any',
-        },
-      },
-    ],
   },
 
   overrides: [
