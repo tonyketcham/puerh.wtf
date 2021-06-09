@@ -2,7 +2,21 @@
   <a
     :href="tag.path"
     :style="`background-color: ${tag.color}; background-opacity: 0.7`"
-    class="whitespace-nowrap inline-block p-1 pr-1.5 text-xs font-medium rounded-lg transition-all transform hover:scale-95 hover:rotate-1 shadow-sm hover:opacity-90"
+    class="
+      whitespace-nowrap
+      inline-block
+      p-1
+      pr-1.5
+      text-xs
+      font-medium
+      rounded-lg
+      transition-all
+      transform
+      hover:scale-95
+      hover:rotate-1
+      shadow-sm
+      hover:opacity-90
+    "
     :class="[isBackgroundDark ? 'text-white' : 'text-gray-800']"
   >
     <span class="blend-luminosity">
@@ -51,9 +65,7 @@
           const value = Number.parseInt(long, 16);
           return [value >> 16, (value >> 8) & 0xff, value & 0xff];
         } else if (short) {
-          return Array.from(short, (s) => Number.parseInt(s, 16)).map(
-            (n) => (n << 4) | n
-          );
+          return Array.from(short, (s) => Number.parseInt(s, 16)).map((n) => (n << 4) | n);
         }
       },
     },

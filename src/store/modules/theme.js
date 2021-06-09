@@ -11,8 +11,7 @@ export default {
   actions: {
     initTheme({ commit, getters }) {
       const cachedTheme = localStorage.theme ? localStorage.theme : false;
-      const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches;
+      const userPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
       if (cachedTheme) commit('SET_THEME', cachedTheme);
       else if (userPrefersDark) commit('SET_THEME', 'dark');

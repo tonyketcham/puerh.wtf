@@ -1,13 +1,8 @@
 <template>
   <div
-    class="relative flex justify-between w-full h-32 overflow-hidden transition-colors duration-100 ease-in-out rounded shadow-md bg-gray-50 dark:bg-gray-200 ring-1 ring-offset-2 ring-gray-800 ring-opacity-30"
+    class="relative flex justify-between w-full h-40 overflow-hidden transition-all duration-200 ease-in-out rounded-sm shadow-md  bg-gray-50 dark:bg-black ring-2 ring-offset-2 ring-offset-gray-50 dark:ring-offset-black ring-gray-700 dark:ring-gray-300 group"
   >
     <div class="flex flex-col h-full lg:w-7/12">
-      <!-- <simplebar class="absolute z-30 m-2 mb-0 mr-0 h-9"> -->
-      <!-- <div class="h-6 flex flex-nowrap space-x-1.5">
-        <TagBadge v-for="tag in info.tags" :key="tag.title" :tag="tag" />
-      </div> -->
-      <!-- </simplebar> -->
       <div
         v-if="info.images[0]"
         class="absolute overflow-hidden rounded-sm inset-2"
@@ -16,10 +11,10 @@
           :src="info.images[0].image"
           :loading="index > 5 ? 'lazy' : 'eager'"
           :alt="info.images[0].alt"
-          class="object-cover w-full h-full"
+          class="inline-block object-cover w-full h-full transition-transform  transform-gpu group-hover:scale-110"
         />
         <div
-          class="absolute inset-0 w-full h-full opacity-60 bg-gradient-to-br from-gray-900 to-transparent"
+          class="absolute inset-0 w-full h-full  opacity-60 bg-gradient-to-br from-gray-900 to-transparent"
         />
       </div>
       <div class="w-10 h-1" :style="`background-color: ${color}`" />
@@ -30,8 +25,10 @@
 
       <div class="absolute m-4 leading-5">
         <h2
-          class="mb-2 text-4xl font-medium"
-          :class="[info.images[0] ? 'text-gray-50' : 'text-gray-700']"
+          class="mb-2 text-4xl font-medium font-cursive"
+          :class="[
+            info.images[0] ? 'text-gray-50' : 'text-gray-700 dark:text-gray-50',
+          ]"
         >
           <g-link :to="info.path">
             {{ info.title }}

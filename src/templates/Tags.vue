@@ -3,40 +3,40 @@
 </template>
 
 <page-query>
-query Tags ($id: ID!) {
-  tags(id: $id) {
-    id
-    title
-    color
-    belongsTo {
-      edges {
-        node {
-          ...on Tasting {
-            title
-            date (format: "MMM DD, YYYY")
-            path
-            id
-            excerpt
-            style {
-              category {
+  query Tags($id: ID!) {
+    tags(id: $id) {
+      id
+      title
+      color
+      belongsTo {
+        edges {
+          node {
+            ... on Tasting {
+              title
+              date(format: "MMM DD, YYYY")
+              path
+              id
+              excerpt
+              style {
+                category {
+                  color
+                }
+              }
+              tags {
+                title
+                path
                 color
               }
-            }
-            tags {
-              title
-              path
-              color
-            }
-            images {
-              image
-              alt
+              images {
+                image
+                alt
+              }
             }
           }
         }
       }
     }
   }
-}
 </page-query>
 
 <script>
@@ -47,9 +47,7 @@ query Tags ($id: ID!) {
     },
     computed: {
       flattenedCategory() {
-        return this.$page.tags.belongsTo.edges.flatMap(
-          (session) => session.node
-        );
+        return this.$page.tags.belongsTo.edges.flatMap((session) => session.node);
       },
     },
   };

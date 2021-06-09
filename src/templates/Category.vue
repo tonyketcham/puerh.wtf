@@ -3,37 +3,38 @@
 </template>
 
 <page-query>
-query Category ($id: ID!) {
-  category (id: $id) {
-    title
-    belongsTo {
-      edges {
-        node {
-          ...on Style {
-            title
-            id
-            belongsTo {
-              edges {
-                node {
-                  ...on Tasting {
-                    title
-                    date (format: "MMM DD, YYYY")
-                    path
-                    id
-                    excerpt
-                    style {
-                      category {
+  query Category($id: ID!) {
+    category(id: $id) {
+      title
+      belongsTo {
+        edges {
+          node {
+            ... on Style {
+              title
+              id
+              belongsTo {
+                edges {
+                  node {
+                    ... on Tasting {
+                      title
+                      date(format: "MMM DD, YYYY")
+                      path
+                      id
+                      excerpt
+                      style {
+                        category {
+                          color
+                        }
+                      }
+                      tags {
+                        title
+                        path
                         color
                       }
-                    }
-                    tags {
-                      title
-                      path
-                      color
-                    }
-                    images {
-                      image
-                      alt
+                      images {
+                        image
+                        alt
+                      }
                     }
                   }
                 }
@@ -44,7 +45,6 @@ query Category ($id: ID!) {
       }
     }
   }
-}
 </page-query>
 
 <script>

@@ -1,21 +1,9 @@
 <template>
-  <ul
-    class="p-6 space-y-2 border-2 border-gray-700 rounded-md w-36 dark:border-gray-200"
-  >
-    <li
-      v-for="(axis, index) of flavor_axes"
-      :key="index"
-      class="font-mono text-sm font-semibold uppercase"
-    >
+  <ul class="p-6 space-y-2 border-2 border-gray-700 rounded-md w-36 dark:border-gray-200">
+    <li v-for="(axis, index) of flavor_axes" :key="index" class="font-mono text-sm font-semibold uppercase">
       {{ index | formatText }}
-      <dl
-        class="ml-2 text-xs font-normal text-gray-500 lowercase dark:text-gray-300"
-      >
-        <div
-          v-for="(point, index) of axis"
-          :key="index"
-          class="flex flex-row justify-between"
-        >
+      <dl class="ml-2 text-xs font-normal text-gray-500 lowercase dark:text-gray-300">
+        <div v-for="(point, index) of axis" :key="index" class="flex flex-row justify-between">
           <dt>{{ index }}</dt>
           <dd>{{ point }}</dd>
         </div>

@@ -40,3 +40,9 @@
     },
   };
 </script>
+
+<style scoped lang="postcss">
+  dt {
+    @apply border-primary-dark;
+  }
+</style>

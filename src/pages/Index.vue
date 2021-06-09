@@ -1,35 +1,39 @@
 <template>
-  <Sessions-Feed :sessions="flattenedSessions" />
+  <section>
+    <h1 class="text-6xl font-bold">{{ heroTagline }}</h1>
+    <p>{{ heroExcerpt }}</p>
+    <Sessions-Feed :sessions="flattenedSessions" />
+  </section>
 </template>
 
 <page-query>
-query {
-  sessions: allTasting {
-  	edges {
-      node {
-        title
-        date (format: "MMM DD, YYYY")
-        path
-        id
-        excerpt
-        style {
-          category {
+  query {
+    sessions: allTasting {
+      edges {
+        node {
+          title
+          date(format: "MMM DD, YYYY")
+          path
+          id
+          excerpt
+          style {
+            category {
+              color
+            }
+          }
+          tags {
+            title
+            path
             color
           }
-        }
-        tags {
-    			title
-          path
-          color
-        }
-        images {
-          image
-          alt
+          images {
+            image
+            alt
+          }
         }
       }
     }
   }
-}
 </page-query>
 
 <script>
@@ -40,6 +44,7 @@ query {
     components: {
       SessionsFeed,
     },
+
     metaInfo() {
       return {
         title: 'A Tea Log',
@@ -52,13 +57,13 @@ query {
           {
             property: 'og:description',
             content:
-              'Data-driven log of teas with a focus towards exploring the world of raw pu-erh and terroir.',
+              'Data-driven log of teas with a focus on exploring the world of raw pu-erh and terroir.',
             vmid: 'og:description',
           },
           {
             name: 'description',
             content:
-              'Data-driven log of teas with a focus towards exploring the world of raw pu-erh and terroir.',
+              'Data-driven log of teas with a focus on exploring the world of raw pu-erh and terroir.',
           },
           {
             property: 'og:url',
@@ -74,12 +79,20 @@ query {
         ],
       };
     },
+
     computed: {
       flattenedSessions() {
         return this.$page.sessions.edges.flatMap((session) => {
           return session.node;
         });
       },
+    },
+
+    data() {
+      return {
+        heroTagline: '',
+        heroExcerpt: '',
+      };
     },
   };
 </script>

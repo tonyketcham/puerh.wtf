@@ -3,33 +3,33 @@
 </template>
 
 <page-query>
-query {
-  sessions: allTasting {
-  	edges {
-      node {
-        title
-        date (format: "MMM DD, YYYY")
-        path
-        id
-        excerpt
-        style {
-          category {
+  query {
+    sessions: allTasting {
+      edges {
+        node {
+          title
+          date(format: "MMM DD, YYYY")
+          path
+          id
+          excerpt
+          style {
+            category {
+              color
+            }
+          }
+          tags {
+            title
+            path
             color
           }
-        }
-        tags {
-    			title
-          path
-          color
-        }
-        images {
-          image
-          alt
+          images {
+            image
+            alt
+          }
         }
       }
     }
   }
-}
 </page-query>
 
 <script>

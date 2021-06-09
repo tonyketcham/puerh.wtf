@@ -1,6 +1,6 @@
 <template>
   <article
-    class="grid w-full h-full grid-flow-row grid-cols-12 gap-6 p-6 overflow-y-scroll grid-rows"
+    class="grid w-full grid-flow-row grid-cols-12 space-x-6 space-y-6 grid-rows"
   >
     <div class="col-span-12 row-start-1 md:col-span-8">
       <div class="flex">
@@ -8,13 +8,14 @@
           :name="$page.tasting.author[0].title"
           :image="$page.tasting.author[0].image"
           :date="$page.tasting.date"
+          :path="$page.tasting.author[0].path"
           class="ml-1 max-w-max"
         />
         <h3 class="font-mono text-xs font-light opacity-30">
           {{ $page.tasting.date }}
         </h3>
       </div>
-      <h1 class="text-6xl">{{ $page.tasting.title }}</h1>
+      <h1 class="text-6xl font-cursive">{{ $page.tasting.title }}</h1>
       <template v-if="$page.tasting.images.length > 0">
         <div
           class="relative w-full mt-6 overflow-hidden rounded-lg shadow h-96"
@@ -30,7 +31,7 @@
       </template>
     </div>
     <aside
-      class="flex flex-row h-full col-span-12 row-span-2 row-start-2 md:sticky md:top-0 md:row-start-1 md:col-span-4"
+      class="flex flex-row h-full col-span-12 row-span-2 row-start-2  md:sticky md:top-0 md:row-start-1 md:col-span-4"
     >
       <Flavor-Chart
         class="mt-2.5 self-start align-middle"
@@ -56,105 +57,106 @@
 </template>
 
 <page-query>
-query Tasting ($id: ID!) {
-  tasting(id: $id) {
-        id
+  query Tasting($id: ID!) {
+    tasting(id: $id) {
+      id
+      path
+      date(format: "MM/DD/YYYY")
+      author {
         path
-        date (format: "MM/DD/YYYY")
-        author {
-          title
-          image
-        }
         title
-        excerpt
-        images {
-          image
-          alt
-        }
-        rating
-        style {
+        image
+      }
+      title
+      excerpt
+      images {
+        image
+        alt
+      }
+      rating
+      style {
+        title
+        category {
           title
-          category {
-            title
-          }
         }
-        cultivar {
-          title
-        }
-        season
-        production_year
-        origin {
-          location
-          municipality
-          country
-        }
-        tags {
-    			title
-          path
-          color
-        }
-        brewing {
-          temperature
-          material_amount
-          vessel
-          liquid_amount
-          first_infusion_duration
-          infusion_increment
-        }
-        flavor_axes {
-          vegetal {
-            start
-            finish
-          }
-          floral {
-            start
-            finish
-          }
-          fruits {
-            start
-            finish
-          }
-          spices {
-            start
-            finish
-          }
-          earth {
-            start
-            finish
-          }
-          wood {
-            start
-            finish
-          }
-          nuts_roast {
-            start
-            finish
-          }
-          cream {
-            start
-            finish
-          }
-          stone {
-            start
-            finish
-          }
-          umami {
-            start
-            finish
-          }
-        }
-        notes {
-          dry_leaf_nose
-          wet_leaf_nose
-          mouthfeel
-          taste
+      }
+      cultivar {
+        title
+      }
+      season
+      production_year
+      origin {
+        location
+        municipality
+        country
+      }
+      tags {
+        title
+        path
+        color
+      }
+      brewing {
+        temperature
+        material_amount
+        vessel
+        liquid_amount
+        first_infusion_duration
+        infusion_increment
+      }
+      flavor_axes {
+        vegetal {
+          start
           finish
-          empty_cup
-          cha_qi
         }
-        content
+        floral {
+          start
+          finish
+        }
+        fruits {
+          start
+          finish
+        }
+        spices {
+          start
+          finish
+        }
+        earth {
+          start
+          finish
+        }
+        wood {
+          start
+          finish
+        }
+        nuts_roast {
+          start
+          finish
+        }
+        cream {
+          start
+          finish
+        }
+        stone {
+          start
+          finish
+        }
+        umami {
+          start
+          finish
+        }
+      }
+      notes {
+        dry_leaf_nose
+        wet_leaf_nose
+        mouthfeel
+        taste
+        finish
+        empty_cup
+        cha_qi
+      }
+      content
     }
-}
+  }
 </page-query>
 
 <script>
