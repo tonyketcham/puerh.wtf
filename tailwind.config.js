@@ -7,6 +7,19 @@ module.exports = {
   darkMode: 'class', // manually trigger
   theme: {
     extend: {
+      colors: {
+        primary: {
+          light: '#FEF4E8',
+          dark: '#030302',
+        },
+      },
+      fontFamily: {
+        sans: ['Lexend', 'Helvetica', 'Arial', 'sans-serif'],
+        cursive: ['Caveat', 'cursive'],
+      },
+      gridTemplateRows: {
+        12: 'repeat(12, minmax(0, 1fr))',
+      },
       width: {
         112: '28rem',
       },
