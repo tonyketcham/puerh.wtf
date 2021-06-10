@@ -43,6 +43,8 @@
     </aside>
 
     <!-- white-space: break-spaces; -->
+    <RadarChart />
+
     <div
       class="col-span-12 row-start-4 md:row-start-2 md:col-span-8 body"
       :class="[
@@ -223,6 +225,7 @@ query Tasting ($id: ID!) {
       Author: () => import('../components/Author.vue'),
       ExperienceNotes: () => import('@/components/tea/Experience-Notes.vue'),
       FlavorChart: () => import('@/components/tea/Flavor-Chart.vue'),
+      RadarChart: () => import('@/components/data-visualization/Chart.vue'),
     },
     methods: {
       ogImageInjection() {
