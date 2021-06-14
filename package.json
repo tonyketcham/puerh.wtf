@@ -33,7 +33,7 @@
     "eslint-plugin-gridsome": "^1.6.2",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-tailwind": "^0.2.1",
-    "eslint-plugin-vue": "^7.10.0",
+    "eslint-plugin-vue": "^7.11.1",
     "gridsome-plugin-tailwindcss": "^4.1.1",
     "postcss": "8",
     "postcss-preset-env": "^6.7.0",
