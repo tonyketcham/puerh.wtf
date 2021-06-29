@@ -5,6 +5,8 @@ author:
 title: Ye Sheng Gushu Baicha
 style:
   - 45fb7b01-c16e-429a-8539-3c902176a5c6
+cultivar:
+  - 155823a5-e457-426e-aa93-020dca00f42e
 origin:
   - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
 season: Spring
@@ -77,3 +79,8 @@ The aromatics off this stuff are incredible. It smells fresh off the press and *
    \
    After a few minutes of letting the aftertaste rest in my mouth, I'm noticing a subtle black walnut note that I thought was interesting & I haven't experienced that flavor as clearly in any other tea I've tried thus far.
 2. The wet leaf has more of a muskiness to it than the first time around. There's an aroma reminding me of a clean wet dog tbh but not in an offputting way. There's way more of an intensity to both sides of those *ye sheng* and white peony groups of flavors. Much more burliness and spiciness in the terpene-laden florals balanced against the softness and hay-like bed of white peony. Smells and tastes like there's a lot of catechins in this tea which correlates to an intense cha qi. The black walnut in the aftertaste is **way more** intense this time around.
+3. Pushed it a bit on accident, still super smooth but there's a burly wild bite with some bitterness. Otherwise similar to before.
+4. ...
+5. The wet leaf has more of a smell like the withered grass on the mower in your garage after you mow the lawn. The liquor is also quite golden now. There's a pronounced grapefruit zest bitterness with some minerality. Some purple grape skin in there too. Definitely feeling the buzz in a focused but heady way.
+6. Preserved lemon rind.
+7. Lemon yaobao all damn day.
