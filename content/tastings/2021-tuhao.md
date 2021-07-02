@@ -69,4 +69,4 @@ brewing:
 3. WAY smoother and less intense on the burliness. The *huigan* is dope as shit, some of the most prominent I've encountered in recent times. Much fruitier and sweeter all around. Just enough saltiness to make the fruit smack. Coriander and mint in the finish. The finish lasts a billion years and feels like you just brushed your teeth or used a smooth mouthwash.
 4. Smooth minerals with a complex body that's difficult to parse individual notes from.
 5. ...
-6. A bit more mineral salty than before. Would pair well with a Saison or Belgian beer. The mouthfeel is heavily oily and thick now.
+6. A bit more mineral salty than before. Would pair well with a Saison or Belgian beer. The mouthfeel is heavily oily and thick now. Brothy body. Definitely an intense tea to drink young, would not recommend on an empty stomach. The aftertaste is a bit more aromatic.
