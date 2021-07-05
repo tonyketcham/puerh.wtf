@@ -12597,10 +12597,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar-vue@^1.6.4:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.4.tgz#90ae6a879430601395d70d2f59a49252f9835cc8"
-  integrity sha512-CV71cO+mLbPHKGNvs+VUriqDYZIT4+KwsM2X4Bt5vRdFEix6jdJQaRmwoCDrzFMDRJnw1VWfJYUFMH4cNhC5JA==
+simplebar-vue@^1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.5.tgz#002996f6ef896a3d23ec394d096cd17abe194cbd"
+  integrity sha512-bOgsCpi73CHv3m1WE592qHczH98zRX9X0neLAeK0mNys7DLuz1Wqp4EGpjvazX8If3QtnuuzZEKIaicUQ1kAjA==
   dependencies:
     core-js "^3.0.1"
     simplebar "^5.3.4"
