@@ -2,7 +2,7 @@
 id: e4ea09b0-aa04-4ecd-a6fd-33f5644d499e
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2011 Xiaguan Jin Se Yin Xiang
+title: Xiaguan Jin Se Yin Xiang
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
@@ -74,6 +74,7 @@ images:
   - image: /images/uploads/da4c40c2-6f83-4d63-b678-e7f249c182fb-min.jpg
     alt: big bag
 ---
+
 This material is 6 years aged prior to the pressing in 2011.
 
 ### Infusions

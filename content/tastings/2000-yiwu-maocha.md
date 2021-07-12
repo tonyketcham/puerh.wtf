@@ -2,11 +2,13 @@
 id: 9e09270e-01f8-41d1-bf58-9e66c5d207b9
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2000 Yiwu Maocha
+title: Yiwu Maocha
 style:
   - 4fb4bf27-c491-4b3a-b29a-339ef7984a86
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
+origin:
+  - 88d4ea3a-b772-4472-bd44-566c55bb608e
 production_year: 2000
 picking: bud + 2 leaves
 aging_conditions: Taiwan stored
@@ -47,7 +49,8 @@ flavor_axes:
     finish: 2
 notes:
   dry_leaf_nose: savory stuff, granite, morels, moss, wood oven
-  wet_leaf_nose: mushrooms and vegetables, decaying flower petals, varnish that's
+  wet_leaf_nose:
+    mushrooms and vegetables, decaying flower petals, varnish that's
     become organic matter, brown paper towels
   mouthfeel: light and astringent
   finish: drying, peat, geosmin, tang

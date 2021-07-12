@@ -2,7 +2,7 @@
 id: 601a613d-6a44-49e7-ba1d-b203e12c9ea1
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2000 Yi Wu "Huang Pian"
+title: Yi Wu "Huang Pian"
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:

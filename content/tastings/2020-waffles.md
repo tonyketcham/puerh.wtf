@@ -2,7 +2,7 @@
 id: 55fe6732-bc51-4aeb-b064-e1d9eaa24816
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2020 Waffles
+title: Waffles
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2020

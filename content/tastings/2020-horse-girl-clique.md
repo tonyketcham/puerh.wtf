@@ -2,7 +2,7 @@
 id: d1b02655-9211-467f-a8a7-ef2150514f21
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2020 Horse Girl Clique
+title: Horse Girl Clique
 style:
   - 65819530-dd2c-4df0-9906-baf9e34e6d39
 cultivar:

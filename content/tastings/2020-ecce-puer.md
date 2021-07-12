@@ -2,7 +2,7 @@
 id: 66ea0526-7e1b-4e43-b466-f215c4fb6730
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2020 Ecce Puer
+title: Ecce Puer
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:

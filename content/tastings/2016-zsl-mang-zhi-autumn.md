@@ -2,7 +2,7 @@
 id: f412087b-a71d-4a7f-ad89-83d2f44ab152
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2016 ZSL Mang Zhi Autumn
+title: ZSL Mang Zhi Autumn
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -10,7 +10,7 @@ cultivar:
 origin:
   - ff781a76-c57d-472a-9f3f-98c4f36b527b
 season: Autumn
-production_year: 2020
+production_year: 2016
 elevation: 1400
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21
@@ -53,7 +53,7 @@ notes:
   wet_leaf_nose: peach pit, apricot, pancake syrup, vegetation zest
   mouthfeel: silky and comforting, a bit effervescent
   finish: wintergreen, honey, pleasant astringency
-  taste: "orchids, lightly tangy golden raisin, gentle woody aged notes, "
+  taste: 'orchids, lightly tangy golden raisin, gentle woody aged notes, '
   cha_qi: grounding and rounding I feel round
   empty_cup: kombucha leather
 tags:
@@ -70,6 +70,7 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 10
 ---
+
 ### Infusions
 
 1. A bit of light wood smokiness, some fruit mid-brightness and tangerine zest, and a pleasant complexity that spans the whole spectrum of flavor axes. There's no bitterness and low astringency. It takes a while for that astringency to kick into effect as well as for the finish to really commence, which has a cooling, honey-like nature. This is something I've come to notice about all the ZSLs I've tried so far; they all tend to have a very sustained body before gettin into a finish that just camps out in your mouth. There's a very smooth and sweet nature imparted to the liquor that's just a joy to drink.

@@ -2,7 +2,7 @@
 id: e1e4460a-0f69-48db-a31f-4545a6f73c47
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2010 Luoshuidong
+title: Luoshuidong
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -77,16 +77,17 @@ images:
   - image: /images/uploads/02c298ed-31fe-43fc-bb9d-72a68042821b-min.jpg
     alt: Liquor in the beaker
 ---
+
 Hittin' the morning with 7.65g of this is gonna mess me up on 4 hours of sleep. Godspeed.
 
 ### Infusions
 
 1. The lid of the gaiwan has a nice petrichor scent to it. The leaf has set aside some of the intensity of the dank forest n wood from the rinsed leaf to allow the grape syrup smell to punch through. The mouthfeel is thick and imposing with a very oily texture. That feeling leads into a set of flavors that give a cream kind of experience where softwoods replace the milk. The aftertaste has that softwood as well - perhaps something like balsa(?). To me, this tea tastes like it was stored slightly wet (or enough to rapidly age it), then conditioned in drier storage. There's extremely low astringency and no detectable bitterness. Some clean, thick paper notes (real high-quality paper) and sweetness.
 2. Wet leaf is a bit headier, like a more spicy/earth terpene profile of cannabis. Mouthfeel is still incredibly smooth with a bit more drag to it. The flavor profile has a tangier softwood chips aspect. The finish has an abrupt and impeding herbaceous, fertilizer-like pungency to it that I'm not a big fan of. To me, that flavor coupled with it bringing in a bit of dryness combines in a weird way. Noticing lots of minerality, woodiness, and earthiness. Getting a little dank. Still has a Yiwu character with its smoothness.
-3. Chocolatey with some blueberry/blackberry notes. 
+3. Chocolatey with some blueberry/blackberry notes.
 4. Much smoother than before with a mineral support and a nice, thick body & finish. The experience here is very balanced and I enjoy it a lot.
 5. Stone, clove, grilled corn without the corn
 6. A bit of a mineral bitterness with a mossy surrounding. The finish is vaporous, cooling, and lingering now.
 7. Some pleasant bitterness and astringency working together to make somethin dope. Cha qi feels real nice like a cruise down the coast while the Sun's goin down.
-8. Chocolatey and smooth with a gentle bite. Noticing some softwoods again. It kind of feels like it's oscillating between these real smooth infusions and burly ones; to my knowledge, I'm not doing anything in the brewing to push it one way or the other. I like the switch-ups to keep things interesting. 
+8. Chocolatey and smooth with a gentle bite. Noticing some softwoods again. It kind of feels like it's oscillating between these real smooth infusions and burly ones; to my knowledge, I'm not doing anything in the brewing to push it one way or the other. I like the switch-ups to keep things interesting.
 9. Very sweet. Kind of reminds me of a Hefeweizen - has that same smooth, banana-like yeasty flavor.

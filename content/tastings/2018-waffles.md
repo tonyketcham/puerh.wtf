@@ -2,7 +2,7 @@
 id: ddc8f6b8-a3e6-4b52-b170-9bc88d192db1
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2018 Waffles
+title: Waffles
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2018

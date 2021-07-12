@@ -2,13 +2,13 @@
 id: 1bed5bde-8212-4d28-bb24-790fe74a5364
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2015 ZSL Wa Long
+title: ZSL Wa Long
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 season: Spring
-production_year: 2020
+production_year: 2015
 elevation: 1100
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21

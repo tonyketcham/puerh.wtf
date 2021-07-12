@@ -2,7 +2,7 @@
 id: 1d264f9b-a435-4f2b-ba9d-8ea355334005
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2013 Shoumei
+title: Shoumei
 style:
   - 18f824ae-afc2-47d5-9255-27c345fbe0c1
 origin:

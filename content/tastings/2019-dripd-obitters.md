@@ -2,7 +2,7 @@
 id: aabc48c0-a616-4bf2-b9d9-28284b7d41e9
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2019 Dripd O'Bitters
+title: Dripd O'Bitters
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2019

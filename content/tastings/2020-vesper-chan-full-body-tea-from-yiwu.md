@@ -2,7 +2,7 @@
 id: 7c114fa3-51f8-4fae-a22e-b089d3c7a8f7
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: '2020 Vesper Chan: Full Body Tea from Yiwu'
+title: 'Vesper Chan: Full Body Tea from Yiwu'
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:

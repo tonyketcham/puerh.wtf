@@ -2,7 +2,7 @@
 id: dc758880-acd9-4cf8-b2d8-6111b8054325
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: "Yang Qing Hao: 2007 Huangshan Qizhong"
+title: 'Yang Qing Hao: Huangshan Qizhong'
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -14,7 +14,7 @@ production_year: 2007
 aging_conditions: "13 years wet in Yang's Taiwanese storage "
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: "Animal Crossing: Wild World extreme Tom Nook speedrun (any % complete)"
+excerpt: 'Animal Crossing: Wild World extreme Tom Nook speedrun (any % complete)'
 date: 2021-03-04T14:53:30.788Z
 flavor_axes:
   cream:
@@ -51,7 +51,8 @@ notes:
   dry_leaf_nose: spicy chocolate, oat milk, leather, animalistic, blueberries, sweet cream
   wet_leaf_nose: funky, old/resinous wood, sugarcane, damp hardwood, cacao nibs, blueberries
   mouthfeel: oily, full, and juicy - astringent in later infusions
-  taste: hot cocoa, resinous wood, black walnuts, cloves, tobacco, chicken of the
+  taste:
+    hot cocoa, resinous wood, black walnuts, cloves, tobacco, chicken of the
     woods
   finish: cooling, nice n decently long with some retro-olfactory ish
   empty_cup: tobacco caramel
@@ -69,6 +70,7 @@ brewing:
   first_infusion_duration: 10
   infusion_increment: 15
 ---
+
 Tried this with two different water temps to see the difference between experiences: 212 degrees and 205 degrees.
 
 ### Infusions
@@ -91,6 +93,7 @@ Tried this with two different water temps to see the difference between experien
 6. The wet leaf smells like currants with a 'dark purple'-like smell. Resinous wood with a pronounced but rounded bitterness. As it cools, that bitterness tones down.
 
    **205:** Wet leaf has that dark purple smell but with quite a bit of bright floral aspects surrounding it. The taste is barely bitter, but is definitely astringent. Some floral woodsy aspects. Retro-olfactory sensation in the throat where deep fruity tones are coming back up from the dark depths.
+
 7. I didn't finish this the first time around at 212 degrees so from here on out, all the words are 205 exclusive. And that's fine, because (in my opinion) 205 is treating this stuff better anyway. Resinous wood and warm spices for sure.
 8. Soupier vegetable broth notes. This is interesting to note that at boiling, that came out 3 infusions ago, so the lower temp definitely stretches out the session. Dense hardwood and sugarcane. Airy and savory finish that becomes cooling with a very slight effervescence.
 9. Chocolate and grilled wild mushrooms, like chicken of the woods.

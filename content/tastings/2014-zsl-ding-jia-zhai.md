@@ -2,7 +2,7 @@
 id: 349e31b0-a994-47d6-a6a7-a58ddc2bd008
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2014 ZSL Ding Jia Zhai
+title: ZSL Ding Jia Zhai
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -53,7 +53,8 @@ notes:
   empty_cup: caramel, burnt sugar, sugarcane
   mouthfeel: intensely thick and steady, sparkly like carbonation
   finish: very long and persisting before dropping off, a bit dry
-  taste: oatmeal raisin cookie, cardamom, lemongrass, orchid, white pepper, clay,
+  taste:
+    oatmeal raisin cookie, cardamom, lemongrass, orchid, white pepper, clay,
     slow-cooked citrus
   cha_qi: heady similar to a light weed high
 tags:

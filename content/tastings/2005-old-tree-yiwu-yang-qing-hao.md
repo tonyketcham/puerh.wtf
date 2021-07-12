@@ -2,7 +2,7 @@
 id: 74a93a7a-7276-4253-a785-530141ea6f7e
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2005 Old Tree (Yiwu) Yang Qing Hao
+title: 'Yang Qing Hao: Old Tree (Yiwu)'
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -51,7 +51,8 @@ notes:
   dry_leaf_nose: aged leather, chocolate milk, brie cheese
   wet_leaf_nose: lots of leather tons of leather, kinda smells like a cowboy,
     sweet varnished hardwood
-  mouthfeel: juicy, lightly oily, very quick to travel throughout the mouth, and a
+  mouthfeel:
+    juicy, lightly oily, very quick to travel throughout the mouth, and a
     bit creamy
   empty_cup: crusty french bread, fall leaves, slight bit of wood
   cha_qi: gentle and almost unnoticeable alteration

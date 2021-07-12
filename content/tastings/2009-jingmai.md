@@ -2,7 +2,7 @@
 id: 4495e21e-8b47-4242-8e45-66ed12780465
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2009 Jingmai
+title: Jingmai
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
@@ -71,6 +71,7 @@ brewing:
   first_infusion_duration: 15
   infusion_increment: 15
 ---
+
 This is the second on-the-record use of Arby's [Truth Serum](http://empiricaltea.com/water-recipe-truth-serum/) water recipe. I really enjoyed this particular tea last time I had it with Hinckley purified water (TDS of 5) + Arby's 1.0 recipe (which consisted just of epsom salt and baking soda). Truth Serum features gypsum, magnesium chloride, and other tweaks on top of baking soda and epsom salt which are put together with the goal of expressing the full character of the tea.
 
 ### Infusions

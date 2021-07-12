@@ -2,7 +2,7 @@
 id: 44a9d48c-7de1-4b0b-9718-1222ad38f9d4
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2020 Wild Crassicolumna Sheng Pu'er
+title: Wild Crassicolumna Sheng Pu'er
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:

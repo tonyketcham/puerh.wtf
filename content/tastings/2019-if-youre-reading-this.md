@@ -2,7 +2,7 @@
 id: d96b1085-349d-4f29-9154-6fede97bad05
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: 2019 If You're Reading This
+title: If You're Reading This
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 production_year: 2019
