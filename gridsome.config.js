@@ -22,7 +22,7 @@ module.exports = {
     Style: '/categories/:category/:title',
     Cultivar: '/cultivar/:id',
     Origin: '/origin/:id',
-    Vendor: '/vendor/:id',
+    Vendor: '/vendor/:title',
     Tags: '/tags/:title',
   },
   transformers: {
