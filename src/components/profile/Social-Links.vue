@@ -1,16 +1,16 @@
 <template>
-  <nav v-if="links" class="flex flex-col m-4">
+  <nav v-if="links" class="flex flex-row space-x-1">
     <a
       v-if="links.github"
       :href="`https://github.com/${links.github}`"
-      class="flex flex-row space-x-1.5 items-center"
+      class="flex flex-row space-x-1.5 items-center text-sm"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
         stroke-width="2"
-        class="w-5 h-5 transition-colors duration-200 ease-in-out dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
         id="GithubFill"
       >
         <path
@@ -19,7 +19,6 @@
           d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
         />
       </svg>
-      <span class="font-medium"><span class="opacity-50 mx-0.5 italic">@</span>{{ links.github }}</span>
     </a>
     <a
       v-if="links.instagram"
@@ -31,7 +30,7 @@
         viewBox="0 0 24 24"
         fill="currentColor"
         stroke-width="2"
-        class="w-5 h-5 transition-colors duration-200 ease-in-out dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
         id="InstagramFill"
       >
         <path
@@ -40,9 +39,22 @@
           d="M7.465 1.066C8.638 1.012 9.012 1 12 1c2.988 0 3.362.013 4.534.066 1.172.053 1.972.24 2.672.511.733.277 1.398.71 1.948 1.27.56.549.992 1.213 1.268 1.947.272.7.458 1.5.512 2.67C22.988 8.639 23 9.013 23 12c0 2.988-.013 3.362-.066 4.535-.053 1.17-.24 1.97-.512 2.67a5.396 5.396 0 0 1-1.268 1.949c-.55.56-1.215.992-1.948 1.268-.7.272-1.5.458-2.67.512-1.174.054-1.548.066-4.536.066-2.988 0-3.362-.013-4.535-.066-1.17-.053-1.97-.24-2.67-.512a5.397 5.397 0 0 1-1.949-1.268 5.392 5.392 0 0 1-1.269-1.948c-.271-.7-.457-1.5-.511-2.67C1.012 15.361 1 14.987 1 12c0-2.988.013-3.362.066-4.534.053-1.172.24-1.972.511-2.672a5.396 5.396 0 0 1 1.27-1.948 5.392 5.392 0 0 1 1.947-1.269c.7-.271 1.5-.457 2.67-.511zm8.98 1.98c-1.16-.053-1.508-.064-4.445-.064-2.937 0-3.285.011-4.445.064-1.073.049-1.655.228-2.043.379-.513.2-.88.437-1.265.822a3.412 3.412 0 0 0-.822 1.265c-.151.388-.33.97-.379 2.043-.053 1.16-.064 1.508-.064 4.445 0 2.937.011 3.285.064 4.445.049 1.073.228 1.655.379 2.043.176.477.457.91.822 1.265.355.365.788.646 1.265.822.388.151.97.33 2.043.379 1.16.053 1.507.064 4.445.064 2.938 0 3.285-.011 4.445-.064 1.073-.049 1.655-.228 2.043-.379.513-.2.88-.437 1.265-.822.365-.355.646-.788.822-1.265.151-.388.33-.97.379-2.043.053-1.16.064-1.508.064-4.445 0-2.937-.011-3.285-.064-4.445-.049-1.073-.228-1.655-.379-2.043-.2-.513-.437-.88-.822-1.265a3.413 3.413 0 0 0-1.265-.822c-.388-.151-.97-.33-2.043-.379zm-5.85 12.345a3.669 3.669 0 0 0 4-5.986 3.67 3.67 0 1 0-4 5.986zM8.002 8.002a5.654 5.654 0 1 1 7.996 7.996 5.654 5.654 0 0 1-7.996-7.996zm10.906-.814a1.337 1.337 0 1 0-1.89-1.89 1.337 1.337 0 0 0 1.89 1.89z"
         />
       </svg>
-      <span class="font-medium"><span class="opacity-50 mx-0.5 italic">@</span>{{ links.instagram }}</span>
     </a>
-    <a v-if="links.website" :href="links.website" class="flex flex-row space-x-1.5 items-center">
+    <a
+      v-if="links.facebook"
+      :href="`https://www.facebook.com/${links.facebook}`"
+    >
+    </a>
+    <a
+      v-if="links.youtube"
+      :href="`https://www.youtube.com/channel/${links.youtube}`"
+    >
+    </a>
+    <a
+      v-if="links.website"
+      :href="links.website"
+      class="flex flex-row space-x-1.5 items-center"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -51,7 +63,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-5 h-5 transition-colors duration-200 ease-in-out dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
         id="Planet"
       >
         <circle cx="12" cy="12" r="8" />
@@ -59,9 +71,6 @@
           d="M8.399 4.849C5.372 2.582 2.972 1.489 2.23 2.23c-1.174 1.174 2.248 6.5 7.643 11.895 5.396 5.395 10.722 8.817 11.895 7.643.431-.43.243-1.421-.435-2.769"
         />
       </svg>
-      <span class="font-medium">
-        {{ links.website }}
-      </span>
     </a>
   </nav>
 </template>
