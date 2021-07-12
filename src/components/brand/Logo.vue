@@ -1,53 +1,21 @@
 <template>
-  <g-link to="/" class="inline-block font-cursive">
-    <div
-      @mouseenter="changeFontWeight(700)"
-      @mouseleave="changeFontWeight(400)"
-      :class="`text-${intensitySwitch}xl`"
-      class="transform group uniform-transition max-w-max"
-      :style="{ 'font-variation-settings': `'wght' ${fontWeight}` }"
-    >
-      <h1 class="inline-block">🍵 {{ $static.metadata.siteName }}</h1>
-      <span
-        class="inline-block transition-transform transform  group-hover:scale-150 group-hover:translate-x-1 group-hover:rotate-3"
-        >?</span
-      >
-    </div>
-  </g-link>
+  <h1 class="inline-block font-black" :class="`text-${intensitySwitch}xl`">
+    <g-link to="/"> 🌱 puerh.wtf </g-link>
+  </h1>
 </template>
-
-<static-query>
-  query {
-    metadata {
-      siteName
-    }
-  }
-</static-query>
 
 <script>
   export default {
     props: {
       intensity: {
         type: Number,
-        default: 3,
+        default: 2,
       },
     },
 
     computed: {
       intensitySwitch() {
         return this.intensity === 1 ? '' : this.intensity;
-      },
-    },
-
-    data() {
-      return {
-        fontWeight: 50,
-      };
-    },
-
-    methods: {
-      changeFontWeight(wght) {
-        this.fontWeight = wght;
       },
     },
   };
