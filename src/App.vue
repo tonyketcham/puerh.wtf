@@ -1,7 +1,5 @@
 <template>
-  <Layout>
-    <router-view />
-  </Layout>
+  <router-view />
 </template>
 
 <static-query>
@@ -26,9 +24,6 @@
           },
         ],
       };
-    },
-    components: {
-      Layout: () => import('~/layouts/Layout.vue'),
     },
     mounted() {
       this.$store.dispatch('initTheme');

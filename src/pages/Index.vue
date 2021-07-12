@@ -1,35 +1,98 @@
 <template>
-  <section>
-    <h1 class="text-6xl font-bold">{{ heroTagline }}</h1>
-    <p>{{ heroExcerpt }}</p>
-    <Sessions-Feed :sessions="flattenedSessions" />
-  </section>
+  <Layout>
+    <template slot="primary-block">
+      <h1 class="text-3xl font-black">
+        Latest Teas
+        <!-- <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          class="inline h-8 text-gray-400 fill-current w-9"
+        >
+          <path fill="none" d="M0 0h24v24H0z" />
+          <path
+            d="M14.59 16.004L5.982 7.397l1.414-1.414 8.607 8.606V7.004h2v11h-11v-2z"
+          />
+        </svg> -->
+      </h1>
+    </template>
+
+    <template slot="secondary-block">
+      <h1 class="mb-3 text-3xl font-black">Tea Collection</h1>
+      <small class="px-2 py-1 tracking-tight bg-gray-100 rounded-md max-w-max">
+        by type
+      </small>
+      <!-- Chart -->
+    </template>
+
+    <template slot="tertiary-block">
+      <h1 class="max-w-lg mb-8 text-3xl font-black">Favorites</h1>
+      <ul class="space-y-8">
+        <li v-for="session in flattenedFavorites" :key="session.id">
+          <div class="flex flex-row space-x-6">
+            <div
+              class="flex w-12 h-12 align-middle bg-gray-100 border-r-2 border-gray-600 rounded-l "
+              :style="`background-color: ${session.style[0].category.color}22;`"
+            >
+              <div
+                class="w-3 h-3 m-auto border-2 border-black"
+                :style="`background-color: ${session.style[0].category.color}`"
+              />
+            </div>
+            <div class="flex flex-col">
+              <h2 class="space-x-1 text-lg font-medium tracking-tight">
+                <span class="font-bold text-gray-900">{{
+                  session.production_year
+                }}</span>
+                <g-link :to="session.path">{{ session.title }} </g-link>
+              </h2>
+              <p class="text-gray-400 truncate w-72">{{ session.excerpt }}</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </template>
+
+    <!-- <template slot="quaternary-block">
+ 
+    </template> -->
+  </Layout>
 </template>
 
 <page-query>
+  fragment sessionPreview on Tasting {
+    title
+    date(format: "MMM DD, YYYY")
+    path
+    id
+    excerpt
+    production_year
+    style {
+      category {
+        color
+      }
+    }
+    tags {
+      title
+      path
+      color
+    }
+    images {
+      image
+      alt
+    }
+  }
   query {
-    sessions: allTasting {
+    latest: allTasting(limit: 3) {
       edges {
         node {
-          title
-          date(format: "MMM DD, YYYY")
-          path
-          id
-          excerpt
-          style {
-            category {
-              color
-            }
-          }
-          tags {
-            title
-            path
-            color
-          }
-          images {
-            image
-            alt
-          }
+          ...sessionPreview
+        }
+      }
+    }
+    favorites: allTasting(limit: 3, sortBy: "rating") {
+      edges {
+        node {
+          ...sessionPreview
         }
       }
     }
@@ -81,8 +144,13 @@
     },
 
     computed: {
-      flattenedSessions() {
-        return this.$page.sessions.edges.flatMap((session) => {
+      flattenedLatest() {
+        return this.$page?.latest.edges.flatMap((session) => {
+          return session.node;
+        });
+      },
+      flattenedFavorites() {
+        return this.$page?.favorites.edges.flatMap((session) => {
           return session.node;
         });
       },
