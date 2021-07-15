@@ -12597,18 +12597,18 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar-vue@^1.6.4:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.4.tgz#90ae6a879430601395d70d2f59a49252f9835cc8"
-  integrity sha512-CV71cO+mLbPHKGNvs+VUriqDYZIT4+KwsM2X4Bt5vRdFEix6jdJQaRmwoCDrzFMDRJnw1VWfJYUFMH4cNhC5JA==
+simplebar-vue@^1.6.7:
+  version "1.6.7"
+  resolved "https://registry.yarnpkg.com/simplebar-vue/-/simplebar-vue-1.6.7.tgz#fb1e2502dec6c87b38dc39787908438d22e13f2b"
+  integrity sha512-URrEV7Y2XqWFmYTxNeDHluC+FCybksHvaace6ItflTl5WXqniQFnZVtUax2AsJK7+n48wp8wpfqBlFv+BR4MAw==
   dependencies:
     core-js "^3.0.1"
-    simplebar "^5.3.4"
+    simplebar "^5.3.5"
 
-simplebar@^5.3.4:
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.3.4.tgz#7de8d4a07ed3c6612644f4dbc04a8427fdf038ef"
-  integrity sha512-2mCaVdiroCKmXuD+Qfy+QSE32m5BMuZ4ssHvRD1QEPYH95Re/kox7j/Wy0Hje8Uo7LY7O6JK3XSNJmesGlsP8Q==
+simplebar@^5.3.5:
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.3.5.tgz#799d14cdc8bb8ed245789745b9f3741d05403944"
+  integrity sha512-mcTlXEiva8pSMdNEzeV3C1KyBHk7Sn2Pe46U1Uwo53dCuQqdJIK0bEJrIPs8W4/RqJquKIsC8Y1h7+aqOl8ccA==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
     can-use-dom "^0.1.0"
