@@ -46,13 +46,15 @@ flavor_axes:
     start: 5
     finish: 0
 notes:
-  dry_leaf_nose: pineapple, peach, toffee
+  dry_leaf_nose: "pineapple, peach, toffee, roots "
   wet_leaf_nose: pineapple, apricot, sassafras, wintergreen, mulling spices
   mouthfeel: more astringent than juicy, medium thickness
   finish: cooling and minty
-  taste: in progress
-  empty_cup: in progress
-  cha_qi: in progress
+  taste: Meyer lemon
+  empty_cup: herbal rain
+  cha_qi: port forwarding a Minecraft server through your brain mind & very relaxing
+tags:
+  - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
 rating: 50
 brewing:
   temperature: 205
@@ -65,9 +67,9 @@ brewing:
 ### Infusions
 
 1. Very herbaceous and up front with some bitterness and astringency. Some complex, oily soupiness that feels quite spicy. Cooling and minty finish with a peachy aftertaste.
-2. Super nice balance with a peaches n cream feel. The bitterness is toned down to almost null, really fitting in nicely. The finish is nice.
-3. Oilier with even less astringency. Not as balanced as the last infusion but it's fantastic in a different way. Sweet and floral while still being spice-forward. Long and persistent cooling mouth sensation in the finish.
-4. ...
-5. Still holding quite similar flavor wise with a bit more astringency.
+2. Super nice balance with a peaches n cream feel. The bitterness is toned down to almost null, really fitting in nicely. The finish is smooth and a bit papery or woody. Some bright Meyer lemon notes. Lifting spicey herbs.
+3. Oilier with even less astringency. Not as balanced as the last infusion but it's fantastic in a different way. Sweet and floral while still being spice-forward. Long and persistent herbal cooling of the mouth & throat in the finish. Nice touch of *huigan* as well. I love these types of finishes in sheng.
+4. Sweeter with a more sticky mouthfeel. Very drinkable and easy to just down a cup real fast.
+5. Still holding quite similar flavor-wise with notably more astringency.
 6. Oily as a bear!
-7. Quite brothy/soupy with some mint that connects the finish.
+7. Quite brothy/soupy with some mint that connects the finish. Gettin savory and still smooth as hell.
