@@ -72,4 +72,5 @@ brewing:
 4. Sweeter with a more sticky mouthfeel. Very drinkable and easy to just down a cup real fast.
 5. Still holding quite similar flavor-wise with notably more astringency.
 6. Oily as a bear!
-7. Quite brothy/soupy with some mint that connects the finish. Gettin savory and still smooth as hell.
+7. Quite brothy/soupy with some mint that connects the finish. Gettin savory and still smooth as hell. Vaporous and herbal out the wazoo.
+8.
