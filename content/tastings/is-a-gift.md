@@ -16,34 +16,34 @@ date: 2021-07-20T15:03:27.589Z
 flavor_axes:
   cream:
     start: 3
-    finish: 0
+    finish: 6
   umami:
     start: 6
-    finish: 0
+    finish: 5
   stone:
     start: 5
-    finish: 0
+    finish: 4
   spices:
     start: 6
-    finish: 0
+    finish: 7
   earth:
     start: 2
-    finish: 0
+    finish: 3
   nuts_roast:
     start: 3
-    finish: 0
+    finish: 4
   wood:
     start: 1
     finish: 0
   vegetal:
     start: 7
-    finish: 0
+    finish: 5
   floral:
     start: 7
-    finish: 0
+    finish: 7
   fruits:
     start: 6
-    finish: 0
+    finish: 7
 notes:
   dry_leaf_nose: limestone, chamois leather, white grape, nectarine, sugarcane
   wet_leaf_nose: edamame, wheatgrass, lemon, spring meadow, that carwash foam that smells dope
@@ -74,4 +74,7 @@ brewing:
 5. Soupy and thick. Bright and sweet. That lemongrass aroma is still sitting in there. A bit more earthy on the vegetal/fruitiness. Kind of like taro. Nice balance on the body with the astringency puckering enough to make you wanna brew another cup. Very sessionable easy-drinker. The finish is lasting longer with a rolling sweetness that reminds me of the [Yiwu Gouyoulin](https://puerh.wtf/sessions/2021/03/yiwu-gouyoulin/) I reviewed.
 6. The liquor is cloudier. Smooth all-around with a bit of astringency drippin off the bottom.
 7. ...
-8. Sweeter and juicier but sticking true to that soupy fruity thing. The lemongrass flavor is a bit more ambiguous and less direct, with coriander taking the clarity spotlight
+8. Sweeter and juicier but sticking true to that soupy fruity thing. The lemongrass flavor is a bit more ambiguous and less direct, with coriander taking the clarity spotlight.
+9. Astringent with some notes of dragonfruit. 
+10. ...
+11. Much creamier and going out into the pasture of good sheng's end
