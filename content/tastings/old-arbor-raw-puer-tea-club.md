@@ -12,7 +12,7 @@ season: Spring
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: grassy old arbor sheng
+excerpt: grassy, medicinal old arbor sheng
 date: 2021-07-26T15:57:40.160Z
 flavor_axes:
   cream:
