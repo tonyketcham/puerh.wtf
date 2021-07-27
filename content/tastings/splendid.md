@@ -70,9 +70,9 @@ brewing:
 ### Infusions
 
 1. A gentle start with an embracing sweetness. A soft hug of a mouthfeel. The flavors are in the realm of cherry, Christmas spices, and cool rain. Some hidden or muffled bitterness that returns as *huigan*. 
-2. The power's kicked up. There are some clear *dian hong* flavors in there for sure. Noticing plum, red honey, and muscatel grape. Then there are some more puer flavors like orchid. Some slight woodiness with the light age, kind of in what some would consider the awkward stage between young and aged. A touch of seran wrap flavor too. I like it.
+2. The power's kicked up. There are some clear *dian hong* flavors in there for sure. Noticing plum, red honey, and muscatel grape. Then there are some more puer flavors like orchid. Some slight woodiness with the light age, kind of in what some would consider the awkward stage between young and aged. A touch of saran wrap flavor too. I like it.
 3. Astringent and woody when pushed. Noticing sage in the flavor. Not a ton of complexity in the body but it's definitely on the more engaging side of daily drinkers.
-4. When you don't push it though, it's super smooth and reminds me of a good Yunnan black tea. Syrupy sweet and dare I say.,,..,,.,..,., splended. 
+4. When you don't push it though, it's super smooth and reminds me of a good Yunnan black tea. Syrupy sweet and dare I say.,,..,,.,..,., splendid. 
 5. Smooth grape flavors.
 6. More of a rustic taste but super fruity and surprisingly floral. Bit of a chalky astringency towards the finish that I'm not a huge fan of in the context of this tea. Otherwise, this is very enjoyable and unique. The bright fruit flavor on the top of the tongue is like a good, ripe mango and dragonfruit. It's somewhat floral and tropical but not acidic. This tea is nice for when you don't exactly want a black tea but you feel like young sheng might be too hard on the stomach. It's got some punchy fruity floral aromas in a calm and soothing context. 
 
