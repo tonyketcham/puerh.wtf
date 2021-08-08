@@ -1,13 +1,16 @@
+const colors = require('tailwindcss/colors');
+
 module.exports = {
-  mode: 'jit',
   purge: {
     enabled: process.env.NODE_ENV === 'production',
     content: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
   },
+  mode: 'jit',
   darkMode: 'class', // manually trigger
   theme: {
     extend: {
       colors: {
+        gray: colors.warmGray,
         primary: {
           light: '#FEF4E8',
           dark: '#030302',
@@ -26,7 +29,7 @@ module.exports = {
     },
   },
   plugins: [
+    require('@tailwindcss/line-clamp'),
     require('tailwindcss-textshadow'),
-    require('tailwind-filter-utilities'),
   ],
 };
