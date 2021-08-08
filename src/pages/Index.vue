@@ -1,19 +1,16 @@
 <template>
   <Layout>
     <template slot="primary-block">
-      <h1 class="text-3xl font-black">
-        Latest Teas
-        <!-- <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          class="inline h-8 text-gray-400 fill-current w-9"
-        >
-          <path fill="none" d="M0 0h24v24H0z" />
-          <path
-            d="M14.59 16.004L5.982 7.397l1.414-1.414 8.607 8.606V7.004h2v11h-11v-2z"
-          />
-        </svg> -->
+      <h1 class="mb-8 text-3xl font-black">
+        <g-link to="/sessions/latest"> Latest Teas</g-link>
       </h1>
+      <Slider seeMoreLink="/sessions/latest">
+        <Card
+          v-for="session in flattenedLatest"
+          :key="session.id"
+          :session="session"
+        />
+      </Slider>
     </template>
 
     <template slot="secondary-block">
@@ -25,31 +22,64 @@
     </template>
 
     <template slot="tertiary-block">
-      <h1 class="max-w-lg mb-8 text-3xl font-black">Favorites</h1>
-      <ul class="space-y-8">
-        <li v-for="session in flattenedFavorites" :key="session.id">
-          <div class="flex flex-row space-x-6">
-            <div
-              class="flex w-12 h-12 align-middle bg-gray-100 border-r-2 border-gray-600 rounded-l "
-              :style="`background-color: ${session.style[0].category.color}22;`"
-            >
-              <div
-                class="w-3 h-3 m-auto border-2 border-black"
-                :style="`background-color: ${session.style[0].category.color}`"
-              />
-            </div>
-            <div class="flex flex-col">
-              <h2 class="space-x-1 text-lg font-medium tracking-tight">
-                <span class="font-bold text-gray-900">{{
-                  session.production_year
-                }}</span>
-                <g-link :to="session.path">{{ session.title }} </g-link>
-              </h2>
-              <p class="text-gray-400 truncate w-72">{{ session.excerpt }}</p>
-            </div>
-          </div>
-        </li>
-      </ul>
+      <h1
+        class="
+          mb-8
+          text-3xl
+          font-black
+          transition-transform
+          ease-out
+          border-transparent
+          max-w-max
+          hover:translate-x-1.5
+        "
+      >
+        <g-link to="/sessions/top">Favorites </g-link>
+      </h1>
+      <div class="lg:relative lg:h-56">
+        <section
+          class="overflow-x-hidden overflow-y-scroll  lg:absolute lg:inset-0 scrollbar"
+        >
+          <ul class="space-y-3">
+            <li v-for="session in flattenedFavorites" :key="session.id">
+              <div class="flex flex-row space-x-3 hover:bg-gray-50">
+                <div
+                  class="flex align-middle bg-gray-100 border-r-2 border-gray-600 rounded-l  w-14 h-14 group"
+                  :style="`background-color: ${session.style[0].category.color}22;`"
+                  :content="session.style[0].category.title"
+                  v-tippy
+                >
+                  <div
+                    class="w-3 h-3 m-auto transition-colors duration-150 border-2 border-black rounded-none  group-hover:border-yellow-900"
+                    :style="`background-color: ${session.style[0].category.color}`"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <h2 class="space-x-1 text-lg font-medium tracking-tight">
+                    <g-link :to="session.path">
+                      <span class="font-bold text-gray-900">{{
+                        session.production_year
+                      }}</span>
+                      {{ session.title }}
+                    </g-link>
+                  </h2>
+                  <p class="text-gray-400 truncate w-72">
+                    {{ session.excerpt }}
+                  </p>
+                </div>
+              </div>
+            </li>
+            <li class="flex justify-end w-full p-4">
+              <g-link to="/sessions/top" class="font-semibold">
+                See more ->
+              </g-link>
+            </li>
+          </ul>
+        </section>
+        <!-- <div
+          class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none bg-gradient-to-t from-white to-transparent lg:h-24"
+        /> -->
+      </div>
     </template>
 
     <!-- <template slot="quaternary-block">
@@ -69,6 +99,7 @@
     style {
       category {
         color
+        title
       }
     }
     tags {
@@ -80,16 +111,21 @@
       image
       alt
     }
+    vendor {
+      title
+      path
+      image
+    }
   }
   query {
-    latest: allTasting(limit: 3) {
+    latest: allTasting(limit: 5) {
       edges {
         node {
           ...sessionPreview
         }
       }
     }
-    favorites: allTasting(limit: 3, sortBy: "rating") {
+    favorites: allTasting(limit: 5, sortBy: "rating") {
       edges {
         node {
           ...sessionPreview
@@ -100,12 +136,16 @@
 </page-query>
 
 <script>
-  import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
   import { SITE_EMOJI, SITE_URL } from '@/lib/constants/brand';
+  import Slider from '@/layouts/modules/Slider.vue';
+  import SessionsFeed from '@/components/sessions/Sessions-Feed.vue';
+  import Card from '@/components/sessions/Card.vue';
 
   export default {
     components: {
       SessionsFeed,
+      Card,
+      Slider,
     },
 
     metaInfo() {
