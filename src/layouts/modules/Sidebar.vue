@@ -1,28 +1,12 @@
 <template>
   <dl>
-    <div>
-      <dt>Teas</dt>
-      <dd>{{ $static.Teas.totalCount }}</dd>
-    </div>
-    <div>
-      <dt>Origins</dt>
-      <dd>{{ $static.Origins.totalCount }}</dd>
-    </div>
-    <div>
-      <dt>Styles</dt>
-      <dd>{{ $static.Styles.totalCount }}</dd>
-    </div>
-    <div>
-      <dt>Types</dt>
-      <dd>{{ $static.Types.totalCount }}</dd>
-    </div>
-    <div>
-      <dt>Vendors</dt>
-      <dd>{{ $static.Vendors.totalCount }}</dd>
-    </div>
-    <div>
-      <dt>Authors</dt>
-      <dd>{{ $static.Authors.totalCount }}</dd>
+    <div v-for="(property, index) of $static" :key="index">
+      <dt>
+        {{ index }}
+      </dt>
+      <dd>
+        {{ property.totalCount }}
+      </dd>
     </div>
   </dl>
 </template>
@@ -30,22 +14,22 @@
 <static-query>
   query {
     Teas: allTasting {
-        totalCount
+      totalCount
     }
     Styles: allStyle {
-        totalCount
+      totalCount
     }
     Types: allCategory {
-        totalCount
+      totalCount
     }
     Origins: allOrigin {
-        totalCount
+      totalCount
     }
     Vendors: allVendor {
-        totalCount
+      totalCount
     }
     Authors: allAuthor {
-        totalCount
+      totalCount
     }
   }
 </static-query>
@@ -54,17 +38,17 @@
   export default {};
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
   dl {
-    @apply space-y-6;
-
-    div {
-      dt {
-        @apply text-gray-400 text-lg tracking-tight;
-      }
-      dd {
-        @apply font-black text-black text-3xl tracking-tight cursor-pointer max-w-max;
-      }
-    }
+    @apply flex lg:block flex-wrap justify-around space-y-0 lg:space-y-6;
+  }
+  div {
+    @apply flex-grow w-20;
+  }
+  dt {
+    @apply text-lg tracking-tight;
+  }
+  dd {
+    @apply font-black text-3xl tracking-tight cursor-pointer max-w-max text-black;
   }
 </style>

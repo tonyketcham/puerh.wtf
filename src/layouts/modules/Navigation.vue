@@ -1,5 +1,8 @@
 <template>
-  <nav class="space-x-8 text-lg font-semibold">
+  <nav
+    class="flex flex-wrap space-x-8 text-lg font-semibold transition-all duration-300  decoration-clone"
+    :class="{ 'text-white': forceDarkMode }"
+  >
     <g-link to="/">Overview</g-link>
     <g-link to="/sessions/latest">Latest</g-link>
     <g-link to="/sessions/top">Top</g-link>
@@ -9,5 +12,9 @@
 </template>
 
 <script>
-  export default {};
+  export default {
+    props: {
+      forceDarkMode: Boolean,
+    },
+  };
 </script>
