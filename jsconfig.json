@@ -1,18 +1,14 @@
 // Here's what's goin on https://lmichelin.fr/vscode-intellisense-jsconfig-vue-js-nuxt-js-absolute-imports/
 {
-"include": [
-    "./src/**/*"
-],
-"compilerOptions": {
+  "include": ["./src/**/*"],
+  "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-        "@/*": [
-            "src/*"
-        ]
+      "@/*": ["src/*"]
     }
-}
-// "exclude": [
-//     "node_modules",
-//     "dist"
-// ]
+  }
+  // "exclude": [
+  //     "node_modules",
+  //     "dist"
+  // ]
 }

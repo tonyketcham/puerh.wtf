@@ -4,8 +4,8 @@ title: Yunnan Sourcing
 image: /images/uploads/ys-logo.png
 links:
   website: https://yunnansourcing.com/
-  instagram: https://instagram.com/yunnan_sourcing
-  youtube: https://www.youtube.com/channel/UCI7KluFihpjjdUR24CzNhMQ
-  facebook: https://facebook.com/yunnansourcing
+  instagram: yunnan_sourcing
+  youtube: UCI7KluFihpjjdUR24CzNhMQ
+  facebook: yunnansourcing
 location: Kunming, China & USA
 ---
