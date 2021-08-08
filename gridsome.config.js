@@ -3,6 +3,8 @@
 
 // Changes here require a server restart.
 // To restart press CTRL + C in terminal and run `gridsome develop`
+// import slugify from 'slugify';
+const slugify = require('slugify');
 
 module.exports = {
   siteName: 'Puerh.wtf',
@@ -16,7 +18,23 @@ module.exports = {
     },
   },
   templates: {
-    Tasting: '/sessions/:year/:month/:title',
+    Tasting: [
+      {
+        path: (node) => {
+          // Split apart date & format it
+          const occurredOn = new Date(node.date);
+          const year = occurredOn.getFullYear();
+          const month = String(occurredOn.getMonth() + 1).padStart(2, '0');
+
+          // Get title
+          const slug = slugify(node.title, {
+            remove: /[*+~.()'"!:@]/g,
+          });
+
+          return `/sessions/${year}/${month}/${slug}-${node.production_year}`;
+        },
+      },
+    ],
     Category: '/categories/:title',
     Author: '/drinker/:title',
     Style: '/categories/:category/:title',
@@ -40,6 +58,9 @@ module.exports = {
       use: 'gridsome-plugin-tailwindcss',
       options: {
         tailwindConfig: './tailwind.config.js',
+        presetEnvConfig: {
+          autoprefixer: true,
+        },
       },
     },
     {
