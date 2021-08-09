@@ -58,6 +58,7 @@ module.exports = {
       use: 'gridsome-plugin-tailwindcss',
       options: {
         tailwindConfig: './tailwind.config.js',
+        shouldTimeTravel: true,
         presetEnvConfig: {
           autoprefixer: true,
         },
