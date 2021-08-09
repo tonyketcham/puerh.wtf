@@ -54,7 +54,7 @@ collections:
         search_fields: ['title', 'category']
         display_fields: ['title']
 
-      - label: 'Cultivar'
+      - label: 'Varietal'
         name: 'cultivar'
         widget: 'relation'
         collection: 'cultivars'
@@ -500,9 +500,9 @@ collections:
         widget: 'markdown'
         required: false
 
-  - label: 'Cultivars'
+  - label: 'Varietals'
     name: 'cultivars'
-    label_singular: 'Tea Cultivar'
+    label_singular: 'Varietal'
     description: 'The different strains in the game'
     folder: 'content/cultivars'
     create: true

@@ -38,8 +38,8 @@ module.exports = {
     Category: '/categories/:title',
     Author: '/drinker/:title',
     Style: '/categories/:category/:title',
-    Cultivar: '/cultivar/:id',
-    Origin: '/origin/:id',
+    Varietal: '/varietal/:title',
+    Origin: '/origin/:title',
     Vendor: '/vendor/:title',
     Tags: '/tags/:title',
   },
@@ -110,7 +110,7 @@ module.exports = {
       use: '@gridsome/source-filesystem',
       options: {
         path: 'content/cultivars/*.md',
-        typeName: 'Cultivar',
+        typeName: 'Varietal',
         refs: {
           style: 'Style',
         },
