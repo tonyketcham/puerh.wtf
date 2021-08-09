@@ -4,13 +4,16 @@
       <h1 class="mb-8 text-3xl font-black">
         <g-link to="/sessions/latest"> Latest Teas</g-link>
       </h1>
-      <Slider seeMoreLink="/sessions/latest">
-        <Card
-          v-for="session in flattenedLatest"
-          :key="session.id"
-          :session="session"
-        />
-      </Slider>
+      <div :class="{ 'relative -mx-8': $isMobile() }">
+        <Slider seeMoreLink="/sessions/latest">
+          <Card
+            v-for="session in flattenedLatest"
+            :key="session.id"
+            :session="session"
+            :class="{ 'first:ml-8': $isMobile() }"
+          />
+        </Slider>
+      </div>
     </template>
 
     <template slot="secondary-block">

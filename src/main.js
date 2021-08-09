@@ -6,6 +6,9 @@ import VueTippy, { TippyComponent } from 'vue-tippy';
 
 // import smoothscroll from 'smoothscroll-polyfill';
 // smoothscroll.polyfill();
+
+import VueMobileDetection from 'vue-mobile-detection';
+
 export default function (Vue) {
   // Layout
   Vue.component('Layout', Layout);
@@ -21,4 +24,6 @@ export default function (Vue) {
     size: 'small',
   });
   Vue.component('tippy', TippyComponent);
+
+  Vue.use(VueMobileDetection);
 }

@@ -25,6 +25,7 @@
     "uuid": "^8.3.2",
     "vue-chartjs": "^3.5.1",
     "vue-click-outside": "^1.1.0",
+    "vue-mobile-detection": "^1.0.0",
     "vue-tippy": "v4",
     "vue-window-size": "0.6.2",
     "vue2-transitions": "^0.3.0"
