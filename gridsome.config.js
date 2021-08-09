@@ -39,7 +39,17 @@ module.exports = {
     Author: '/drinker/:title',
     Style: '/categories/:category/:title',
     Varietal: '/varietal/:title',
-    Origin: '/origin/:title',
+    Origin: [
+      {
+        path: (node) => {
+          const country = slugify(node?.country ?? '') ?? 'unknown';
+          const municipality = slugify(node?.municipality ?? '') ?? 'unknown';
+          const location = slugify(node?.location ?? '');
+
+          return `/origin/${country}/${municipality}/${location}`;
+        },
+      },
+    ],
     Vendor: '/vendor/:title',
     Tags: '/tags/:title',
   },
@@ -72,7 +82,7 @@ module.exports = {
         refs: {
           author: 'Author',
           style: 'Style',
-          cultivar: 'Cultivar',
+          cultivar: 'Varietal',
           origin: 'Origin',
           vendor: 'Vendor',
           tags: 'Tags',
