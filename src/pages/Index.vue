@@ -4,7 +4,7 @@
       <h1 class="mb-8 text-3xl font-black">
         <g-link to="/sessions/latest"> Latest Teas</g-link>
       </h1>
-      <div :class="{ 'relative -mx-8': $isMobile() }">
+      <div :class="{ 'relative -mx-8': $isMobile() }" class="slider-wrapper">
         <Slider seeMoreLink="/sessions/latest">
           <Card
             v-for="session in flattenedLatest"
@@ -207,3 +207,14 @@
     },
   };
 </script>
+
+<style scoped>
+  .slider-wrapper {
+    @apply h-96;
+  }
+  @screen lg {
+    .slider-wrapper {
+      height: calc(100% - 4.25rem);
+    }
+  }
+</style>

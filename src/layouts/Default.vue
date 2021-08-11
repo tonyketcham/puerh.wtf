@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <Logo :intensity="2" class="!text-lg 2xl:!text-2xl brand" />
+    <Logo :intensity="2" class="!text-xl 2xl:!text-2xl brand" />
 
     <div class="space-x-2 place-items-start site-menu">
       <button v-if="isMenuOpen || !isMobile" class="p-1">
@@ -81,7 +81,7 @@
       <div
         v-for="area in layouts[layout]"
         :key="area.id"
-        class="scrollbar"
+        class="relative scrollbar light-border"
         :class="`${area.id}-${area.mode}`"
       >
         <slot :name="`${area.id}-block`" />
@@ -178,10 +178,23 @@
 </script>
 
 <style lang="scss">
+  @media (max-height: 900px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-height: 900.1px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
   html {
     @apply selection:bg-yellow-400 selection:text-black selection:rounded-md selection:text-shadow-sm;
     @apply bg-primary-light;
   }
+
   .dashboard {
     @apply h-screen px-8 space-y-8;
   }
@@ -204,7 +217,11 @@
       grid-template-rows: 0.5fr 2fr repeat(3, 1fr);
       column-gap: 4rem;
       row-gap: 4rem;
-      @apply p-16 pb-12 gap-16 space-y-0;
+      @apply p-12 gap-12 space-y-0;
+    }
+
+    .light-border {
+      @apply border-2 border-transparent border-opacity-10;
     }
 
     // Header
@@ -254,6 +271,7 @@
     // Footer
     .footer {
       grid-area: 5 / 1 / 6 / 2;
+      @apply mb-12;
     }
   }
 
