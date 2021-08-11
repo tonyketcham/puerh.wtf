@@ -1,7 +1,7 @@
 <template>
-  <section class="relative w-full h-96">
+  <section class="relative w-full h-full">
     <div
-      class="absolute flex w-full space-x-3 overflow-x-scroll overflow-y-hidden  no-scrollbar"
+      class="absolute flex w-full h-full space-x-3 overflow-x-scroll overflow-y-hidden  no-scrollbar"
       style="
         scroll-behavior: smooth;
         scroll-snap-points-x: repeat(100%);
@@ -13,7 +13,7 @@
       <slot />
       <g-link class="font-semibold" :to="seeMoreLink">
         <div
-          class="flex justify-center  w-36 place-items-center rounded-2xl h-96 group"
+          class="flex justify-center h-full  w-36 place-items-center rounded-2xl group"
           style="scroll-snap-align: center"
           ref="end"
         >
@@ -49,6 +49,16 @@
       </g-link>
     </div>
     <div
+      class="border-l-2 slider-overlay"
+      :class="[disableLeft ? 'h-0' : 'h-full']"
+      v-if="!$isMobile()"
+    />
+    <div
+      class="border-r-2 slider-overlay"
+      :class="[disableRight ? 'h-0' : 'h-full']"
+      v-if="!$isMobile()"
+    />
+    <div
       class="absolute top-0 bottom-0 z-50 flex h-full text-lg align-middle  -left-8"
       v-if="!$isMobile()"
     >
@@ -76,7 +86,7 @@
       </button>
     </div>
     <div
-      class="absolute top-0 bottom-0 z-50 flex h-full text-lg align-middle  -right-8"
+      class="absolute top-0 bottom-0 z-50 flex h-full text-lg -right-8"
       v-if="!$isMobile()"
     >
       <button class="m-auto group" @click="scrollLeft(true)">
@@ -133,7 +143,7 @@
         const end = this.$refs.end.getBoundingClientRect();
 
         // Detect scroll collision with the start or end of the carousel
-        if (Math.ceil(scroller.left) === Math.ceil(start.left)) {
+        if (scroller.left - start.left <= 2) {
           this.disableLeft = true;
         } else if (end.right - scroller.right <= 2) {
           this.disableRight = true;
@@ -153,3 +163,9 @@
     },
   };
 </script>
+
+<style scroped>
+  .slider-overlay {
+    @apply absolute inset-0 w-full my-auto transition-all duration-300 border-black pointer-events-none;
+  }
+</style>
