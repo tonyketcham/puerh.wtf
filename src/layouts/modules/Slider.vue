@@ -1,6 +1,60 @@
 <template>
   <section class="relative w-full h-full">
     <div
+      class="slider-button"
+      :class="[disableLeft ? 'left-0 opacity-0' : '-left-8 opacity-100']"
+      v-if="!$isMobile()"
+    >
+      <button class="m-auto group" @click="scrollLeft(false)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          display="block"
+          id="TriangleLeft"
+          class="fill-[transparent] transition-colors ease-in-out"
+          :class="{
+            'group-hover:fill-current': !disableLeft,
+          }"
+        >
+          <path d="M7 12l8-6v12l-8-6z" />
+        </svg>
+      </button>
+    </div>
+    <div
+      class="slider-button"
+      :class="[disableRight ? 'right-0 opacity-0' : '-right-8 opacity-100']"
+      v-if="!$isMobile()"
+    >
+      <button class="m-auto group" @click="scrollLeft(true)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          display="block"
+          id="TriangleRight"
+          class="fill-[transparent] transition-colors ease-in-out"
+          :class="{
+            'group-hover:fill-current': !disableRight,
+            'text-gray-300': disableRight,
+          }"
+        >
+          <path d="M17 12L9 6v12l8-6z" />
+        </svg>
+      </button>
+    </div>
+    <div
       class="absolute flex w-full h-full space-x-3 overflow-x-scroll overflow-y-hidden  no-scrollbar"
       style="
         scroll-behavior: smooth;
@@ -58,59 +112,6 @@
       :class="[disableRight ? 'h-0' : 'h-full']"
       v-if="!$isMobile()"
     />
-    <div
-      class="absolute top-0 bottom-0 z-50 flex h-full text-lg align-middle  -left-8"
-      v-if="!$isMobile()"
-    >
-      <button class="m-auto group" @click="scrollLeft(false)">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          display="block"
-          id="TriangleLeft"
-          class="fill-[transparent] transition-colors ease-in-out"
-          :class="{
-            'group-hover:fill-current': !disableLeft,
-            'text-gray-300': disableLeft,
-          }"
-        >
-          <path d="M7 12l8-6v12l-8-6z" />
-        </svg>
-      </button>
-    </div>
-    <div
-      class="absolute top-0 bottom-0 z-50 flex h-full text-lg -right-8"
-      v-if="!$isMobile()"
-    >
-      <button class="m-auto group" @click="scrollLeft(true)">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          display="block"
-          id="TriangleRight"
-          class="fill-[transparent] transition-colors ease-in-out"
-          :class="{
-            'group-hover:fill-current': !disableRight,
-            'text-gray-300': disableRight,
-          }"
-        >
-          <path d="M17 12L9 6v12l8-6z" />
-        </svg>
-      </button>
-    </div>
   </section>
 </template>
 
@@ -143,9 +144,9 @@
         const end = this.$refs.end.getBoundingClientRect();
 
         // Detect scroll collision with the start or end of the carousel
-        if (scroller.left - start.left <= 2) {
+        if (scroller.left - start.left <= 4) {
           this.disableLeft = true;
-        } else if (end.right - scroller.right <= 2) {
+        } else if (end.right - scroller.right <= 4) {
           this.disableRight = true;
         } else {
           this.disableLeft = false;
@@ -167,5 +168,8 @@
 <style scroped>
   .slider-overlay {
     @apply absolute inset-0 w-full my-auto transition-all duration-300 border-black pointer-events-none;
+  }
+  .slider-button {
+    @apply absolute top-0 bottom-0 flex h-full text-lg align-middle transition-all duration-100 delay-200;
   }
 </style>
