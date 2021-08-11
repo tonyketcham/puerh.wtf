@@ -10,7 +10,7 @@
         viewBox="0 0 24 24"
         fill="currentColor"
         stroke-width="2"
-        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out"
         id="GithubFill"
       >
         <path
@@ -30,7 +30,7 @@
         viewBox="0 0 24 24"
         fill="currentColor"
         stroke-width="2"
-        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out"
         id="InstagramFill"
       >
         <path
@@ -63,7 +63,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="w-4 h-4 transition-colors duration-200 ease-in-out  dark:text-yellow-200"
+        class="w-4 h-4 transition-colors duration-200 ease-in-out"
         id="Planet"
       >
         <circle cx="12" cy="12" r="8" />
