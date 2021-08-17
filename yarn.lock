@@ -3933,13 +3933,6 @@ create-react-class@^15.5.1, create-react-class@^15.7.0:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
-cross-env@^7.0.3:
-  version "7.0.3"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-7.0.3.tgz#865264b29677dc015ba8418918965dd232fc54cf"
-  integrity sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==
-  dependencies:
-    cross-spawn "^7.0.1"
-
 cross-spawn@^5.0.1:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
@@ -3960,7 +3953,7 @@ cross-spawn@^6.0.0, cross-spawn@^6.0.5:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-cross-spawn@^7.0.0, cross-spawn@^7.0.1, cross-spawn@^7.0.2:
+cross-spawn@^7.0.0, cross-spawn@^7.0.2:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.3.tgz#f73a85b9d5d41d045551c177e2882d4ac85728a6"
   integrity sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
@@ -15058,12 +15051,12 @@ vue-tippy@v4:
     humps "^2.0.1"
     tippy.js "^4.3.5"
 
-vue-window-size@0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/vue-window-size/-/vue-window-size-0.6.2.tgz#02522e2c0d8a95f242e0249b6d72a47848bc4e01"
-  integrity sha512-/mODjnC5xdZb0T0UlnUzYgOgxeaUVCEuBZkiD4jss2LkByA+208SA+MhMKvZFcMvej484+7mDjr2q9TNIRj+Dw==
+vue-window-size@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vue-window-size/-/vue-window-size-1.1.2.tgz#a92a1d7cdc260d08a6ac8a19a7993b85736a0bdd"
+  integrity sha512-7TBPWXjvn6Kwmbl1OAlI+O0wj2CSlryqeVPo5AnglW/nvuXxnW3ehRn42Epk2OjXNK/VhO99JsXciFhqyM2tFQ==
   dependencies:
-    window-resize-subject "^1.4.2"
+    window-resize-subject "^1.5.0"
 
 vue2-transitions@^0.3.0:
   version "0.3.0"
@@ -15351,7 +15344,7 @@ widest-line@^3.1.0:
   dependencies:
     string-width "^4.0.0"
 
-window-resize-subject@^1.4.2:
+window-resize-subject@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/window-resize-subject/-/window-resize-subject-1.5.0.tgz#a866128119c3899a8c03cfd1b86decf883e595a4"
   integrity sha512-r+zXdtumr1+De51Lb3P561K+3t6PvEVXq+dTaEhikNY8Hj0UuzkYL3v9jo5TLpPaL7s9gkaX3Sb643HqYT7uSA==
