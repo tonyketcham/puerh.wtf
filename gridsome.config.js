@@ -5,6 +5,9 @@
 // To restart press CTRL + C in terminal and run `gridsome develop`
 // import slugify from 'slugify';
 const slugify = require('slugify');
+const slugSettings = {
+  remove: /[*+~.,()'"!:@]/g,
+};
 
 module.exports = {
   siteName: 'Puerh.wtf',
@@ -27,9 +30,7 @@ module.exports = {
           const month = String(occurredOn.getMonth() + 1).padStart(2, '0');
 
           // Get title
-          const slug = slugify(node.title, {
-            remove: /[*+~.()'"!:@]/g,
-          });
+          const slug = slugify(node.title, slugSettings);
 
           return `/sessions/${year}/${month}/${slug}-${node.production_year}`;
         },
@@ -42,9 +43,11 @@ module.exports = {
     Origin: [
       {
         path: (node) => {
-          const country = slugify(node?.country ?? '') ?? 'unknown';
-          const municipality = slugify(node?.municipality ?? '') ?? 'unknown';
-          const location = slugify(node?.location ?? '');
+          const country =
+            slugify(node?.country ?? '', slugSettings) ?? 'unknown';
+          const municipality =
+            slugify(node?.municipality ?? '', slugSettings) ?? 'unknown';
+          const location = slugify(node?.location ?? '', slugSettings);
 
           return `/origin/${country}/${municipality}/${location}`;
         },
