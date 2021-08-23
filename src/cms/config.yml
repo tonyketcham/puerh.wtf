@@ -23,7 +23,7 @@ collections:
     folder: 'content/tastings'
     create: true
     delete: true
-    slug: '{{slug}}'
+    slug: '{{production_year}}-{{slug}}'
     identifier_field: 'title'
     summary: '{{year}}-{{month}}-{{day}} | {{title}} | {{season}} {{production_year}}'
     extension: 'md'
