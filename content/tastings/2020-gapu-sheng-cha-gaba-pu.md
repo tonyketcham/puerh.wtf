@@ -8,6 +8,7 @@ style:
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2020
+picking: Bud up to 3 leaves
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/1042846786/2021-gaba-puerh-25g
@@ -64,6 +65,17 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: /images/uploads/395534e2-023a-44cc-8632-32759d6bc1f9-min.jpg
+    alt: pu in the beak
+  - image: /images/uploads/3bbe75e8-a7f8-4941-bec1-62f2e1df7fcc-min.jpg
+    alt: gaiwan mode
+  - image: /images/uploads/d8032764-c6b4-4562-b930-d3c580d9bdbb-min.jpg
+    alt: hunk of pu
+  - image: /images/uploads/ef39ef4f-7039-4e18-992f-71bb23292662-min.jpg
+    alt: pu soup
+  - image: /images/uploads/9d615e7f-d170-4360-a4dd-d0a8197ae5e4-min.jpg
+    alt: pu ready for flushing
 ---
 This tea seems to be an interesting find by [LP](https://puerh.wtf/vendor/liquid-proust), coming from a Taiwanese producer and distributor called [GABA Tea (May Zest Tea Co., Ltd)](https://www.facebook.com/mzt.gaba)
 
