@@ -16,40 +16,40 @@ date: 2021-08-24T15:51:48.342Z
 flavor_axes:
   cream:
     start: 6
-    finish: 0
+    finish: 5
   umami:
     start: 4
-    finish: 0
+    finish: 2
   stone:
     start: 4
-    finish: 0
+    finish: 4
   spices:
     start: 5
-    finish: 0
+    finish: 5
   earth:
     start: 4
-    finish: 0
+    finish: 3
   nuts_roast:
     start: 5
-    finish: 0
+    finish: 6
   wood:
     start: 4
-    finish: 0
+    finish: 6
   vegetal:
     start: 4
-    finish: 0
+    finish: 4
   floral:
     start: 6
-    finish: 0
+    finish: 4
   fruits:
     start: 6
-    finish: 0
+    finish: 4
 notes:
   dry_leaf_nose: caramel, cream, dark chocolate, granola, hazelnut, maple syrup
   wet_leaf_nose: raisin, chili pepper, chocolate, lilac, popcorn
   mouthfeel: thin oil
   finish: persisting sweetness, medium astringency, floral & bright wild honey notes
-  taste: in progress
+  taste: "cereal milk, raisins, muscatel grape, honey, plum, maple wood, "
   empty_cup: kombucha scoby, gummy candy
   cha_qi: motivational, creative, and clear-minded
 tags:
@@ -73,8 +73,14 @@ This tea seems to be an interesting find by [LP](https://puerh.wtf/vendor/liquid
    \
    The finish is sweet and a bit astringent. No bitterness so far. The wet leaves have a pink hue to them and are quite dark.
 2. The flavors are much richer but still have a certain muted feeling to them. That may be a part of the effects of GABA processing. Some muscatel grape, honey, and plum notes. A bit of maple wood hiding out in there especially as it cools.
-3. Kind of an awkward faint chocolate milk taste but vegetal. Definitely noticing my motivation has gone way up and the way to break down a complex task seems readily apparent to me versus this morning everything was fuzzy in my brain-mind. So the cha qi is very positive and motivating although I barely feel it body-wise. Huge impact on my mood and cognition though.
+3. Kind of an awkward faint chocolate milk taste but vegetal. Definitely noticing my motivation has gone way up and the way to break down a complex task seems readily apparent to me versus this morning everything was fuzzy in my brain-mind. So the *cha qi* is very positive and motivating although I barely feel it body-wise. Huge impact on my mood and cognition though.
 4. Minty and more cohesive in flavor. Still a little awkward.  Some *huigan* chillin out there.
 5. ...
 6. ...
 7. Nuttier with an almond-like profile. Reminds me of almond skin and sunflower seeds. Smoothing out more where I find the flavor much more enjoyable. Definitely loving the headspace this tea puts you in even though it's not my favorite tasting sheng.
+8. Has some reminiscence of *yaobao* with a lemony/woody flavor.
+9. Pulling into the dead-end
+
+### Conclusion
+
+Definitely interesting and great for *cha qi* lovers or a pick-me-up on a day you're feeling unmotivated, but I probably won't reach for this stuff super often, flavor-wise.
