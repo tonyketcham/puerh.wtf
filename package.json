@@ -20,7 +20,7 @@
     "chart.js": "^3.3.0",
     "gridsome": "^0.7.23",
     "gridsome-plugin-netlify-cms": "^1.0.9",
-    "netlify-cms": "^2.10.158",
+    "netlify-cms": "^2.10.160",
     "netlify-cms-widget-youtube": "^0.3.1",
     "uuid": "^8.3.2",
     "vue-chartjs": "^3.5.1",
