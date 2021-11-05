@@ -4,7 +4,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2020,
   },
-  extends: ['plugin:gridsome/recommended', 'plugin:tailwind/recommended'],
+  extends: ['plugin:gridsome/recommended'],
 
   env: {
     node: true,

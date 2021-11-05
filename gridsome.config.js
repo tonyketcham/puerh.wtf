@@ -68,16 +68,6 @@ module.exports = {
   },
   plugins: [
     {
-      use: 'gridsome-plugin-tailwindcss',
-      options: {
-        tailwindConfig: './tailwind.config.js',
-        shouldTimeTravel: true,
-        presetEnvConfig: {
-          autoprefixer: true,
-        },
-      },
-    },
-    {
       use: '@gridsome/source-filesystem',
       options: {
         path: 'content/tastings/*.md',
@@ -157,6 +147,12 @@ module.exports = {
         configPath: `src/cms/config.yml`,
         publicPath: `/cms`,
         htmlTitle: `Tea CMS`,
+      },
+    },
+    {
+      use: 'gridsome-plugin-windicss',
+      options: {
+        config: false,
       },
     },
   ],

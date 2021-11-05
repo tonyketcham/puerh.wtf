@@ -1,11 +1,10 @@
-const colors = require('tailwindcss/colors');
+const colors = require('windicss/colors');
 
 module.exports = {
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
+  attributify: true,
+  extract: {
+    include: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
   },
-  mode: 'jit',
   darkMode: 'class', // manually trigger
   theme: {
     extend: {
@@ -29,7 +28,7 @@ module.exports = {
     },
   },
   plugins: [
-    require('@tailwindcss/line-clamp'),
-    require('tailwindcss-textshadow'),
+    require('windicss/plugin/line-clamp'),
+    require('@windicss/plugin-question-mark'),
   ],
 };
