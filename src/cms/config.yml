@@ -3,12 +3,6 @@ backend:
   repo: tonyketcham/puerh.wtf
   branch: main
 
-# media_library:
-#   name: cloudinary
-#   config:
-#     cloud_name: pu-erh
-#     api_key: 532164973571635
-
 media_folder: 'static/images/uploads'
 public_folder: '/images/uploads'
 publish_mode: editorial_workflow
@@ -23,7 +17,7 @@ collections:
     folder: 'content/tastings'
     create: true
     delete: true
-    slug: '{{slug}}'
+    slug: '{{production_year}}-{{slug}}'
     identifier_field: 'title'
     summary: '{{year}}-{{month}}-{{day}} | {{title}} | {{season}} {{production_year}}'
     extension: 'md'
