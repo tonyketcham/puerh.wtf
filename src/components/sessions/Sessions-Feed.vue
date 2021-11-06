@@ -10,7 +10,6 @@
 </template>
 
 <script>
-  import 'simplebar/dist/simplebar.min.css';
   import Title from '../utility/layout/Title.vue';
 
   export default {
