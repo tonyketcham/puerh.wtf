@@ -65,6 +65,15 @@ brewing:
   vessel: Cat Gaiwan with the lid off
   first_infusion_duration: 25
   infusion_increment: 20
+images:
+  - image: /images/uploads/f22ed4dc-28ff-41a9-b7f5-dd30eb487c4f.jpeg
+    alt: loose leaf
+  - image: /images/uploads/e5bd8923-3e89-49d2-8748-728ea2011683.jpeg
+    alt: open lid brewing
+  - image: /images/uploads/a9ef8803-e4aa-44b3-ad1c-27d6089f3f4e.jpeg
+    alt: liquid in the beaker
+  - image: /images/uploads/f7aec579-4667-490c-b10a-a4d87acd6e5a.jpeg
+    alt: cup of tea
 ---
 ### Synopsis
 
