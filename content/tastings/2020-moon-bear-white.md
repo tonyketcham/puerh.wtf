@@ -67,6 +67,19 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+images:
+  - image: /images/uploads/184298ea-3567-40e9-b6f3-7763f2b36a6c.jpeg
+    alt: front of the tea cake wrapper
+  - alt: back of the tea cake wrapper
+    image: /images/uploads/70319b54-3f8c-4c9d-bf88-8075596168e2.jpeg
+  - image: /images/uploads/89f36291-94e8-4de8-9337-2db3539d7b5e.jpeg
+    alt: tea cake exposed
+  - image: /images/uploads/456c5a6b-cd70-4582-b34f-4a56c6e2b048.jpeg
+    alt: Moon Bear in the gaiwan
+  - image: /images/uploads/9ae47ec9-d80a-468b-9f22-a601fad5090e.jpeg
+    alt: Moon Bear brewed in the cup
+  - image: /images/uploads/b5aa3a27-f600-47b8-8773-b2edb8e130d2.jpeg
+    alt: The card that came with the Tea Club
 ---
 ### Synopsis
 
