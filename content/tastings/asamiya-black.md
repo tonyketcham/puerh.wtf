@@ -69,6 +69,13 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 25
   infusion_increment: 5
+images:
+  - image: /images/uploads/img_8079.jpeg
+    alt: tea leaves
+  - image: /images/uploads/img_8086.jpeg
+    alt: wet leaves
+  - image: /images/uploads/img_8093.jpeg
+    alt: brewed tea
 ---
 The leaves that comprise this tea are quite odd. There are some with a deep brownish/yellow-green, and others with an almost turquoise/deep green. The stems are then a bright reddish-brown, so there's a lot of color contrast which I've not found in most other teas - particularly not a black tea.
 
