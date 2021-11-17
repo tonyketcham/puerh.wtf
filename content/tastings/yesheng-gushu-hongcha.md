@@ -11,6 +11,7 @@ origin:
   - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
 season: Spring
 production_year: 2021
+picking: Bud up to 2 or 3 leaves
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 excerpt: an intense and burly black tea in the licorice, incense, and honey realm
