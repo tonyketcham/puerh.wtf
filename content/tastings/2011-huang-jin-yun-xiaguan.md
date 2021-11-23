@@ -18,37 +18,38 @@ date: 2021-06-21T17:28:28.529Z
 flavor_axes:
   cream:
     start: 2
-    finish: 0
+    finish: 6
   umami:
     start: 5
-    finish: 0
+    finish: 3
   stone:
     start: 3
-    finish: 0
+    finish: 6
   spices:
     start: 4
-    finish: 0
+    finish: 7
   earth:
     start: 4
-    finish: 0
+    finish: 5
   nuts_roast:
     start: 4
-    finish: 0
+    finish: 7
   wood:
     start: 3
-    finish: 0
+    finish: 6
   vegetal:
     start: 3
-    finish: 0
+    finish: 4
   floral:
     start: 7
-    finish: 0
+    finish: 4
   fruits:
     start: 5
-    finish: 0
+    finish: 3
 notes:
-  dry_leaf_nose: raisin bran cereal, cacao nibs, Belgian waffle, tree sap
-  wet_leaf_nose: wild grain flour, animalistic/herbaceous notes, dried flowers, blueberries
+  dry_leaf_nose: raisin bran cereal, cacao nibs, Belgian waffle, tree sap, fruit smoke
+  wet_leaf_nose: wild grain flour, animalistic/herbaceous notes, dried flowers,
+    hibiscus, blueberries
   mouthfeel: oily, juicy, and soft
   taste: in progress
   finish: in progress
@@ -70,8 +71,9 @@ This material is 6 years aged prior to the pressing in 2011.
 ### Infusions
 
 1. The wet leaf smell is more rosy and fruity than after the rinse, taking on some of the characteristic bright puer florals akin to something like orchids or plumeria. The mouthfeel is oily, juicy, and soft. The flavor is light, floral, and sweet. There's some *huigan* in the finish with a lovely aroma wafting back up in the throat. There's a rather effervescent finish.
-2. Much thicker and more aromatic body. There's more of a burliness with some Peychaud's bitters, grapefruit/citrus, and medium astringency.
-3. Much more pungent and animalistic/funky.
+2. Much thicker and more aromatic body. Sweet peanut butter. There's more of a burliness with some Peychaud's bitters, grapefruit/citrus, and medium astringency.
+3. Much more pungent and animalistic/funky. 
 4. A focus more on a liquor-like funk. The flavor is quite alcoholic like a smooth, expensive whiskey. Woody and earthy flavors that complement whiskey.
-5. Much smoother with woodiness and cask-like flavors.
-6.
+5. Much smoother with woodiness and cask-like flavors. Some tobacco notes in there as well. Very sweet and spiced up overall. Some gentle but noticeable *huigan* is coming through with a lifting coolness.
+6. Higher powered astringency. The tea truly do be opening up much more n brewin quicker. It's gettin dark as 5pm in Chicago durin late November. 
+7. Creamier and goes down easy. Highly drinkable.
