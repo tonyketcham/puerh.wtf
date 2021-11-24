@@ -2,7 +2,7 @@
 id: faed9df1-a19e-475a-a895-064ffb787009
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2018 Purple Lemon Sheng
+title: Purple Lemon Sheng
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 production_year: 2018
@@ -54,7 +54,6 @@ notes:
 tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
-rating: 81
 brewing:
   temperature: 203
   material_amount: 6.05
@@ -62,6 +61,8 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 10
+tea_name: 2018 Purple Lemon Sheng
+rating: 81
 ---
 ### Infusions
 
