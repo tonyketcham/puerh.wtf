@@ -54,6 +54,7 @@ notes:
 tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
+rating: 81
 brewing:
   temperature: 203
   material_amount: 6.05
@@ -61,8 +62,16 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 10
+images:
+  - image: /images/uploads/img_6787.jpeg
+    alt: loose maocha with gunmetal/green/brown leaves, and fuzzy white stems
+  - image: /images/uploads/img_6788.jpeg
+    alt: top-down view of the leaves
+  - image: /images/uploads/img_6792.jpeg
+    alt: bright yellow tea liquor
+  - image: /images/uploads/img_6794.jpeg
+    alt: tea liquor in a cup
 tea_name: 2018 Purple Lemon Sheng
-rating: 81
 ---
 ### Infusions
 
