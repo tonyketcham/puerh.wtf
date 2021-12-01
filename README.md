@@ -2,7 +2,9 @@
 
 # 🌱 Pu-erh, wtf? 🍵
 
-So I decided to develop a site just so I could document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds of dollars on tea? Well hey I'll meet ya in the cart on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that bitch with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
+> Currently in flux, undergoing a major refactor over to [SvelteKit](https://kit.svelte.dev/) and [Flatbread](https://github.com/tonyketcham/flatbread). Gridsome lacking maintenance was causing too many headaches and compromises to be made. The next version of the UI is gonna be wild & I'm very excited for it.
+
+So I decided to develop a site to document all the damn teas I drink. How did it come to this? Where did I go wrong? Why am I spending hundreds on tea? Well hey, I'll meet ya in the cart over on [white2tea](https://white2tea.com),,,,, hope that thing has digital wheels cuz I wanna kickflip that thing with a `transform: rotateX(6rad);` and watch all the samples n cakes go flyin
 
 ## Features
 
@@ -13,12 +15,12 @@ So I decided to develop a site just so I could document all the damn teas I drin
 
 ## Status & Roadmap
 
-Right now we're in what you could consider the alpha state. The CMS is put together and experience tested well (a few updates still to come). 
+Right now we're in what you could consider the alpha.5 state. The CMS is put together and experience tested well (a few updates still to come). 
 The frontend of the site is usable but definitely a stand-in for what's to come. I've been designing a prototype in Adobe XD that's a complete departure from what's currently live, and I'm excited to finish that up and get to coding on it.
 
 After that, I'm going to add in data visualization components, vendor/author pages, and more tea info that exists in the backend but not yet on the front. 
 
-I think this project has some neat potential to show the trends of what I like and what terroirs I tend to gravitate towards. I'm also curious about working with some interactive map ideas down the line. Here, I could place context to terroir, displaying geo-tagged teas along with an average tasting chart for single origin teas of similar vintages.
+Tea wise, I think this project has some neat potential to show the trends of what I like and what terroirs I tend to gravitate towards. I'm also curious about working with some interactive map ideas down the line. With that, I could place context to terroir, displaying geo-tagged teas along with an average characteristics chart for single origin teas of similar vintages.
 
 To keep up with the status, check in to the issues pannel and the projects tab!
 
