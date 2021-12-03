@@ -12,6 +12,7 @@ origin:
 production_year: 2019
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
+purchase_link: https://white2tea.com/products/2019-laconic/
 excerpt: in progress
 date: 2021-04-09T13:55:34.545Z
 flavor_axes:
@@ -46,7 +47,7 @@ flavor_axes:
     start: 5
     finish: 0
 notes:
-  dry_leaf_nose: "pineapple, peach, toffee, roots "
+  dry_leaf_nose: pineapple, peach, toffee, roots, tepache
   wet_leaf_nose: pineapple, apricot, sassafras, wintergreen, mulling spices
   mouthfeel: more astringent than juicy, medium thickness
   finish: cooling and minty
@@ -66,7 +67,7 @@ brewing:
 ---
 ### Infusions
 
-1. Very herbaceous and up front with some bitterness and astringency. Some complex, oily soupiness that feels quite spicy. Cooling and minty finish with a peachy aftertaste.
+1. Very herbaceous and upfront with some bitterness and astringency. Some complex, oily soupiness that feels quite spicy. Milk Duds. Cooling and minty finish with a peachy aftertaste.
 2. Super nice balance with a peaches n cream feel. The bitterness is toned down to almost null, really fitting in nicely. The finish is smooth and a bit papery or woody. Some bright Meyer lemon notes. Lifting spicey herbs.
 3. Oilier with even less astringency. Not as balanced as the last infusion but it's fantastic in a different way. Sweet and floral while still being spice-forward. Long and persistent herbal cooling of the mouth & throat in the finish. Nice touch of *huigan* as well. I love these types of finishes in sheng.
 4. Sweeter with a more sticky mouthfeel. Very drinkable and easy to just down a cup real fast.
