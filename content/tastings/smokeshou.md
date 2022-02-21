@@ -74,4 +74,4 @@ After the first infusion, this tea carried a relaxing pine smoke aroma that gent
 
 There's something primitively relaxing from this tea that's making me feel loose and social. It's got a bit of an alcoholic characteristic like scotch - perhaps a bit peaty.
 
-As the session moves on, the outright smokiness tones down into something of a background context. Chocolate breads follow with malt and smooth texture. This tea finishes with a light smoke, chocolate granola, and juiciness around the mouth with astringency on the roof of the top of the tongue - even a bit of a *huigan* in there. The empty cup reminds me of being besides a campfire eating smores.
+As the session moves on, the outright smokiness tones down into something of a background context. Chocolate breads follow with malt and smooth texture. This tea finishes with a light smoke, chocolate granola, and juiciness around the mouth with astringency on the roof of the top of the tongue - even a bit of a *huigan* in there. The empty cup reminds me of being besides a campfire eating smores. Super enjoyable.
