@@ -13,7 +13,7 @@ vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/collections/latest-additions/products/2021-tuhao
 excerpt: Burly big guy with a sweet side
-date: 2021-07-02T14:49:06.803Z
+date: 2022-03-15T00:59:51.726Z
 flavor_axes:
   cream:
     start: 1
@@ -67,6 +67,14 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: /images/uploads/img_9316.jpeg
+    alt: cake wrapper w/ the funky tuhao man
+  - image: /images/uploads/img_9320.jpeg
+    alt: front view of the pressed cake (leaf) with yellow-greens, browns, creams,
+      and gunmetal greys
+  - image: /images/uploads/img_9321.jpeg
+    alt: backside of the pressed cake (leaf) with the binghole
 ---
 ### Infusions
 
