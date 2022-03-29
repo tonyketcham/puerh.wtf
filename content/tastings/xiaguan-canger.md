@@ -61,6 +61,11 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+images:
+  - image: /images/uploads/0e80cfc6-776b-4a7f-bd72-e3bdae972373.jpeg
+    alt: dry leaf
+  - image: /images/uploads/313095a3-a82f-4f6e-8d7b-5a53b9745f9a.jpeg
+    alt: ushi the cat with the cat gaiwan
 ---
 ### Synopsis
 
