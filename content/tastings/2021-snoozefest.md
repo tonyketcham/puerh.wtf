@@ -65,6 +65,17 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: /images/uploads/642c265d-f179-452c-baf7-4cfbe399dcf8.jpeg
+    alt: front of the cake wrapper with white2tea self-imposed slander written on it
+  - image: /images/uploads/79d77b44-aae8-4d0d-a80a-a68175a5e5f3.jpeg
+    alt: sexy back the cake wrapper
+  - image: /images/uploads/3d1dc7f8-d6c5-45a2-b52e-b6d63550ca34.jpeg
+    alt: very nice green leaves
+  - image: /images/uploads/943979eb-0a4d-4f2e-bd44-8a1e928ddda1.jpeg
+    alt: bing hole shot
+  - image: /images/uploads/eb116509-555b-4aaf-ab61-4c0bdbf79860.jpeg
+    alt: wet leaf in the gaiwan
 ---
 ### Synopsis
 
