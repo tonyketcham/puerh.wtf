@@ -1,4 +1,0 @@
-This is a Brave Rewards publisher verification file.
-
-Domain: puerh.wtf
-Token: 61e298920416098c20cbc4efdc3af77c8a8658efacaf64ae17b681023263352e
