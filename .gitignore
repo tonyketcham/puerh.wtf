@@ -1,11 +1,9 @@
-*.log
-.cache
 .DS_Store
-src/.temp
 node_modules
-dist
+/build
+/.svelte-kit
+/package
 .env
 .env.*
-
-# Local Netlify folder
-.netlify
+!.env.example
+vue
