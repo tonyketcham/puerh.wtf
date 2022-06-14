@@ -11,7 +11,5 @@
 				<span>{vendor.title}</span>
 			</button>
 		</li>
-	{:else}
-		<p>Error fetching vendors</p>
 	{/each}
 </ul>

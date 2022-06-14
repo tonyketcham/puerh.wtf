@@ -15,25 +15,18 @@ module.exports = {
 					100: '#eeeeee',
 					200: '#eef5dB'
 				},
-				maofeng: '#42723c',
-				matcha: '#10522f',
 				heicha: {
-					50: '#f4f4f5',
-					100: '#e9eaea',
-					200: '#c8c9cc',
-					300: '#a7a9ad',
-					400: '#64696f',
-					500: '#222831',
-					600: '#141410',
-					700: '#0f0f0c',
-					800: '#0e0e0c',
-					900: '#0a0a08'
+					700: '#2D282D',
+					900: '#121012'
 				}
 			},
 			fontFamily: {
-				sans: ['Karrik-Regular', ...defaultTheme.fontFamily.sans],
-				'sans-italic': ['Karrik-Italic', ...defaultTheme.fontFamily.sans]
+				display: ['Rock3D-Regular', ...defaultTheme.fontFamily.sans],
+				sans: ['FiraCode-Regular', ...defaultTheme.fontFamily.sans]
 			}
+		},
+		dropShadow: {
+			split: '0px 4px 0px rgba(255, 255, 255, 0.25)'
 		}
 	},
 	plugins: []

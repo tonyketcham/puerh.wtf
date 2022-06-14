@@ -1,10 +1,12 @@
 <section
-	class="flex flex-col w-full h-full overflow-hidden divide-y rounded-2xl divide-tea-soup-500/30 ring-1 ring-tea-soup-500/30"
+	class="flex flex-col w-full flex-grow overflow-hidden rounded-2xl border border-white/5 box-border bg-heicha-700/[0.35]"
+	style="box-shadow: 0px 8px 14px rgba(0, 0, 0, 0.1);
+	backdrop-filter: blur(48px);"
 >
-	<div class="bg-heicha-700/70 backdrop-blur-xl">
-		<slot name="header"><h2>Heading</h2></slot>
+	<div>
+		<slot name="header" />
 	</div>
-	<div class="h-full bg-heicha-800/70 backdrop-blur-xl">
+	<div class="h-full">
 		<slot />
 	</div>
 </section>
