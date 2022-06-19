@@ -1,3 +1,4 @@
+import type { TastingPreview } from '$lib/types/tasting';
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
 
@@ -25,7 +26,7 @@ export async function get(page: Page) {
 	const {
 		allTastings
 	}: {
-		allTastings: Tasting[];
+		allTastings: TastingPreview[];
 	} = await flatbread.request(query, { order, sortBy });
 
 	return {
@@ -34,12 +35,3 @@ export async function get(page: Page) {
 		}
 	};
 }
-
-export type Tasting = {
-	id: string;
-	slug: string;
-	title: string;
-	date: string;
-	production_year: number;
-	excerpt: string;
-};

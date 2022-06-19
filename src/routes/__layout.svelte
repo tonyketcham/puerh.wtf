@@ -32,7 +32,7 @@
 <div class="relative flex flex-row">
 	<div class="fixed z-20 flex flex-col w-[340px] h-screen p-8 space-y-10">
 		<SiteHeader />
-		<Panel>
+		<Panel id="nav">
 			<SidebarNav />
 		</Panel>
 	</div>
@@ -40,7 +40,7 @@
 		<slot />
 	</div>
 	<div class="fixed z-20 flex flex-col w-[340px] right-0 h-screen p-8">
-		<Panel>
+		<Panel id="details">
 			<!-- <SiteHeader slot="header" /> -->
 			<SidebarNav />
 		</Panel>

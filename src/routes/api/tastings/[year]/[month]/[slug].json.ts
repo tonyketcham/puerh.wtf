@@ -1,6 +1,6 @@
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
-import type { Tasting } from '../../index.json';
+import type { TastingFull } from '$lib/types/tasting';
 
 export async function get({ params }: Page) {
 	const { slug, month, year } = params;
@@ -22,6 +22,64 @@ export async function get({ params }: Page) {
 				date
 				production_year
 				excerpt
+				season
+				elevation
+				aging_conditions
+				purchase_link
+				notes {
+					dry_leaf_nose
+					wet_leaf_nose
+					finish
+					empty_cup
+					mouthfeel
+					taste
+					cha_qi
+				}
+				flavor_axes {
+					cream {
+						start
+						finish
+					}
+					umami {
+						start
+						finish
+					}
+					stone {
+						start
+						finish
+					}
+					spices {
+						start
+						finish
+					}
+					earth {
+						start
+						finish
+					}
+					nuts_roast {
+						start
+						finish
+					}
+					wood {
+						start
+						finish
+					}
+					vegetal {
+						start
+						finish
+					}
+					floral {
+						start
+						finish
+					}
+					fruits {
+						start
+						finish
+					}
+				}
+				content {
+					html
+				}
 			}
 		}
 	`;
@@ -34,7 +92,7 @@ export async function get({ params }: Page) {
 	const {
 		allTastings
 	}: {
-		allTastings: Tasting[];
+		allTastings: TastingFull[];
 	} = await flatbread.request(query, variables);
 
 	let error = null;

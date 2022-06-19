@@ -1,4 +1,7 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
+const wordSpacing = require('./tailwindPlugins/wordSpacingPlugin.cjs');
+const typography = require('@tailwindcss/typography');
+const textshadow = require('tailwindcss-textshadow');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -29,5 +32,5 @@ module.exports = {
 			split: '0px 4px 0px rgba(255, 255, 255, 0.25)'
 		}
 	},
-	plugins: []
+	plugins: [wordSpacing, typography, textshadow]
 };
