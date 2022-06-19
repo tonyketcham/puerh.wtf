@@ -3,7 +3,7 @@ import { selectAll } from 'hast-util-select';
 import { parseSelector } from 'hast-util-parse-selector';
 
 /**
- * Wraps matched HTML nodes (via selector) with a given tag.
+ * Internally wraps matched HTML nodes (via selector) with a given tag.
  */
 export const wrapMany =
 	(options = { tagsToWrap: [], wrapper: 'span' }) =>
