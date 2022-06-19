@@ -8,9 +8,11 @@
 	style="box-shadow: 0px 8px 14px rgba(0, 0, 0, 0.1);
 	backdrop-filter: blur(48px);"
 >
-	<div>
-		<slot name="header" />
-	</div>
+	{#if $$slots.header}
+		<div class="bg-heicha-600/5 py-3 px-4 border-b border-white/5">
+			<slot name="header" />
+		</div>
+	{/if}
 	<div class="h-full">
 		<slot />
 	</div>

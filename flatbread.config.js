@@ -2,11 +2,23 @@ import defineConfig from '@flatbread/config';
 import transformer from '@flatbread/transformer-markdown';
 // import transformer from '@flatbread/transformer-yaml';
 import filesystem from '@flatbread/source-filesystem';
+import { wrapMany } from './plugins/flatbread/wrap.js';
+
+const elementsToWrap = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'p'];
 
 const transformerConfig = {
 	markdown: {
 		gfm: true,
-		externalLinks: true
+		externalLinks: true,
+		rehypePlugins: [
+			[
+				wrapMany,
+				{
+					tagsToWrap: elementsToWrap,
+					wrapper: 'span.background-box'
+				}
+			]
+		]
 	}
 };
 export default defineConfig({

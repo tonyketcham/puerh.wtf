@@ -4,7 +4,7 @@
 </script>
 
 <header class="flex flex-row justify-between px-4 py-1 font-display">
-	<h1 class="text-6xl leading-[3.25rem] text-white select-none drop-shadow-split">
+	<h1 class="text-6xl leading-[3.25rem] text-bai-cha-100 select-none drop-shadow-split">
 		<span>puerh</span>
 		<br />
 		<span class="block -ml-4">.wtf</span>

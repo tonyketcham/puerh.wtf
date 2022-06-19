@@ -16,9 +16,10 @@ module.exports = {
 				'bai-cha': {
 					50: '#fcfff0',
 					100: '#eeeeee',
-					200: '#eef5dB'
+					200: '#dddddd'
 				},
 				heicha: {
+					600: '#D9D9D9',
 					700: '#2D282D',
 					900: '#121012'
 				}

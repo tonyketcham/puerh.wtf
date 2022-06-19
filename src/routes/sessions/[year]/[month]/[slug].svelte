@@ -43,7 +43,7 @@
 			>
 		</h2>
 		<div
-			class="session-body-content py-10 prose text-white prose-headings:text-white prose-h3:before:content-['###_'] prose-h3:before:opacity-50 prose-li:marker:text-white/50 session-body text-shadow-lg"
+			class="session-body-content py-10 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-li:text-neutral-300"
 		>
 			{@html session.content.html}
 		</div>
@@ -61,7 +61,7 @@
 	.parallax__layer--back {
 		transform: translateZ(-1px) scale(2);
 	}
-	.session-body-content {
-		@apply text-shadow-md;
+	:global(.session-body-content span.background-box) {
+		@apply box-decoration-clone bg-heicha-900/80 backdrop-blur-lg px-1 border-x border-heicha-900/80 rounded text-shadow-md;
 	}
 </style>
