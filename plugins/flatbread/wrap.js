@@ -8,7 +8,6 @@ import { parseSelector } from 'hast-util-parse-selector';
 export const wrapMany =
 	(options = { tagsToWrap: [], wrapper: 'span' }) =>
 	(tree) => {
-		// console.log(JSON.stringify(tree, null, 2));
 		for (const match of selectAll(generateSelector(options.tagsToWrap), tree)) {
 			if (options.tagsToWrap.includes(match.tagName)) {
 				visit(tree, match, (node, i, parent) => {
@@ -19,7 +18,6 @@ export const wrapMany =
 				});
 			}
 		}
-		// console.log(JSON.stringify(tree));
 	};
 
 function generateSelector(elements) {
