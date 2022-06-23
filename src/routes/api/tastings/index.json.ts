@@ -19,6 +19,11 @@ export async function get(page: Page) {
 				date
 				production_year
 				excerpt
+				style {
+					category {
+						color
+					}
+				}
 			}
 		}
 	`;

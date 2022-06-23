@@ -1,3 +1,6 @@
+import type { Category } from '$lib/types/category';
+import type { Content } from '$lib/types/content';
+
 export type BaseTasting = {
 	id: string;
 	slug: string;
@@ -8,6 +11,9 @@ export type TastingPreview = BaseTasting & {
 	date: string;
 	production_year: number | null;
 	excerpt: string;
+	style: {
+		category: Category;
+	}[];
 };
 
 export type TastingFull = BaseTasting &
@@ -19,9 +25,12 @@ export type TastingFull = BaseTasting &
 		purchase_link: string | null;
 		notes: TastingNotes;
 
-		content: {
-			html: string;
-		};
+		images: {
+			image: string;
+			alt: string;
+		}[];
+
+		content: Content;
 	};
 
 export type TastingNotes = {

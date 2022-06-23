@@ -1,4 +1,4 @@
-import type { Vendor } from '$lib/types/vendor';
+import type { Category } from '$lib/types/category';
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
 
@@ -11,25 +11,29 @@ export async function get(page: Page) {
 	const sortBy = page.url.searchParams.get('sortBy') ?? 'title';
 
 	const query = gql`
-		query AllVendors($sortBy: String, $order: Order) {
-			allVendors(sortBy: $sortBy, order: $order) {
+		query AllCategories($sortBy: String, $order: Order) {
+			allCategories(sortBy: $sortBy, order: $order) {
 				slug
 				id
 				title
-				image
+				color
+				description
+				content {
+					html
+				}
 			}
 		}
 	`;
 
 	const {
-		allVendors
+		allCategories
 	}: {
-		allVendors: Vendor[];
+		allCategories: Category[];
 	} = await flatbread.request(query, { order, sortBy });
 
 	return {
 		body: {
-			allVendors
+			allCategories
 		}
 	};
 }

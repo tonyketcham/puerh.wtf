@@ -4,7 +4,7 @@
 
 <section
 	{id}
-	class="flex flex-col w-full flex-grow overflow-hidden rounded-2xl border border-white/5 box-border bg-heicha-700/[0.35]"
+	class="flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-white/5 box-border bg-heicha-700/[0.35]"
 	style="box-shadow: 0px 8px 14px rgba(0, 0, 0, 0.1);
 	backdrop-filter: blur(48px);"
 >
@@ -13,7 +13,7 @@
 			<slot name="header" />
 		</div>
 	{/if}
-	<div class="h-full">
+	<div class="max-h-full overscroll-y-auto overflow-y-scroll pointer-events-auto">
 		<slot />
 	</div>
 </section>

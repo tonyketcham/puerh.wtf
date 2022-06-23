@@ -8,7 +8,6 @@ export async function get({ params }: Page) {
 		headers: {}
 	});
 
-	//
 	const monthStart = new Date(Number(year), Number(month) - 1, 1);
 	// TODO: add date range `between[]` comparator to Flatbread
 	// const monthEnd = new Date(Number(year), Number(month) - 1, 0);
@@ -79,6 +78,10 @@ export async function get({ params }: Page) {
 				}
 				content {
 					html
+				}
+				images {
+					image
+					alt
 				}
 			}
 		}

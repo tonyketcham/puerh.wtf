@@ -31,20 +31,59 @@
 </script>
 
 <article class="relative inset-0 h-screen px-56 py-6 parallax">
-	<div class="absolute inset-0 w-full px-56 top-96 parallax__layer--back">
-		<img src="/images/uploads/1988-wuyi_4.jpeg" alt="Test" width="500" />
+	<div class="absolute inset-0 px-72 top-72 space-y-8 parallax__layer--back">
+		{#if session.images.length > 0}
+			<img
+				src={session.images[0].image}
+				alt={session.images[0].alt}
+				class="aspect-square w-5/12 object-cover rounded-xl border border-heicha-700/50"
+			/>
+		{/if}
+		{#if session.images.length > 3}
+			{#each session.images as image, i}
+				{#if i > 2}
+					<img
+						src={session.images[i].image}
+						alt={session.images[i].alt}
+						class="aspect-square w-5/12 object-cover rounded-xl border border-heicha-700/50"
+					/>
+				{/if}
+			{/each}
+		{/if}
 	</div>
-	<section class="relative top-0 block w-full h-screen mx-28 parallax__layer--base contrast-2003">
-		<h2 class="font-display text-[121px] leading-[113.7%] text-shadow-md">
-			{session.production_year} <br /><span
-				class="block mr-80 -word-spacing-9"
-				style="font-size: clamp(64px, 6vw, 121px); line-height: clamp(100%, 6vw, 113.7%);"
+	<section
+		class="relative top-0 block h-screen parallax__layer--base w-[calc(100vw-45rem)] mx-auto"
+	>
+		<h2 class="font-display text-6xl leading-tight text-shadow-lg py-5">
+			{#if session.production_year}
+				<span
+					class="block max-w-max text-5xl px-1 py-2 bg-heicha-700/50 border border-white/5 rounded-xl"
+					>{session.production_year}</span
+				>
+			{/if}
+			<span class="block -word-spacing-9" style="font-size: clamp(16px, 6vw, 60px);"
 				>{session.title}</span
 			>
 		</h2>
 		<div
-			class="session-body-content py-10 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-li:text-neutral-300"
+			class="w-7/12 px-6 pb-24 ml-auto session-body-content mt-3 mb-6 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-li:text-neutral-300"
 		>
+			<div class="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4">
+				{#if session.images.length > 1}
+					<img
+						src={session.images[1].image}
+						alt={session.images[1].alt}
+						class="aspect-square xl:w-1/2 max-h-max object-cover rounded-xl border border-heicha-700/50 m-0"
+					/>
+				{/if}
+				{#if session.images.length > 2}
+					<img
+						src={session.images[2].image}
+						alt={session.images[2].alt}
+						class="aspect-square xl:w-1/2 object-cover rounded-xl border border-heicha-700/50 m-0"
+					/>
+				{/if}
+			</div>
 			{@html session.content.html}
 		</div>
 	</section>
@@ -60,8 +99,5 @@
 	}
 	.parallax__layer--back {
 		transform: translateZ(-1px) scale(2);
-	}
-	:global(.session-body-content span.background-box) {
-		@apply box-decoration-clone bg-heicha-900/80 backdrop-blur-lg px-1 border-x border-heicha-900/80 rounded text-shadow-md;
 	}
 </style>
