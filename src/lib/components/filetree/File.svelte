@@ -1,11 +1,23 @@
 <script lang="ts">
 	import type { TreeNode } from '$lib/types/tree';
 
-  
 	export let node: TreeNode;
+	export let hrefFunction: ((node: TreeNode) => string) | null = null;
+	$: hasHref = !!hrefFunction;
+
+	$: linkProps = hasHref
+		? {
+				href: hrefFunction ? hrefFunction(node) : '#',
+				'sveltekit:prefetch': true
+		  }
+		: {};
 </script>
 
-<a sveltekit:prefetch href="{node.}" class="px-4 py-1.5 text-left flex space-x-2">
+<svelte:element
+	this={hasHref ? 'a' : 'div'}
+	class="px-4 py-1.5 text-left flex space-x-2"
+	{...linkProps}
+>
 	<svg
 		width="19"
 		height="22"
@@ -45,4 +57,4 @@
 		/>
 	</svg>
 	<span class="font-normal opacity-60 my-auto">{node.title}</span>
-</a>
+</svelte:element>

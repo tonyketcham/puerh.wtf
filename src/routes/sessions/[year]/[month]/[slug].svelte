@@ -1,8 +1,9 @@
 <script context="module" lang="ts">
+	export const prerender = true;
 	import type { LoadEvent } from '@sveltejs/kit';
 
 	export async function load({ params, url, fetch }: LoadEvent) {
-		const apiURL = `/api/tastings/${params.year}/${params.month}/${params.slug}.json`;
+		const apiURL = `/api/sessions/${params.year}/${params.month}/${params.slug}.json`;
 		const res = await fetch(apiURL);
 
 		if (res.ok) {
@@ -25,9 +26,9 @@
 </script>
 
 <script lang="ts">
-	import type { TastingFull } from '$lib/types/tasting';
+	import type { SessionFull } from '$lib/types/session';
 
-	export let session: TastingFull;
+	export let session: SessionFull;
 </script>
 
 <article class="relative inset-0 h-screen px-56 py-6 parallax">
@@ -84,7 +85,7 @@
 					/>
 				{/if}
 			</div>
-			{@html session.content.html}
+			{@html session._content.html}
 		</div>
 	</section>
 </article>

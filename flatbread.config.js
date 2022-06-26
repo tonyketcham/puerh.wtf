@@ -28,7 +28,7 @@ export default defineConfig({
 	content: [
 		{
 			path: 'content/tastings',
-			typeName: 'Tasting',
+			collection: 'Session',
 			refs: {
 				author: 'Author',
 				style: 'Style',
@@ -40,37 +40,37 @@ export default defineConfig({
 		},
 		{
 			path: 'content/authors',
-			typeName: 'Author'
+			collection: 'Author'
 		},
 		{
 			path: 'content/categories',
-			typeName: 'Category'
+			collection: 'Category'
 		},
 		{
 			path: 'content/styles',
-			typeName: 'Style',
+			collection: 'Style',
 			refs: {
 				category: 'Category'
 			}
 		},
 		{
 			path: 'content/cultivars',
-			typeName: 'Varietal',
+			collection: 'Varietal',
 			refs: {
 				style: 'Style'
 			}
 		},
 		{
 			path: 'content/origins',
-			typeName: 'Origin'
+			collection: 'Origin'
 		},
 		{
 			path: 'content/tags',
-			typeName: 'Tags'
+			collection: 'Tags'
 		},
 		{
 			path: 'content/vendors',
-			typeName: 'Vendor'
+			collection: 'Vendor'
 		}
 	]
 });

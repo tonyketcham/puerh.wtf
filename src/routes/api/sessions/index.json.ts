@@ -1,4 +1,4 @@
-import type { TastingPreview } from '$lib/types/tasting';
+import type { SessionPreview } from '$lib/types/session';
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
 
@@ -11,10 +11,11 @@ export async function get(page: Page) {
 	const sortBy = page.url.searchParams.get('sortBy') ?? 'date';
 
 	const query = gql`
-		query AllTastings($order: Order, $sortBy: String) {
-			allTastings(order: $order, sortBy: $sortBy) {
+		query AllSessions($order: Order, $sortBy: String) {
+			allSessions(order: $order, sortBy: $sortBy) {
+				_slug
+				_collection
 				id
-				slug
 				title
 				date
 				production_year
@@ -29,14 +30,14 @@ export async function get(page: Page) {
 	`;
 
 	const {
-		allTastings
+		allSessions
 	}: {
-		allTastings: TastingPreview[];
+		allSessions: SessionPreview[];
 	} = await flatbread.request(query, { order, sortBy });
 
 	return {
 		body: {
-			allTastings
+			allSessions
 		}
 	};
 }

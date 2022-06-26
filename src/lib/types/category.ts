@@ -1,10 +1,10 @@
 export type Category = {
 	id: string;
-	slug: string;
+	_slug: string;
 	title: string;
 	color: string;
 	description: string | null;
-	content: {
+	_content: {
 		html: string;
 	};
 };

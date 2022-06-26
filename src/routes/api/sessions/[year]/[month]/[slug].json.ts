@@ -1,6 +1,6 @@
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
-import type { TastingFull } from '$lib/types/tasting';
+import type { SessionFull } from '$lib/types/session';
 
 export async function get({ params }: Page) {
 	const { slug, month, year } = params;
@@ -13,10 +13,10 @@ export async function get({ params }: Page) {
 	// const monthEnd = new Date(Number(year), Number(month) - 1, 0);
 
 	const query = gql`
-		query TastingBySlug($slug: String!, $monthStart: Date!) {
-			allTastings(filter: { slug: { eq: $slug }, date: { gte: $monthStart } }) {
+		query SessionBySlug($slug: String!, $monthStart: Date!) {
+			allSessions(filter: { _slug: { eq: $slug }, date: { gte: $monthStart } }) {
 				id
-				slug
+				_slug
 				title
 				date
 				production_year
@@ -76,7 +76,7 @@ export async function get({ params }: Page) {
 						finish
 					}
 				}
-				content {
+				_content {
 					html
 				}
 				images {
@@ -93,16 +93,16 @@ export async function get({ params }: Page) {
 	};
 
 	const {
-		allTastings
+		allSessions
 	}: {
-		allTastings: TastingFull[];
+		allSessions: SessionFull[];
 	} = await flatbread.request(query, variables);
 
 	let error = null;
 
-	if (allTastings.length === 0) {
-		error = 'Tasting not found';
-	} else if (allTastings.length > 1) {
+	if (allSessions.length === 0) {
+		error = 'Session not found';
+	} else if (allSessions.length > 1) {
 		error = 'Multiple tastings found';
 	}
 
@@ -117,6 +117,6 @@ export async function get({ params }: Page) {
 
 	return {
 		status: 200,
-		body: allTastings[0]
+		body: allSessions[0]
 	};
 }

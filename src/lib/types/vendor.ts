@@ -1,6 +1,6 @@
 export type Vendor = {
 	id: string;
-	slug: string;
+	_slug: string;
 	title: string;
 	image: string;
 };

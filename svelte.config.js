@@ -1,5 +1,6 @@
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
 import preprocess from 'svelte-preprocess';
+import os from 'os';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -10,7 +11,13 @@ const config = {
 	}),
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter({
+			precompress: true
+		}),
+		prerender: {
+			concurrency: os.cpus().length,
+			default: true
+		}
 	}
 };
 

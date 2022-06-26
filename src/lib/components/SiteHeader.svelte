@@ -4,11 +4,13 @@
 </script>
 
 <header class="flex flex-row justify-between px-4 py-1 font-display">
-	<h1 class="text-6xl leading-[3.25rem] text-bai-cha-100 select-none drop-shadow-split">
-		<span>puerh</span>
-		<br />
-		<span class="block -ml-4">.wtf</span>
-	</h1>
+	<a sveltekit:prefetch href="/" aria-label="home" class="pointer-events-auto">
+		<h1 class="text-6xl leading-[3.25rem] text-bai-cha-100 select-none drop-shadow-split">
+			<span>puerh</span>
+			<br />
+			<span class="block -ml-4">.wtf</span>
+		</h1>
+	</a>
 
 	<div class="flex flex-col space-y-1.5 m-auto pt-4 opacity-80">
 		<a

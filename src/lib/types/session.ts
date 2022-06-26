@@ -1,12 +1,13 @@
 import type { Category } from '$lib/types/category';
 import type { Content } from '$lib/types/content';
 
-export type BaseTasting = {
+export type BaseSession = {
 	id: string;
-	slug: string;
+	_slug: string;
 };
 
-export type TastingPreview = BaseTasting & {
+export type SessionPreview = BaseSession & {
+	_collection: string;
 	title: string;
 	date: string;
 	production_year: number | null;
@@ -16,24 +17,24 @@ export type TastingPreview = BaseTasting & {
 	}[];
 };
 
-export type TastingFull = BaseTasting &
-	TastingPreview & {
+export type SessionFull = BaseSession &
+	SessionPreview & {
 		season: string | null;
 		elevation: number | null;
 		aging_conditions: string | null;
 		rating: number;
 		purchase_link: string | null;
-		notes: TastingNotes;
+		notes: SessionNotes;
 
 		images: {
 			image: string;
 			alt: string;
 		}[];
 
-		content: Content;
+		_content: Content;
 	};
 
-export type TastingNotes = {
+export type SessionNotes = {
 	dry_leaf_nose: string;
 	wet_leaf_nose: string;
 	finish: string;
@@ -43,7 +44,7 @@ export type TastingNotes = {
 	cha_qi: string;
 };
 
-export type TastingFlavorAxes = {
+export type SessionFlavorAxes = {
 	vegetal: FlavorAxesTransition;
 	floral: FlavorAxesTransition;
 	fruits: FlavorAxesTransition;

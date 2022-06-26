@@ -1,18 +1,20 @@
 <script context="module" lang="ts">
+	export const prerender = true;
+
 	import type { LoadEvent } from '@sveltejs/kit';
-	import type { TastingPreview } from '$lib/types/tasting';
+	import type { SessionPreview } from '$lib/types/session';
 	import type { Vendor } from '$lib/types/vendor';
 	import type { Category } from '$lib/types/category';
 
 	export async function load({ fetch }: LoadEvent) {
-		const tastingRes = await fetch('/api/tastings.json');
+		const tastingRes = await fetch('/api/sessions.json');
 		const vendorsRes = await fetch('/api/vendors.json');
 		const categoriesRes = await fetch('/api/categories.json');
 
 		return {
 			status: vendorsRes.status,
 			props: {
-				tastings: tastingRes.ok && ((await tastingRes.json()).allTastings as TastingPreview[]),
+				sessions: tastingRes.ok && ((await tastingRes.json()).allSessions as SessionPreview[]),
 				vendors: vendorsRes.ok && ((await vendorsRes.json()).allVendors as Vendor[]),
 				categories: categoriesRes.ok && ((await categoriesRes.json()).allCategories as Category[])
 			}
@@ -26,7 +28,7 @@
 	import '../app.css';
 	import FileTree from '$lib/components/filetree/FileTree.svelte';
 
-	export let tastings: TastingPreview[] = [];
+	export let sessions: SessionPreview[] = [];
 	export let vendors: Vendor[] = [];
 	export let categories: Category[] = [];
 </script>
@@ -46,7 +48,7 @@
 			</div>
 			<FileTree
 				data={[
-					{ id: 'sessions', title: 'Sessions', children: tastings },
+					{ id: 'sessions', title: 'Sessions', children: sessions },
 					{ id: 'vendors', title: 'Vendors', children: vendors },
 					{ id: 'categories', title: 'Categories', children: categories }
 				]}

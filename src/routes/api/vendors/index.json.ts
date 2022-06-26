@@ -13,7 +13,8 @@ export async function get(page: Page) {
 	const query = gql`
 		query AllVendors($sortBy: String, $order: Order) {
 			allVendors(sortBy: $sortBy, order: $order) {
-				slug
+				_slug
+				_collection
 				id
 				title
 				image

@@ -13,12 +13,13 @@ export async function get(page: Page) {
 	const query = gql`
 		query AllCategories($sortBy: String, $order: Order) {
 			allCategories(sortBy: $sortBy, order: $order) {
-				slug
+				_slug
+				_collection
 				id
 				title
 				color
 				description
-				content {
+				_content {
 					html
 				}
 			}
