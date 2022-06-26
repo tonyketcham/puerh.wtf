@@ -5,10 +5,10 @@
 	export let id = '';
 
 	const { getMainContent } = getContext('mainContent');
-	let mainContent: HTMLElement;
+	let mainContentContainer: HTMLElement;
 
 	onMount(() => {
-		mainContent = getMainContent();
+		mainContentContainer = getMainContent();
 	});
 
 	let handle: HTMLDivElement;
@@ -37,7 +37,7 @@
 			bind:this={handle}
 			class="bg-heicha-600/5 py-3 px-4 border-b border-white/5 cursor-grab pointer-events-auto"
 			on:wheel={(e) => {
-				mainContent.scrollTop += e.deltaY;
+				mainContentContainer.scrollTop += e.deltaY;
 			}}
 			class:cursor-grabbing={isDragging}
 			on:mousedown={() => {
