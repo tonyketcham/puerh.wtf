@@ -16,7 +16,7 @@
 		<a
 			aria-label="source code"
 			href="https://github.com/tonyketcham/puerh.wtf"
-			class="w-5 h-5 outline-none focus:outline-none hover:text-tea-soup-500 focus:text-tea-soup-500"
+			class="w-5 h-5 outline-none focus:outline-none hover:text-tea-soup-500 focus:text-tea-soup-500 pointer-events-auto"
 		>
 			<Github />
 		</a>
@@ -24,7 +24,7 @@
 		<a
 			aria-label="puerh.wtf instagram"
 			href="https://instagram.com/puerh.wtf/"
-			class="w-5 h-5 outline-none focus:outline-none hover:text-tea-soup-500 focus:text-tea-soup-500"
+			class="w-5 h-5 outline-none focus:outline-none hover:text-tea-soup-500 focus:text-tea-soup-500 pointer-events-auto"
 		>
 			<Instagram />
 		</a>

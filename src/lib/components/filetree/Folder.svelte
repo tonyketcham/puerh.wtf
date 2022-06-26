@@ -6,7 +6,7 @@
 	import { prerendering } from '$app/env';
 
 	// This allows SvelteKit to crawl the file-tree and build all the dynamic routes of the site. In prod, all the folders will be collapsed.
-	export let expanded = prerendering;
+	export let expanded = prerendering ? true : true; // temporarily forced open until vendors and categories are implemented
 	export let title: string;
 	export let nodes: TreeNode[];
 
@@ -33,7 +33,7 @@
 
 <div
 	on:click={toggle}
-	class="px-2.5 py-1.5 text-left flex space-x-2 place-items-center cursor-pointer"
+	class="group p-1.5 text-left flex space-x-2 place-items-center cursor-pointer hover:bg-bai-cha-200/5 rounded-lg"
 >
 	<svg
 		width="6"
@@ -64,13 +64,14 @@
 			stroke-linejoin="round"
 		/>
 	</svg>
-	<span class="font-normal opacity-60">{title}</span>
+	<span class="font-normal opacity-60 group-hover:opacity-100 group-focus:opacity-100">{title}</span
+	>
 </div>
 
 {#if expanded}
-	<ul transition:slide={{ duration: 300 }} class="pl-4">
+	<ul transition:slide={{ duration: 300 }}>
 		{#each nodes as node}
-			<li>
+			<li class="pl-3 hover:bg-bai-cha-200/5 rounded-lg">
 				{#if node?.children}
 					<svelte:self {...node} />
 				{:else}

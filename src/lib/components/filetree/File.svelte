@@ -15,7 +15,7 @@
 
 <svelte:element
 	this={hasHref ? 'a' : 'div'}
-	class="px-4 py-1.5 text-left flex space-x-2"
+	class="group px-4 py-1.5 text-left flex space-x-2 text-xs"
 	{...linkProps}
 >
 	<svg
@@ -56,5 +56,12 @@
 			stroke-linejoin="round"
 		/>
 	</svg>
-	<span class="font-normal opacity-60 my-auto">{node.title}</span>
+	<div class="inline font-normal my-auto">
+		{#if node.production_year}
+			<span class="opacity-60 group-hover:opacity-100">{node.production_year}</span>
+		{/if}
+		<span class="opacity-60 group-hover:opacity-100 group-hover:text-tea-soup-500"
+			>{node.title}</span
+		>
+	</div>
 </svelte:element>

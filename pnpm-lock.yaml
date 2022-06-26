@@ -20,6 +20,7 @@ specifiers:
   hast-util-select: ^5.0.2
   plur: ^5.1.0
   postcss: ^8.4.14
+  postcss-scrollbar: ^0.5.1
   prettier: ^2.6.2
   prettier-plugin-svelte: ^2.7.0
   svelte: ^3.44.0
@@ -47,11 +48,12 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@8.17.0
   eslint-plugin-svelte3: 4.0.0_3aft6623ti3qaietkx5ojwfh2e
   flatbread: 1.0.0-alpha.13
-  graphql-request: 4.3.0
+  graphql-request: 4.3.0_graphql@15.8.0
   hast-util-parse-selector: 3.1.0
   hast-util-select: 5.0.2
   plur: 5.1.0
   postcss: 8.4.14
+  postcss-scrollbar: 0.5.1_postcss@8.4.14
   prettier: 2.6.2
   prettier-plugin-svelte: 2.7.0_kkjbqzpydplecjtkxrgomroeru
   svelte: 3.48.0
@@ -2515,7 +2517,7 @@ packages:
       graphql: 16.0.1
     dev: true
 
-  /graphql-request/4.3.0:
+  /graphql-request/4.3.0_graphql@15.8.0:
     resolution: {integrity: sha512-2v6hQViJvSsifK606AliqiNiijb1uwWp6Re7o0RTyH+uRTv/u7Uqm2g4Fjq/LgZIzARB38RZEvVBFOQOVdlBow==}
     peerDependencies:
       graphql: 14 - 16
@@ -2523,6 +2525,7 @@ packages:
       cross-fetch: 3.1.5
       extract-files: 9.0.0
       form-data: 3.0.1
+      graphql: 15.8.0
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -3976,6 +3979,16 @@ packages:
     dependencies:
       postcss: 8.4.14
       postcss-selector-parser: 6.0.10
+    dev: true
+
+  /postcss-scrollbar/0.5.1_postcss@8.4.14:
+    resolution: {integrity: sha512-OPvwloab5juU3z5MOCRrYHRGAnDei8ObDIDBWpRfMt0zHptceOWWJUaaG+rodUJ4ItI+6fdaGs8uw77lCWqdbQ==}
+    peerDependencies:
+      postcss: ^8.0.0
+    dependencies:
+      postcss: 8.4.14
+      postcss-selector-parser: 6.0.10
+      postcss-value-parser: 4.2.0
     dev: true
 
   /postcss-selector-parser/6.0.10:

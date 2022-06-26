@@ -29,8 +29,8 @@
 	import FileTree from '$lib/components/filetree/FileTree.svelte';
 
 	export let sessions: SessionPreview[] = [];
-	export let vendors: Vendor[] = [];
-	export let categories: Category[] = [];
+	// export let vendors: Vendor[] = [];
+	// export let categories: Category[] = [];
 </script>
 
 <svelte:head>
@@ -48,9 +48,9 @@
 			</div>
 			<FileTree
 				data={[
-					{ id: 'sessions', title: 'Sessions', children: sessions },
-					{ id: 'vendors', title: 'Vendors', children: vendors },
-					{ id: 'categories', title: 'Categories', children: categories }
+					{ id: 'sessions', title: 'Sessions', children: sessions }
+					// { id: 'vendors', title: 'Vendors', children: vendors },
+					// { id: 'categories', title: 'Categories', children: categories }
 				]}
 			/>
 		</Panel>

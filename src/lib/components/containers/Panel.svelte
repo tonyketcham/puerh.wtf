@@ -13,7 +13,7 @@
 			<slot name="header" />
 		</div>
 	{/if}
-	<div class="max-h-full overscroll-y-auto overflow-y-scroll pointer-events-auto">
+	<div class="max-h-full overscroll-y-auto pointer-events-auto" style="overflow-y: overlay">
 		<slot />
 	</div>
 </section>

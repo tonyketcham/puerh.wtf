@@ -26,10 +26,12 @@ export type SessionFull = BaseSession &
 		purchase_link: string | null;
 		notes: SessionNotes;
 
-		images: {
-			image: string;
-			alt: string;
-		}[];
+		images:
+			| {
+					image: string;
+					alt: string;
+			  }[]
+			| null;
 
 		_content: Content;
 	};
