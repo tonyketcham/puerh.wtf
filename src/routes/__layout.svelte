@@ -27,10 +27,17 @@
 	import Panel from '$lib/components/containers/Panel.svelte';
 	import '../app.css';
 	import FileTree from '$lib/components/filetree/FileTree.svelte';
+	import { setContext } from 'svelte';
 
 	export let sessions: SessionPreview[] = [];
 	// export let vendors: Vendor[] = [];
 	// export let categories: Category[] = [];
+
+	// ref to the main content container
+	let main: HTMLElement;
+	setContext('mainContent', {
+		getMainContent: () => main
+	});
 </script>
 
 <svelte:head>
@@ -38,7 +45,6 @@
 </svelte:head>
 
 <div class="relative flex flex-row">
-	<div id="background" class="absolute inset-0" />
 	<div class="fixed z-20 flex flex-col w-[340px] h-screen p-8 space-y-10 pointer-events-none">
 		<SiteHeader />
 		<Panel id="nav">
@@ -55,9 +61,9 @@
 			/>
 		</Panel>
 	</div>
-	<div class="relative z-0 flex-1">
+	<main bind:this={main} class="relative z-0 flex-1">
 		<slot />
-	</div>
+	</main>
 	<div class="fixed z-20 flex flex-col w-[340px] right-0 h-screen p-8 pointer-events-none">
 		<Panel id="details">
 			<!-- <SiteHeader slot="header" /> -->

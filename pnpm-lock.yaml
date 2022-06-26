@@ -4,6 +4,7 @@ specifiers:
   '@flatbread/config': latest
   '@flatbread/source-filesystem': latest
   '@flatbread/transformer-markdown': latest
+  '@neodrag/svelte': ^1.2.3
   '@playwright/test': ^1.22.2
   '@sveltejs/adapter-static': next
   '@sveltejs/kit': next
@@ -37,6 +38,7 @@ devDependencies:
   '@flatbread/config': 1.0.0-alpha.2
   '@flatbread/source-filesystem': 1.0.0-alpha.2
   '@flatbread/transformer-markdown': 1.0.0-alpha.1
+  '@neodrag/svelte': 1.2.3
   '@playwright/test': 1.22.2
   '@sveltejs/adapter-static': 1.0.0-next.34
   '@sveltejs/kit': 1.0.0-next.354_svelte@3.48.0
@@ -400,6 +402,10 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.0.7
       '@jridgewell/sourcemap-codec': 1.4.13
+    dev: true
+
+  /@neodrag/svelte/1.2.3:
+    resolution: {integrity: sha512-+OMidMflSWLxPq0m0xyEozaqq5MPzFukZo6cEx4Hp/inHmuHjbDMfUkGDd/g+MpVFgzkqPDGrTS6JnXVGA2d9Q==}
     dev: true
 
   /@nodelib/fs.scandir/2.1.5:

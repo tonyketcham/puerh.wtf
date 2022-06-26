@@ -17,6 +17,7 @@
 		"@flatbread/config": "latest",
 		"@flatbread/source-filesystem": "latest",
 		"@flatbread/transformer-markdown": "latest",
+		"@neodrag/svelte": "^1.2.3",
 		"@playwright/test": "^1.22.2",
 		"@sveltejs/adapter-static": "next",
 		"@sveltejs/kit": "next",
