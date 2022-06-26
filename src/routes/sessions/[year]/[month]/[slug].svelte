@@ -27,35 +27,18 @@
 
 <script lang="ts">
 	import type { SessionFull } from '$lib/types/session';
+	import { onMount } from 'svelte';
 
 	export let session: SessionFull;
 	$: images = session?.images ?? [];
+
+	onMount(() => {
+		window.scrollTo(0, 0);
+	});
 </script>
 
-<article class="relative inset-0 h-screen px-56 py-6 parallax">
-	<div class="absolute inset-0 px-72 top-72 space-y-8 parallax__layer--back">
-		{#if images.length > 0}
-			<img
-				src={images[0].image}
-				alt={images[0].alt}
-				class="aspect-square w-5/12 object-cover rounded-xl border border-heicha-700/50"
-			/>
-		{/if}
-		{#if images.length > 3}
-			{#each images as image, i}
-				{#if i > 2}
-					<img
-						src={images[i].image}
-						alt={images[i].alt}
-						class="aspect-square w-5/12 object-cover rounded-xl border border-heicha-700/50"
-					/>
-				{/if}
-			{/each}
-		{/if}
-	</div>
-	<section
-		class="relative top-0 block h-screen parallax__layer--base w-[calc(100vw-45rem)] mx-auto"
-	>
+<article class="px-56 pt-6 pb-8">
+	<section class="relative top-0 block w-[calc(100vw-45rem)] mx-auto">
 		<h2 class="font-display text-6xl leading-tight text-shadow-lg py-5">
 			{#if session.production_year}
 				<span
@@ -67,39 +50,56 @@
 				>{session.title}</span
 			>
 		</h2>
-		<div
-			class="w-7/12 px-6 pb-24 ml-auto session-body-content mt-3 mb-6 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-li:text-neutral-300"
-		>
-			<div class="flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4">
-				{#if images.length > 1}
-					<img
-						src={images[1].image}
-						alt={images[1].alt}
-						class="aspect-square xl:w-1/2 max-h-max object-cover rounded-xl border border-heicha-700/50 m-0"
-					/>
+		<div class="relative flex flex-col xl:flex-row space-y-4 xl:space-y-0 xl:space-x-4 mt-3">
+			<div class="xl:sticky top-24 space-y-4">
+				{#if images.length > 0}
+					<div class="rounded-xl border border-heicha-700/50 overflow-hidden">
+						<img src={images[0].image} alt={images[0].alt} class="object-cover image-zoom" />
+					</div>
 				{/if}
-				{#if images.length > 2}
-					<img
-						src={images[2].image}
-						alt={images[2].alt}
-						class="aspect-square xl:w-1/2 object-cover rounded-xl border border-heicha-700/50 m-0"
-					/>
+				{#if images.length > 3}
+					{#each images as _, i}
+						{#if i > 2}
+							<div class="rounded-xl border border-heicha-700/50 overflow-hidden">
+								<img src={images[i].image} alt={images[i].alt} class="object-cover image-zoom" />
+							</div>
+						{/if}
+					{/each}
 				{/if}
 			</div>
-			{@html session._content.html}
+			<div class="space-y-3.5">
+				<div class="flex flex-col xl:flex-row justify-between space-y-4 xl:space-y-0 xl:space-x-4">
+					{#if images.length > 1}
+						<div class="w-1/2 rounded-xl border border-heicha-700/50 overflow-hidden">
+							<img
+								src={images[1].image}
+								alt={images[1].alt}
+								class="aspect-square object-cover m-0 image-zoom"
+							/>
+						</div>
+					{/if}
+					{#if images.length > 2}
+						<div class="w-1/2 rounded-xl border border-heicha-700/50 overflow-hidden">
+							<img
+								src={images[2].image}
+								alt={images[2].alt}
+								class="aspect-square object-cover m-0 image-zoom"
+							/>
+						</div>
+					{/if}
+				</div>
+				<div
+					class="session-body-content prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-p:text-sm prose-li:text-neutral-300 prose-a:text-tea-soup-400 prose-strong:text-bai-cha-50 z-10 relative"
+				>
+					{@html session._content.html}
+				</div>
+			</div>
 		</div>
 	</section>
 </article>
 
-<style lang="postcss">
-	.parallax {
-		perspective: 1px;
-		@apply overflow-x-hidden overflow-y-auto;
-	}
-	.parallax__layer--base {
-		transform: translateZ(0);
-	}
-	.parallax__layer--back {
-		transform: translateZ(-1px) scale(2);
+<style>
+	.image-zoom {
+		@apply hover:scale-125 transform-gpu transition-transform;
 	}
 </style>

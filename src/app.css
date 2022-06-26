@@ -23,11 +23,9 @@ body {
 	@apply transition-opacity duration-75 ease-in-out;
 }
 
-@layer components {
-	.background-box {
-		@apply box-decoration-clone bg-heicha-900/80 px-1 text-shadow-lg shadow-md;
-		/* @apply bg-heicha-700/80 backdrop-blur px-1.5 rounded text-shadow-md block; */
-	}
+.background-box {
+	/* @apply box-decoration-clone bg-heicha-900/80 px-1 text-shadow-lg shadow-md; */
+	/* @apply bg-heicha-700/80 backdrop-blur px-1.5 rounded text-shadow-md block; */
 }
 
 * {
