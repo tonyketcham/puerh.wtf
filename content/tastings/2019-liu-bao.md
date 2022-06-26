@@ -2,7 +2,7 @@
 id: a837dbaa-bb8b-4846-ade6-d74b6e7bfbd3
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: Liu Bao 2019
+title: Liu Bao
 style:
   - a1d47bd4-b2a2-4b33-933f-1ab0c7f6b4f1
 cultivar:
@@ -53,8 +53,7 @@ notes:
   dry_leaf_nose: wood shavings, limonene, dried flowers
   wet_leaf_nose: rye bread, dark chocolate, wood workshop
   mouthfeel: juicy and salivating
-  taste:
-    dark rye bread, french bread, bittersweet chocolate, roasted grains, wood
+  taste: dark rye bread, french bread, bittersweet chocolate, roasted grains, wood
     shavings
   finish: lingering, lifting into a cool camphor, a bit scratchy (that scratch
     quickly goes away in later steeps)

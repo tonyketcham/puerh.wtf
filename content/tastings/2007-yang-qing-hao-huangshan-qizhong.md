@@ -11,7 +11,7 @@ origin:
   - 085425bb-508a-49af-94b8-22a0fff12985
 season: Early Spring
 production_year: 2007
-aging_conditions: "13 years wet in Yang's Taiwanese storage "
+aging_conditions: "13 years wet in Yang's Taiwanese storage"
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 excerpt: 'Animal Crossing: Wild World extreme Tom Nook speedrun (any % complete)'
@@ -51,8 +51,7 @@ notes:
   dry_leaf_nose: spicy chocolate, oat milk, leather, animalistic, blueberries, sweet cream
   wet_leaf_nose: funky, old/resinous wood, sugarcane, damp hardwood, cacao nibs, blueberries
   mouthfeel: oily, full, and juicy - astringent in later infusions
-  taste:
-    hot cocoa, resinous wood, black walnuts, cloves, tobacco, chicken of the
+  taste: hot cocoa, resinous wood, black walnuts, cloves, tobacco, chicken of the
     woods
   finish: cooling, nice n decently long with some retro-olfactory ish
   empty_cup: tobacco caramel
