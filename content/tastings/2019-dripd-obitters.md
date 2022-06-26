@@ -78,4 +78,4 @@ Yea this is a funky smellin one.
 3. Same as the last round but even smoother. Deep, thick, and dope.
 4. Think it's getting even smoother. Tastes like summer and winter at the same time. A bit of camphor on the finish.
 5. Damp old wood, dried citrus peel
-6. Steeped the fuck out of this one, it's intense on that medicinal bitter smoothness. Soy milk sugar cookie. This is definitely a unique experience that I recommend you summon a sample of over at [white2tea.com](white2tea.com)
+6. Steeped the fuck out of this one, it's intense on that medicinal bitter smoothness. Soy milk sugar cookie. This is definitely a unique experience that I recommend you summon a sample of over at [white2tea.com](https://white2tea.com)

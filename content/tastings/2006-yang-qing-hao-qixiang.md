@@ -54,8 +54,7 @@ flavor_axes:
     start: 3
     finish: 3
 notes:
-  dry_leaf_nose:
-    dried spice, that 'museum' smell, aged hardwood, brown paper bag,
+  dry_leaf_nose: dried spice, that 'museum' smell, aged hardwood, brown paper bag,
     carrot, smells like spacetime itself
   wet_leaf_nose: green peas, leather, hot pavement, petrichor, brown paper bag
   cha_qi: yea alright it got me
@@ -80,7 +79,7 @@ brewing:
   infusion_increment: 15
 ---
 
-Here's where I sourced my info on this tea: [YQH group orders site](<YQH group orders site>). It reads:
+Here's where I sourced my info on this tea: [YQH group orders site](http://www.yangqinghao.com/index.php/teas/2006-qixiang). It reads:
 
 > Like the 2005 Cangliu and 2006 Baisuixiang, the Qixiang is a blend of the six famous tea mountains (Youle, Yiwu, Gedeng, Yibang, Manzhuan, Mangzhi). Five are in Mengla County and all six could be considered a part of the greater Yiwu area. Unlike the Baisuixiang and Cangliu this is 100% spring harvest. Also known as Chi Hsiang. 30% Yiwu, 100% gushu.
 
