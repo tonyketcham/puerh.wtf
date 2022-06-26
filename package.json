@@ -5,7 +5,7 @@
 		"dev": "flatbread start -- svelte-kit dev",
 		"build": "flatbread start -- svelte-kit build",
 		"package": "svelte-kit package",
-		"preview": "svelte-kit preview",
+		"preview": "flatbread start -- svelte-kit preview",
 		"prepare": "svelte-kit sync",
 		"test": "flatbread start -- playwright test",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
