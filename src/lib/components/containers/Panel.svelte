@@ -18,9 +18,10 @@
 
 <section
 	{id}
-	class="flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-white/5 box-border bg-heicha-700/[0.35] transition-colors duration-200 ease-in-out"
-	style="box-shadow: 0px 8px 14px rgba(0, 0, 0, 0.1);
-	backdrop-filter: blur(48px);"
+	class="flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-white/5 box-border bg-heicha-700 backdrop-brightness-50 backdrop-blur-[48px] transition-opacity duration-200 ease-in-out {isDragging
+		? 'bg-opacity-80 border-white/30'
+		: 'bg-opacity-40'}"
+	style="box-shadow: 0px 8px 14px rgba(0, 0, 0, 0.1);"
 	use:draggable={{
 		axis: 'both',
 		bounds: 'body',
@@ -35,11 +36,12 @@
 	{#if $$slots.header}
 		<div
 			bind:this={handle}
-			class="bg-heicha-600/5 py-3 px-4 border-b border-white/5 cursor-grab pointer-events-auto"
+			class="bg-heicha-600/5 py-3 px-4 border-b cursor-grab pointer-events-auto {isDragging
+				? 'curosr-grabbing border-white/30'
+				: 'cursor-grab border-white/5'}"
 			on:wheel={(e) => {
 				mainContentContainer.scrollTop += e.deltaY;
 			}}
-			class:cursor-grabbing={isDragging}
 			on:mousedown={() => {
 				isDragging = true;
 			}}
