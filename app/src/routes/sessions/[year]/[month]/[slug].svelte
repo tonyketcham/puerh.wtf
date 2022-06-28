@@ -90,29 +90,29 @@
 					{/if}
 				</div>
 				<div
-					class="session-body-content prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-p:text-sm prose-li:text-neutral-300 prose-a:text-tea-soup-400 prose-strong:text-bai-cha-50 z-10 relative"
+					class="session-body-content pb-8 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-p:text-sm prose-li:text-neutral-300 prose-a:text-tea-soup-400 prose-strong:text-bai-cha-50 z-10 relative"
 				>
 					{@html session._content.html}
 				</div>
+				<div class="w-11/12 mx-auto h-0.5 bg-heicha-700/20 mb-8" />
+				<section>
+					<Giscus
+						id="comments"
+						repo="tonyketcham/puerh.wtf"
+						repoId="MDEwOlJlcG9zaXRvcnkzMTMwMzU3OTA="
+						category="Teas I've logged"
+						categoryId="DIC_kwDOEqiMDs4CP6yW"
+						mapping="pathname"
+						reactionsEnabled="1"
+						emitMetadata="0"
+						inputPosition="top"
+						theme="transparent_dark"
+						lang="en"
+						loading="lazy"
+					/>
+				</section>
 			</div>
 		</div>
-		<div class="w-11/12 mx-auto h-0.5 bg-heicha-700/20 mt-16 mb-8" />
-		<section>
-			<Giscus
-				id="comments"
-				repo="tonyketcham/puerh.wtf"
-				repoId="MDEwOlJlcG9zaXRvcnkzMTMwMzU3OTA="
-				category="Teas I've logged"
-				categoryId="DIC_kwDOEqiMDs4CP6yW"
-				mapping="pathname"
-				reactionsEnabled="1"
-				emitMetadata="0"
-				inputPosition="top"
-				theme="transparent_dark"
-				lang="en"
-				loading="lazy"
-			/>
-		</section>
 	</section>
 </article>
 
