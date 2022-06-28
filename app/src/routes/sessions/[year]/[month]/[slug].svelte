@@ -26,6 +26,7 @@
 </script>
 
 <script lang="ts">
+	import Giscus from '@giscus/svelte';
 	import type { SessionFull } from '$lib/types/session';
 	import { onMount } from 'svelte';
 
@@ -95,6 +96,23 @@
 				</div>
 			</div>
 		</div>
+		<div class="w-11/12 mx-auto h-0.5 bg-heicha-700/20 mt-16 mb-8" />
+		<section>
+			<Giscus
+				id="comments"
+				repo="tonyketcham/puerh.wtf"
+				repoId="MDEwOlJlcG9zaXRvcnkzMTMwMzU3OTA="
+				category="Teas I've logged"
+				categoryId="DIC_kwDOEqiMDs4CP6yW"
+				mapping="pathname"
+				reactionsEnabled="1"
+				emitMetadata="0"
+				inputPosition="top"
+				theme="transparent_dark"
+				lang="en"
+				loading="lazy"
+			/>
+		</section>
 	</section>
 </article>
 
