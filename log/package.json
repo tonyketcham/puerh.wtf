@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "preinstall": "npx only-allow pnpx",
+    "prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"

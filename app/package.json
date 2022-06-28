@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "flatbread start -- svelte-kit dev",
+		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
 		"build": "flatbread start -- svelte-kit build",
 		"package": "svelte-kit package",
 		"preview": "flatbread start -- svelte-kit preview",
