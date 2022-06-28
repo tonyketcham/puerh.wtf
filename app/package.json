@@ -2,6 +2,7 @@
 	"name": "puerh.wtf",
 	"version": "0.0.1",
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"dev": "flatbread start -- svelte-kit dev",
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
 		"build": "flatbread start -- svelte-kit build",

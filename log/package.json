@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "preinstall": "npx only-allow pnpx",
+    "preinstall": "npx only-allow pnpm",
     "prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
     "dev": "vite",
     "build": "tsc && vite build",
