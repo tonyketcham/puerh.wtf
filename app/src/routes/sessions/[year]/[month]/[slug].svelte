@@ -98,7 +98,7 @@
 	</section>
 </article>
 
-<style>
+<style lang="postcss">
 	.image-zoom {
 		@apply hover:scale-125 transform-gpu transition-transform;
 	}
