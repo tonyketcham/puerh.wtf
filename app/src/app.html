@@ -18,9 +18,21 @@
 			type="font/ttf"
 			crossorigin="anonymous"
 		/>
+		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 		%sveltekit.head%
 	</head>
 	<body class="font-sans font-normal text-sm text-bai-cha-100 bg-heicha-900">
 		<div>%sveltekit.body%</div>
+		<script>
+			if (window.netlifyIdentity) {
+				window.netlifyIdentity.on('init', (user) => {
+					if (!user) {
+						window.netlifyIdentity.on('login', () => {
+							document.location.href = '/tea-time/';
+						});
+					}
+				});
+			}
+		</script>
 	</body>
 </html>

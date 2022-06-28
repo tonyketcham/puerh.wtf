@@ -17,7 +17,8 @@ const config = {
 		prerender: {
 			concurrency: os.cpus().length,
 			default: true
-		}
+		},
+		endpointExtensions: ['.js', '.ts', '.html']
 	}
 };
 
