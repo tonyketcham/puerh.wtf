@@ -7,9 +7,6 @@ importers:
 
   app:
     specifiers:
-      '@flatbread/config': latest
-      '@flatbread/source-filesystem': latest
-      '@flatbread/transformer-markdown': latest
       '@giscus/svelte': ^2.0.6
       '@neodrag/svelte': ^1.2.3
       '@playwright/test': ^1.22.2
@@ -41,14 +38,11 @@ importers:
       typescript: ^4.7.4
       unist-util-visit: ^4.1.0
     devDependencies:
-      '@flatbread/config': 1.0.0-alpha.2
-      '@flatbread/source-filesystem': 1.0.0-alpha.2
-      '@flatbread/transformer-markdown': 1.0.0-alpha.1
       '@giscus/svelte': 2.0.6
       '@neodrag/svelte': 1.2.3
       '@playwright/test': 1.22.2
       '@sveltejs/adapter-static': 1.0.0-next.34
-      '@sveltejs/kit': 1.0.0-next.355_svelte@3.48.0
+      '@sveltejs/kit': 1.0.0-next.357_svelte@3.48.0
       '@tailwindcss/typography': 0.5.2_tailwindcss@3.1.4
       '@typescript-eslint/eslint-plugin': 5.29.0_qqmbkyiaixvppdwswpytuf2hgm
       '@typescript-eslint/parser': 5.29.0_b5e7v2qnwxfo6hmiq56u52mz3e
@@ -56,7 +50,7 @@ importers:
       eslint: 8.18.0
       eslint-config-prettier: 8.5.0_eslint@8.18.0
       eslint-plugin-svelte3: 4.0.0_wy4erphnvhealet26qderqv6bu
-      flatbread: 1.0.0-alpha.13
+      flatbread: 1.0.0-alpha.19
       graphql-request: 4.3.0_graphql@15.8.0
       hast-util-parse-selector: 3.1.0
       hast-util-select: 5.0.2
@@ -141,7 +135,7 @@ packages:
     resolution: {integrity: sha512-nLgYLomqjVimEzQ4cdvVQkcryi970NDvcRVPfd0OPeXhBfda38WjBq+WhQFk+czSHrmrSp34YHBxpat0EtiowA==}
     dependencies:
       '@apollo/utils.logger': 1.0.0
-      lru-cache: 7.10.2
+      lru-cache: 7.12.0
     dev: true
 
   /@apollo/utils.logger/1.0.0:
@@ -669,25 +663,24 @@ packages:
       - supports-color
     dev: true
 
-  /@flatbread/config/1.0.0-alpha.2:
-    resolution: {integrity: sha512-Va4hir17rn/tlb0NrV8rilD8TB0Pj/zssxCtwVf1Lo9prcptP6joB3p1sccvcH7dUp8xlTfqf1MrFEQSqky48A==}
+  /@flatbread/config/1.0.0-alpha.7:
+    resolution: {integrity: sha512-ot1lt0ipRfbBGA6RZzhprVl1cAqZqMgYAiyL2o6Av7pb8KjqNweud1P2k4NdgOrF3KqbwXlGv2sYeoz0SjZKfw==}
     dev: true
 
-  /@flatbread/core/1.0.0-alpha.10_graphql@16.0.1:
-    resolution: {integrity: sha512-zx8NrMqymIIHQkjV1DqYu7lQztk1qGIOBZDW3b7AuRmsnBXZP9WNnUXfE431MMlbcB1ewY2sSJ3B+hx+ustPHA==}
+  /@flatbread/core/1.0.0-alpha.14:
+    resolution: {integrity: sha512-bpkuVQUHFAWKkQdsc9LAezLmByX4PWm9tIBMNEkr3Nad7TzxBbGJqi9jHFt19sVuPHklxV/sbTS3L/qzN6xIKA==}
     dependencies:
+      graphql: 16.0.1
       graphql-compose: 9.0.8_graphql@16.0.1
       graphql-compose-json: 6.2.0_graphql-compose@9.0.8
       lodash-es: 4.17.21
       lru-cache: 6.0.0
       matcher: 5.0.0
       plur: 5.1.0
-    transitivePeerDependencies:
-      - graphql
     dev: true
 
-  /@flatbread/source-filesystem/1.0.0-alpha.2:
-    resolution: {integrity: sha512-UfzyeYMA/lbvPW9GN6jTkKyaHpKKHILKyxvTvIGMmQ0d4HQsphzAFazD71oRCDJKMIDnD8IPsztLQdxhKTq1yA==}
+  /@flatbread/source-filesystem/1.0.0-alpha.7:
+    resolution: {integrity: sha512-snbtpax3+lrsLMOpmFNDDM6cf8/1BSYZnIGP95c+aOtpo0SrCBFGvvvQ22uK2hQrfOYkyT49m5jHJ9RhgOztgA==}
     engines: {node: ^14.13.1 || >=16.0.0}
     dependencies:
       lodash-es: 4.17.21
@@ -695,8 +688,8 @@ packages:
       unified: 10.1.2
     dev: true
 
-  /@flatbread/transformer-markdown/1.0.0-alpha.1:
-    resolution: {integrity: sha512-upqnjtXwMAXTF6eMXD7vk0IKWgxNKUPAOddKmw6rn47sVhM1p+EVskucO+fI1kriGfVAAMqFP8qGTuczqbUqYQ==}
+  /@flatbread/transformer-markdown/1.0.0-alpha.6:
+    resolution: {integrity: sha512-nZ2zXaq4NodI8VyoooOgSklSxQCofI57L8890vo62bqWIZV7kL31TvanFFSbD+HKm5K2mstegzlCTx3X8foJNg==}
     engines: {node: ^14.13.1 || >=16.0.0}
     dependencies:
       '@sindresorhus/slugify': 2.1.0
@@ -740,42 +733,42 @@ packages:
       giscus: 1.0.6
     dev: true
 
-  /@graphql-tools/merge/8.2.15_graphql@16.0.1:
-    resolution: {integrity: sha512-AXslz9ySCEKzTuK8Hl+TYEvfUWQ9tAm1oyIrut1PUEl+TQQMKATC5gCjfBw9PHFxi1ELSaa4lZdZ4bWK4sKfHQ==}
+  /@graphql-tools/merge/8.3.0_graphql@16.0.1:
+    resolution: {integrity: sha512-xRa7RAQok/0DD2YnjuqikMrr7dUAxTpdGtZ7BkvUUGhYs3B3p7reCAfvOVr1DJAqVToP7hdlMk+S5+Ylk+AaqA==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@graphql-tools/utils': 8.7.0_graphql@16.0.1
+      '@graphql-tools/utils': 8.8.0_graphql@16.0.1
       graphql: 16.0.1
       tslib: 2.4.0
     dev: true
 
-  /@graphql-tools/mock/8.6.13_graphql@16.0.1:
-    resolution: {integrity: sha512-2QzeE4bH/Vj6NuGmQpBnrGjbg5ekiuRJAybSKLbkuIuv902R29JTsXoySVXrXdyF3ERyxrOPPHf+q4+XtPj6IQ==}
+  /@graphql-tools/mock/8.7.0_graphql@16.0.1:
+    resolution: {integrity: sha512-K/hqP442mXAvW36v/3TmqFpNzRw14P86xlsJZod88OXwpDfb97X09z1QsaMcvSe8E7ijcKWLlTRk15/vDQSL2Q==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@graphql-tools/schema': 8.4.0_graphql@16.0.1
-      '@graphql-tools/utils': 8.7.0_graphql@16.0.1
+      '@graphql-tools/schema': 8.5.0_graphql@16.0.1
+      '@graphql-tools/utils': 8.8.0_graphql@16.0.1
       fast-json-stable-stringify: 2.1.0
       graphql: 16.0.1
       tslib: 2.4.0
     dev: true
 
-  /@graphql-tools/schema/8.4.0_graphql@16.0.1:
-    resolution: {integrity: sha512-1eNzmcYIdojSkLUyglJ11iqoums/U4/2XN9Aujja8val/M7yaQ7pUKScEiAwdffkH/tKqo3HLPNScXAyIvTNfg==}
+  /@graphql-tools/schema/8.5.0_graphql@16.0.1:
+    resolution: {integrity: sha512-VeFtKjM3SA9/hCJJfr95aEdC3G0xIKM9z0Qdz4i+eC1g2fdZYnfWFt2ucW4IME+2TDd0enHlKzaV0qk2SLVUww==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@graphql-tools/merge': 8.2.15_graphql@16.0.1
-      '@graphql-tools/utils': 8.7.0_graphql@16.0.1
+      '@graphql-tools/merge': 8.3.0_graphql@16.0.1
+      '@graphql-tools/utils': 8.8.0_graphql@16.0.1
       graphql: 16.0.1
       tslib: 2.4.0
       value-or-promise: 1.0.11
     dev: true
 
-  /@graphql-tools/utils/8.7.0_graphql@16.0.1:
-    resolution: {integrity: sha512-71rJZJKJVOMsDlBGFq9gf1PaBbeW0kt8nZWmc50lhxYrCn0rzRY0auGrhhOWhdhZ5WsCWFxpnDurdF5VqB4Iig==}
+  /@graphql-tools/utils/8.8.0_graphql@16.0.1:
+    resolution: {integrity: sha512-KJrtx05uSM/cPYFdTnGAS1doL5bftJLAiFCDMZ8Vkifztz3BFn3gpFiy/o4wDtM8s39G46mxmt2Km/RmeltfGw==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
@@ -1006,8 +999,8 @@ packages:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.355_svelte@3.48.0:
-    resolution: {integrity: sha512-4M+BZL/kKgw5tMRkAYcpg38hxMX80iz6H9+nv2v6VzvKhD4Pw6zatzMs2D6PCT2uBHnrKGrUCheBBcK8kZdWKg==}
+  /@sveltejs/kit/1.0.0-next.357_svelte@3.48.0:
+    resolution: {integrity: sha512-nCAehVybIEpQNnPu61V/EFVdfDb1nBSiQUfW9EcSSDEUbyAMCVBOKZZuzQ0qQDp3xniqRkyDzpBA4wN+ADxHBw==}
     engines: {node: '>=16.7'}
     hasBin: true
     peerDependencies:
@@ -1477,21 +1470,6 @@ packages:
       uri-js: 4.4.1
     dev: true
 
-  /altair-express-middleware/4.5.1:
-    resolution: {integrity: sha512-cLF7Sr8ApGGOxuPZHHQnKHZ40AQFCqv7meHokZuXhlLg7x1OS/2DFxtdQTP6+bV1Tl9eVmQTcrKK/RzYYPB+Pg==}
-    engines: {node: '>= 12'}
-    dependencies:
-      altair-static: 4.5.1
-      express: 4.18.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /altair-static/4.5.1:
-    resolution: {integrity: sha512-8A90nVXDvp9C69fb0gT7gVLdD4zdQPHAak4DCYHX+ZVJA+Kq88kvBhHKazNRoK/CJYspbqM54/sSh9JCYTkvbg==}
-    engines: {node: '>= 6.9.1'}
-    dev: true
-
   /ansi-regex/5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -1628,8 +1606,8 @@ packages:
       '@apollo/utils.usagereporting': 1.0.0_graphql@16.0.1
       '@apollographql/apollo-tools': 0.5.4_graphql@16.0.1
       '@apollographql/graphql-playground-html': 1.6.29
-      '@graphql-tools/mock': 8.6.13_graphql@16.0.1
-      '@graphql-tools/schema': 8.4.0_graphql@16.0.1
+      '@graphql-tools/mock': 8.7.0_graphql@16.0.1
+      '@graphql-tools/schema': 8.5.0_graphql@16.0.1
       '@josephg/resolvable': 1.0.1
       apollo-datasource: 3.3.2
       apollo-reporting-protobuf: 3.3.1
@@ -3029,16 +3007,14 @@ packages:
       rimraf: 3.0.2
     dev: true
 
-  /flatbread/1.0.0-alpha.13:
-    resolution: {integrity: sha512-LK5hNRoEpvde+vHcO6NDB52Z3bD8Z6mXQTyDXO1UukXSN0TDjGR/8+mpJfH4ZXpTLxBpYW7mrKNvENWZbHzUug==}
+  /flatbread/1.0.0-alpha.19:
+    resolution: {integrity: sha512-n/ZmbjbBUpkD2EON9t8oTIaENhUo1fEXLKD+/iJFWR5yNaiVyEcV2Vq6XFimX17kt+dgrqvodARfO4he1wSrzg==}
     hasBin: true
     dependencies:
-      '@flatbread/config': 1.0.0-alpha.2
-      '@flatbread/core': 1.0.0-alpha.10_graphql@16.0.1
-      '@flatbread/source-filesystem': 1.0.0-alpha.2
-      '@flatbread/transformer-markdown': 1.0.0-alpha.1
-      '@types/cors': 2.8.12
-      altair-express-middleware: 4.5.1
+      '@flatbread/config': 1.0.0-alpha.7
+      '@flatbread/core': 1.0.0-alpha.14
+      '@flatbread/source-filesystem': 1.0.0-alpha.7
+      '@flatbread/transformer-markdown': 1.0.0-alpha.6
       apollo-server-core: 3.9.0_graphql@16.0.1
       apollo-server-express: 3.9.0_l7qp4tguov27zzuvtoryzl36ki
       cors: 2.8.5
@@ -4194,8 +4170,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lru-cache/7.10.2:
-    resolution: {integrity: sha512-9zDbhgmXAUvUMPV81A705K3tVzcPiZL3Bf5/5JC/FjYJlLZ5AJCeqIRFHJqyBppiLosqF+uKB7p8/RDXylqBIw==}
+  /lru-cache/7.12.0:
+    resolution: {integrity: sha512-OIP3DwzRZDfLg9B9VP/huWBlpvbkmbfiBy8xmsXp4RPmE4A3MhwNozc5ZJ3fWnSg8fDcdlE/neRTPG2ycEKliw==}
     engines: {node: '>=12'}
     dev: true
 

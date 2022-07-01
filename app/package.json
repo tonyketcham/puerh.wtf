@@ -5,7 +5,7 @@
 		"preinstall": "npx only-allow pnpm",
 		"dev": "flatbread start -- svelte-kit dev",
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
-		"build": "flatbread start -X npm -- svelte-kit build",
+		"build": "flatbread start -X npx -- svelte-kit build",
 		"package": "svelte-kit package",
 		"preview": "flatbread start -- svelte-kit preview",
 		"prepare": "svelte-kit sync",
@@ -16,9 +16,6 @@
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
-		"@flatbread/config": "latest",
-		"@flatbread/source-filesystem": "latest",
-		"@flatbread/transformer-markdown": "latest",
 		"@giscus/svelte": "^2.0.6",
 		"@neodrag/svelte": "^1.2.3",
 		"@playwright/test": "^1.22.2",

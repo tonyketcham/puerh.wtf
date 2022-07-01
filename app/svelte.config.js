@@ -18,7 +18,7 @@ const config = {
 			concurrency: os.cpus().length,
 			default: true
 		},
-		endpointExtensions: ['.js', '.ts', '.html']
+		moduleExtensions: ['.js', '.ts', '.html']
 	}
 };
 
