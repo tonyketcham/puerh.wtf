@@ -68,6 +68,15 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: https://puerh.wtf/images/uploads/91f67d55-e26a-48b9-b2a5-b8ff3735fd01.jpeg
+    alt: WET
+  - image: https://puerh.wtf/images/uploads/e70df0a5-b029-422a-9017-40219f22ce0b.jpeg
+    alt: keek & dry leaf
+  - image: https://puerh.wtf/images/uploads/23a61b07-d6f0-491d-9b29-541ceb1e4711.jpeg
+    alt: Double stacked gaiwan lid and filter
+  - image: https://puerh.wtf/images/uploads/33866d56-f9a4-48eb-ad10-dd428ee9e6d3.jpeg
+    alt: packaging
 ---
 ### Words and things
 
