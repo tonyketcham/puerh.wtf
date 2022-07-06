@@ -90,7 +90,7 @@
 					{/if}
 				</div>
 				<div
-					class="session-body-content pb-8 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-p:text-sm prose-li:text-neutral-300 prose-a:text-tea-soup-400 prose-strong:text-bai-cha-50 z-10 relative"
+					class="session-body-content pb-8 prose text-bai-cha-100 prose-headings:text-bai-cha-100 prose-h3:text-xl prose-li:marker:text-bai-cha-100/80 prose-li:text-sm prose-p:text-sm prose-li:text-neutral-300 prose-blockquote:text-bai-cha-200/70 prose-a:text-tea-soup-400 prose-strong:text-bai-cha-50 z-10 relative"
 				>
 					{@html session._content.html}
 				</div>

@@ -3,14 +3,15 @@ backend:
   repo: tonyketcham/puerh.wtf
   branch: main
 
-media_folder: '../../../app/static/images/uploads'
-public_folder: '../../../app/images/uploads'
+media_folder: app/static/images/uploads
+public_folder: https://puerh.wtf/images/uploads
 publish_mode: editorial_workflow
 
-display_url: puerh.wtf
+site_url: https://puerh.wtf
+logo_url: https://log.puerh.wtf/favicon.png
 
 collections:
-  - label: 'Tastings'
+  - label: 'Sessions'
     name: 'tastings'
     label_singular: 'Tea Tasting'
     description: 'Personal evaluations of teas'
@@ -19,6 +20,7 @@ collections:
     delete: true
     slug: '{{production_year}}-{{slug}}'
     identifier_field: 'title'
+    preview_path: 'sessions/{{year}}/{{month}}/{{slug}}'
     summary: '{{year}}-{{month}}-{{day}} | {{title}} | {{season}} {{production_year}}'
     extension: 'md'
     fields:
