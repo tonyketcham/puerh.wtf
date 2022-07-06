@@ -4,11 +4,10 @@ backend:
   branch: main
 
 media_folder: app/static/images/uploads
-public_folder: https://puerh.wtf/images/uploads
+public_folder: /images/uploads
 publish_mode: editorial_workflow
 
 site_url: https://puerh.wtf
-logo_url: https://log.puerh.wtf/favicon.png
 
 collections:
   - label: 'Sessions'
