@@ -5,40 +5,48 @@ author:
 title: ZSL Yi Shan Mo
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
-production_year: 2020
+cultivar:
+  - 976cb22c-fe00-40e5-8949-f0f3a791ce26
+origin:
+  - 88d4ea3a-b772-4472-bd44-566c55bb608e
+season: Spring
+production_year: 2018
+vendor:
+  - b812cdac-a64b-4c80-b42b-a36843b22e21
+purchase_link: https://tea-encounter.com/product/zsl-2018-yi-shan-mo/
 excerpt: Smooth, sweet caramel transforms into minerals and basil
 date: 2022-07-06T22:50:20.699Z
 flavor_axes:
   cream:
-    start: 0
-    finish: 0
+    start: 7
+    finish: 7
   umami:
-    start: 0
-    finish: 0
+    start: 4
+    finish: 6
   stone:
-    start: 0
-    finish: 0
+    start: 5
+    finish: 7
   spices:
-    start: 0
-    finish: 0
+    start: 6
+    finish: 7
   earth:
-    start: 0
+    start: 1
     finish: 0
   nuts_roast:
-    start: 0
-    finish: 0
+    start: 4
+    finish: 3
   wood:
-    start: 0
-    finish: 0
+    start: 4
+    finish: 3
   vegetal:
-    start: 0
-    finish: 0
+    start: 4
+    finish: 5
   floral:
-    start: 0
-    finish: 0
+    start: 6
+    finish: 5
   fruits:
-    start: 0
-    finish: 0
+    start: 5
+    finish: 4
 notes:
   dry_leaf_nose: 100% gooey caramel apple
   wet_leaf_nose: black peppercorn, chocolate milk, orange blossom, locked away wood
@@ -47,7 +55,12 @@ notes:
   finish: minty & cooling, basil
   empty_cup: ocean, kombucha scoby, caramel
   cha_qi: grounding, tingly ankles, L-Theanine injected directly into my bloodstream
-rating: 50
+tags:
+  - ec7956dd-39db-40a0-b8d6-326811515c9d
+  - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
+  - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
+  - 815c4584-1559-468f-9e65-794f079f0af2
+rating: 89.957
 brewing:
   temperature: 205
   material_amount: 5.55
