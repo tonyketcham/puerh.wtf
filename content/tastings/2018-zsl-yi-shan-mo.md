@@ -68,6 +68,9 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+images:
+  - image: https://puerh.wtf/images/uploads/91f67d55-e26a-48b9-b2a5-b8ff3735fd01.jpeg
+    alt: WET
 ---
 ### Words and things
 
