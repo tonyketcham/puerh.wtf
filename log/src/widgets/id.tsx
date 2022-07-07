@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 import type {
   CmsWidgetControlProps,
   CmsWidgetPreviewProps,
@@ -9,7 +9,7 @@ import type {
 export const IdControl = ({ value, onChange }: CmsWidgetControlProps) => {
   useEffect(() => {
     if (!value) {
-      onChange(uuid());
+      onChange(nanoid());
     }
   }, []);
 
