@@ -3,11 +3,11 @@
 	"version": "0.0.1",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
-		"dev": "flatbread start -- svelte-kit dev",
+		"dev": "flatbread start -- vite dev",
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
-		"build": "flatbread start -X npx -- svelte-kit build",
+		"build": "flatbread start -X npx -- vite build",
 		"package": "svelte-kit package",
-		"preview": "flatbread start -- svelte-kit preview",
+		"preview": "flatbread start -- vite preview",
 		"prepare": "svelte-kit sync",
 		"test": "flatbread start -- playwright test",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
@@ -45,7 +45,8 @@
 		"tailwindcss-textshadow": "^2.1.3",
 		"tslib": "^2.3.1",
 		"typescript": "^4.7.4",
-		"unist-util-visit": "^4.1.0"
+		"unist-util-visit": "^4.1.0",
+		"vite": "2.9.12"
 	},
 	"type": "module",
 	"pnpm": {
