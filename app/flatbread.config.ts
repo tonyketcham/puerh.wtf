@@ -1,4 +1,4 @@
-import { defineConfig, markdownTransforer, filesystem } from 'flatbread';
+import { defineConfig, transformerMarkdown, sourceFilesystem } from 'flatbread';
 import { wrapMany } from './plugins/flatbread/wrap.js';
 
 const elementsToWrap = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'p'];
@@ -19,8 +19,8 @@ const transformerConfig = {
 	}
 };
 export default defineConfig({
-	source: filesystem(),
-	transformer: markdownTransforer(transformerConfig),
+	source: sourceFilesystem(),
+	transformer: transformerMarkdown(transformerConfig),
 
 	content: [
 		{

@@ -2,7 +2,7 @@ import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
 import type { SessionFull } from '$lib/types/session';
 
-export async function get({ params }: Page) {
+export async function GET({ params }: Page) {
 	const { slug, month, year } = params;
 	const flatbread = new GraphQLClient(import.meta.env.VITE_FLATBREAD_URL, {
 		headers: {}
@@ -12,9 +12,16 @@ export async function get({ params }: Page) {
 	// TODO: add date range `between[]` comparator to Flatbread
 	// const monthEnd = new Date(Number(year), Number(month) - 1, 0);
 
+	// Fix date comparison as it's broken in Flatbread v20
 	const query = gql`
-		query SessionBySlug($slug: String!, $monthStart: Date!) {
-			allSessions(filter: { _slug: { eq: $slug }, date: { gte: $monthStart } }) {
+		query SessionBySlug($slug: String!) #  $monthStart: Date!
+		{
+			allSessions(
+				filter: {
+					_slug: { eq: $slug }
+					#  date: { gte: $monthStart }
+				}
+			) {
 				id
 				_slug
 				title
@@ -98,6 +105,8 @@ export async function get({ params }: Page) {
 		allSessions: SessionFull[];
 	} = await flatbread.request(query, variables);
 
+	console.log(query, allSessions, allSessions.length);
+
 	let error = null;
 
 	if (allSessions.length === 0) {
@@ -107,8 +116,9 @@ export async function get({ params }: Page) {
 	}
 
 	if (error) {
+		console.error(error, variables);
 		return {
-			status: 400,
+			status: 500,
 			body: {
 				error
 			}

@@ -2,7 +2,7 @@ import type { SessionPreview } from '$lib/types/session';
 import type { Page } from '@sveltejs/kit';
 import { gql, GraphQLClient } from 'graphql-request';
 
-export async function get(page: Page) {
+export async function GET(page: Page) {
 	const flatbread = new GraphQLClient(import.meta.env.VITE_FLATBREAD_URL, {
 		headers: {}
 	});
