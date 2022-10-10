@@ -44,6 +44,9 @@
 		}
 	} as const;
 
+	// Don't display the radar until mounted and transformed
+	let isLoading = true;
+
 	/**
 	 * The min/max values for each category.
 	 */
@@ -133,17 +136,16 @@
 
 	$: polygonPoints = wellFormedData.map(({ axis }) => axis.polygonPoint);
 	$: polygonPointsString = formatPoints(polygonPoints);
-	$: polygonHalfPointsString = generatePolygon(0.5);
+	$: polygonMarkers = [2, 4, 6, 8].map((magnitude) => generatePolygon(magnitude));
 
-	function transformToCenter() {
+	function transformToCenter(nodeToTransform: SVGElement) {
 		const { height: containerHeight } = svg?.getBoundingClientRect();
-		const { height } = polygonGroup?.getBoundingClientRect();
+		const { height } = nodeToTransform?.getBoundingClientRect();
 
 		// We want this to strictly be square
 		const translateY = (containerHeight - height) / 2;
 
-		polygonGroup?.setAttribute('transform', `translate(${translateY}, ${translateY})`);
-		textGroup?.setAttribute('transform', `translate(${translateY}, ${translateY})`);
+		return `translate(${translateY}, ${translateY})`;
 	}
 
 	function anchorXYRelativeToPoint(point: Point, label: string) {
@@ -155,23 +157,32 @@
 		// Account for floating point rounding errors for centering on ~0.5
 		const anchorXWithPadding =
 			xPercent > 0.5
-				? { 'text-anchor': 'start', dx: '0.2em' }
+				? { 'text-anchor': 'start', dx: '0.4em' }
 				: xPercent >= 0.49
 				? { 'text-anchor': 'middle' }
-				: { 'text-anchor': 'end', dx: '-0.2em' };
+				: { 'text-anchor': 'end', dx: '-0.4em' };
 
 		const anchorYWithPadding =
 			yPercent > 0.5
-				? { 'dominant-baseline': 'hanging', dy: '0.2em' }
+				? { 'dominant-baseline': 'hanging', dy: '0.4em' }
 				: yPercent >= 0.49
 				? { 'dominant-baseline': 'middle' }
-				: { 'dominant-baseline': 'baseline', dy: '-0.2em' };
+				: { 'dominant-baseline': 'baseline', dy: '-0.4em' };
 
 		return { x: x, y: y, ...anchorXWithPadding, ...anchorYWithPadding };
 	}
 
 	onMount(() => {
-		transformToCenter();
+		const transform = transformToCenter(polygonGroup);
+		textGroup?.setAttribute('transform', transform);
+
+		// set polygon origin to center
+		polygonGroup.childNodes.forEach((node) => {
+			const childTransform = transformToCenter(node as SVGElement);
+			(node as SVGElement).setAttribute('transform', childTransform);
+		});
+
+		isLoading = false;
 	});
 </script>
 
@@ -180,14 +191,18 @@
 	viewBox={viewBox.join(' ')}
 	xmlns="http://www.w3.org/2000/svg"
 	preserveAspectRatio="xMidYMid meet"
-	class="w-full h-full stroke-current"
+	class="flex flex-col w-full h-full stroke-current place-content-center transition-opacity {isLoading
+		? 'opacity-0'
+		: 'opacity-100'}"
 >
 	<g>
 		<g bind:this={polygonGroup}>
 			<polygon points={polygonPointsString} fill="none" class="opacity-60" />
-			<polygon points={polygonHalfPointsString} fill="none" class="opacity-60" />
+			{#each polygonMarkers as polygonMarker, i}
+				<polygon points={polygonMarker} fill="none" style="opacity: {(i + 1) * 0.05};" />
+			{/each}
 		</g>
-		<g bind:this={textGroup}>
+		<g bind:this={textGroup} class="select-none">
 			{#each wellFormedData as datum, _ (datum.axis.key)}
 				<text
 					{...anchorXYRelativeToPoint(datum.axis.polygonPoint, datum.axis.label)}
@@ -198,3 +213,10 @@
 		</g>
 	</g>
 </svg>
+
+<style>
+	svg * {
+		transform-box: fill-box;
+		transform-origin: 50% 50%;
+	}
+</style>
