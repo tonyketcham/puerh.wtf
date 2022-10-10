@@ -26,7 +26,7 @@ module.exports = {
 			},
 			fontFamily: {
 				display: ['Rock3D-Regular', ...defaultTheme.fontFamily.sans],
-				sans: ['FiraCode-Regular', ...defaultTheme.fontFamily.sans]
+				sans: ['FiraCode-Variable', ...defaultTheme.fontFamily.sans]
 			}
 		},
 		dropShadow: {

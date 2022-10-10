@@ -11,11 +11,11 @@
 }
 
 @font-face {
-	font-family: 'FiraCode-Regular';
+	font-family: 'FiraCode-Variable';
 	font-style: normal;
-	font-weight: 400;
+	font-weight: 300 700;
 	font-display: swap;
-	src: url(/fonts/Fira_Code/static/FiraCode-Regular.ttf) format('truetype');
+	src: url(/fonts/Fira_Code/FiraCode-VF.woff2) format('woff2');
 }
 
 body {

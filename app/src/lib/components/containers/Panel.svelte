@@ -4,11 +4,11 @@
 
 	export let id = '';
 
-	const { getMainContent } = getContext('mainContent');
-	let mainContentContainer: HTMLElement;
+	const { getSiteContent } = getContext('siteContent');
+	let siteContentContainer: HTMLElement;
 
 	onMount(() => {
-		mainContentContainer = getMainContent();
+		siteContentContainer = getSiteContent();
 	});
 
 	let handle: HTMLDivElement;
@@ -40,7 +40,7 @@
 				? 'curosr-grabbing border-white/30'
 				: 'cursor-grab border-white/5'}"
 			on:wheel={(e) => {
-				mainContentContainer.scrollTop += e.deltaY;
+				siteContentContainer.scrollTop += e.deltaY;
 			}}
 			on:mousedown={() => {
 				isDragging = true;

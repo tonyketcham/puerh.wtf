@@ -47,5 +47,8 @@
 		"unist-util-visit": "4.1.0",
 		"vite": "3.0.4"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"layercake": "^7.1.0"
+	}
 }

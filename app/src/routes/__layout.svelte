@@ -33,10 +33,10 @@
 	// export let vendors: Vendor[] = [];
 	// export let categories: Category[] = [];
 
-	// ref to the main content container
-	let main: HTMLElement;
-	setContext('mainContent', {
-		getMainContent: () => main
+	// ref to the site content container
+	let site: HTMLElement;
+	setContext('siteContent', {
+		getSiteContent: () => site
 	});
 </script>
 
@@ -44,7 +44,7 @@
 	<title>puerh.wtf - a tea log</title>
 </svelte:head>
 
-<div class="relative flex flex-row">
+<div bind:this={site} class="relative flex flex-row">
 	<div class="fixed z-20 flex flex-col w-[340px] h-screen p-8 space-y-10 pointer-events-none">
 		<SiteHeader />
 		<Panel id="nav">
@@ -61,12 +61,5 @@
 			/>
 		</Panel>
 	</div>
-	<main bind:this={main} class="relative z-0 flex-1">
-		<slot />
-	</main>
-	<div class="fixed z-20 flex flex-col w-[340px] right-0 h-screen p-8 pointer-events-none">
-		<Panel id="details">
-			<!-- <SiteHeader slot="header" /> -->
-		</Panel>
-	</div>
+	<slot />
 </div>
