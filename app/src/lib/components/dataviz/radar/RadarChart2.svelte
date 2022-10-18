@@ -1,48 +1,9 @@
+<!-- WIP vanilla component closer to the design -->
 <script lang="ts">
+	import type { SessionFlavorAxes } from '$lib/types/session';
 	import { onMount } from 'svelte';
 
-	const data = {
-		cream: {
-			start: 4,
-			finish: 7
-		},
-		umami: {
-			start: 4,
-			finish: 4
-		},
-		stone: {
-			start: 5,
-			finish: 4
-		},
-		spices: {
-			start: 7,
-			finish: 6
-		},
-		earth: {
-			start: 7,
-			finish: 7
-		},
-		nuts_roast: {
-			start: 6,
-			finish: 5
-		},
-		wood: {
-			start: 8,
-			finish: 8
-		},
-		vegetal: {
-			start: 0,
-			finish: 0
-		},
-		floral: {
-			start: 4,
-			finish: 4
-		},
-		fruits: {
-			start: 5,
-			finish: 5
-		}
-	} as const;
+	export let data: SessionFlavorAxes;
 
 	// Don't display the radar until mounted and transformed
 	let isLoading = true;
@@ -113,12 +74,11 @@
 		return formatPoints(Object.keys(data).map((_, i) => generatePolygonPoint(i, scale)));
 	};
 
-	const flattenSeriesData = (keyedSeriesData: Record<Series, number>) =>
-		Object.entries(keyedSeriesData).map(([_, value]) => value);
-
 	const formatPoints = (points: Point[]) => points.map(([x, y]) => `${x},${y}`).join(' ');
 
 	const wellFormedData = Object.entries(data).map(([axisKey, keyedSeriesData], i) => {
+		const valueSet = keyedSeriesData;
+
 		return {
 			axis: {
 				index: i,
@@ -126,17 +86,39 @@
 				label: getAxisLabel(axisKey as AxisKey),
 				polygonPoint: generatePolygonPoint(i)
 			},
-			value: flattenSeriesData(keyedSeriesData)
+			value: valueSet,
+			valuePoints: Object.entries(keyedSeriesData).reduce(
+				(acc, [key, value]) => ({
+					...acc,
+					[key]: generatePolygonPoint(i, value)
+				}),
+				{} as Record<Series, Point>
+			)
 		};
 	});
 
 	let svg: SVGElement;
 	let polygonGroup: SVGElement;
 	let textGroup: SVGGElement;
+	let dataPoints: SVGElement;
 
 	$: polygonPoints = wellFormedData.map(({ axis }) => axis.polygonPoint);
 	$: polygonPointsString = formatPoints(polygonPoints);
 	$: polygonMarkers = [2, 4, 6, 8].map((magnitude) => generatePolygon(magnitude));
+
+	// Current series to display
+	$: series = Series.Start;
+	// Current series data
+	$: seriesData = wellFormedData.map(({ axis, value, valuePoints }) => ({
+		axis,
+		value,
+		valuePoint: valuePoints[series]
+	}));
+	$: seriesPolygonPointsString = formatPoints(seriesData.map(({ valuePoint }) => valuePoint));
+	// $: () => {
+	// 	const transform = transformToCenter(dataPoints);
+	// 	dataPoints?.setAttribute('transform', transform);
+	// };
 
 	function transformToCenter(nodeToTransform: SVGElement) {
 		const { height: containerHeight } = svg?.getBoundingClientRect();
@@ -183,6 +165,10 @@
 		});
 
 		isLoading = false;
+
+		setInterval(() => {
+			// series = series === Series.Finish ? Series.Start : Series.Finish;
+		}, 2500);
 	});
 </script>
 
@@ -211,6 +197,13 @@
 				>
 			{/each}
 		</g>
+		<polygon
+			points={seriesPolygonPointsString}
+			transform={`translate(50,50)`}
+			class="opacity-60"
+			style="		transform-box: fill-box;
+		transform-origin: 50% 50%;"
+		/>
 	</g>
 </svg>
 
