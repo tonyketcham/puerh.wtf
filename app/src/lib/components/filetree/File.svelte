@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/env';
+	import { page } from '$app/stores';
 	import type { TreeNode } from '$lib/types/tree';
 
 	export let node: TreeNode;
@@ -11,6 +13,8 @@
 				'sveltekit:prefetch': true
 		  }
 		: {};
+
+	$: isCurrentPage = hasHref && browser && $page.url.pathname === linkProps.href;
 </script>
 
 <svelte:element
@@ -56,12 +60,18 @@
 			stroke-linejoin="round"
 		/>
 	</svg>
-	<div class="inline font-normal my-auto">
+	<div class="inline my-auto font-normal">
 		{#if node.production_year}
-			<span class="opacity-60 group-hover:opacity-100">{node.production_year}</span>
+			<span class="{isCurrentPage ? 'opacity-100' : 'opacity-60'} group-hover:opacity-100"
+				>{node.production_year}</span
+			>
 		{/if}
-		<span class="opacity-60 group-hover:opacity-100 group-hover:text-tea-soup-500"
-			>{node.title}</span
+		<span
+			class="{isCurrentPage
+				? 'opacity-100 text-tea-soup-500'
+				: 'opacity-60'} group-hover:opacity-100 group-hover:text-tea-soup-500"
 		>
+			{node.title}
+		</span>
 	</div>
 </svelte:element>
