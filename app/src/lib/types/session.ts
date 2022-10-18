@@ -25,6 +25,7 @@ export type SessionFull = BaseSession &
 		rating: number;
 		purchase_link: string | null;
 		notes: SessionNotes;
+		flavor_axes: SessionFlavorAxes;
 
 		images:
 			| {

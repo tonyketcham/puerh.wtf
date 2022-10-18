@@ -1,20 +1,42 @@
 <script lang="ts">
 	import AxisRadial from '$lib/components/dataviz/radar/elements/AxisRadial.svelte';
 	import Radar from '$lib/components/dataviz/radar/elements/Radar.svelte';
-
 	import { LayerCake, Svg } from 'layercake';
+	import type { SessionFlavorAxes } from '$lib/types/session';
 
-	// Define some data
-	const data = [{ name: 'Allison', fastball: 10, change: 0, slider: 2, cutter: 4, curve: 8 }];
+	// Pull in some data
+	export let data: SessionFlavorAxes;
 
-	const seriesKey = 'name';
-	const xKey = ['fastball', 'change', 'slider', 'cutter', 'curve'];
+	enum Series {
+		Start = 'start',
+		Finish = 'finish'
+	}
 
-	const seriesNames = Object.keys(data[0]).filter((d) => d !== seriesKey);
+	// Current series to display
+	$: series = Series.Start;
+
+	$: dataSeries = Object.entries(data).reduce(
+		(acc, [label, axes]) => ({
+			...acc,
+			[label]: axes[series]
+		}),
+		{}
+	);
+
+	const seriesKey = 'series';
+	$: seriesNames = Object.keys(dataSeries).filter((d) => d !== seriesKey);
+
+	const handleXRange = ({ height }: { height: number }) => [0, height / 2];
 </script>
 
-<div class="w-full h-56">
-	<LayerCake {data} x={xKey} xDomain={[0, 10]} xRange={[0, 10]}>
+<div class="w-full h-48">
+	<LayerCake
+		padding={{ top: 16, right: 4, bottom: 4, left: 4 }}
+		x={seriesNames}
+		xDomain={[0, 10]}
+		xRange={handleXRange}
+		data={[dataSeries]}
+	>
 		<Svg>
 			<AxisRadial />
 			<Radar />

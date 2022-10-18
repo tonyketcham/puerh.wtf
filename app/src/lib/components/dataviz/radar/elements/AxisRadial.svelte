@@ -2,7 +2,7 @@
   @component
   Generates an SVG radial scale, useful for radar charts.
  -->
-<script lang="ts">
+<script>
 	import { getContext } from 'svelte';
 
 	const { width, height, xScale, extents, config } = getContext('LayerCake');
@@ -20,7 +20,7 @@
 
 	$: angleSlice = (Math.PI * 2) / $config.x.length;
 
-	function anchor(total: number, i: number) {
+	function anchor(total, i) {
 		if (i === 0 || i === total / 2) {
 			return 'middle';
 		} else if (i < total / 2) {
@@ -49,7 +49,7 @@
 			text-anchor={anchor($config.x.length, i)}
 			dy="0.35em"
 			font-size="12px"
-			text-outline="#fff"
+			class="fill-current"
 			transform="translate({labelPlacement * Math.cos(thisAngleSlice)}, {labelPlacement *
 				Math.sin(thisAngleSlice)})">{label}</text
 		>

@@ -14,8 +14,9 @@ export async function GET({ params }: Page) {
 
 	// Fix date comparison as it's broken in Flatbread v20
 	const query = gql`
-		query SessionBySlug($slug: String!) #  $monthStart: Date!
-		{
+		query SessionBySlug(
+			$slug: String! #  $monthStart: Date!
+		) {
 			allSessions(
 				filter: {
 					_slug: { eq: $slug }
@@ -104,8 +105,6 @@ export async function GET({ params }: Page) {
 	}: {
 		allSessions: SessionFull[];
 	} = await flatbread.request(query, variables);
-
-	console.log(query, allSessions, allSessions.length);
 
 	let error = null;
 

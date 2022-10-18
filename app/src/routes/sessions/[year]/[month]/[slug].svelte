@@ -30,8 +30,7 @@
 	import type { SessionFull } from '$lib/types/session';
 	import { onMount } from 'svelte';
 	import PageWithDetailsPane from '$lib/components/containers/PageWithDetailsPane.svelte';
-	import RadarChart2 from '$lib/components/dataviz/radar/RadarChart2.svelte';
-	// import RadarChart from '$lib/components/dataviz/radar/RadarChart.svelte';
+	import RadarChart from '$lib/components/dataviz/radar/RadarChart.svelte';
 
 	export let session: SessionFull;
 	$: images = session?.images ?? [];
@@ -122,8 +121,8 @@
 		</section>
 	</article>
 	<div slot="details" class="flex flex-col space-y-5">
-		<div class="w-full -mt-4 text-bai-cha-200">
-			<RadarChart2 />
+		<div class="w-full text-bai-cha-200">
+			<RadarChart data={session.flavor_axes} />
 		</div>
 	</div>
 </PageWithDetailsPane>
