@@ -5,6 +5,8 @@
 <script>
 	import { getContext } from 'svelte';
 	import { line, curveCardinalClosed } from 'd3-shape';
+	import { draw } from 'svelte/transition';
+	import { smoothFade } from '$lib/animations/smoothFade';
 
 	const { data, width, height, xGet, config } = getContext('LayerCake');
 
@@ -35,7 +37,7 @@
 	$: angleSlice = (Math.PI * 2) / $config.x.length;
 
 	$: path = line()
-		.curve(curveCardinalClosed.tension(1.1))
+		.curve(curveCardinalClosed.tension(0.2))
 		.x((d, i) => d * Math.cos(angleSlice * i - Math.PI / 2))
 		.y((d, i) => d * Math.sin(angleSlice * i - Math.PI / 2));
 </script>
@@ -46,6 +48,7 @@
 		<!-- Draw a line connecting all the dots -->
 		<path
 			class="path-line"
+			in:draw={{ duration: 1000 }}
 			d={path(xVals)}
 			{stroke}
 			stroke-width={strokeWidth}
@@ -57,6 +60,7 @@
 		{#each xVals as circleR, i}
 			{@const thisAngleSlice = angleSlice * i - Math.PI / 2}
 			<circle
+				in:smoothFade={{ delay: 750, duration: 1000 }}
 				cx={circleR * Math.cos(thisAngleSlice)}
 				cy={circleR * Math.sin(thisAngleSlice)}
 				{r}

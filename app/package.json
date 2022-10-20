@@ -18,6 +18,7 @@
 		"@giscus/svelte": "2.2.0",
 		"@neodrag/svelte": "1.2.3",
 		"@playwright/test": "1.24.2",
+		"@svelte-plugins/tooltips": "^0.1.6",
 		"@sveltejs/adapter-static": "1.0.0-next.39",
 		"@sveltejs/kit": "1.0.0-next.405",
 		"@tailwindcss/typography": "0.5.4",

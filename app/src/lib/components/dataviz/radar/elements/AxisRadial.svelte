@@ -11,9 +11,9 @@
 	export let lineLengthFactor = 1.1;
 
 	/** @type {Number} [labelPlacementFactor=1.25] - How far to place the labels from the circle's center. A value of `1` puts them at the circle's circumference. */
-	export let labelPlacementFactor = 1.25;
+	export let labelPlacementFactor = 1.2;
 
-	$: max = $xScale(Math.max(...$extents.x));
+	$: max = $xScale(10);
 
 	$: lineLength = max * lineLengthFactor;
 	$: labelPlacement = max * labelPlacementFactor;
@@ -31,8 +31,16 @@
 </script>
 
 <g transform="translate({$width / 2}, {$height / 2})">
-	<circle cx="0" cy="0" r={max} stroke="#ccc" stroke-width="1" fill="#CDCDCD" fill-opacity="0.1" />
-	<circle cx="0" cy="0" r={max / 2} stroke="#ccc" stroke-width="1" fill="none" />
+	<circle
+		cx="0"
+		cy="0"
+		r={max}
+		class="fill-heicha-600/60"
+		stroke="#555"
+		stroke-width="1"
+		fill-opacity="0.1"
+	/>
+	<circle cx="0" cy="0" r={max / 2} stroke="#666" stroke-width="1" fill="none" />
 
 	{#each $config.x as label, i}
 		{@const thisAngleSlice = angleSlice * i - Math.PI / 2}
@@ -41,15 +49,16 @@
 			y1="0"
 			x2={lineLength * Math.cos(thisAngleSlice)}
 			y2={lineLength * Math.sin(thisAngleSlice)}
-			stroke="#ccc"
+			stroke="#666"
 			stroke-width="1"
+			stroke-linecap="round"
 			fill="none"
 		/>
 		<text
 			text-anchor={anchor($config.x.length, i)}
 			dy="0.35em"
 			font-size="12px"
-			class="fill-current"
+			class="fill-bai-cha-200/80"
 			transform="translate({labelPlacement * Math.cos(thisAngleSlice)}, {labelPlacement *
 				Math.sin(thisAngleSlice)})">{label}</text
 		>
