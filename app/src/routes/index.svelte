@@ -8,16 +8,3 @@
 		</h2>
 	</section>
 </article>
-
-<style>
-	.parallax {
-		perspective: 1px;
-		@apply overflow-x-hidden overflow-y-auto;
-	}
-	.parallax__layer--base {
-		transform: translateZ(0);
-	}
-	.parallax__layer--back {
-		transform: translateZ(-1px) scale(2);
-	}
-</style>

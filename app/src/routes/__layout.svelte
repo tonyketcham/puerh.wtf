@@ -23,15 +23,11 @@
 </script>
 
 <script lang="ts">
-	import SiteHeader from '$lib/components/SiteHeader.svelte';
-	import Panel from '$lib/components/containers/Panel.svelte';
 	import '../app.css';
-	import FileTree from '$lib/components/filetree/FileTree.svelte';
 	import { setContext } from 'svelte';
+	import NavSidebar from '$lib/components/NavSidebar.svelte';
 
 	export let sessions: SessionPreview[] = [];
-	// export let vendors: Vendor[] = [];
-	// export let categories: Category[] = [];
 
 	// ref to the site content container
 	let site: HTMLElement;
@@ -45,21 +41,6 @@
 </svelte:head>
 
 <div bind:this={site} class="relative flex flex-row">
-	<div class="fixed z-20 flex flex-col w-[340px] h-screen p-8 space-y-10 pointer-events-none">
-		<SiteHeader />
-		<Panel id="nav">
-			<div slot="header" class="flex space-x-2 place-items-center justify-between">
-				<h2>Explorer</h2>
-				<!-- TODO: add search -->
-			</div>
-			<FileTree
-				data={[
-					{ id: 'sessions', title: 'Sessions', children: sessions }
-					// { id: 'vendors', title: 'Vendors', children: vendors },
-					// { id: 'categories', title: 'Categories', children: categories }
-				]}
-			/>
-		</Panel>
-	</div>
+	<NavSidebar {sessions} />
 	<slot />
 </div>
