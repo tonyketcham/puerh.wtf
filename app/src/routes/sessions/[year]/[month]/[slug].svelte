@@ -30,9 +30,10 @@
 	import type { SessionFull } from '$lib/types/session';
 	import { onMount } from 'svelte';
 	import PageWithDetailsPane from '$lib/components/containers/PageWithDetailsPane.svelte';
-	import RadarChart from '$lib/components/dataviz/radar/RadarChart.svelte';
+	import SessionDetailsSidebar from '$lib/components/SessionDetailsSidebar.svelte';
 
 	export let session: SessionFull;
+	console.log({ session });
 	$: images = session?.images ?? [];
 
 	onMount(() => {
@@ -120,15 +121,11 @@
 			</div>
 		</section>
 	</article>
-	<div slot="details" class="flex flex-col space-y-5">
-		<div class="w-full text-bai-cha-200">
-			<RadarChart data={session.flavor_axes} />
-		</div>
-	</div>
+	<SessionDetailsSidebar slot="details" {session} />
 </PageWithDetailsPane>
 
 <style lang="postcss">
 	.image-zoom {
-		@apply hover:scale-125 transform-gpu transition-transform;
+		@apply hover:scale-110 transform-gpu transition-transform;
 	}
 </style>

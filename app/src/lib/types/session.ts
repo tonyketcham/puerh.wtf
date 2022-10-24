@@ -13,6 +13,9 @@ export type SessionPreview = BaseSession & {
 	production_year: number | null;
 	excerpt: string;
 	style: {
+		id: string;
+		title: string;
+		color: string;
 		category: Category;
 	}[];
 };
@@ -24,6 +27,18 @@ export type SessionFull = BaseSession &
 		aging_conditions: string | null;
 		rating: number;
 		purchase_link: string | null;
+		vendor:
+			| {
+					_slug: string;
+					title: string;
+					image: string;
+			  }[]
+			| null;
+		cultivar: {
+			title: string;
+		};
+		picking: string | null;
+		genre: string[] | null;
 		notes: SessionNotes;
 		flavor_axes: SessionFlavorAxes;
 

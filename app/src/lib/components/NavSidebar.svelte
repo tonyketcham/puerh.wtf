@@ -9,7 +9,7 @@
 	// export let categories: Category[] = [];
 </script>
 
-<div class="absolute z-20 flex flex-col w-[340px] h-screen p-8 space-y-10 pointer-events-none">
+<div class="fixed z-20 flex flex-col w-[340px] h-screen p-8 space-y-10 pointer-events-none">
 	<SiteHeader />
 	<Panel id="nav">
 		<div slot="header" class="flex justify-between space-x-2 place-items-center">

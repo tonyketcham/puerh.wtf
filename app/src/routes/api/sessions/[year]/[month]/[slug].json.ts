@@ -33,6 +33,22 @@ export async function GET({ params }: Page) {
 				elevation
 				aging_conditions
 				purchase_link
+				vendor {
+					_slug
+					title
+					image
+				}
+				cultivar {
+					title
+				}
+				style {
+					id
+					title
+					category {
+						color
+					}
+					color
+				}
 				notes {
 					dry_leaf_nose
 					wet_leaf_nose
