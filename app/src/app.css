@@ -40,3 +40,7 @@ body {
 *::-webkit-scrollbar-thumb {
 	@apply rounded-lg;
 }
+
+.image-zoom {
+	@apply hover:scale-110 transform-gpu transition-transform;
+}

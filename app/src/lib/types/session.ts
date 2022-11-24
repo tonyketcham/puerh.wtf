@@ -20,37 +20,45 @@ export type SessionPreview = BaseSession & {
 	}[];
 };
 
-export type SessionFull = BaseSession &
-	SessionPreview & {
-		season: string | null;
-		elevation: number | null;
-		aging_conditions: string | null;
-		rating: number;
-		purchase_link: string | null;
-		vendor:
-			| {
-					_slug: string;
-					title: string;
-					image: string;
-			  }[]
-			| null;
-		cultivar: {
-			title: string;
-		};
-		picking: string | null;
-		genre: string[] | null;
-		notes: SessionNotes;
-		flavor_axes: SessionFlavorAxes;
+export type SessionPreviewWithFeatureImage = SessionPreview & {
+	images:
+		| {
+				image: string;
+				alt: string;
+		  }[]
+		| null;
+};
 
-		images:
-			| {
-					image: string;
-					alt: string;
-			  }[]
-			| null;
-
-		_content: Content;
+export type SessionFull = SessionPreviewWithFeatureImage & {
+	season: string | null;
+	elevation: number | null;
+	aging_conditions: string | null;
+	rating: number;
+	purchase_link: string | null;
+	vendor:
+		| {
+				_slug: string;
+				title: string;
+				image: string;
+		  }[]
+		| null;
+	cultivar: {
+		title: string;
 	};
+	picking: string | null;
+	genre: string[] | null;
+	notes: SessionNotes;
+	flavor_axes: SessionFlavorAxes;
+
+	images:
+		| {
+				image: string;
+				alt: string;
+		  }[]
+		| null;
+
+	_content: Content;
+};
 
 export type SessionNotes = {
 	dry_leaf_nose: string;

@@ -31,6 +31,7 @@
 	import { onMount } from 'svelte';
 	import PageWithDetailsPane from '$lib/components/containers/PageWithDetailsPane.svelte';
 	import SessionDetailsSidebar from '$lib/components/SessionDetailsSidebar.svelte';
+	import Heading2 from '$lib/components/typography/Heading2.svelte';
 
 	export let session: SessionFull;
 	console.log({ session });
@@ -44,17 +45,17 @@
 <PageWithDetailsPane>
 	<article class="px-56 pt-6 pb-8">
 		<section class="relative top-0 block w-[calc(100vw-45rem)] mx-auto">
-			<h2 class="py-5 text-6xl leading-tight font-display text-shadow-lg">
-				{#if session.production_year}
-					<span
-						class="block px-1 py-2 text-5xl border max-w-max bg-heicha-700/50 border-white/5 rounded-xl"
-						>{session.production_year}</span
-					>
-				{/if}
-				<span class="block -word-spacing-9" style="font-size: clamp(16px, 6vw, 60px);"
-					>{session.title}</span
-				>
-			</h2>
+			<Heading2>
+				<svelte:fragment slot="auxilery-info">
+					{#if session.production_year}
+						<span
+							class="block px-1 py-2 text-5xl border max-w-max bg-heicha-700/50 border-white/5 rounded-xl"
+							>{session.production_year}</span
+						>
+					{/if}
+				</svelte:fragment>
+				{session.title}
+			</Heading2>
 			<div class="relative flex flex-col mt-3 space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4">
 				<div class="space-y-4 xl:sticky top-24">
 					{#if images.length > 0}
@@ -77,7 +78,7 @@
 						class="flex flex-col justify-between space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4"
 					>
 						{#if images.length > 1}
-							<div class="w-1/2 overflow-hidden border rounded-xl border-heicha-700/50">
+							<div class="overflow-hidden border xl:w-1/2 rounded-xl border-heicha-700/50">
 								<img
 									src={images[1].image}
 									alt={images[1].alt}
@@ -86,7 +87,7 @@
 							</div>
 						{/if}
 						{#if images.length > 2}
-							<div class="w-1/2 overflow-hidden border rounded-xl border-heicha-700/50">
+							<div class="overflow-hidden border xl:w-1/2 rounded-xl border-heicha-700/50">
 								<img
 									src={images[2].image}
 									alt={images[2].alt}
@@ -123,9 +124,3 @@
 	</article>
 	<SessionDetailsSidebar slot="details" {session} />
 </PageWithDetailsPane>
-
-<style lang="postcss">
-	.image-zoom {
-		@apply hover:scale-110 transform-gpu transition-transform;
-	}
-</style>

@@ -9,10 +9,15 @@ export async function GET(page: Page) {
 
 	const order = page.url.searchParams.get('order') ?? 'DESC';
 	const sortBy = page.url.searchParams.get('sortBy') ?? 'date';
+	const limit =
+		page.url.searchParams.get('limit') !== null
+			? Number.parseInt(page.url.searchParams.get('limit') as string)
+			: undefined;
+	const withImages = page.url.searchParams.get('withImages') !== null ? true : undefined;
 
 	const query = gql`
-		query AllSessions($order: Order, $sortBy: String) {
-			allSessions(order: $order, sortBy: $sortBy) {
+		query AllSessions($order: Order, $sortBy: String, $limit: Int) {
+			allSessions(order: $order, sortBy: $sortBy, limit: $limit) {
 				_slug
 				_collection
 				id
@@ -25,6 +30,15 @@ export async function GET(page: Page) {
 						color
 					}
 				}
+				${
+					withImages
+						? gql`
+						images {
+							alt
+							image
+						}`
+						: ''
+				}
 			}
 		}
 	`;
@@ -33,7 +47,7 @@ export async function GET(page: Page) {
 		allSessions
 	}: {
 		allSessions: SessionPreview[];
-	} = await flatbread.request(query, { order, sortBy });
+	} = await flatbread.request(query, { order, sortBy, limit });
 
 	return {
 		body: {
