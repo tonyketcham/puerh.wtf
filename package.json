@@ -48,7 +48,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.3.6",
     "postcss-preset-env": "^6.7.0",
-    "prettier": "^2.3.1",
+    "prettier": "^2.8.2",
     "sass": "^1.35.1",
     "sass-loader": "^10.1.1",
     "slugify": "^1.6.0",
