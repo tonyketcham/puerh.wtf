@@ -15235,9 +15235,9 @@ vue-template-es2015-compiler@^1.9.0:
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
 vue-tippy@v4:
-  version "4.10.2"
-  resolved "https://registry.yarnpkg.com/vue-tippy/-/vue-tippy-4.10.2.tgz#d87846141b84699753fd3ac6a537f205bab12997"
-  integrity sha512-o1E4Q7gJHrL5VKpPF10Mdp9Grrqi9JGUBrkOQQUmTrklxctYvjpsSxePZVM0mgfGfRFAboOClw33X1ueB4Byjw==
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/vue-tippy/-/vue-tippy-4.16.0.tgz#4e8964ae1aac386a42ce67902697cceeda6c814c"
+  integrity sha512-ViI9Gd7PPzOfykkIcDlSqJ3Nx3g+mUoO5rkfkc1jxwNtf74vN7YvqfLO9zKjDAac1wFbKuc21ndLxsTeWkk0VA==
   dependencies:
     humps "^2.0.1"
     tippy.js "^4.3.5"
