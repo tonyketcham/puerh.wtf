@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link
+			rel="preload"
+			href="/fonts/Rock_3D/Rock3D-Regular.ttf"
+			as="font"
+			type="font/ttf"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/Fira_Code/FiraCode-VF.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+		%sveltekit.head%
+	</head>
+	<body class="font-sans text-sm font-normal text-bai-cha-100 bg-heicha-900">
+		<div>%sveltekit.body%</div>
+		<script>
+			if (window.netlifyIdentity) {
+				window.netlifyIdentity.on('init', (user) => {
+					if (!user) {
+						window.netlifyIdentity.on('login', () => {
+							document.location.href = '/tea-time/';
+						});
+					}
+				});
+			}
+		</script>
+	</body>
+</html>

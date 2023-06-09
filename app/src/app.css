@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: 'Rock3D-Regular';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(/fonts/Rock_3D/Rock3D-Regular.ttf) format('truetype');
+}
+
+@font-face {
+	font-family: 'FiraCode-Variable';
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url(/fonts/Fira_Code/FiraCode-VF.woff2) format('woff2');
+}
+
+body {
+	@apply selection:bg-tea-soup-500/60 selection:text-black;
+	@apply transition-opacity duration-75 ease-in-out;
+}
+
+.background-box {
+	/* @apply box-decoration-clone bg-heicha-900/80 px-1 text-shadow-lg shadow-md; */
+	/* @apply bg-heicha-700/80 backdrop-blur px-1.5 rounded text-shadow-md block; */
+}
+
+* {
+	scrollbar-color: transparent transparent;
+	scrollbar-width: thin;
+}
+
+*:hover {
+	scrollbar-color: #26232677 transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply rounded-lg;
+}
+
+.image-zoom {
+	@apply hover:scale-110 transform-gpu transition-transform;
+}

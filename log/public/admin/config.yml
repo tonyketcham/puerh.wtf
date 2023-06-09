@@ -1,0 +1,736 @@
+backend:
+  name: github
+  repo: tonyketcham/puerh.wtf
+  branch: main
+
+media_folder: app/static/images/uploads
+public_folder: /images/uploads
+publish_mode: editorial_workflow
+
+site_url: https://puerh.wtf
+
+collections:
+  - label: 'Sessions'
+    name: 'tastings'
+    label_singular: 'Tea Tasting'
+    description: 'Personal evaluations of teas'
+    folder: 'content/tastings'
+    create: true
+    delete: true
+    slug: '{{production_year}}-{{slug}}'
+    identifier_field: 'title'
+    preview_path: 'sessions/{{year}}/{{month}}/{{slug}}'
+    summary: '{{year}}-{{month}}-{{day}} | {{title}} | {{season}} {{production_year}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Author'
+        name: 'author'
+        widget: relation
+        collection: 'authors'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title', 'instagram']
+        display_fields: ['title']
+
+      - label: 'Tea Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Style'
+        name: 'style'
+        widget: 'relation'
+        collection: 'styles'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title', 'category']
+        display_fields: ['title']
+
+      - label: 'Varietal'
+        name: 'cultivar'
+        widget: 'relation'
+        collection: 'cultivars'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title']
+        display_fields: ['title']
+        required: false
+
+      - label: 'Origin'
+        name: 'origin'
+        widget: 'relation'
+        collection: 'origins'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['location', 'municipality', 'country']
+        display_fields: ['location', 'municipality', 'country']
+        required: false
+
+      - label: 'Season'
+        name: 'season'
+        widget: 'string'
+        required: false
+
+      - label: 'Production Year'
+        name: 'production_year'
+        widget: 'number'
+        default: 2020
+        required: false
+
+      - label: 'Picking'
+        name: 'picking'
+        widget: 'string'
+        required: false
+
+      - label: 'Elevation (Meters)'
+        name: 'elevation'
+        widget: 'number'
+        required: false
+        default: null
+
+      - label: 'Aging Conditions'
+        name: 'aging_conditions'
+        widget: 'string'
+        required: false
+        default: null
+
+      - label: 'Vendor'
+        name: 'vendor'
+        widget: 'relation'
+        collection: 'vendors'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title', 'location', 'municipality', 'country']
+        display_fields: ['title']
+        required: false
+
+      - label: 'Purchase Link'
+        name: 'purchase_link'
+        widget: 'string'
+        required: false
+
+      - label: 'Excerpt'
+        name: 'excerpt'
+        widget: 'string'
+
+      - label: 'Publish Date'
+        name: 'date'
+        widget: 'datetime'
+
+      - label: 'Flavor Axes'
+        name: 'flavor_axes'
+        widget: 'object'
+        collapsed: true
+        fields:
+          - label: 'Vegetal'
+            name: 'vegetal'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Floral'
+            name: 'floral'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Fruits'
+            name: 'fruits'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Spices'
+            name: 'spices'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Earth'
+            name: 'earth'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Wood'
+            name: 'wood'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Nuts/Roast'
+            name: 'nuts_roast'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Cream'
+            name: 'cream'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Stone'
+            name: 'stone'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+          - label: 'Umami'
+            name: 'umami'
+            widget: 'object'
+            fields:
+              - label: 'Start'
+                name: 'start'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+              - label: 'Finish'
+                name: 'finish'
+                widget: 'number'
+                default: 0
+                min: 0
+                max: 10
+
+      - label: 'Experience Notes'
+        name: 'notes'
+        widget: 'object'
+        summary: '{{taste}}'
+        collapsed: true
+        fields:
+          - label: 'Dry Leaf Nose'
+            name: 'dry_leaf_nose'
+            widget: 'string'
+
+          - label: 'Wet Leaf Nose'
+            name: 'wet_leaf_nose'
+            widget: 'string'
+
+          - label: 'Mouthfeel'
+            name: 'mouthfeel'
+            widget: 'string'
+
+          - label: 'Taste'
+            name: 'taste'
+            widget: 'string'
+
+          - label: 'Finish'
+            name: 'finish'
+            widget: 'string'
+
+          - label: 'Empty Cup'
+            name: 'empty_cup'
+            widget: 'string'
+
+          - label: 'Cha Qi (body sensation, perspective alteration)'
+            name: 'cha_qi'
+            widget: 'string'
+
+      - label: 'Tags'
+        label_singular: 'Tag'
+        name: 'tags'
+        widget: 'relation'
+        collection: 'tags'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title']
+        display_fields: ['title']
+        required: false
+
+      - label: 'Preference Rating (0-100)'
+        name: 'rating'
+        widget: 'number'
+        default: 50
+        min: 0
+        max: 100
+        value_type: 'float'
+        step: 0.5
+
+      - label: 'Brewing Parameters'
+        name: 'brewing'
+        widget: 'object'
+        collapsed: true
+        fields:
+          - label: 'Temp (°F)'
+            name: 'temperature'
+            widget: 'number'
+            default: 200
+            min: 0
+            max: 705 # Just in case https://en.wikipedia.org/wiki/Superheated_water
+
+          - label: 'Material Used (g)'
+            name: 'material_amount'
+            widget: 'number'
+            default: 5
+            min: 0
+            value_type: 'float'
+            step: 0.1
+
+          - label: 'Liquid Amount (mL)'
+            name: 'liquid_amount'
+            widget: 'number'
+            default: 100
+            min: 0
+
+          - label: 'First Infusion (s)'
+            name: 'first_infusion_duration'
+            widget: 'number'
+            min: 0
+
+          - label: 'General Increment (s)'
+            name: 'infusion_increment'
+            widget: 'number'
+            min: 0
+
+          - label: 'Vessel Type'
+            name: 'vessel'
+            widget: 'string'
+            default: 'Jianshui Zitao Xishi pot'
+
+      - label: 'Images'
+        label_singular: 'Image'
+        name: 'images'
+        widget: 'list'
+        summary: '{{fields.image}} - {{fields.alt}}'
+        collapsed: true
+        fields:
+          - label: 'Image'
+            name: 'image'
+            widget: 'image'
+          - label: 'Alt Text'
+            name: 'alt'
+            widget: 'string'
+
+      - label: 'Body'
+        name: 'body'
+        widget: 'markdown'
+
+  - label: 'Tea Categories'
+    name: 'categories'
+    label_singular: 'Category'
+    description: 'The main tea cornerstones'
+    folder: 'content/categories'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
+    extension: 'md'
+    sortable_fields: ['title', 'color']
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Color'
+        name: 'color'
+        widget: 'color'
+        allowInput: true
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
+  - label: 'Tea Styles'
+    name: 'styles'
+    label_singular: 'Tea Styles'
+    description: 'The different variations within a category'
+    folder: 'content/styles'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{fields.title}}'
+    extension: 'md'
+    sortable_fields: ['category', 'color', 'title']
+    view_groups:
+      - label: 'Category'
+        field: 'category'
+
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Category'
+        name: 'category'
+        widget: 'relation'
+        collection: 'categories'
+        value_field: 'id'
+        search_fields: ['title']
+        display_fields: ['title']
+        required: false
+
+      - label: 'Color'
+        name: 'color'
+        widget: 'color'
+        allowInput: true
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
+  - label: 'Varietals'
+    name: 'cultivars'
+    label_singular: 'Varietal'
+    description: 'The different strains in the game'
+    folder: 'content/cultivars'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Related Styles'
+        name: 'styles'
+        widget: relation
+        collection: 'styles'
+        value_field: 'id'
+        search_fields: ['title']
+        display_fields: ['title']
+        multiple: true
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
+      - label: 'Videos'
+        name: 'videos'
+        widget: list
+        summary: '{{fields.video}}'
+        collapsed: true
+        required: false
+        fields:
+          - label: 'Video'
+            name: 'video'
+            widget: 'youtube'
+            extraInfo: true
+            APIkey: ''
+
+  - label: 'Origins'
+    name: 'origins'
+    label_singular: 'Tea Origin'
+    description: 'Places around the tea world'
+    folder: 'content/origins'
+    create: true
+    delete: true
+    slug: '{{location}}-{{municipality}}-{{country}}'
+    identifier_field: 'id'
+    summary: '{{location}} - {{municipality}} - {{country}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Location'
+        name: 'location'
+        widget: 'string'
+        required: false
+
+      - label: 'Municipality'
+        name: 'municipality'
+        widget: 'string'
+        required: false
+
+      - label: 'Country'
+        name: 'country'
+        widget: 'string'
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
+  - label: 'Vendors'
+    name: 'vendors'
+    label_singular: 'Tea Vendor'
+    description: 'Sellers of tea'
+    folder: 'content/vendors'
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Vendor Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Profile Picture'
+        name: 'image'
+        widget: 'image'
+        required: false
+
+      - label: 'Links'
+        label_singular: 'Link'
+        name: 'links'
+        widget: 'object'
+        summary: '{{website}}'
+        collapsed: true
+        required: false
+        fields:
+          - label: 'Website'
+            name: 'website'
+            widget: 'string'
+            required: false
+
+          - label: 'Instagram'
+            name: 'instagram'
+            widget: 'string'
+            required: false
+
+          - label: 'YouTube'
+            name: 'youtube'
+            widget: 'string'
+            required: false
+
+          - label: 'Facebook'
+            name: 'facebook'
+            widget: 'string'
+            required: false
+
+      - label: 'Location'
+        name: 'location'
+        widget: 'string'
+        required: false
+
+      - label: 'Municipality'
+        name: 'municipality'
+        widget: 'string'
+        required: false
+
+      - label: 'Country'
+        name: 'country'
+        widget: 'string'
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
+
+  - label: 'Authors'
+    name: 'authors'
+    label_singular: 'Author'
+    folder: 'content/authors'
+    create: true
+    delete: true
+    slug: '{{title}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Author Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Profile Picture'
+        name: 'image'
+        widget: 'image'
+
+      - label: 'Links'
+        label_singular: 'Link'
+        name: 'links'
+        widget: 'object'
+        summary: '{{fields.website}}'
+        collapsed: true
+        required: false
+        fields:
+          - label: 'Website'
+            name: 'website'
+            widget: 'string'
+            required: false
+
+          - label: 'Instagram'
+            name: 'instagram'
+            widget: 'string'
+            required: false
+
+          - label: 'Github'
+            name: 'github'
+            widget: 'string'
+            required: false
+
+          - label: 'YouTube'
+            name: 'youtube'
+            widget: 'string'
+            required: false
+
+          - label: 'Facebook'
+            name: 'facebook'
+            widget: 'string'
+            required: false
+
+      - label: 'Excerpt'
+        name: 'excerpt'
+        widget: 'string'
+
+  - label: 'Tags'
+    label_singular: 'Tag'
+    folder: 'content/tags'
+    create: true
+    delete: true
+    name: 'tags'
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{title}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Tag'
+        name: 'title'
+        widget: string
+
+      - label: 'Color'
+        name: 'color'
+        widget: color

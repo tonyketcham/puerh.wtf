@@ -1,0 +1,5 @@
+[build]
+publish = "dist"
+
+[build.environment]
+NPM_FLAGS = "--version"
