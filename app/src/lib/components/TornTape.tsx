@@ -57,15 +57,25 @@ export default function TornTape({ seed, color }: TornTapeProps) {
 		return `polygon(${points.join(", ")})`
 	}
 
+	const transformValue = `rotate(${randomVal(-12, 20)}deg)`
+	const clipPathValue = generateJaggedPolygon()
+
 	const tapeStyle: CSSProperties = {
-		backgroundColor: color,
-		width: `${randomVal(2.5, 4)}rem`,
-		height: `${randomVal(1.25, 1.75)}rem`,
-		top: `${randomVal(-0.4, -0.8)}rem`,
-		right: `${randomVal(0.5, 1.75)}rem`,
-		transform: `rotate(${randomVal(-12, 12)}deg)`,
-		clipPath: generateJaggedPolygon(),
-		filter: `url(#tape-texture-${seed})`,
+		width: `${randomVal(2.4, 3.8)}rem`,
+		height: `${randomVal(0.95, 1.75)}rem`,
+		top: `${randomVal(-0.75, -0.3)}rem`,
+		left: `${randomVal(-2, -0.7)}rem`,
+		transform: transformValue,
+		clipPath: clipPathValue,
+		"--transform": transformValue,
+		"--clip-path": clipPathValue,
+		"--background-color": color,
+		"--filter": `url(#tape-texture-${seed})`,
+	} as CSSProperties & {
+		"--transform": string
+		"--clip-path": string
+		"--background-color": string | undefined
+		"--filter": string
 	}
 
 	return (
@@ -132,7 +142,8 @@ export default function TornTape({ seed, color }: TornTapeProps) {
 					/>
 				</filter>
 			</svg>
-			<span className="absolute z-10 block shadow-sm" style={tapeStyle} />
+
+			<span className="absolute z-10 block shadow-sm tape-duplicator" style={tapeStyle} />
 		</>
 	)
 }
