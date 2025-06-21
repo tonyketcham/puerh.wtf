@@ -7,10 +7,10 @@ interface FileTreeProps {
 
 export default function FileTree({ data }: FileTreeProps) {
 	return (
-		<div className="flex flex-col p-1 select-none">
-			{data.map((datum) => (
-				<Folder key={datum.id} title={datum.title} nodes={datum.children ?? []} />
-			))}
+		<div className="flex flex-col select-none">
+			{data.map((node) => {
+				return <Folder key={node.id} title={node.title} nodes={node.children ?? []} />
+			})}
 		</div>
 	)
 }
