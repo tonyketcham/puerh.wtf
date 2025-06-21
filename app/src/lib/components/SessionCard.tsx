@@ -1,6 +1,7 @@
 import Link from "next/link"
 import type { SessionPreviewWithFeatureImage } from "../types/session"
 import { buildLink } from "../utils/BuildLinkToGivenCollectionNode"
+import TornTape from "./TornTape"
 
 interface SessionCardProps {
 	session: SessionPreviewWithFeatureImage
@@ -8,10 +9,11 @@ interface SessionCardProps {
 
 export default function SessionCard({ session }: SessionCardProps) {
 	return (
-		<article className="box-border relative w-full overflow-hidden border group rounded-2xl border-heicha-500 bg-heicha-700 bg-opacity-40">
+		<article className="box-border relative w-full border group rounded-2xl border-heicha-500">
+			<TornTape seed={session.id} color={session?.style?.[0]?.category?.color} />
 			<Link
 				href={buildLink(session)}
-				className="flex flex-col divide-y-2 lg:flex-row lg:divide-y-0 lg:divide-x-2 divide-white/5"
+				className="relative z-0 flex flex-col overflow-hidden divide-y-2 rounded-2xl bg-heicha-700 bg-opacity-40 lg:flex-row lg:divide-y-0 lg:divide-x-2 divide-white/5"
 			>
 				<div className="flex-shrink-0 w-full h-32 overflow-hidden lg:w-40">
 					<img
@@ -36,12 +38,6 @@ export default function SessionCard({ session }: SessionCardProps) {
 					</p>
 				</div>
 			</Link>
-			<div className="absolute top-2.5 right-2.5">
-				<span
-					className="block w-3 h-3 rounded-2xl"
-					style={{ backgroundColor: session?.style?.[0]?.category?.color }}
-				/>
-			</div>
 		</article>
 	)
 }
