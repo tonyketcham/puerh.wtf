@@ -24,9 +24,12 @@ const config = {
 					500: "#8a8a8a",
 				},
 				heicha: {
+					400: "#d9d9d9",
+					500: "#262427",
 					600: "#2a2a2a",
 					700: "#1a1a1a",
 				},
+				"panel-header-bg": "rgba(40,37,40,0.66)",
 			},
 			textShadow: {
 				lg: "0 4px 8px rgba(0, 0, 0, 0.3)",
@@ -38,9 +41,16 @@ const config = {
 			lineHeight: {
 				"extra-tight": "1.13703",
 			},
+			dropShadow: {
+				split: "0px 4px 0px rgba(255, 255, 255, 0.25)",
+			},
 		},
 	},
-	plugins: [require("@tailwindcss/typography"), require("./tailwindPlugins/wordSpacingPlugin.cjs")],
+	plugins: [
+		require("@tailwindcss/typography"),
+		require("./tailwindPlugins/wordSpacingPlugin.cjs"),
+		require("@tailwindcss/line-clamp"),
+	],
 }
 
 module.exports = config

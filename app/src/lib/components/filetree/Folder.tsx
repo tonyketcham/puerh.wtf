@@ -68,7 +68,7 @@ export default function Folder({
 			>
 				<ExpandCollapseIcon expanded={expanded} />
 				<FolderIcon />
-				<p className="font-sans text-sm text-white/60 group-hover:text-white">{title}</p>
+				<p className="text-sm leading-4 text-white/60 group-hover:text-white">{title}</p>
 			</div>
 			{expanded && (
 				<ul className="py-1">

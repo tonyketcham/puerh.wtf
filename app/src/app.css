@@ -5,6 +5,7 @@
 body {
 	@apply bg-background selection:bg-tea-soup-500/60 selection:text-black;
 	@apply transition-opacity duration-75 ease-in-out;
+	@apply font-fira-code text-white;
 }
 
 .background-box {
@@ -27,4 +28,12 @@ body {
 
 .image-zoom {
 	@apply hover:scale-110 transform-gpu transition-transform;
+}
+
+.simplebar-scrollbar::before {
+	@apply bg-white/40 w-1.5;
+}
+
+.simplebar-track.simplebar-vertical {
+	@apply w-3;
 }

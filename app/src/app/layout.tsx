@@ -33,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
 	return (
 		<html lang="en">
-			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable} font-sans`}>
+			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<div className="relative flex flex-row">
 					<NavSidebar sessions={sessions} vendors={vendors} categories={categories} />
 					<main className="ml-[340px] w-full">{children}</main>

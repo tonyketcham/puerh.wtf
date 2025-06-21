@@ -1,10 +1,7 @@
 import { getSession, getSessions } from "@/lib/api"
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import RadarChart from "@/lib/components/dataviz/radar/RadarChart"
-import Panel from "@/lib/components/containers/Panel"
-import DetailsListItem from "@/lib/components/DetailsListItem"
-import { GiSteam, GiLips, GiNoseSide } from "react-icons/gi"
+import SessionProperties from "@/lib/components/SessionProperties"
 
 interface SessionPageProps {
 	params: {
@@ -56,33 +53,7 @@ export default async function SessionPage({ params }: SessionPageProps) {
 					/>
 				</div>
 
-				<aside className="col-span-4 space-y-8">
-					<Panel>
-						<h2 className="mb-4 text-lg font-fira-code">Flavor Profile</h2>
-						{session.flavor_axes && <RadarChart data={session.flavor_axes} />}
-					</Panel>
-
-					<Panel>
-						<h2 className="mb-4 text-lg font-fira-code">Notes</h2>
-						<ul className="space-y-4">
-							<DetailsListItem
-								icon={<GiNoseSide />}
-								title="Dry Leaf"
-								value={session.notes.dry_leaf_nose}
-							/>
-							<DetailsListItem
-								icon={<GiSteam />}
-								title="Wet Leaf"
-								value={session.notes.wet_leaf_nose}
-							/>
-							<DetailsListItem
-								icon={<GiLips />}
-								title="Mouthfeel"
-								value={session.notes.mouthfeel}
-							/>
-						</ul>
-					</Panel>
-				</aside>
+				<SessionProperties session={session} />
 			</div>
 		</main>
 	)

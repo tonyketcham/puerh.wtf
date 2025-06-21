@@ -8,5 +8,8 @@
         "graphql": "^16.0.1"
       }
     }
+  },
+  "dependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4"
   }
 }

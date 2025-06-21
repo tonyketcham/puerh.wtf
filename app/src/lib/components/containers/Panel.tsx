@@ -28,7 +28,7 @@ export default function Panel({ id = "", children, header }: PanelProps) {
 	return (
 		<section
 			id={id}
-			className={`flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-white/5 box-border bg-heicha-700 backdrop-brightness-50 backdrop-blur-[48px] transition-opacity duration-200 ease-in-out ${
+			className={`flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-heicha-500 box-border bg-heicha-700 backdrop-brightness-50 backdrop-blur-[48px] transition-opacity duration-200 ease-in-out ${
 				isDragging ? "bg-opacity-80 border-white/30" : "bg-opacity-40"
 			}`}
 			style={{
@@ -40,7 +40,7 @@ export default function Panel({ id = "", children, header }: PanelProps) {
 				<div
 					ref={handleRef}
 					className={`bg-heicha-600/5 py-3 px-4 border-b cursor-grab pointer-events-auto ${
-						isDragging ? "cursor-grabbing border-white/30" : "cursor-grab border-white/5"
+						isDragging ? "cursor-grabbing border-white/30" : "cursor-grab border-heicha-500"
 					}`}
 					onMouseDown={handleMouseDown}
 					onMouseUp={handleMouseUp}

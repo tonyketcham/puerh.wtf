@@ -4,21 +4,11 @@ interface DetailsListItemProps {
 	icon: React.ReactNode
 	title: string
 	value: string
-	alignment?: "center" | "start" | "end"
-	flexDirection?: "row" | "col"
 }
 
-export default function DetailsListItem({
-	icon,
-	title,
-	value,
-	alignment = "center",
-	flexDirection = "row",
-}: DetailsListItemProps) {
+export default function DetailsListItem({ icon, title, value }: DetailsListItemProps) {
 	return (
-		<li
-			className={`flex flex-${flexDirection} justify-between w-full space-x-2 place-items-${alignment}`}
-		>
+		<li className="flex flex-col justify-between w-full space-y-2">
 			<div className="flex items-center space-x-2">
 				{icon}
 				<span className="font-fira-code text-brand">{title}</span>
