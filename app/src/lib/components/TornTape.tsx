@@ -72,6 +72,26 @@ export default function TornTape({ seed, color }: TornTapeProps) {
 		<>
 			<svg className="absolute w-0 h-0">
 				<filter id={`tape-texture-${seed}`}>
+					{/* Create a bevel highlight from the alpha channel */}
+					<feGaussianBlur in="SourceAlpha" stdDeviation="0.75" result="blurredAlpha" />
+					<feSpecularLighting
+						in="blurredAlpha"
+						surfaceScale="3"
+						specularConstant="0.5"
+						specularExponent="15"
+						lightingColor="#fff"
+						result="specularLighting"
+					>
+						<feDistantLight azimuth="225" elevation="15" />
+					</feSpecularLighting>
+					<feComposite
+						in="specularLighting"
+						in2="SourceAlpha"
+						operator="in"
+						result="bevelHighlight"
+					/>
+
+					{/* Create the fibrous texture */}
 					<feTurbulence
 						type="fractalNoise"
 						baseFrequency="0.1 0.4"
@@ -79,15 +99,34 @@ export default function TornTape({ seed, color }: TornTapeProps) {
 						result="noise"
 						seed={prng()}
 					/>
-					<feDiffuseLighting in="noise" lightingColor="white" surfaceScale="1">
+					<feDiffuseLighting
+						in="noise"
+						lightingColor="white"
+						surfaceScale="1"
+						result="diffuseTexture"
+					>
 						<feDistantLight azimuth="45" elevation="30" />
 					</feDiffuseLighting>
+
+					{/* Combine texture with original color */}
 					<feComposite
 						in="SourceGraphic"
-						in2="diffuse"
+						in2="diffuseTexture"
 						operator="arithmetic"
 						k1="0.5"
 						k2="0.5"
+						k3="0"
+						k4="0"
+						result="texturedGraphic"
+					/>
+
+					{/* Add the bevel highlight on top */}
+					<feComposite
+						in="texturedGraphic"
+						in2="bevelHighlight"
+						operator="arithmetic"
+						k1="1"
+						k2="1"
 						k3="0"
 						k4="0"
 					/>
