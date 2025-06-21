@@ -1,0 +1,6 @@
+---
+description: When installing a new package or running services
+globs: 
+alwaysApply: false
+---
+This repository is a monorepo with `app/` and `log/` packages. If installing or running commands, you may need to target the appropriate package, likely where the current context is. Anything like "CMS" or the "Log" backend will mean you must work inside the `log/` package. If you attempt to add new packages to `app/`, do so by `pnpm --filter puerh.wtf <command>`

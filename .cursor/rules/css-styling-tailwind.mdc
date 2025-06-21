@@ -1,0 +1,8 @@
+---
+description: 
+globs: *.tsx,*.css,*.scss
+alwaysApply: false
+---
+If the code relates to a React Component, prefer using Tailwind. If that is not sufficient, use a style attribute. Only after that use CSS.
+
+Only add a dynamic class/variant if it makes sense to do so, otherwise extend the tailwind config. 

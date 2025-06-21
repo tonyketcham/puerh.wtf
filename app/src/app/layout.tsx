@@ -4,6 +4,7 @@ import localFont from "next/font/local"
 import "../app.css"
 import NavSidebar from "@/lib/components/NavSidebar"
 import { getSessions, getVendors, getCategories } from "@/lib/api"
+import GenreLegend from "@/lib/components/GenreLegend"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -36,8 +37,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<div className="relative flex flex-row">
 					<NavSidebar sessions={sessions} vendors={vendors} categories={categories} />
-					<main className="ml-[340px] w-full">{children}</main>
+					<div className="flex flex-col w-full ml-[340px]">
+						<GenreLegend categories={categories} />
+						<main className="w-full p-8">{children}</main>
+					</div>
 				</div>
+				<div id="portal-root" />
 			</body>
 		</html>
 	)
