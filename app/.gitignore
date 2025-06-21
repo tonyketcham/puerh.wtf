@@ -1,8 +1,32 @@
-.DS_Store
-node_modules
-/build
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnpm
+/pnpm-lock.yaml
+
+# sveltekit
 /.svelte-kit
-/package
-.env.*
+/build
+
+# nextjs
+/.next/
+/out/
+
+# misc
+.DS_Store
+*.log
+.env
+.env*.local
 !.env.example
-vue
+*.tgz
+*.tsbuildinfo
+
+# vercel
+.vercel
+
+# testing
+/coverage
+
+# vue
+/vue

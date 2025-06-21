@@ -1,38 +1,53 @@
-# create-svelte
+# puerh.wtf - Next.js Migration
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This is the Next.js version of puerh.wtf, migrated from SvelteKit 1.0.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Static Site Generation (SSG)** - All pages are pre-rendered at build time
+- **Flatbread CMS** - Headless CMS for content management
+- **TypeScript** - Full type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **Responsive Design** - Mobile-first approach
 
-```bash
-# create a new project in the current directory
-npm init svelte
+## Getting Started
 
-# create a new project in my-app
-npm init svelte my-app
-```
+1. Install dependencies:
 
-## Developing
+   ```bash
+   pnpm install
+   ```
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+2. Start the development server:
 
-```bash
-npm run dev
+   ```bash
+   pnpm dev
+   ```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+3. Build for production:
+   ```bash
+   pnpm build
+   ```
 
-## Building
+## Project Structure
 
-To create a production version of your app:
+- `src/app/` - Next.js App Router pages and layouts
+- `src/lib/` - Shared utilities, components, and types
+- `content/` - Flatbread CMS content (unchanged from original)
+- `static/` - Static assets (unchanged from original)
 
-```bash
-npm run build
-```
+## Migration Notes
 
-You can preview the production build with `npm run preview`.
+- Converted all Svelte components to React components
+- Replaced SvelteKit API routes with Next.js API functions
+- Maintained the same visual design and functionality
+- Preserved all content and Flatbread configuration
+- Updated build system to use Next.js instead of Vite
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Environment Variables
+
+- `FLATBREAD_URL` - URL for the Flatbread GraphQL endpoint (defaults to `http://localhost:3001/graphql`)
+
+## Development
+
+The development server will start on `http://localhost:3000` by default. Make sure Flatbread is running on port 3001 for content to load properly.

@@ -1,4 +1,4 @@
-import type { TreeNode } from '$lib/types/tree';
+import type { TreeNode } from '../types/tree';
 import plur from 'plur';
 
 function formatDate(date: Date) {
