@@ -46,4 +46,4 @@ const config = {
 	plugins: [require("./tailwindPlugins/wordSpacingPlugin.cjs")],
 }
 
-module.exports = config
+export default config

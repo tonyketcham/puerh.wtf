@@ -1,5 +1,7 @@
 [build]
-publish = "build"
+command = "pnpm build"
+publish = "out"
 
 [build.environment]
-NPM_FLAGS = "--version"
+NODE_VERSION = "20"
+PNPM_FLAGS = "--frozen-lockfile"

@@ -2,6 +2,11 @@
   "name": "puerh.wtf-monorepo",
   "private": true,
   "version": "0.0.0",
+  "scripts": {
+    "dev": "pnpm --filter app dev",
+    "build": "pnpm --filter app build && pnpm --filter log build",
+    "test": "pnpm --filter app test"
+  },
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {

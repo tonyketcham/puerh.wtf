@@ -1,6 +1,6 @@
 import type { SessionFull } from "../types/session"
 import RadarChart from "./dataviz/radar/RadarChart"
-import DetailsListItem from "./DetailsListItem"
+import DetailListEntry from "./DetailListEntry"
 import PartitionedDivider from "./PartitionedDivider"
 import TeaStyleBadge from "./TeaStyleBadge"
 
@@ -31,10 +31,10 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 					<section>
 						<h3 className="my-4 text-sm text-tea-soup-400">💽 deets</h3>
 						<ul className="w-full space-y-2">
-							<DetailsListItem label="excerpt" alignment="start">
+							<DetailListEntry label="excerpt" alignment="start">
 								<p className="text-right">{session.excerpt}</p>
-							</DetailsListItem>
-							<DetailsListItem label="logged_on">
+							</DetailListEntry>
+							<DetailListEntry label="logged_on">
 								<time>
 									{new Intl.DateTimeFormat("default", {
 										year: "numeric",
@@ -44,7 +44,7 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 										minute: "numeric",
 									}).format(new Date(session.date))}
 								</time>
-							</DetailsListItem>
+							</DetailListEntry>
 
 							{(session.style ||
 								session.production_year ||
@@ -52,7 +52,7 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 								session.elevation ||
 								session.aging_conditions) && <PartitionedDivider />}
 							{session.style && session.style.length > 0 && (
-								<DetailsListItem label="style" alignment="start">
+								<DetailListEntry label="style" alignment="start">
 									<div className="w-2/3 space-y-0.5 text-right">
 										{session.style.map((genre) => (
 											<TeaStyleBadge
@@ -62,32 +62,32 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 											/>
 										))}
 									</div>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 							{session.production_year && (
-								<DetailsListItem label="production_year">
+								<DetailListEntry label="production_year">
 									<span>{session.production_year}</span>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 							{session.season && (
-								<DetailsListItem label="season">
+								<DetailListEntry label="season">
 									<span>{session.season}</span>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 							{session.elevation && (
-								<DetailsListItem label="elevation">
+								<DetailListEntry label="elevation">
 									<span>{session.elevation}m</span>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 							{session.aging_conditions && (
-								<DetailsListItem label="aging" alignment="start">
+								<DetailListEntry label="aging" alignment="start">
 									<span className="text-right">{session.aging_conditions}</span>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 
 							{(session.vendor || session.purchase_link) && <PartitionedDivider />}
 							{session.vendor && (
-								<DetailsListItem label="vendor">
+								<DetailListEntry label="vendor">
 									<div className="flex flex-row space-x-2 truncate place-items-center">
 										{session.vendor[0].image && (
 											<img
@@ -98,10 +98,10 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 										)}
 										<span className="truncate">{session.vendor[0].title}</span>
 									</div>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 							{session.purchase_link && (
-								<DetailsListItem label="purchase">
+								<DetailListEntry label="purchase">
 									<div className="flex flex-row space-x-2 truncate place-items-center">
 										<a
 											href={formatUrlReference(session.purchase_link, "ref=puerhwtf")}
@@ -111,7 +111,7 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 											{extractHostname(session.purchase_link)}
 										</a>
 									</div>
-								</DetailsListItem>
+								</DetailListEntry>
 							)}
 						</ul>
 					</section>
@@ -123,9 +123,9 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 						<h3 className="my-4 text-sm text-tea-soup-400">📓 notes</h3>
 						<ul className="w-full space-y-2">
 							{Object.entries(session.notes).map(([label, description]) => (
-								<DetailsListItem key={label} label={label} alignment="start">
+								<DetailListEntry key={label} label={label} alignment="start">
 									<span className="w-7/12 text-left">{description}</span>
-								</DetailsListItem>
+								</DetailListEntry>
 							))}
 						</ul>
 					</section>
