@@ -1,10 +1,11 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
+import type { PlaywrightTestConfig } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
 	webServer: {
-		command: 'pnpm build && pnpm preview',
-		port: 3000
-	}
-};
+		command: "pnpm dev",
+		port: 3000,
+		reuseExistingServer: !process.env.CI,
+	},
+}
 
-export default config;
+export default config

@@ -4,9 +4,10 @@ import type { SessionFlavorAxes } from "../../../types/session"
 
 interface RadarChartProps {
 	data: SessionFlavorAxes
+	recordingKey?: string
 }
 
-export default function RadarChart({ data }: RadarChartProps) {
+export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 	// Use viewBox for responsive SVG - increased size to accommodate labels
 	const viewBoxSize = 380
 	const centerX = viewBoxSize / 2
@@ -45,6 +46,7 @@ export default function RadarChart({ data }: RadarChartProps) {
 				viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
 				className="w-full h-full"
 				preserveAspectRatio="xMidYMid meet"
+				data-recording-key={recordingKey}
 			>
 				{/* Background circles - multiple concentric circles */}
 				{[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, i) => (
