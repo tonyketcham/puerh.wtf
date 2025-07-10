@@ -41,13 +41,13 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 						portal
 						anchor={{ to: "top", gap: 8 }}
 						modal={false}
-						className="flex flex-col p-2 space-y-1 overflow-y-auto rounded-2xl w-max max-h-[60svh] border border-heicha-500 bg-heicha-700/90 backdrop-blur-md outline-none"
+						className="flex flex-col p-2 space-y-1 overflow-y-auto rounded-2xl w-max max-h-[60svh] border border-heicha-500 bg-heicha-700/90 backdrop-blur-md outline-hidden"
 					>
 						{categories.map((category) => (
 							<ListboxOption
 								key={category._slug}
 								value={category}
-								className="flex items-center px-3 py-1.5 rounded-md transition-colors group cursor-pointer data-[selected]:bg-heicha-500/20 text-xs hover:bg-white/10 data-[focus]:bg-white/10 data-[active]:bg-white/10"
+								className="flex items-center px-3 py-1.5 rounded-md transition-colors group cursor-pointer data-selected:bg-heicha-500/20 text-xs hover:bg-white/10 data-focus:bg-white/10 data-active:bg-white/10"
 							>
 								{({ selected }) => (
 									<>
@@ -57,7 +57,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 												backgroundColor: category.color,
 											}}
 										/>
-										<span className="flex-grow ml-2 font-mono text-sm truncate transition-colors text-white/60 group-hover:text-white/90">
+										<span className="grow ml-2 font-mono text-sm truncate transition-colors text-white/60 group-hover:text-white/90">
 											{category.title}
 										</span>
 										{selected && <Check className="w-4 h-4" />}

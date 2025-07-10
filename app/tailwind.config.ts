@@ -35,9 +35,6 @@ const config = {
 				lg: "0 4px 8px rgba(0, 0, 0, 0.3)",
 				"2xl": "1px 2px 0px rgba(0,0,0,0.6)",
 			},
-			wordSpacing: {
-				9: "0.25rem",
-			},
 			lineHeight: {
 				"extra-tight": "1.13703",
 			},
@@ -46,6 +43,7 @@ const config = {
 			},
 		},
 	},
+	plugins: [require("./tailwindPlugins/wordSpacingPlugin.cjs")],
 }
 
 module.exports = config

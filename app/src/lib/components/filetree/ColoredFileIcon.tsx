@@ -10,7 +10,7 @@ export default function ColoredFileIcon({ color = "white" }: ColoredFileIconProp
 			viewBox="0 0 16 16"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			className="mt-0.5 w-4 h-4 text-bai-cha-50 flex-shrink-0"
+			className="mt-0.5 w-4 h-4 text-bai-cha-50 shrink-0"
 			style={{ color }}
 		>
 			<path

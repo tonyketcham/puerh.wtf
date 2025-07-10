@@ -28,7 +28,7 @@ export default function Panel({ id = "", children, header }: PanelProps) {
 	return (
 		<section
 			id={id}
-			className={`flex flex-col w-full flex-grow overflow-hidden h-full rounded-2xl border border-heicha-500 box-border bg-heicha-700 backdrop-brightness-50 backdrop-blur-[48px] transition-opacity duration-200 ease-in-out ${
+			className={`flex flex-col w-full grow overflow-hidden h-full rounded-2xl border border-heicha-500 box-border bg-heicha-700 backdrop-brightness-50 backdrop-blur-[48px] transition-opacity duration-200 ease-in-out ${
 				isDragging ? "bg-opacity-80 border-white/30" : "bg-opacity-40"
 			}`}
 			style={{

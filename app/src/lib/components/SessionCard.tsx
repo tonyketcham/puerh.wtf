@@ -15,7 +15,7 @@ export default function SessionCard({ session }: SessionCardProps) {
 				href={buildLink(session)}
 				className="relative z-0 flex flex-col overflow-hidden divide-y-2 rounded-2xl bg-heicha-700 bg-opacity-40 lg:flex-row lg:divide-y-0 lg:divide-x-2 divide-white/5"
 			>
-				<div className="flex-shrink-0 w-full h-32 overflow-hidden lg:w-40">
+				<div className="shrink-0 w-full h-32 overflow-hidden lg:w-40">
 					<img
 						src={session.images?.[0]?.image}
 						alt={session.images?.[0]?.alt}

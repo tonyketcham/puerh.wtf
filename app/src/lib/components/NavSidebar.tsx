@@ -20,7 +20,7 @@ export default function NavSidebar({ sessions, vendors, categories }: NavSidebar
 			<SiteHeader />
 
 			{/* The actual sidebar panel. Make this interactive. */}
-			<div className="relative flex flex-col flex-grow min-h-0 overflow-hidden border shadow-lg pointer-events-auto rounded-2xl border-heicha-500">
+			<div className="relative flex flex-col grow min-h-0 overflow-hidden border shadow-lg pointer-events-auto rounded-2xl border-heicha-500">
 				{/* Background Element */}
 				<div className="absolute inset-0 bg-[rgba(45,40,45,0.35)] backdrop-blur-xl" />
 
