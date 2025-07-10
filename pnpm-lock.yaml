@@ -29,6 +29,9 @@ importers:
       layercake:
         specifier: ^7.1.0
         version: 7.6.1(svelte@4.2.20)(typescript@4.7.4)
+      lucide-react:
+        specifier: ^0.522.0
+        version: 0.522.0(react@18.3.1)
       motion:
         specifier: ^12.18.1
         version: 12.18.1(@emotion/is-prop-valid@0.8.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3312,6 +3315,11 @@ packages:
   lru-cache@7.13.2:
     resolution: {integrity: sha512-VJL3nIpA79TodY/ctmZEfhASgqekbT574/c4j3jn4bKXbSCnTTCH/KltZyvL2GlV+tGSMtsWyem8DCX7qKTMBA==}
     engines: {node: '>=12'}
+
+  lucide-react@0.522.0:
+    resolution: {integrity: sha512-jnJbw974yZ7rQHHEFKJOlWAefG3ATSCZHANZxIdx8Rk/16siuwjgA4fBULpXEAWx/RlTs3FzmKW/udWUuO0aRw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
@@ -9255,6 +9263,10 @@ snapshots:
   lru-cache@7.13.1: {}
 
   lru-cache@7.13.2: {}
+
+  lucide-react@0.522.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   magic-string@0.30.17:
     dependencies:

@@ -13,7 +13,7 @@ export default function Portal({ children }: PortalProps) {
 
 	useEffect(() => {
 		setMounted(true)
-		setPortalContainer(document.getElementById("portal-root"))
+		setPortalContainer(document.getElementById("portal-top-fixed"))
 	}, [])
 
 	return mounted && portalContainer ? createPortal(children, portalContainer) : null

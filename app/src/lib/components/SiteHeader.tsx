@@ -17,7 +17,7 @@ export default function SiteHeader() {
 				<a
 					aria-label="source code"
 					href="https://github.com/tonyketcham/puerh.wtf"
-					className="outline-none pointer-events-auto size-6 focus:outline-none"
+					className="w-6 outline-none pointer-events-auto focus:outline-none"
 				>
 					<Github />
 				</a>
@@ -25,7 +25,7 @@ export default function SiteHeader() {
 				<a
 					aria-label="puerh.wtf instagram"
 					href="https://instagram.com/puerh.wtf/"
-					className="outline-none pointer-events-auto size-6 focus:outline-none"
+					className="w-6 outline-none pointer-events-auto focus:outline-none"
 				>
 					<Instagram />
 				</a>
