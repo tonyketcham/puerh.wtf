@@ -1,4 +1,4 @@
-const plugin = require('tailwindcss/plugin');
+const plugin = require("tailwindcss/plugin")
 
 const positiveWordSpacing = {
 	1: 0.25,
@@ -10,41 +10,38 @@ const positiveWordSpacing = {
 	7: 1.75,
 	8: 2,
 	9: 2.25,
-	10: 2.5
-};
+	10: 2.5,
+}
 
 const negativeWordSpacing = Object.entries(positiveWordSpacing).reduce(
 	(acc, [key, value]) => ({
 		...acc,
-		[`-${key}`]: value * -1
+		[`-${key}`]: value * -1,
 	}),
 	{}
-);
+)
 
 const wordSpacing = plugin(
 	function ({ matchUtilities, theme }) {
-		const values = theme('wordSpacing');
+		const values = theme("wordSpacing")
 
 		matchUtilities(
 			{
-				'word-spacing': (value) => ({
-					'word-spacing': `${value}rem`
-				})
+				"word-spacing": (value) => ({
+					"word-spacing": `${value}rem`,
+				}),
 			},
 			{ values }
-		);
+		)
 	},
 	{
 		theme: {
 			wordSpacing: {
 				...negativeWordSpacing,
-				...positiveWordSpacing
-			}
+				...positiveWordSpacing,
+			},
 		},
-		variants: {
-			wordSpacing: ['responsive']
-		}
 	}
-);
+)
 
-module.exports = wordSpacing;
+module.exports = wordSpacing
