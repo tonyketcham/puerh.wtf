@@ -46,11 +46,6 @@ const config = {
 			},
 		},
 	},
-	plugins: [
-		require("@tailwindcss/typography"),
-		require("./tailwindPlugins/wordSpacingPlugin.cjs"),
-		require("@tailwindcss/line-clamp"),
-	],
 }
 
 module.exports = config
