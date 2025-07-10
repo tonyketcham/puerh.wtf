@@ -1,13 +1,17 @@
+import { cn } from "@/lib/utils"
+
 interface PanelSectionProps {
 	title: string
 	children: React.ReactNode
 	hasBottomBorder?: boolean
+	hasPadding?: boolean
 }
 
 export default function PanelSection({
 	title,
 	children,
 	hasBottomBorder = false,
+	hasPadding = true,
 }: PanelSectionProps) {
 	return (
 		<div className="relative">
@@ -16,7 +20,9 @@ export default function PanelSection({
 					<h2 className="text-sm font-medium text-white/80">{title}</h2>
 				</div>
 			</div>
-			<div className={`p-4 ${hasBottomBorder ? "border-b border-heicha-500" : ""}`}>{children}</div>
+			<div className={cn(hasPadding && "p-4", hasBottomBorder && "border-b border-heicha-500")}>
+				{children}
+			</div>
 		</div>
 	)
 }

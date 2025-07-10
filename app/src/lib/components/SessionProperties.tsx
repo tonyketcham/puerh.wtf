@@ -164,7 +164,7 @@ const noteDisplayConfig: Record<keyof SessionNotes, { title: string; icon: React
 export default function SessionProperties({ session }: SessionPropertiesProps) {
 	return (
 		<aside className="fixed inset-y-0 right-0 flex flex-col w-[340px] h-full p-8 space-y-10 pointer-events-none font-fira-code">
-			<div className="relative flex flex-col grow min-h-0 overflow-hidden border shadow-lg pointer-events-auto rounded-2xl border-heicha-500">
+			<div className="relative flex flex-col min-h-0 overflow-hidden border shadow-lg pointer-events-auto grow rounded-2xl border-heicha-500">
 				<div className="absolute inset-0 bg-sidebar backdrop-blur-xl" />
 				{/* Content Wrapper */}
 				<div className="relative flex flex-col h-full">
@@ -174,7 +174,7 @@ export default function SessionProperties({ session }: SessionPropertiesProps) {
 							height: "100cqh",
 						}}
 					>
-						<PanelSection title="Flavor Profile" hasBottomBorder>
+						<PanelSection title="Flavor Profile" hasBottomBorder hasPadding={false}>
 							{session.flavor_axes && <RadarChart data={session.flavor_axes} />}
 						</PanelSection>
 
