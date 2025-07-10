@@ -6,6 +6,9 @@ const config: PlaywrightTestConfig = {
 		port: 3000,
 		reuseExistingServer: !process.env.CI,
 	},
+	use: {
+		baseURL: "http://localhost:3000",
+	},
 }
 
 export default config

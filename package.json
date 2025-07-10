@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "pnpm --filter app dev",
-    "build": "pnpm --filter app build && pnpm --filter log build",
-    "test": "pnpm --filter app test"
+    "dev": "pnpm --filter puerh.wtf dev",
+    "build": "pnpm --filter puerh.wtf build && pnpm --filter log build",
+    "test": "pnpm --filter puerh.wtf test"
   },
   "pnpm": {
     "peerDependencyRules": {

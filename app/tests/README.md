@@ -25,7 +25,7 @@ await radarChart.expectToBeVisible()
 
 ### Test Page Wrapper
 
-The `TestPageWrapper` component ensures test pages are only rendered in development mode:
+The `TestPageWrapper` component ensures test pages are only rendered in appropriate environments:
 
 ```tsx
 import TestPageWrapper from "@/lib/components/TestPageWrapper"
@@ -35,7 +35,14 @@ export default function MyTestPage() {
 }
 ```
 
-In production, test pages will show a 404 message instead of the test content.
+**Environment Behavior:**
+
+- ✅ **Development**: Test pages render normally (`NODE_ENV=development`)
+- ✅ **CI Testing**: Test pages render normally (`CI=true`)
+- ✅ **Local Testing**: Test pages render normally (`NODE_ENV=test`)
+- ❌ **Production**: Test pages show 404 message (prevents accidental deployment)
+
+This ensures test pages are accessible during development and testing but are safely hidden in production deployments.
 
 ### Page Object Model
 
@@ -64,13 +71,41 @@ await radarChart.takeScreenshot("screenshot-name.png")
 
 ### Running Tests
 
+#### Local Testing
+
 ```bash
 # Run all tests
-npm run test
+pnpm test
 
 # Run specific test file
 npx playwright test tests/radar-chart.test.ts
 
 # Run tests with UI
 npx playwright test --ui
+
+# Run tests in headed mode (with browser visible)
+npx playwright test --headed
 ```
+
+**Notes:**
+
+- For local testing, ensure no dev server is already running on ports 3000 or 5057, as Playwright will start its own server.
+- Test pages will render correctly in CI because GitHub Actions automatically sets `CI=true`.
+- For local testing with production builds, you can set `NODE_ENV=test` to ensure test pages render.
+
+#### CI Testing
+
+Tests run automatically on:
+
+- Pull requests to main branch
+- Pushes to main branch
+
+The CI workflow:
+
+1. Installs dependencies
+2. Installs Playwright browsers
+3. Builds the app
+4. Runs all tests
+5. Uploads test results and reports as artifacts
+
+Test results and HTML reports are available as downloadable artifacts in the GitHub Actions workflow runs.

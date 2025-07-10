@@ -27,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: cd app && pnpm build
+      - run: pnpm --filter puerh.wtf build
   log-build:
     strategy:
       fail-fast: false
@@ -46,4 +46,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: cd log && pnpm build
+      - run: pnpm --filter log build

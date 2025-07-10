@@ -5,8 +5,11 @@ interface TestPageWrapperProps {
 }
 
 export default function TestPageWrapper({ children }: TestPageWrapperProps) {
-	// Only render test pages in development mode
-	if (process.env.NODE_ENV === "production") {
+	// Allow test pages in development mode OR when running tests (CI or local)
+	const isTestEnvironment = process.env.NODE_ENV === "test" || process.env.CI === "true"
+	const isDevelopment = process.env.NODE_ENV === "development"
+
+	if (process.env.NODE_ENV === "production" && !isTestEnvironment) {
 		return (
 			<div className="flex items-center justify-center min-h-screen p-8 bg-gray-900">
 				<div className="text-center">
