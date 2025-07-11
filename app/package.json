@@ -5,9 +5,9 @@
 		"preinstall": "npx only-allow pnpm",
 		"dev": "flatbread start -- next dev",
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
-		"build": "flatbread start -X npx -- next build",
+		"build": "./scripts/build-with-exit-code.sh flatbread start -X npx -- next build",
 		"start": "next start",
-		"test": "flatbread start -- playwright test",
+		"test": "./scripts/build-with-exit-code.sh flatbread start -- playwright test",
 		"lint": "next lint",
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
