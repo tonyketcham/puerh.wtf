@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { SessionFlavorAxes } from "../../../types/session"
 
 interface RadarChartProps {
@@ -19,6 +19,20 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 	const axes = Object.keys(data)
 	const angleSlice = (Math.PI * 2) / axes.length
 	const svgRef = useRef<SVGSVGElement>(null)
+
+	// Generate randomized delay sequence for data points
+	const randomizedDelays = useMemo(() => {
+		const baseDelay = 1.0
+		const staggerIncrement = 0.1 // Faster than 0.15
+		const delays = axes.map((_, i) => baseDelay + i * staggerIncrement)
+
+		// Fisher-Yates shuffle
+		for (let i = delays.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1))
+			;[delays[i], delays[j]] = [delays[j], delays[i]]
+		}
+		return delays
+	}, [axes.length])
 
 	// Track animation completion
 	const [completedAnimations, setCompletedAnimations] = useState(new Set<string>())
@@ -197,9 +211,9 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							opacity: [0, 0.4, 1, 0.8, 1], // Flicker effect
 						}}
 						transition={{
-							duration: 0.6,
+							duration: 0.4, // Faster flicker (was 0.6)
 							ease: [0.34, 1.56, 0.64, 1], // Cyberpunk bounce
-							delay: 1.0 + i * 0.15, // Staggered activation
+							delay: randomizedDelays[i], // Randomized activation order
 						}}
 						onAnimationComplete={() => handleAnimationComplete(`data-point-${i}`)}
 						style={{
@@ -248,7 +262,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							transition={{
 								duration: 0.4,
 								ease: "easeOut",
-								delay: 1.5 + i * 0.05, // After points appear
+								delay: Math.max(...randomizedDelays) + 0.4 + i * 0.03, // After all points appear, faster stagger
 							}}
 							onAnimationComplete={() => handleAnimationComplete(`label-${i}`)}
 							style={{

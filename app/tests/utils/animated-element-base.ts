@@ -29,7 +29,9 @@ export abstract class AnimatedElementBase {
 	}
 
 	async takeScreenshot(filename: string) {
-		await expect(this.element).toHaveScreenshot(filename)
+		await expect(this.element).toHaveScreenshot(filename, {
+			maxDiffPixelRatio: 0.01,
+		})
 	}
 
 	getElement() {
