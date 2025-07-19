@@ -1,5 +1,6 @@
 "use client"
 
+import { motion } from "motion/react"
 import type { SessionFlavorAxes } from "../../../types/session"
 
 interface RadarChartProps {
@@ -50,7 +51,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 			>
 				{/* Background circles - multiple concentric circles */}
 				{[0.2, 0.4, 0.6, 0.8, 1.0].map((scale, i) => (
-					<circle
+					<motion.circle
 						key={i}
 						cx={centerX}
 						cy={centerY}
@@ -59,6 +60,23 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 						stroke="#374151"
 						strokeWidth="1"
 						opacity="0.4"
+						initial={{
+							opacity: 0,
+							scale: 0.8,
+						}}
+						animate={{
+							opacity: 0.4,
+							scale: 1,
+						}}
+						transition={{
+							duration: 0.5,
+							ease: "easeOut",
+							delay: i * 0.05, // Subtle stagger from inside out
+						}}
+						style={{
+							transformOrigin: `${centerX}px ${centerY}px`,
+							willChange: "transform, opacity",
+						}}
 					/>
 				))}
 
@@ -69,7 +87,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 					const y2 = centerY + radius * 1.15 * Math.sin(angle)
 
 					return (
-						<line
+						<motion.line
 							key={axis}
 							x1={centerX}
 							y1={centerY}
@@ -78,16 +96,55 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							stroke="#4B5563"
 							strokeWidth="1"
 							opacity="0.6"
+							initial={{
+								pathLength: 0,
+								opacity: 0,
+							}}
+							animate={{
+								pathLength: 1,
+								opacity: 0.6,
+							}}
+							transition={{
+								duration: 0.4,
+								ease: "easeOut",
+								delay: 0.3 + i * 0.08, // Staggered draw-on effect
+							}}
+							style={{
+								willChange: "opacity",
+							}}
 						/>
 					)
 				})}
 
 				{/* Radar shape */}
-				<path d={pathData} fill="#F59E0B" fillOpacity="0.15" stroke="#F59E0B" strokeWidth="2" />
+				<motion.path
+					d={pathData}
+					fill="#F59E0B"
+					fillOpacity="0.15"
+					stroke="#F59E0B"
+					strokeWidth="2"
+					initial={{
+						scale: 0,
+						opacity: 0,
+					}}
+					animate={{
+						scale: 1,
+						opacity: 1,
+					}}
+					transition={{
+						duration: 0.8,
+						ease: [0.25, 0.1, 0.25, 1], // Sharp but smooth easing
+						delay: 0.2,
+					}}
+					style={{
+						transformOrigin: `${centerX}px ${centerY}px`,
+						willChange: "transform, opacity",
+					}}
+				/>
 
 				{/* Data points */}
 				{points.map((point, i) => (
-					<circle
+					<motion.circle
 						key={i}
 						cx={point.x}
 						cy={point.y}
@@ -95,6 +152,23 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 						fill="#F59E0B"
 						stroke="#1F2937"
 						strokeWidth="2"
+						initial={{
+							scale: 0,
+							opacity: 0,
+						}}
+						animate={{
+							scale: [0, 1.3, 1], // Slight overshoot for impact
+							opacity: [0, 0.4, 1, 0.8, 1], // Flicker effect
+						}}
+						transition={{
+							duration: 0.6,
+							ease: [0.34, 1.56, 0.64, 1], // Cyberpunk bounce
+							delay: 1.0 + i * 0.15, // Staggered activation
+						}}
+						style={{
+							transformOrigin: `${point.x}px ${point.y}px`,
+							willChange: "transform, opacity",
+						}}
 					/>
 				))}
 
@@ -116,7 +190,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 					}
 
 					return (
-						<text
+						<motion.text
 							key={axis}
 							x={x}
 							y={y}
@@ -126,9 +200,25 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							opacity="0.9"
 							dy="0.35em"
 							className="font-medium"
+							initial={{
+								opacity: 0,
+								y: 10, // Use transform y instead of SVG y
+							}}
+							animate={{
+								opacity: 0.9,
+								y: 0,
+							}}
+							transition={{
+								duration: 0.4,
+								ease: "easeOut",
+								delay: 1.5 + i * 0.05, // After points appear
+							}}
+							style={{
+								willChange: "opacity, transform",
+							}}
 						>
 							{axis}
-						</text>
+						</motion.text>
 					)
 				})}
 			</svg>
