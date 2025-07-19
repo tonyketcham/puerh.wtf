@@ -12,6 +12,9 @@ test.describe("RadarChart Component", () => {
 		// Wait for the radar chart to load
 		await radarChart.waitForLoad()
 
+		// Wait for all animations to complete before testing
+		await radarChart.waitForAnimationsComplete()
+
 		// Check that the radar chart SVG container exists
 		await radarChart.expectToBeVisible()
 
@@ -42,7 +45,7 @@ test.describe("RadarChart Component", () => {
 		// Check that axis lines are present
 		await radarChart.expectAxisLinesCount(10)
 
-		// Visual regression test - take screenshot
+		// Visual regression test - take screenshot after animations complete
 		await radarChart.takeScreenshot("radar-chart-max-values.png")
 	})
 
@@ -56,13 +59,16 @@ test.describe("RadarChart Component", () => {
 		// Wait for the radar chart to load
 		await radarChart.waitForLoad()
 
+		// Wait for all animations to complete before testing
+		await radarChart.waitForAnimationsComplete()
+
 		// Check that the radar chart SVG container exists
 		await radarChart.expectToBeVisible()
 
 		// Check that data points are at center (all values 0)
 		await radarChart.expectDataPointsCount(10)
 
-		// Visual regression test - take screenshot
+		// Visual regression test - take screenshot after animations complete
 		await radarChart.takeScreenshot("radar-chart-min-values.png")
 	})
 
@@ -82,6 +88,12 @@ test.describe("RadarChart Component", () => {
 		await mixedRadarChart.waitForLoad()
 		await singleRadarChart.waitForLoad()
 
+		// Wait for all animations to complete on all charts
+		await maxRadarChart.waitForAnimationsComplete()
+		await minRadarChart.waitForAnimationsComplete()
+		await mixedRadarChart.waitForAnimationsComplete()
+		await singleRadarChart.waitForAnimationsComplete()
+
 		// Test that all charts are visible
 		await maxRadarChart.expectToBeVisible()
 		await minRadarChart.expectToBeVisible()
@@ -100,7 +112,7 @@ test.describe("RadarChart Component", () => {
 		await mixedRadarChart.expectBackgroundCirclesCount(5)
 		await singleRadarChart.expectBackgroundCirclesCount(5)
 
-		// Take screenshots of specific charts
+		// Take screenshots of specific charts after animations complete
 		await maxRadarChart.takeScreenshot("radar-chart-max-comprehensive.png")
 		await singleRadarChart.takeScreenshot("radar-chart-single-comprehensive.png")
 	})

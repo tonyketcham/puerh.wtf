@@ -1,18 +1,9 @@
-import { expect, type Page, type Locator } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
+import { AnimatedElementBase } from "./animated-element-base"
 
-export class RadarChartElement {
-	private page: Page
-	private recordingKey: string
-	private element: Locator
-
+export class RadarChartElement extends AnimatedElementBase {
 	constructor(page: Page, recordingKey: string) {
-		this.page = page
-		this.recordingKey = recordingKey
-		this.element = page.locator(`svg[data-recording-key="${recordingKey}"]`)
-	}
-
-	async waitForLoad() {
-		await this.page.waitForSelector(`svg[data-recording-key="${this.recordingKey}"]`)
+		super(page, recordingKey, "svg")
 	}
 
 	async expectToBeVisible() {
@@ -43,13 +34,5 @@ export class RadarChartElement {
 	async expectAxisLinesCount(count: number) {
 		const axisLines = this.element.locator("line")
 		await expect(axisLines).toHaveCount(count)
-	}
-
-	async takeScreenshot(filename: string) {
-		await expect(this.element).toHaveScreenshot(filename)
-	}
-
-	getElement() {
-		return this.element
 	}
 }

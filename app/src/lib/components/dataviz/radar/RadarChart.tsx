@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type { SessionFlavorAxes } from "../../../types/session"
 
 interface RadarChartProps {
@@ -17,6 +18,37 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 
 	const axes = Object.keys(data)
 	const angleSlice = (Math.PI * 2) / axes.length
+	const svgRef = useRef<SVGSVGElement>(null)
+
+	// Track animation completion
+	const [completedAnimations, setCompletedAnimations] = useState(new Set<string>())
+
+	// Calculate total number of animations:
+	// 5 graph circles + axes.length axis lines + 1 radar path + axes.length data points + axes.length labels
+	const totalAnimations = 5 + axes.length * 3 + 1
+
+	const handleAnimationComplete = useCallback((animationId: string) => {
+		setCompletedAnimations((prev) => {
+			const newSet = new Set(prev)
+			newSet.add(animationId)
+			return newSet
+		})
+	}, [])
+
+	// Reset animation tracking when data changes
+	useEffect(() => {
+		setCompletedAnimations(new Set())
+		if (svgRef.current) {
+			svgRef.current.removeAttribute("data-animations-complete")
+		}
+	}, [data])
+
+	// Set data attribute when all animations are complete
+	useEffect(() => {
+		if (completedAnimations.size === totalAnimations && svgRef.current) {
+			svgRef.current.setAttribute("data-animations-complete", "true")
+		}
+	}, [completedAnimations.size, totalAnimations])
 
 	// Convert data to points for the radar chart
 	const points = axes.map((axis, i) => {
@@ -44,6 +76,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 	return (
 		<div className="w-full h-full">
 			<svg
+				ref={svgRef}
 				viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
 				className="w-full h-full"
 				preserveAspectRatio="xMidYMid meet"
@@ -73,6 +106,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							ease: "easeOut",
 							delay: i * 0.05, // Subtle stagger from inside out
 						}}
+						onAnimationComplete={() => handleAnimationComplete(`background-circle-${i}`)}
 						style={{
 							transformOrigin: `${centerX}px ${centerY}px`,
 							willChange: "transform, opacity",
@@ -109,6 +143,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 								ease: "easeOut",
 								delay: 0.3 + i * 0.08, // Staggered draw-on effect
 							}}
+							onAnimationComplete={() => handleAnimationComplete(`axis-line-${i}`)}
 							style={{
 								willChange: "opacity",
 							}}
@@ -136,6 +171,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 						ease: [0.25, 0.1, 0.25, 1], // Sharp but smooth easing
 						delay: 0.2,
 					}}
+					onAnimationComplete={() => handleAnimationComplete("radar-path")}
 					style={{
 						transformOrigin: `${centerX}px ${centerY}px`,
 						willChange: "transform, opacity",
@@ -165,6 +201,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 							ease: [0.34, 1.56, 0.64, 1], // Cyberpunk bounce
 							delay: 1.0 + i * 0.15, // Staggered activation
 						}}
+						onAnimationComplete={() => handleAnimationComplete(`data-point-${i}`)}
 						style={{
 							transformOrigin: `${point.x}px ${point.y}px`,
 							willChange: "transform, opacity",
@@ -213,6 +250,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 								ease: "easeOut",
 								delay: 1.5 + i * 0.05, // After points appear
 							}}
+							onAnimationComplete={() => handleAnimationComplete(`label-${i}`)}
 							style={{
 								willChange: "opacity, transform",
 							}}
