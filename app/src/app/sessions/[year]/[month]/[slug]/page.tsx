@@ -4,11 +4,11 @@ import Image from "next/image"
 import SessionProperties from "@/lib/components/SessionProperties"
 
 interface SessionPageProps {
-	params: {
+	params: Promise<{
 		year: string
 		month: string
 		slug: string
-	}
+	}>
 }
 
 export async function generateStaticParams() {
@@ -23,14 +23,15 @@ export async function generateStaticParams() {
 	})
 }
 
-export default async function SessionPage({ params }: SessionPageProps) {
-	const session = await getSession(params.slug)
+export default async function SessionPage(props: SessionPageProps) {
+    const params = await props.params;
+    const session = await getSession(params.slug)
 
-	if (!session) {
+    if (!session) {
 		notFound()
 	}
 
-	return (
+    return (
 		<main className="flex-1 bg-background text-ink">
 			<div className="grid grid-cols-12 gap-8 p-8">
 				<div className="col-span-8 space-y-8">

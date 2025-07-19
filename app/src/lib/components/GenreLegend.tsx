@@ -1,6 +1,6 @@
 "use client"
 
-import { Fragment, useState } from "react"
+import { useState } from "react"
 import type { Category } from "@/lib/types/category"
 import {
 	Listbox,
@@ -20,7 +20,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 
 	return (
 		<Listbox value={selectedCategory} onChange={setSelectedCategory}>
-			<>
+			<div>
 				<ListboxButton className="flex items-center self-start p-1.5 rounded-md group bg-white/5 hover:bg-white/10">
 					<span
 						className="transition-colors group-hover:text-white"
@@ -32,7 +32,6 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 					</span>
 				</ListboxButton>
 				<Transition
-					as={Fragment}
 					leave="transition ease-in duration-100"
 					leaveFrom="opacity-100"
 					leaveTo="opacity-0"
@@ -57,7 +56,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 												backgroundColor: category.color,
 											}}
 										/>
-										<span className="grow ml-2 font-mono text-sm truncate transition-colors text-white/60 group-hover:text-white/90">
+										<span className="ml-2 font-mono text-sm truncate transition-colors grow text-white/60 group-hover:text-white/90">
 											{category.title}
 										</span>
 										{selected && <Check className="w-4 h-4" />}
@@ -67,7 +66,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 						))}
 					</ListboxOptions>
 				</Transition>
-			</>
+			</div>
 		</Listbox>
 	)
 }
