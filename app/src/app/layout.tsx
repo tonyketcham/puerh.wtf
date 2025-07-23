@@ -6,6 +6,7 @@ import NavSidebar from "@/lib/components/NavSidebar"
 import { getSessions, getVendors, getCategories } from "@/lib/api"
 import GenreLegend from "@/lib/components/GenreLegend"
 import { Toolbar } from "@/lib/components/containers/Toolbar"
+import { StoreProvider } from "@/lib/store/StoreProvider"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -36,16 +37,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 	return (
 		<html lang="en">
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
-				<div className="relative flex flex-row">
-					<NavSidebar sessions={sessions} vendors={vendors} categories={categories} />
-					<div className="flex flex-col w-full ml-[340px]">
-						<main className="w-full p-8">{children}</main>
+				<StoreProvider>
+					<div className="relative flex flex-row">
+						<NavSidebar sessions={sessions} vendors={vendors} categories={categories} />
+						<div className="flex flex-col w-full ml-[340px]">
+							<main className="w-full p-8">{children}</main>
+						</div>
+						<Toolbar>
+							<GenreLegend categories={categories} />
+						</Toolbar>
 					</div>
-					<Toolbar>
-						<GenreLegend categories={categories} />
-					</Toolbar>
-				</div>
-				<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
+					<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
+				</StoreProvider>
 			</body>
 		</html>
 	)

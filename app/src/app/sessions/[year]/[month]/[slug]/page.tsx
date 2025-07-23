@@ -1,7 +1,7 @@
 import { getSession, getSessions } from "@/lib/api"
 import { notFound } from "next/navigation"
 import Image from "next/image"
-import SessionProperties from "@/lib/components/SessionProperties"
+import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
 
 interface SessionPageProps {
 	params: Promise<{
@@ -24,38 +24,35 @@ export async function generateStaticParams() {
 }
 
 export default async function SessionPage(props: SessionPageProps) {
-    const params = await props.params;
-    const session = await getSession(params.slug)
+	const params = await props.params
+	const session = await getSession(params.slug)
 
-    if (!session) {
+	if (!session) {
 		notFound()
 	}
 
-    return (
-		<main className="flex-1 bg-background text-ink">
-			<div className="grid grid-cols-12 gap-8 p-8">
-				<div className="col-span-8 space-y-8">
-					<h1 className="font-rock-3d text-8xl text-shadow-2xl">{session.title}</h1>
+	return (
+		<>
+			{/* Sync session data to the store */}
+			<SetSessionState session={session} />
 
-					{session.images && session.images.length > 0 && (
-						<div className="relative h-[500px]">
-							<Image
-								src={session.images[0].image}
-								alt={session.images[0].alt || ""}
-								fill
-								className="object-cover rounded-lg"
-							/>
-						</div>
-					)}
+			<h1 className="font-rock-3d text-8xl text-shadow-2xl">{session.title}</h1>
 
-					<article
-						className="prose prose-invert max-w-none"
-						dangerouslySetInnerHTML={{ __html: session._content.html }}
+			{session.images && session.images.length > 0 && (
+				<div className="relative h-[500px]">
+					<Image
+						src={session.images[0].image}
+						alt={session.images[0].alt || ""}
+						fill
+						className="object-cover rounded-lg"
 					/>
 				</div>
+			)}
 
-				<SessionProperties session={session} />
-			</div>
-		</main>
+			<article
+				className="prose prose-invert max-w-none"
+				dangerouslySetInnerHTML={{ __html: session._content.html }}
+			/>
+		</>
 	)
 }

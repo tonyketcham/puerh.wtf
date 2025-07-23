@@ -5,7 +5,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { SessionFlavorAxes } from "../../../types/session"
 
 interface RadarChartProps {
-	data: SessionFlavorAxes
+	data: Record<
+		string,
+		{
+			start: number
+			finish: number
+		}
+	>
 	recordingKey?: string
 }
 

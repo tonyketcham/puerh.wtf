@@ -1,5 +1,5 @@
 import { gql, GraphQLClient } from "graphql-request"
-import type { SessionPreview, SessionPreviewWithFeatureImage } from "./types/session"
+import type { SessionFull, SessionPreview, SessionPreviewWithFeatureImage } from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
 
@@ -79,7 +79,7 @@ export async function getCategories(): Promise<Category[]> {
 	return allCategories
 }
 
-export async function getSession(slug: string): Promise<any> {
+export async function getSession(slug: string): Promise<SessionFull> {
 	// First, find the session by slug to get its id
 	const findQuery = gql`
 		query FindSession($slug: String!) {
