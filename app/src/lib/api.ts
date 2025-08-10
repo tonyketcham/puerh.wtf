@@ -132,6 +132,8 @@ export async function getSession(slug: string): Promise<SessionFull> {
 					image
 				}
 				cultivar {
+					_slug
+					id
 					title
 				}
 				notes {

@@ -30,3 +30,4 @@
 
 # vue
 /vue
+.flatbread-codegen-cache.json

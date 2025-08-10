@@ -5,8 +5,6 @@ import FileTree from "./filetree/FileTree"
 import type { SessionPreview } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
-import SimpleBar from "simplebar-react"
-import "simplebar-react/dist/simplebar.min.css"
 import Panel from "./containers/Panel"
 import PanelSection from "@/lib/components/containers/PanelSection"
 
@@ -18,11 +16,11 @@ interface NavSidebarProps {
 
 export default function NavSidebar({ sessions, vendors, categories }: NavSidebarProps) {
 	return (
-		<div className="fixed inset-y-0 left-0 z-20 flex flex-col w-[340px] h-full p-8 space-y-10 pointer-events-none font-fira-code">
+		<div className="fixed inset-y-0 left-0 z-20 flex flex-col w-[340px] p-8 space-y-10 pointer-events-none font-fira-code">
 			<SiteHeader />
 
 			{/* The actual sidebar panel. Make this interactive. */}
-			<Panel className="grow" backdropClassName="bg-[rgba(45,40,45,0.35)]">
+			<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
 				<PanelSection title="Explorer">
 					<FileTree
 						data={[

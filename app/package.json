@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
+		"codegen": "flatbread codegen",
 		"dev": "NODE_OPTIONS='--inspect' flatbread start -- next dev --turbopack",
 		"dev:no-turbopack": "NODE_OPTIONS='--inspect' flatbread start -- next dev",
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
@@ -14,7 +15,9 @@
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
+		"@flatbread/codegen": "1.0.0-alpha.2",
 		"@flatbread/resolver-svimg": "1.0.0-alpha.0",
+		"@graphql-typed-document-node/core": "^3.2.0",
 		"@neodrag/svelte": "1.2.3",
 		"@playwright/test": "1.24.2",
 		"@swc-jotai/debug-label": "^0.2.0",
@@ -30,7 +33,7 @@
 		"eslint": "8.21.0",
 		"eslint-config-next": "15.4.2",
 		"eslint-config-prettier": "8.5.0",
-		"flatbread": "1.0.0-alpha.20",
+		"flatbread": "1.0.0-alpha.22",
 		"graphql-request": "4.3.0",
 		"hast-util-parse-selector": "3.1.0",
 		"hast-util-select": "5.0.2",

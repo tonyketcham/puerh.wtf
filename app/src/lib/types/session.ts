@@ -1,17 +1,26 @@
 import type { Category } from "@/lib/types/category"
 import type { Content } from "@/lib/types/content"
+import type {
+	Session as GqlSession,
+	Varietal as GqlVarietal,
+	Session_Flavor_Axes as GqlSessionFlavorAxes,
+	Session_Notes as GqlSessionNotes,
+} from "@/generated/graphql"
 
+type NonNullObject<T> = { [K in keyof T]-?: NonNullable<T[K]> }
+
+// Base identity fields used throughout the app, derived from generated schema
 export type BaseSession = {
-	id: string
-	_slug: string
+	id: NonNullable<GqlSession["id"]>
+	_slug: NonNullable<GqlSession["_slug"]>
 }
 
 export type SessionPreview = BaseSession & {
-	_collection: string
-	title: string
-	date: string
-	production_year: number | null
-	excerpt: string
+	_collection: NonNullable<GqlSession["_collection"]>
+	title: NonNullable<GqlSession["title"]>
+	date: NonNullable<GqlSession["date"]>
+	production_year: GqlSession["production_year"]
+	excerpt: NonNullable<GqlSession["excerpt"]>
 	style: {
 		id: string
 		title: string
@@ -23,52 +32,58 @@ export type SessionPreview = BaseSession & {
 export type SessionPreviewWithFeatureImage = SessionPreview & {
 	images:
 		| {
-				image: string
-				alt: string
+				image: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["image"]
+				>
+				alt: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["alt"]
+				>
 		  }[]
 		| null
 }
 
+export type Cultivar = Pick<NonNullObject<NonNullable<GqlVarietal>>, "id" | "_slug" | "title">
+
 export type SessionFull = SessionPreviewWithFeatureImage & {
-	season: string | null
-	elevation: number | null
-	aging_conditions: string | null
-	rating: number
-	purchase_link: string | null
+	season: GqlSession["season"]
+	elevation: GqlSession["elevation"]
+	aging_conditions: GqlSession["aging_conditions"]
+	rating: NonNullable<GqlSession["rating"]>
+	purchase_link: GqlSession["purchase_link"]
 	vendor:
 		| {
-				_slug: string
-				title: string
-				image: string
+				_slug: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["_slug"]
+				>
+				title: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["title"]
+				>
+				image: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["image"]
+				>
 		  }[]
 		| null
-	cultivar: {
-		title: string
-	}
-	picking: string | null
-	genre: string[] | null
+	cultivar: Cultivar[]
+	picking: GqlSession["picking"]
+	genre: GqlSession["genre"]
 	notes: SessionNotes
 	flavor_axes: SessionFlavorAxes
 
 	images:
 		| {
-				image: string
-				alt: string
+				image: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["image"]
+				>
+				alt: NonNullable<
+					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["alt"]
+				>
 		  }[]
 		| null
 
 	_content: Content
 }
 
-export type SessionNotes = {
-	dry_leaf_nose: string
-	wet_leaf_nose: string
-	finish: string
-	empty_cup: string
-	mouthfeel: string
-	taste: string
-	cha_qi: string
-}
+export type SessionNotes = Omit<NonNullObject<NonNullable<GqlSessionNotes>>, "__typename">
 
 export type SessionFlavorAxes = {
 	vegetal: FlavorAxesTransition

@@ -2,18 +2,15 @@
 
 import RadarChart from "@/lib/components/dataviz/radar/RadarChart"
 import DetailsListItem from "@/lib/components/DetailsListItem"
-import type { SessionFull, SessionNotes } from "@/lib/types/session"
+import type { Cultivar, SessionFull, SessionNotes } from "@/lib/types/session"
 import SimpleBar from "simplebar-react"
 import "simplebar-react/dist/simplebar.min.css"
 import PanelSection from "./containers/PanelSection"
 import Panel from "./containers/Panel"
 import type { PropsWithChildren } from "react"
-import { useAtomValue } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { flavorAxesAtom, notesAtom, sessionAtom } from "@/lib/store/sessionAtom"
-
-interface SessionPropertiesProps {
-	session: SessionFull
-}
+import Chip from "@/lib/components/Chip"
 
 const noteDisplayConfig: Record<keyof SessionNotes, { title: string; icon: React.JSX.Element }> = {
 	dry_leaf_nose: {
@@ -168,7 +165,10 @@ const noteDisplayConfig: Record<keyof SessionNotes, { title: string; icon: React
 export function SessionPropertiesPanel({ children }: PropsWithChildren<unknown>) {
 	return (
 		<aside>
-			<Panel className="fixed inset-y-0 right-0 w-[340px] h-full" backdropClassName="bg-sidebar">
+			<Panel
+				className="fixed inset-y-0 right-0 w-[340px] h-full p-8"
+				backdropClassName="bg-sidebar"
+			>
 				{children}
 			</Panel>
 		</aside>
@@ -180,6 +180,12 @@ export default function SessionProperties() {
 		<>
 			<PanelSection title="Flavor Profile" hasBottomBorder hasPadding={false}>
 				<FlavorProfile />
+			</PanelSection>
+
+			<PanelSection title="Metadata">
+				<ul className="space-y-4">
+					<MetaData />
+				</ul>
 			</PanelSection>
 
 			<PanelSection title="Notes">
@@ -207,4 +213,24 @@ function Notes() {
 
 		return <DetailsListItem key={key} icon={config.icon} title={config.title} value={value} />
 	})
+}
+
+function MetaData() {
+	const session = useAtomValue(sessionAtom)
+	console.log({ session })
+	return (
+		<>
+			{session?.production_year && (
+				<DetailsListItem icon={null} title="Production Year" value={session.production_year} />
+			)}
+			{session?.cultivar && <Cultivars values={session.cultivar} />}
+		</>
+	)
+}
+
+function Cultivars({ values }: { values: Cultivar[] }) {
+	return values.map((value) => (
+		// <DetailsListItem key={value.id} icon={null} title="Cultivar" value={value.title} />
+		<Chip key={value.id}>{value.title}</Chip>
+	))
 }
