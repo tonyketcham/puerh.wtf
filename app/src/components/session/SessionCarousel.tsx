@@ -1,9 +1,12 @@
 "use client"
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { cn } from "@/lib/utils"
 import BoxCarousel, {
 	type CarouselItem,
 	type RotationDirection,
+	type BoxCarouselRef,
 } from "@/components/fancy/carousel/box-carousel"
 
 type ImageItem = {
@@ -107,6 +110,7 @@ export default function SessionCarousel({
 	initialRotationOffset = 10,
 }: SessionCarouselProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
+	const carouselRef = useRef<BoxCarouselRef>(null)
 	const [containerWidth, setContainerWidth] = useState<number>(0)
 
 	// Observe container size for responsive width/height
@@ -142,36 +146,76 @@ export default function SessionCarousel({
 		[images]
 	)
 
+	const handlePrevious = () => {
+		carouselRef.current?.prev()
+	}
+
+	const handleNext = () => {
+		carouselRef.current?.next()
+	}
+
 	return (
-		<div
-			ref={containerRef}
-			className="p-2 border-2 rounded-full border-heicha-400 drop-shadow-2xl drop-shadow-heicha-600/40 w-72"
-			style={{ transform: `rotate(${cssRotation}deg)` }}
-			data-recording-key={recordingKey}
-		>
-			{width > 0 && items.length > 0 && (
-				<BoxCarousel
-					items={items}
-					width={width}
-					height={height}
-					direction={direction}
-					enableDrag
-					debug={false}
-					autoPlay={!continuousRotation} // Disable autoPlay when continuous rotation is enabled
-					continuousRotation={continuousRotation}
-					continuousSpeed={continuousSpeed}
-					turnSpeedMultiplier={turnSpeedMultiplier}
-					hoverScale={hoverScale}
-					enableScrollControl={enableScrollControl}
-					scrollSensitivity={scrollSensitivity}
-					enablePageScrollControl={enablePageScrollControl}
-					pageScrollSensitivity={pageScrollSensitivity}
-					scrollOffset={scrollOffset}
-					pauseOnHover={pauseOnHover}
-					pauseOnDrag={pauseOnDrag}
-					initialRotationOffset={initialRotationOffset}
-				/>
-			)}
+		<div className="relative" data-recording-key={recordingKey}>
+			<div
+				ref={containerRef}
+				className="p-2 border-2 rounded-full border-heicha-400 drop-shadow-2xl drop-shadow-heicha-600/40 w-72"
+				style={{ transform: `rotate(${cssRotation}deg)` }}
+			>
+				{width > 0 && items.length > 0 && (
+					<BoxCarousel
+						ref={carouselRef}
+						items={items}
+						width={width}
+						height={height}
+						direction={direction}
+						enableDrag
+						debug={false}
+						autoPlay={!continuousRotation} // Disable autoPlay when continuous rotation is enabled
+						continuousRotation={continuousRotation}
+						continuousSpeed={continuousSpeed}
+						turnSpeedMultiplier={turnSpeedMultiplier}
+						hoverScale={hoverScale}
+						enableScrollControl={enableScrollControl}
+						scrollSensitivity={scrollSensitivity}
+						enablePageScrollControl={enablePageScrollControl}
+						pageScrollSensitivity={pageScrollSensitivity}
+						scrollOffset={scrollOffset}
+						pauseOnHover={pauseOnHover}
+						pauseOnDrag={pauseOnDrag}
+						initialRotationOffset={initialRotationOffset}
+					/>
+				)}
+			</div>
+
+			{/* Navigation buttons */}
+			<div className="flex justify-center mt-4">
+				<div className="flex items-center space-x-2 px-2 py-1.5 border bg-heicha-700/80 backdrop-blur-xl border-heicha-500/50 rounded-xl">
+					<button
+						onClick={handlePrevious}
+						className={cn(
+							"flex items-center justify-center w-8 h-8 transition-all duration-200 rounded-lg",
+							"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
+							"focus:outline-none focus:ring-1 focus:ring-tea-soup-500/50",
+							"disabled:opacity-50 disabled:cursor-not-allowed"
+						)}
+						aria-label="Previous image"
+					>
+						<ChevronLeft className="w-4 h-4" />
+					</button>
+					<button
+						onClick={handleNext}
+						className={cn(
+							"flex items-center justify-center w-8 h-8 transition-all duration-200 rounded-lg",
+							"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
+							"focus:outline-none focus:ring-1 focus:ring-tea-soup-500/50",
+							"disabled:opacity-50 disabled:cursor-not-allowed"
+						)}
+						aria-label="Next image"
+					>
+						<ChevronRight className="w-4 h-4" />
+					</button>
+				</div>
+			</div>
 		</div>
 	)
 }
