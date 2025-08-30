@@ -394,25 +394,53 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		const lastPageScrollY = useRef(0)
 		const carouselElementRef = useRef<HTMLElement | null>(null)
 
+		// Single source of truth for rotation
+		const rotationMotionValue = useMotionValue(initialRotationOffset)
 		const baseRotateX = useMotionValue(0)
 		const baseRotateY = useMotionValue(0)
+
+		// Track rotation offset from user interactions (drag, manual navigation)
+		const userRotationOffset = useRef(initialRotationOffset)
+
+		// Track previous scroll position to determine scroll direction
+		const previousScrollY = useRef(0)
 
 		// Use springs for smoother animation during drag
 		const springRotateX = useSpring(baseRotateX, dragSpring)
 		const springRotateY = useSpring(baseRotateY, dragSpring)
 
+		// Unified rotation update function - single source of truth
+		const updateRotation = useCallback(
+			(
+				newRotation: number,
+				source: "continuous" | "drag" | "scroll" | "pageScroll" | "manual" | "initial" = "manual"
+			) => {
+				// Update the single source of truth
+				rotationMotionValue.set(newRotation)
+				setCurrentRotation(newRotation)
+
+				// Track user-initiated rotation changes (not from page scroll)
+				if (source !== "pageScroll") {
+					userRotationOffset.current = newRotation
+				}
+
+				// Apply to appropriate axis based on direction
+				const isVertical = direction === "top" || direction === "bottom"
+				if (isVertical) {
+					baseRotateX.set(newRotation)
+				} else {
+					baseRotateY.set(newRotation)
+				}
+			},
+			[direction, rotationMotionValue, baseRotateX, baseRotateY]
+		)
+
 		// Apply initial rotation offset
 		useEffect(() => {
 			if (initialRotationOffset !== 0) {
-				const isVertical = direction === "top" || direction === "bottom"
-				if (isVertical) {
-					baseRotateX.set(initialRotationOffset)
-				} else {
-					baseRotateY.set(initialRotationOffset)
-				}
-				setCurrentRotation(initialRotationOffset)
+				updateRotation(initialRotationOffset, "initial")
 			}
-		}, [initialRotationOffset, direction, baseRotateX, baseRotateY])
+		}, [initialRotationOffset, updateRotation])
 
 		// Continuous rotation helper functions
 		const shouldPauseContinuous = useCallback(() => {
@@ -434,9 +462,6 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 
 			lastUpdateTime.current = performance.now()
 
-			const isVertical = direction === "top" || direction === "bottom"
-			const targetMotionValue = isVertical ? baseRotateX : baseRotateY
-
 			// Calculate rotation direction multiplier
 			let directionMultiplier = 1
 			if (direction === "top" || direction === "left") {
@@ -444,7 +469,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			}
 
 			// Store the starting rotation to track progress
-			const startingRotation = targetMotionValue.get()
+			const startingRotation = rotationMotionValue.get()
 			let lastTrackedQuarter = Math.floor((((startingRotation % 360) + 360) % 360) / 90)
 
 			const animateFrame = () => {
@@ -456,7 +481,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					return
 				}
 
-				const currentValue = targetMotionValue.get()
+				const currentValue = rotationMotionValue.get()
 
 				// Calculate dynamic speed based on proximity to quarter boundaries
 				const normalizedCurrent = ((currentValue % 360) + 360) % 360
@@ -473,10 +498,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				const rotationIncrement = dynamicSpeed * directionMultiplier * deltaTime
 				const newValue = currentValue + rotationIncrement
 
-				targetMotionValue.set(newValue)
-
-				// Update current rotation for tracking
-				setCurrentRotation(newValue)
+				// Use unified rotation update
+				updateRotation(newValue, "continuous")
 
 				// Check if we've completed a full 90-degree rotation to update indices
 				const normalizedNewValue = ((newValue % 360) + 360) % 360
@@ -528,11 +551,12 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			continuousSpeed,
 			direction,
 			shouldPauseContinuous,
-			baseRotateX,
-			baseRotateY,
+			rotationMotionValue,
+			updateRotation,
 			currentItemIndex,
 			items.length,
 			onIndexChange,
+			turnSpeedMultiplier,
 		])
 
 		const stopContinuousRotation = useCallback(() => {
@@ -554,9 +578,6 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					stopContinuousRotation()
 				}
 
-				const isVertical = direction === "top" || direction === "bottom"
-				const targetMotionValue = isVertical ? baseRotateX : baseRotateY
-
 				// Accumulate scroll delta for smoother control
 				const scrollDelta = e.deltaY * scrollSensitivity * 0.5
 				scrollAccumulator.current += scrollDelta
@@ -567,12 +588,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					directionMultiplier = -1
 				}
 
-				const currentValue = targetMotionValue.get()
+				const currentValue = rotationMotionValue.get()
 				const newValue = currentValue + scrollDelta * directionMultiplier
 
-				// Apply the rotation
-				targetMotionValue.set(newValue)
-				setCurrentRotation(newValue)
+				// Apply the rotation using unified function
+				updateRotation(newValue, "scroll")
 
 				// Update item index when crossing 90-degree boundaries
 				const normalizedNewValue = ((newValue % 360) + 360) % 360
@@ -610,8 +630,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				enableScrollControl,
 				direction,
 				scrollSensitivity,
-				baseRotateX,
-				baseRotateY,
+				rotationMotionValue,
+				updateRotation,
 				currentItemIndex,
 				items.length,
 				onIndexChange,
@@ -624,65 +644,57 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		const handlePageScroll = useCallback(() => {
 			if (!enablePageScrollControl || !carouselElementRef.current) return
 
+			const currentScrollY = window.scrollY
+			const scrollDelta = currentScrollY - previousScrollY.current
+			previousScrollY.current = currentScrollY
+
+			// Only proceed if there's actual scroll movement
+			if (Math.abs(scrollDelta) < 1) return
+
 			const element = carouselElementRef.current
 			const rect = element.getBoundingClientRect()
 			const viewportHeight = window.innerHeight
 
-			// Calculate scroll progress based on element position in viewport
+			// Check if element is in viewport
 			const elementTop = rect.top - scrollOffset
 			const elementBottom = rect.bottom
 
-			// Calculate how much of the element is visible in the viewport
-			let scrollProgress = 0
-
 			if (elementTop <= viewportHeight && elementBottom >= 0) {
-				// Element is in viewport
-				const visibleTop = Math.max(0, viewportHeight - elementTop)
-				const visibleBottom = Math.min(elementBottom, viewportHeight)
-				const visibleHeight = visibleBottom - Math.max(0, -elementTop)
-				const elementHeight = rect.height
+				// Calculate rotation delta based on scroll direction and sensitivity
+				// Use much smaller sensitivity (scrollDelta is typically 1-100 pixels)
+				const rotationDelta = scrollDelta * pageScrollSensitivity * 0.1
 
-				// Progress from 0 to 1 based on how much the element has scrolled through viewport
-				scrollProgress = Math.max(
-					0,
-					Math.min(1, (visibleTop - visibleHeight * 0.5) / (viewportHeight + elementHeight))
-				)
-			}
+				// Calculate rotation direction multiplier
+				let directionMultiplier = 1
+				if (direction === "top" || direction === "left") {
+					directionMultiplier = -1
+				}
 
-			// Convert scroll progress to rotation
-			const targetRotation = scrollProgress * 360 * pageScrollSensitivity
+				// Apply rotation delta to current user offset
+				const newValue = userRotationOffset.current + rotationDelta * directionMultiplier
 
-			const isVertical = direction === "top" || direction === "bottom"
-			const targetMotionValue = isVertical ? baseRotateX : baseRotateY
+				// Update the user offset since this is a user-initiated scroll
+				userRotationOffset.current = newValue
 
-			// Calculate rotation direction multiplier
-			let directionMultiplier = 1
-			if (direction === "top" || direction === "left") {
-				directionMultiplier = -1
-			}
+				// Smoothly update rotation using unified function
+				updateRotation(newValue, "pageScroll")
 
-			const newValue = targetRotation * directionMultiplier
+				// Update item index based on rotation
+				const normalizedValue = ((newValue % 360) + 360) % 360
+				const currentQuarter = Math.floor(normalizedValue / 90)
+				const expectedIndex = Math.floor(((normalizedValue / 90) * items.length) / 4) % items.length
 
-			// Smoothly update rotation
-			targetMotionValue.set(newValue)
-			setCurrentRotation(newValue)
-
-			// Update item index based on rotation
-			const normalizedValue = ((newValue % 360) + 360) % 360
-			const currentQuarter = Math.floor(normalizedValue / 90)
-			const expectedIndex = Math.floor(((normalizedValue / 90) * items.length) / 4) % items.length
-
-			if (expectedIndex !== currentItemIndex) {
-				setCurrentItemIndex(expectedIndex)
-				onIndexChange?.(expectedIndex)
+				if (expectedIndex !== currentItemIndex) {
+					setCurrentItemIndex(expectedIndex)
+					onIndexChange?.(expectedIndex)
+				}
 			}
 		}, [
 			enablePageScrollControl,
 			scrollOffset,
 			pageScrollSensitivity,
 			direction,
-			baseRotateX,
-			baseRotateY,
+			updateRotation,
 			items.length,
 			currentItemIndex,
 			onIndexChange,
@@ -741,10 +753,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				const point = "touches" in e ? e.touches[0] : e
 				startPosition.current = { x: point.clientX, y: point.clientY }
 
-				// Get the actual current rotation value from motion values for accurate drag start
-				const isVertical = direction === "top" || direction === "bottom"
-				const currentMotionValue = isVertical ? baseRotateX.get() : baseRotateY.get()
-				startRotation.current = currentMotionValue
+				// Get the actual current rotation value for accurate drag start
+				startRotation.current = rotationMotionValue.get()
 
 				// Stop continuous rotation during drag
 				if (continuousRotation && pauseOnDrag) {
@@ -757,8 +767,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			[
 				enableDrag,
 				direction,
-				baseRotateX,
-				baseRotateY,
+				rotationMotionValue,
 				continuousRotation,
 				pauseOnDrag,
 				stopContinuousRotation,
@@ -790,14 +799,10 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				const maxRotation = startRotation.current + 120
 				newRotation = Math.max(minRotation, Math.min(maxRotation, newRotation))
 
-				// Apply the rotation immediately during drag
-				if (isVertical) {
-					baseRotateX.set(newRotation)
-				} else {
-					baseRotateY.set(newRotation)
-				}
+				// Apply the rotation immediately during drag using unified function
+				updateRotation(newRotation, "drag")
 			},
-			[enableDrag, direction, dragSensitivity]
+			[enableDrag, direction, dragSensitivity, updateRotation]
 		)
 
 		const handleDragEnd = useCallback(() => {
@@ -805,8 +810,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 
 			isDragging.current = false
 
-			const isVertical = direction === "top" || direction === "bottom"
-			const currentValue = isVertical ? baseRotateX.get() : baseRotateY.get()
+			const currentValue = rotationMotionValue.get()
 
 			// Calculate the nearest quarter rotation (90-degree increment)
 			const quarterRotations = Math.round(currentValue / 90)
@@ -819,10 +823,19 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			if (steps !== 0) {
 				isRotating.current = true
 
-				// Calculate new item index based on steps from current position
+				// Calculate new item index based on steps and direction
+				// Account for direction-specific rotation mapping
+				let indexSteps = steps
+
+				// For "top" and "left" directions, positive rotation goes backward
+				if (direction === "top" || direction === "left") {
+					indexSteps = -steps
+				}
+
+				// Calculate new item index based on corrected steps
 				let newItemIndex = currentItemIndex
-				for (let i = 0; i < Math.abs(steps); i++) {
-					if (steps > 0) {
+				for (let i = 0; i < Math.abs(indexSteps); i++) {
+					if (indexSteps > 0) {
 						newItemIndex = (newItemIndex + 1) % items.length
 					} else {
 						newItemIndex = newItemIndex === 0 ? items.length - 1 : newItemIndex - 1
@@ -831,13 +844,12 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 
 				pendingIndexChange.current = newItemIndex
 
-				// Animate to the snapped position
-				const targetMotionValue = isVertical ? baseRotateX : baseRotateY
-				animate(targetMotionValue, snappedRotation, {
+				// Animate to the snapped position using unified rotation
+				animate(rotationMotionValue, snappedRotation, {
 					...snapTransition,
 					onComplete: () => {
 						handleAnimationComplete(steps > 0 ? "next" : "prev")
-						setCurrentRotation(snappedRotation)
+						updateRotation(snappedRotation, "manual")
 
 						// Restart continuous rotation after drag ends if enabled
 						if (continuousRotation) {
@@ -852,11 +864,10 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				})
 			} else {
 				// Snap back to nearest quarter rotation
-				const targetMotionValue = isVertical ? baseRotateX : baseRotateY
-				animate(targetMotionValue, snappedRotation, {
+				animate(rotationMotionValue, snappedRotation, {
 					...snapTransition,
 					onComplete: () => {
-						setCurrentRotation(snappedRotation)
+						updateRotation(snappedRotation, "manual")
 
 						// Restart continuous rotation after drag ends if enabled
 						if (continuousRotation) {
@@ -872,8 +883,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			}
 		}, [
 			direction,
-			baseRotateX,
-			baseRotateY,
+			rotationMotionValue,
+			updateRotation,
 			currentItemIndex,
 			items.length,
 			snapTransition,
@@ -948,11 +959,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			pendingIndexChange.current = newIndex
 
 			if (direction === "top") {
-				animate(baseRotateX, currentRotation + 90, {
+				animate(rotationMotionValue, currentRotation + 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("next")
-						setCurrentRotation(currentRotation + 90)
+						updateRotation(currentRotation + 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -965,11 +976,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "bottom") {
-				animate(baseRotateX, currentRotation - 90, {
+				animate(rotationMotionValue, currentRotation - 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("next")
-						setCurrentRotation(currentRotation - 90)
+						updateRotation(currentRotation - 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -982,11 +993,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "left") {
-				animate(baseRotateY, currentRotation - 90, {
+				animate(rotationMotionValue, currentRotation - 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("next")
-						setCurrentRotation(currentRotation - 90)
+						updateRotation(currentRotation - 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -999,11 +1010,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "right") {
-				animate(baseRotateY, currentRotation + 90, {
+				animate(rotationMotionValue, currentRotation + 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("next")
-						setCurrentRotation(currentRotation + 90)
+						updateRotation(currentRotation + 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -1040,11 +1051,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			pendingIndexChange.current = newIndex
 
 			if (direction === "top") {
-				animate(baseRotateX, currentRotation - 90, {
+				animate(rotationMotionValue, currentRotation - 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("prev")
-						setCurrentRotation(currentRotation - 90)
+						updateRotation(currentRotation - 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -1057,11 +1068,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "bottom") {
-				animate(baseRotateX, currentRotation + 90, {
+				animate(rotationMotionValue, currentRotation + 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("prev")
-						setCurrentRotation(currentRotation + 90)
+						updateRotation(currentRotation + 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -1074,11 +1085,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "left") {
-				animate(baseRotateY, currentRotation + 90, {
+				animate(rotationMotionValue, currentRotation + 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("prev")
-						setCurrentRotation(currentRotation + 90)
+						updateRotation(currentRotation + 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -1091,11 +1102,11 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					},
 				})
 			} else if (direction === "right") {
-				animate(baseRotateY, currentRotation - 90, {
+				animate(rotationMotionValue, currentRotation - 90, {
 					..._transition,
 					onComplete: () => {
 						handleAnimationComplete("prev")
-						setCurrentRotation(currentRotation - 90)
+						updateRotation(currentRotation - 90, "manual")
 
 						// Restart continuous rotation after manual navigation if enabled
 						if (continuousRotation) {
@@ -1143,10 +1154,12 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			scaleMotionValue.set(isHovered ? hoverScale : 1)
 		}, [isHovered, hoverScale, scaleMotionValue])
 
-		const transform = useTransform(
-			isDragging.current ? [springRotateX, springRotateY] : [baseRotateX, baseRotateY],
-			([x, y]) => `translateZ(-${depth / 2}px) rotateX(${x}deg) rotateY(${y}deg)`
-		)
+		const transform = useTransform(rotationMotionValue, (rotation) => {
+			const isVertical = direction === "top" || direction === "bottom"
+			const x = isVertical ? rotation : 0
+			const y = isVertical ? 0 : rotation
+			return `translateZ(-${depth / 2}px) rotateX(${x}deg) rotateY(${y}deg)`
+		})
 
 		const containerTransform = useTransform(scale, (s) => `scale(${s})`)
 

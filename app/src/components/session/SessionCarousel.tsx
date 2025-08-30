@@ -16,6 +16,11 @@ interface SessionCarouselProps {
 	direction?: RotationDirection
 	recordingKey?: string
 	/**
+	 * CSS rotation in degrees (e.g., 12 for "rotate-12", -8 for "-rotate-8")
+	 * @default 12
+	 */
+	cssRotation?: number
+	/**
 	 * Enable continuous rotation (smooth, infinite rotation)
 	 * Takes precedence over autoPlay if both are enabled
 	 * @default false
@@ -87,16 +92,17 @@ export default function SessionCarousel({
 	images,
 	direction = "right",
 	recordingKey,
+	cssRotation = 12,
 	continuousRotation = true,
 	continuousSpeed = 3,
 	pauseOnHover = true,
 	pauseOnDrag = true,
 	turnSpeedMultiplier = 3,
 	hoverScale = 1.05,
-	enableScrollControl = false,
+	enableScrollControl = true,
 	scrollSensitivity = 1,
 	enablePageScrollControl = true,
-	pageScrollSensitivity = 1.5,
+	pageScrollSensitivity = 5,
 	scrollOffset = 0,
 	initialRotationOffset = 10,
 }: SessionCarouselProps) {
@@ -139,7 +145,8 @@ export default function SessionCarousel({
 	return (
 		<div
 			ref={containerRef}
-			className="w-72 aspect-square rotate-12"
+			className="p-2 border-2 rounded-full border-heicha-400 drop-shadow-2xl drop-shadow-heicha-600/40 w-72"
+			style={{ transform: `rotate(${cssRotation}deg)` }}
 			data-recording-key={recordingKey}
 		>
 			{width > 0 && items.length > 0 && (

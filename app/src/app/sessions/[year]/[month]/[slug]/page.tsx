@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import SessionCarousel from "@/components/session/SessionCarousel"
 import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
+import { generateSessionRotation } from "@/app/sessions/[year]/[month]/[slug]/generateSessionRotation"
 
 interface SessionPageProps {
 	params: Promise<{
@@ -32,6 +33,9 @@ export default async function SessionPage(props: SessionPageProps) {
 		notFound()
 	}
 
+	// Generate a unique rotation for this session
+	const rotation = generateSessionRotation(session._slug)
+
 	return (
 		<>
 			{/* Sync session data to the store */}
@@ -42,7 +46,11 @@ export default async function SessionPage(props: SessionPageProps) {
 			<div className="relative">
 				{session.images && session.images.length > 0 && (
 					<div className="float-right clear-right mb-8 ml-8">
-						<SessionCarousel images={session.images} recordingKey="session-hero-carousel" />
+						<SessionCarousel
+							images={session.images}
+							cssRotation={rotation}
+							recordingKey="session-hero-carousel"
+						/>
 					</div>
 				)}
 
