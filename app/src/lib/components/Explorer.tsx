@@ -8,13 +8,13 @@ import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
 import PanelSection from "@/lib/components/containers/PanelSection"
 
-interface NavSidebarProps {
+interface ExplorerProps {
 	sessions: SessionPreview[]
 	vendors: Vendor[]
 	categories: Category[]
 }
 
-export default function NavSidebar({ sessions, vendors, categories }: NavSidebarProps) {
+export default function Explorer({ sessions, vendors, categories }: ExplorerProps) {
 	return (
 		<div className="fixed inset-y-0 left-0 z-20 flex flex-col w-[340px] p-8 space-y-10 pointer-events-none font-fira-code">
 			<SiteHeader />

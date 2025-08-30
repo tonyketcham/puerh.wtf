@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import localFont from "next/font/local"
 import "../app.css"
-import NavSidebar from "@/lib/components/NavSidebar"
+import Explorer from "@/lib/components/Explorer"
 import { getSessions, getVendors, getCategories } from "@/lib/api"
 import GenreLegend from "@/lib/components/GenreLegend"
 import { Toolbar } from "@/lib/components/containers/Toolbar"
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<StoreProvider>
 					<div className="relative flex flex-row">
-						<NavSidebar sessions={sessions} vendors={vendors} categories={categories} />
+						<Explorer sessions={sessions} vendors={vendors} categories={categories} />
 						<div className="flex flex-col w-full ml-[340px]">
 							<main className="w-full p-8">{children}</main>
 						</div>
