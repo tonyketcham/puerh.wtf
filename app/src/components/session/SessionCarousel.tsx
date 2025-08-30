@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { motion } from "motion/react"
 import { cn } from "@/lib/utils"
 import BoxCarousel, {
 	type CarouselItem,
@@ -111,7 +112,8 @@ export default function SessionCarousel({
 }: SessionCarouselProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const carouselRef = useRef<BoxCarouselRef>(null)
-	const [containerWidth, setContainerWidth] = useState<number>(0)
+	const [containerWidth, setContainerWidth] = useState<number>(288) // 72 * 4 (w-72 is 288px)
+	const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
 	// Observe container size for responsive width/height
 	useEffect(() => {
@@ -121,14 +123,24 @@ export default function SessionCarousel({
 		const ro = new ResizeObserver((entries) => {
 			for (const entry of entries) {
 				const w = Math.floor(entry.contentRect.width)
-				if (w !== containerWidth) setContainerWidth(w)
+				if (w !== containerWidth) {
+					setContainerWidth(w)
+					if (!isLoaded) setIsLoaded(true)
+				}
 			}
 		})
 		ro.observe(el)
 		return () => ro.disconnect()
-	}, [containerWidth])
+	}, [containerWidth, isLoaded])
 
-	const width = containerWidth || 0
+	// Mark as loaded when images are available
+	useEffect(() => {
+		if (images && images.length > 0 && !isLoaded) {
+			setIsLoaded(true)
+		}
+	}, [images, isLoaded])
+
+	const width = containerWidth
 	const height = useMemo(() => {
 		// 16:9 ratio with bounds similar to previous hero height
 		const computed = Math.round((width * 9) / 16)
@@ -156,12 +168,24 @@ export default function SessionCarousel({
 
 	return (
 		<div className="relative" data-recording-key={recordingKey}>
-			<div
+			<motion.div
 				ref={containerRef}
 				className="p-2 border-2 rounded-full border-heicha-400 drop-shadow-2xl drop-shadow-heicha-600/40 w-72"
-				style={{ transform: `rotate(${cssRotation}deg)` }}
+				style={{
+					transform: `rotate(${cssRotation}deg)`,
+					minHeight: height + 16, // Reserve height (height + padding)
+				}}
+				initial={{ scale: 0.9, opacity: 0 }}
+				animate={{
+					scale: isLoaded ? 1 : 0.9,
+					opacity: isLoaded ? 1 : 0,
+				}}
+				transition={{
+					duration: 0.5,
+					ease: "easeOut",
+				}}
 			>
-				{width > 0 && items.length > 0 && (
+				{items.length > 0 && (
 					<BoxCarousel
 						ref={carouselRef}
 						items={items}
@@ -185,7 +209,7 @@ export default function SessionCarousel({
 						initialRotationOffset={initialRotationOffset}
 					/>
 				)}
-			</div>
+			</motion.div>
 
 			{/* Navigation buttons */}
 			<div className="flex justify-center mt-4">
