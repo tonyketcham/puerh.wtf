@@ -1,6 +1,7 @@
 import { getSession, getSessions } from "@/lib/api"
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import SessionCarousel from "@/components/session/SessionCarousel"
 import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
 
 interface SessionPageProps {
@@ -39,13 +40,8 @@ export default async function SessionPage(props: SessionPageProps) {
 			<h1 className="font-rock-3d text-8xl text-shadow-2xl">{session.title}</h1>
 
 			{session.images && session.images.length > 0 && (
-				<div className="relative h-[500px]">
-					<Image
-						src={session.images[0].image}
-						alt={session.images[0].alt || ""}
-						fill
-						className="object-cover rounded-lg"
-					/>
+				<div className="relative">
+					<SessionCarousel images={session.images} recordingKey="session-hero-carousel" />
 				</div>
 			)}
 
