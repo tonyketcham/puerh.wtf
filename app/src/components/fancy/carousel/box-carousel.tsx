@@ -112,7 +112,7 @@ const MediaRenderer = memo(
 					src={item.src}
 					alt={item.alt || ""}
 					draggable={false}
-					className={cn("object-cover w-full h-full border-2 border-yellow-400", className)}
+					className={cn("object-cover w-full h-full", className)}
 				/>
 			)
 		}
@@ -157,7 +157,11 @@ interface SpringConfig {
 /**
  * Props for the BoxCarousel component
  */
-interface BoxCarouselProps extends React.HTMLProps<HTMLDivElement> {
+interface BoxCarouselProps
+	extends Omit<
+		React.HTMLProps<HTMLDivElement>,
+		"onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd"
+	> {
 	/**
 	 * Array of items to display in the carousel
 	 */
@@ -242,6 +246,51 @@ interface BoxCarouselProps extends React.HTMLProps<HTMLDivElement> {
 	continuousSpeed?: number
 
 	/**
+	 * Speed multiplier during turns (90-degree transitions)
+	 * Higher values make turns faster, creating a dynamic rotation effect
+	 * @default 3
+	 */
+	turnSpeedMultiplier?: number
+
+	/**
+	 * Scale factor when hovered (as percentage, e.g., 1.05 = 5% larger)
+	 * @default 1.05
+	 */
+	hoverScale?: number
+
+	/**
+	 * Enable scroll wheel control for rotation
+	 * When enabled, scroll wheel will control rotation instead of continuous rotation
+	 * @default false
+	 */
+	enableScrollControl?: boolean
+
+	/**
+	 * Sensitivity of scroll wheel control (higher = more rotation per scroll)
+	 * @default 1
+	 */
+	scrollSensitivity?: number
+
+	/**
+	 * Enable page scroll control for rotation
+	 * When enabled, carousel rotation is tied to page scroll position
+	 * @default false
+	 */
+	enablePageScrollControl?: boolean
+
+	/**
+	 * Sensitivity of page scroll control (higher = more rotation per scroll pixel)
+	 * @default 0.5
+	 */
+	pageScrollSensitivity?: number
+
+	/**
+	 * Offset from top of viewport where scroll control starts (in pixels)
+	 * @default 0
+	 */
+	scrollOffset?: number
+
+	/**
 	 * Pause continuous rotation on hover
 	 * @default true
 	 */
@@ -269,6 +318,12 @@ interface BoxCarouselProps extends React.HTMLProps<HTMLDivElement> {
 	 * @default 0.5
 	 */
 	dragSensitivity?: number
+
+	/**
+	 * Initial rotation offset in degrees
+	 * @default 0
+	 */
+	initialRotationOffset?: number
 }
 
 const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
@@ -288,11 +343,19 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			autoPlayInterval = 3000,
 			continuousRotation = false,
 			continuousSpeed = 30,
+			turnSpeedMultiplier = 3,
+			hoverScale = 1.05,
+			enableScrollControl = false,
+			scrollSensitivity = 1,
+			enablePageScrollControl = false,
+			pageScrollSensitivity = 0.5,
+			scrollOffset = 0,
 			pauseOnHover = true,
 			pauseOnDrag = true,
 			onIndexChange,
 			enableDrag = true,
 			dragSensitivity = 0.5,
+			initialRotationOffset = 0,
 			...props
 		},
 		ref
@@ -316,7 +379,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		// 3 ⇢ two steps ahead (the face that is at the back right now)
 		const [afterNextIndex, setAfterNextIndex] = useState(2)
 
-		const [currentRotation, setCurrentRotation] = useState(0)
+		const [currentRotation, setCurrentRotation] = useState(initialRotationOffset)
 		const [isHovered, setIsHovered] = useState(false)
 
 		const rotationCount = useRef(1)
@@ -327,6 +390,9 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		const startRotation = useRef(0)
 		const continuousAnimationRef = useRef<{ stop: () => void } | null>(null)
 		const lastUpdateTime = useRef<number>(0)
+		const scrollAccumulator = useRef(0)
+		const lastPageScrollY = useRef(0)
+		const carouselElementRef = useRef<HTMLElement | null>(null)
 
 		const baseRotateX = useMotionValue(0)
 		const baseRotateY = useMotionValue(0)
@@ -334,6 +400,19 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		// Use springs for smoother animation during drag
 		const springRotateX = useSpring(baseRotateX, dragSpring)
 		const springRotateY = useSpring(baseRotateY, dragSpring)
+
+		// Apply initial rotation offset
+		useEffect(() => {
+			if (initialRotationOffset !== 0) {
+				const isVertical = direction === "top" || direction === "bottom"
+				if (isVertical) {
+					baseRotateX.set(initialRotationOffset)
+				} else {
+					baseRotateY.set(initialRotationOffset)
+				}
+				setCurrentRotation(initialRotationOffset)
+			}
+		}, [initialRotationOffset, direction, baseRotateX, baseRotateY])
 
 		// Continuous rotation helper functions
 		const shouldPauseContinuous = useCallback(() => {
@@ -378,7 +457,20 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				}
 
 				const currentValue = targetMotionValue.get()
-				const rotationIncrement = continuousSpeed * directionMultiplier * deltaTime
+
+				// Calculate dynamic speed based on proximity to quarter boundaries
+				const normalizedCurrent = ((currentValue % 360) + 360) % 360
+				const positionInQuarter = normalizedCurrent % 90
+
+				// Distance from nearest quarter boundary (0 at boundary, 45 at middle)
+				const distanceFromBoundary = Math.min(positionInQuarter, 90 - positionInQuarter)
+
+				// Speed multiplier: faster near boundaries (turns), slower in middle
+				// Creates a smooth curve where speed increases as we approach turns
+				const speedCurve = 1 + (turnSpeedMultiplier - 1) * (1 - distanceFromBoundary / 45)
+				const dynamicSpeed = continuousSpeed * speedCurve
+
+				const rotationIncrement = dynamicSpeed * directionMultiplier * deltaTime
 				const newValue = currentValue + rotationIncrement
 
 				targetMotionValue.set(newValue)
@@ -449,6 +541,152 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				continuousAnimationRef.current = null
 			}
 		}, [])
+
+		// Scroll wheel handler
+		const handleWheel = useCallback(
+			(e: WheelEvent) => {
+				if (!enableScrollControl) return
+
+				e.preventDefault()
+
+				// Stop continuous rotation during scroll control
+				if (continuousRotation) {
+					stopContinuousRotation()
+				}
+
+				const isVertical = direction === "top" || direction === "bottom"
+				const targetMotionValue = isVertical ? baseRotateX : baseRotateY
+
+				// Accumulate scroll delta for smoother control
+				const scrollDelta = e.deltaY * scrollSensitivity * 0.5
+				scrollAccumulator.current += scrollDelta
+
+				// Calculate rotation direction multiplier
+				let directionMultiplier = 1
+				if (direction === "top" || direction === "left") {
+					directionMultiplier = -1
+				}
+
+				const currentValue = targetMotionValue.get()
+				const newValue = currentValue + scrollDelta * directionMultiplier
+
+				// Apply the rotation
+				targetMotionValue.set(newValue)
+				setCurrentRotation(newValue)
+
+				// Update item index when crossing 90-degree boundaries
+				const normalizedNewValue = ((newValue % 360) + 360) % 360
+				const normalizedCurrentValue = ((currentValue % 360) + 360) % 360
+
+				const newQuarter = Math.floor(normalizedNewValue / 90)
+				const currentQuarter = Math.floor(normalizedCurrentValue / 90)
+
+				if (newQuarter !== currentQuarter) {
+					// Determine rotation direction
+					let rotationDirection = 0
+					if (Math.abs(newValue - currentValue) < 180) {
+						rotationDirection = newValue > currentValue ? 1 : -1
+					} else {
+						// Handle wrapping around 0/360
+						rotationDirection = newValue > currentValue ? -1 : 1
+					}
+
+					const indexChange = rotationDirection * directionMultiplier
+
+					let newItemIndex = currentItemIndex
+					if (indexChange > 0) {
+						newItemIndex = (currentItemIndex + 1) % items.length
+					} else {
+						newItemIndex = currentItemIndex === 0 ? items.length - 1 : currentItemIndex - 1
+					}
+
+					if (newItemIndex !== currentItemIndex) {
+						setCurrentItemIndex(newItemIndex)
+						onIndexChange?.(newItemIndex)
+					}
+				}
+			},
+			[
+				enableScrollControl,
+				direction,
+				scrollSensitivity,
+				baseRotateX,
+				baseRotateY,
+				currentItemIndex,
+				items.length,
+				onIndexChange,
+				continuousRotation,
+				stopContinuousRotation,
+			]
+		)
+
+		// Page scroll handler
+		const handlePageScroll = useCallback(() => {
+			if (!enablePageScrollControl || !carouselElementRef.current) return
+
+			const element = carouselElementRef.current
+			const rect = element.getBoundingClientRect()
+			const viewportHeight = window.innerHeight
+
+			// Calculate scroll progress based on element position in viewport
+			const elementTop = rect.top - scrollOffset
+			const elementBottom = rect.bottom
+
+			// Calculate how much of the element is visible in the viewport
+			let scrollProgress = 0
+
+			if (elementTop <= viewportHeight && elementBottom >= 0) {
+				// Element is in viewport
+				const visibleTop = Math.max(0, viewportHeight - elementTop)
+				const visibleBottom = Math.min(elementBottom, viewportHeight)
+				const visibleHeight = visibleBottom - Math.max(0, -elementTop)
+				const elementHeight = rect.height
+
+				// Progress from 0 to 1 based on how much the element has scrolled through viewport
+				scrollProgress = Math.max(
+					0,
+					Math.min(1, (visibleTop - visibleHeight * 0.5) / (viewportHeight + elementHeight))
+				)
+			}
+
+			// Convert scroll progress to rotation
+			const targetRotation = scrollProgress * 360 * pageScrollSensitivity
+
+			const isVertical = direction === "top" || direction === "bottom"
+			const targetMotionValue = isVertical ? baseRotateX : baseRotateY
+
+			// Calculate rotation direction multiplier
+			let directionMultiplier = 1
+			if (direction === "top" || direction === "left") {
+				directionMultiplier = -1
+			}
+
+			const newValue = targetRotation * directionMultiplier
+
+			// Smoothly update rotation
+			targetMotionValue.set(newValue)
+			setCurrentRotation(newValue)
+
+			// Update item index based on rotation
+			const normalizedValue = ((newValue % 360) + 360) % 360
+			const currentQuarter = Math.floor(normalizedValue / 90)
+			const expectedIndex = Math.floor(((normalizedValue / 90) * items.length) / 4) % items.length
+
+			if (expectedIndex !== currentItemIndex) {
+				setCurrentItemIndex(expectedIndex)
+				onIndexChange?.(expectedIndex)
+			}
+		}, [
+			enablePageScrollControl,
+			scrollOffset,
+			pageScrollSensitivity,
+			direction,
+			baseRotateX,
+			baseRotateY,
+			items.length,
+			currentItemIndex,
+			onIndexChange,
+		])
 
 		const handleAnimationComplete = useCallback(
 			(triggeredBy: string) => {
@@ -661,6 +899,42 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			}
 		}, [enableDrag, handleDragMove, handleDragEnd])
 
+		// Set up scroll wheel event listener
+		useEffect(() => {
+			const containerElement = document.getElementById(`carousel-${items[0]?.id || "default"}`)
+			if (enableScrollControl && containerElement) {
+				containerElement.addEventListener("wheel", handleWheel, { passive: false })
+
+				return () => {
+					containerElement.removeEventListener("wheel", handleWheel)
+				}
+			}
+		}, [enableScrollControl, handleWheel, items])
+
+		// Set up page scroll event listener
+		useEffect(() => {
+			if (enablePageScrollControl) {
+				// Store reference to carousel element
+				const containerElement = document.getElementById(`carousel-${items[0]?.id || "default"}`)
+				carouselElementRef.current = containerElement
+
+				window.addEventListener("scroll", handlePageScroll, { passive: true })
+
+				// Delay initial trigger to allow initial rotation offset to be applied
+				const timer = setTimeout(() => {
+					if (initialRotationOffset === 0) {
+						// Only trigger on initial load if no rotation offset is set
+						handlePageScroll()
+					}
+				}, 150)
+
+				return () => {
+					clearTimeout(timer)
+					window.removeEventListener("scroll", handlePageScroll)
+				}
+			}
+		}, [enablePageScrollControl, handlePageScroll, items, initialRotationOffset])
+
 		const next = useCallback(() => {
 			if (items.length === 0 || isRotating.current) return
 
@@ -860,10 +1134,21 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			[direction, width, height]
 		)
 
+		// Create a motion value for scale
+		const scaleMotionValue = useMotionValue(1)
+		const scale = useSpring(scaleMotionValue, { stiffness: 300, damping: 30 })
+
+		// Update scale based on hover state
+		useEffect(() => {
+			scaleMotionValue.set(isHovered ? hoverScale : 1)
+		}, [isHovered, hoverScale, scaleMotionValue])
+
 		const transform = useTransform(
 			isDragging.current ? [springRotateX, springRotateY] : [baseRotateX, baseRotateY],
 			([x, y]) => `translateZ(-${depth / 2}px) rotateX(${x}deg) rotateY(${y}deg)`
 		)
+
+		const containerTransform = useTransform(scale, (s) => `scale(${s})`)
 
 		// Determine face transforms based on the desired rotation axis
 		const faceTransforms = (() => {
@@ -911,13 +1196,32 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			}
 		})()
 
-		// Continuous rotation management
+		// Continuous rotation management (disabled when any scroll control is enabled)
 		useEffect(() => {
-			if (continuousRotation && items.length > 0) {
-				startContinuousRotation()
-				return stopContinuousRotation
+			if (
+				continuousRotation &&
+				!enableScrollControl &&
+				!enablePageScrollControl &&
+				items.length > 0
+			) {
+				// Add a small delay to ensure initial rotation offset is applied first
+				const timer = setTimeout(() => {
+					startContinuousRotation()
+				}, 100)
+
+				return () => {
+					clearTimeout(timer)
+					stopContinuousRotation()
+				}
 			}
-		}, [continuousRotation, items.length, startContinuousRotation, stopContinuousRotation])
+		}, [
+			continuousRotation,
+			enableScrollControl,
+			enablePageScrollControl,
+			items.length,
+			startContinuousRotation,
+			stopContinuousRotation,
+		])
 
 		// Pause/resume continuous rotation based on hover state
 		useEffect(() => {
@@ -936,13 +1240,27 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			stopContinuousRotation,
 		])
 
-		// Auto play functionality (disabled when continuous rotation is enabled)
+		// Auto play functionality (disabled when continuous rotation or any scroll control is enabled)
 		useEffect(() => {
-			if (autoPlay && !continuousRotation && items.length > 0) {
+			if (
+				autoPlay &&
+				!continuousRotation &&
+				!enableScrollControl &&
+				!enablePageScrollControl &&
+				items.length > 0
+			) {
 				const interval = setInterval(next, autoPlayInterval)
 				return () => clearInterval(interval)
 			}
-		}, [autoPlay, continuousRotation, items.length, next, autoPlayInterval])
+		}, [
+			autoPlay,
+			continuousRotation,
+			enableScrollControl,
+			enablePageScrollControl,
+			items.length,
+			next,
+			autoPlayInterval,
+		])
 
 		// Cleanup continuous rotation on unmount
 		useEffect(() => {
@@ -990,7 +1308,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		)
 
 		return (
-			<div
+			<motion.div
+				id={`carousel-${items[0]?.id || "default"}`}
 				className={cn(
 					"relative focus:outline-0",
 					enableDrag && "cursor-grab active:cursor-grabbing",
@@ -1000,6 +1319,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					width,
 					height,
 					perspective: `${perspective}px`,
+					transform: containerTransform,
 				}}
 				onKeyDown={handleKeyDown}
 				onMouseEnter={() => setIsHovered(true)}
@@ -1060,7 +1380,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 						<MediaRenderer item={items[afterNextIndex]} debug={debug} />
 					</CubeFace>
 				</motion.div>
-			</div>
+			</motion.div>
 		)
 	}
 )

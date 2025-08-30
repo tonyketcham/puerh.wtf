@@ -39,16 +39,18 @@ export default async function SessionPage(props: SessionPageProps) {
 
 			<h1 className="font-rock-3d text-8xl text-shadow-2xl">{session.title}</h1>
 
-			{session.images && session.images.length > 0 && (
-				<div className="relative">
-					<SessionCarousel images={session.images} recordingKey="session-hero-carousel" />
-				</div>
-			)}
+			<div className="relative">
+				{session.images && session.images.length > 0 && (
+					<div className="float-right clear-right mb-8 ml-8">
+						<SessionCarousel images={session.images} recordingKey="session-hero-carousel" />
+					</div>
+				)}
 
-			<article
-				className="prose prose-invert max-w-none"
-				dangerouslySetInnerHTML={{ __html: session._content.html }}
-			/>
+				<article
+					className="prose prose-invert max-w-none"
+					dangerouslySetInnerHTML={{ __html: session._content.html }}
+				/>
+			</div>
 		</>
 	)
 }

@@ -38,6 +38,49 @@ interface SessionCarouselProps {
 	 * @default true
 	 */
 	pauseOnDrag?: boolean
+	/**
+	 * Speed multiplier during turns (90-degree transitions)
+	 * Higher values make turns faster, creating a dynamic rotation effect
+	 * @default 3
+	 */
+	turnSpeedMultiplier?: number
+	/**
+	 * Scale factor when hovered (as percentage, e.g., 1.05 = 5% larger)
+	 * @default 1.05
+	 */
+	hoverScale?: number
+	/**
+	 * Enable scroll wheel control for rotation
+	 * When enabled, scroll wheel will control rotation instead of continuous rotation
+	 * @default false
+	 */
+	enableScrollControl?: boolean
+	/**
+	 * Sensitivity of scroll wheel control (higher = more rotation per scroll)
+	 * @default 1
+	 */
+	scrollSensitivity?: number
+	/**
+	 * Enable page scroll control for rotation
+	 * When enabled, carousel rotation is tied to page scroll position
+	 * @default false
+	 */
+	enablePageScrollControl?: boolean
+	/**
+	 * Sensitivity of page scroll control (higher = more rotation per scroll pixel)
+	 * @default 0.5
+	 */
+	pageScrollSensitivity?: number
+	/**
+	 * Offset from top of viewport where scroll control starts (in pixels)
+	 * @default 0
+	 */
+	scrollOffset?: number
+	/**
+	 * Initial rotation offset in degrees
+	 * @default 0
+	 */
+	initialRotationOffset?: number
 }
 
 export default function SessionCarousel({
@@ -45,9 +88,17 @@ export default function SessionCarousel({
 	direction = "right",
 	recordingKey,
 	continuousRotation = true,
-	continuousSpeed = 17,
+	continuousSpeed = 3,
 	pauseOnHover = true,
 	pauseOnDrag = true,
+	turnSpeedMultiplier = 3,
+	hoverScale = 1.05,
+	enableScrollControl = false,
+	scrollSensitivity = 1,
+	enablePageScrollControl = true,
+	pageScrollSensitivity = 1.5,
+	scrollOffset = 0,
+	initialRotationOffset = 10,
 }: SessionCarouselProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const [containerWidth, setContainerWidth] = useState<number>(0)
@@ -86,7 +137,11 @@ export default function SessionCarousel({
 	)
 
 	return (
-		<div ref={containerRef} className="w-full" data-recording-key={recordingKey}>
+		<div
+			ref={containerRef}
+			className="w-72 aspect-square rotate-12"
+			data-recording-key={recordingKey}
+		>
 			{width > 0 && items.length > 0 && (
 				<BoxCarousel
 					items={items}
@@ -98,8 +153,16 @@ export default function SessionCarousel({
 					autoPlay={!continuousRotation} // Disable autoPlay when continuous rotation is enabled
 					continuousRotation={continuousRotation}
 					continuousSpeed={continuousSpeed}
+					turnSpeedMultiplier={turnSpeedMultiplier}
+					hoverScale={hoverScale}
+					enableScrollControl={enableScrollControl}
+					scrollSensitivity={scrollSensitivity}
+					enablePageScrollControl={enablePageScrollControl}
+					pageScrollSensitivity={pageScrollSensitivity}
+					scrollOffset={scrollOffset}
 					pauseOnHover={pauseOnHover}
 					pauseOnDrag={pauseOnDrag}
+					initialRotationOffset={initialRotationOffset}
 				/>
 			)}
 		</div>
