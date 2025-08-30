@@ -705,6 +705,8 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				if (isRotating.current && pendingIndexChange.current !== null) {
 					isRotating.current = false
 
+					const targetIndex = pendingIndexChange.current
+
 					let newFrontFaceIndex: number
 					let currentBackFaceIndex: number
 
@@ -716,25 +718,25 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 						currentBackFaceIndex = (newFrontFaceIndex + 3) % 4
 					}
 
-					setCurrentItemIndex(pendingIndexChange.current)
-					onIndexChange?.(pendingIndexChange.current)
+					// Update the current item index first
+					setCurrentItemIndex(targetIndex)
+					onIndexChange?.(targetIndex)
 
+					// Calculate face indices based on the new current index
+					// Ensure all face indices are properly synchronized
 					const indexOffset = triggeredBy === "next" ? 2 : -1
 
 					if (currentBackFaceIndex === 0) {
-						setPrevIndex((pendingIndexChange.current + indexOffset + items.length) % items.length)
+						setPrevIndex((targetIndex + indexOffset + items.length) % items.length)
 					} else if (currentBackFaceIndex === 1) {
-						setCurrentIndex(
-							(pendingIndexChange.current + indexOffset + items.length) % items.length
-						)
+						setCurrentIndex((targetIndex + indexOffset + items.length) % items.length)
 					} else if (currentBackFaceIndex === 2) {
-						setNextIndex((pendingIndexChange.current + indexOffset + items.length) % items.length)
+						setNextIndex((targetIndex + indexOffset + items.length) % items.length)
 					} else if (currentBackFaceIndex === 3) {
-						setAfterNextIndex(
-							(pendingIndexChange.current + indexOffset + items.length) % items.length
-						)
+						setAfterNextIndex((targetIndex + indexOffset + items.length) % items.length)
 					}
 
+					// Clear pending change before updating front face index
 					pendingIndexChange.current = null
 					rotationCount.current++
 
@@ -747,7 +749,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		// Drag functionality - using direct event handlers like css-box
 		const handleDragStart = useCallback(
 			(e: React.MouseEvent | React.TouchEvent) => {
-				if (!enableDrag || isRotating.current) return
+				if (!enableDrag || isRotating.current || pendingIndexChange.current !== null) return
 
 				isDragging.current = true
 				const point = "touches" in e ? e.touches[0] : e
@@ -776,7 +778,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 
 		const handleDragMove = useCallback(
 			(e: MouseEvent | TouchEvent) => {
-				if (!isDragging.current || isRotating.current) return
+				if (!isDragging.current || isRotating.current || pendingIndexChange.current !== null) return
 
 				const point = "touches" in e ? e.touches[0] : e
 				const deltaX = point.clientX - startPosition.current.x
@@ -821,6 +823,25 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			const steps = Math.round(rotationDifference / 90)
 
 			if (steps !== 0) {
+				// Prevent conflicting operations
+				if (pendingIndexChange.current !== null) {
+					// If there's already a pending change, just snap to position
+					animate(rotationMotionValue, snappedRotation, {
+						...snapTransition,
+						onComplete: () => {
+							updateRotation(snappedRotation, "manual")
+							if (continuousRotation) {
+								setTimeout(() => {
+									if (!isDragging.current && !isRotating.current) {
+										startContinuousRotation()
+									}
+								}, 100)
+							}
+						},
+					})
+					return
+				}
+
 				isRotating.current = true
 
 				// Calculate new item index based on steps and direction
@@ -832,15 +853,18 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					indexSteps = -steps
 				}
 
-				// Calculate new item index based on corrected steps
+				// Use modular arithmetic for more robust index calculation
+				const totalSteps = Math.abs(indexSteps)
 				let newItemIndex = currentItemIndex
-				for (let i = 0; i < Math.abs(indexSteps); i++) {
-					if (indexSteps > 0) {
-						newItemIndex = (newItemIndex + 1) % items.length
-					} else {
-						newItemIndex = newItemIndex === 0 ? items.length - 1 : newItemIndex - 1
-					}
+
+				if (indexSteps > 0) {
+					newItemIndex = (currentItemIndex + totalSteps) % items.length
+				} else {
+					newItemIndex = (currentItemIndex - totalSteps + items.length) % items.length
 				}
+
+				// Ensure the new index is valid
+				newItemIndex = Math.max(0, Math.min(items.length - 1, newItemIndex))
 
 				pendingIndexChange.current = newItemIndex
 
