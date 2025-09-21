@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import localFont from "next/font/local"
 import "../app.css"
-import Explorer from "@/lib/components/Explorer"
-import { getSessions, getVendors, getCategories } from "@/lib/api"
+import Explorer from "../lib/components/Explorer"
+import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
 import GenreLegend from "@/lib/components/GenreLegend"
 import { Toolbar } from "@/lib/components/containers/Toolbar"
 import { StoreProvider } from "@/lib/store/StoreProvider"
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-	const sessions = await getSessions()
+	const sessions = await getExplorerSessions()
 	const vendors = await getVendors()
 	const categories = await getCategories()
 

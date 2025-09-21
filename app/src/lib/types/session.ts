@@ -18,6 +18,7 @@ export type BaseSession = {
 export type SessionPreview = BaseSession & {
 	_collection: NonNullable<GqlSession["_collection"]>
 	title: NonNullable<GqlSession["title"]>
+	tea_name?: GqlSession["tea_name"]
 	date: NonNullable<GqlSession["date"]>
 	production_year: GqlSession["production_year"]
 	excerpt: NonNullable<GqlSession["excerpt"]>
@@ -27,6 +28,24 @@ export type SessionPreview = BaseSession & {
 		color: string
 		category: Category
 	}[]
+	vendor?:
+		| {
+				_slug: string
+				title: string
+				image: string
+		  }[]
+		| null
+	cultivar?: Cultivar[]
+	tags?: { _slug: string; title: string }[] | null
+	origin?:
+		| {
+				_slug: string
+				id: string
+				country?: string | null
+				location?: string | null
+				municipality?: string | null
+		  }[]
+		| null
 }
 
 export type SessionPreviewWithFeatureImage = SessionPreview & {

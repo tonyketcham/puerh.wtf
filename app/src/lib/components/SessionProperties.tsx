@@ -46,12 +46,7 @@ const noteDisplayConfig: Record<keyof SessionNotes, { title: string; icon: strin
 export function SessionPropertiesPanel({ children }: PropsWithChildren<unknown>) {
 	return (
 		<aside>
-			<Panel
-				className="fixed inset-y-0 right-0 w-[340px] h-full p-8"
-				backdropClassName="bg-sidebar"
-			>
-				{children}
-			</Panel>
+			<Panel className="fixed inset-y-0 right-0 w-[340px] h-full p-8">{children}</Panel>
 		</aside>
 	)
 }

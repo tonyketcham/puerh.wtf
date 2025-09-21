@@ -27,8 +27,15 @@ export async function getSessions(options?: {
         excerpt
         style {
           category {
+            _slug
+            title
             color
           }
+        }
+        vendor {
+          _slug
+          title
+          image
         }
         ${
 					withImages
@@ -49,10 +56,75 @@ export async function getSessions(options?: {
 	return allSessions
 }
 
+export async function getExplorerSessions(options?: {
+	order?: "ASC" | "DESC"
+	sortBy?: string
+	limit?: number
+}): Promise<SessionPreview[]> {
+	const { order = "DESC", sortBy = "date", limit } = options || {}
+
+	const query = gql`
+		query AllSessionsForExplorer($order: Order, $sortBy: String, $limit: Int) {
+			allSessions(order: $order, sortBy: $sortBy, limit: $limit) {
+				_slug
+				_collection
+				id
+				title
+				tea_name
+				date
+				production_year
+				excerpt
+				style {
+					id
+					title
+					color
+					category {
+						_slug
+						title
+						color
+					}
+				}
+				vendor {
+					_collection
+					_slug
+					title
+					image
+				}
+				cultivar {
+					id
+					_slug
+					title
+				}
+				tags {
+					_slug
+					title
+				}
+				origin {
+					_slug
+					id
+					country
+					location
+					municipality
+				}
+			}
+		}
+	`
+
+	const { allSessions }: { allSessions: SessionPreview[] } = await flatbread.request(query, {
+		order,
+		sortBy,
+		limit,
+	})
+
+	return allSessions
+}
+
 export async function getVendors(): Promise<Vendor[]> {
 	const query = gql`
 		query AllVendors {
 			allVendors {
+				id
+				_collection
 				_slug
 				title
 				image
@@ -68,6 +140,8 @@ export async function getCategories(): Promise<Category[]> {
 	const query = gql`
 		query AllCategories {
 			allCategories {
+				id
+				_collection
 				_slug
 				title
 				color
@@ -200,4 +274,108 @@ export async function getSession(slug: string): Promise<SessionFull> {
 
 	const { Session } = await flatbread.request(query, { id: sessionId })
 	return Session
+}
+
+export type VendorDetail = {
+	_slug: string
+	title: string
+	image?: string | null
+	country?: string | null
+	location?: string | null
+	municipality?: string | null
+	description?: string | null
+	links?: {
+		website?: string | null
+		instagram?: string | null
+		twitter?: string | null
+		facebook?: string | null
+		youtube?: string | null
+	} | null
+	_content?: { html?: string | null } | null
+}
+
+export async function getVendorBySlug(slug: string): Promise<VendorDetail> {
+	const findQuery = gql`
+		query FindVendor($slug: String!) {
+			allVendors(filter: { _slug: { eq: $slug } }) {
+				id
+				_slug
+			}
+		}
+	`
+
+	const { allVendors } = await flatbread.request(findQuery, { slug })
+	if (!allVendors || allVendors.length === 0) {
+		throw new Error(`Vendor with slug "${slug}" not found`)
+	}
+
+	const vendorId = allVendors[0].id
+	const query = gql`
+		query Vendor($id: String!) {
+			Vendor(id: $id) {
+				_slug
+				title
+				image
+				country
+				location
+				municipality
+				description
+				links {
+					website
+					instagram
+					twitter
+					facebook
+					youtube
+				}
+				_content {
+					html
+				}
+			}
+		}
+	`
+
+	const { Vendor: vendor } = await flatbread.request(query, { id: vendorId })
+	return vendor as VendorDetail
+}
+
+export type CategoryDetail = {
+	_slug: string
+	title: string
+	color?: string | null
+	description?: string | null
+	_content?: { html?: string | null } | null
+}
+
+export async function getCategoryBySlug(slug: string): Promise<CategoryDetail> {
+	const findQuery = gql`
+		query FindCategory($slug: String!) {
+			allCategories(filter: { _slug: { eq: $slug } }) {
+				id
+				_slug
+			}
+		}
+	`
+
+	const { allCategories } = await flatbread.request(findQuery, { slug })
+	if (!allCategories || allCategories.length === 0) {
+		throw new Error(`Category with slug "${slug}" not found`)
+	}
+
+	const categoryId = allCategories[0].id
+	const query = gql`
+		query Category($id: String!) {
+			Category(id: $id) {
+				_slug
+				title
+				color
+				description
+				_content {
+					html
+				}
+			}
+		}
+	`
+
+	const { Category: category } = await flatbread.request(query, { id: categoryId })
+	return category as CategoryDetail
 }
