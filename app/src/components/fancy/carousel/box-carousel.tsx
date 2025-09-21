@@ -21,7 +21,7 @@ import {
 	ValueAnimationOptions,
 } from "motion/react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 
 interface CarouselItem {
 	/**
@@ -74,7 +74,11 @@ interface FaceProps {
 
 const CubeFace = memo(({ transform, className, children, style, debug }: FaceProps) => (
 	<div
-		className={cn("absolute overflow-hidden", debug && "backface-visible opacity-50", className)}
+		className={cn(
+			"absolute overflow-hidden p-3 border-2 border-white",
+			debug && "backface-visible opacity-50",
+			className
+		)}
 		style={{ transform, ...style }}
 	>
 		{children}
@@ -99,7 +103,7 @@ const MediaRenderer = memo(
 					<video
 						src={item.src}
 						poster={item.poster}
-						className={cn("object-cover w-full h-full", className)}
+						className={cn("object-cover w-full h-full border border-white rounded", className)}
 						muted
 						loop
 						autoPlay
@@ -112,7 +116,7 @@ const MediaRenderer = memo(
 					src={item.src}
 					alt={item.alt || ""}
 					draggable={false}
-					className={cn("object-cover w-full h-full", className)}
+					className={cn("object-cover w-full h-full border border-white rounded", className)}
 				/>
 			)
 		}
