@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/cn"
 import BoxCarousel, {
 	type CarouselItem,
 	type RotationDirection,

@@ -1374,7 +1374,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				onTouchStart={handleDragStart}
 				{...props}
 			>
-				<div className="sr-only" aria-live="assertive">
+				<div className="sr-only" aria-live="polite">
 					Showing item {currentItemIndex + 1} of {items.length}:{" "}
 					{items[currentItemIndex]?.alt || `Item ${currentItemIndex + 1}`}
 				</div>
