@@ -59,7 +59,6 @@ function useUrlSync(initial: { q: string; facets: FacetState }) {
 			cultivars: readList("cultivars"),
 			tags: readList("tags"),
 		})
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	console.log({ facets })

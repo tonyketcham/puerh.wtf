@@ -95,10 +95,12 @@ const MediaRenderer = memo(
 		className,
 		debug = false,
 	}: {
-		item: CarouselItem
+		item?: CarouselItem
 		className?: string
 		debug?: boolean
 	}) => {
+		if (!item) return null
+
 		if (!debug) {
 			if (item.type === "video") {
 				return (
@@ -372,18 +374,20 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		const prefersReducedMotion = useReducedMotion()
 
 		const _transition = prefersReducedMotion ? { duration: 0 } : transition
+		const itemIndex = (offset: number) =>
+			items.length ? ((offset % items.length) + items.length) % items.length : 0
 
 		// 0 ⇢ will be shown if the user presses "prev"
-		const [prevIndex, setPrevIndex] = useState(items.length - 1)
+		const [prevIndex, setPrevIndex] = useState(() => itemIndex(-1))
 
 		// 1 ⇢ item that is currently visible
-		const [currentIndex, setCurrentIndex] = useState(0)
+		const [currentIndex, setCurrentIndex] = useState(() => itemIndex(0))
 
 		// 2 ⇢ will be shown on the next "next"
-		const [nextIndex, setNextIndex] = useState(1)
+		const [nextIndex, setNextIndex] = useState(() => itemIndex(1))
 
 		// 3 ⇢ two steps ahead (the face that is at the back right now)
-		const [afterNextIndex, setAfterNextIndex] = useState(2)
+		const [afterNextIndex, setAfterNextIndex] = useState(() => itemIndex(2))
 
 		const [currentRotation, setCurrentRotation] = useState(initialRotationOffset)
 		const [isHovered, setIsHovered] = useState(false)

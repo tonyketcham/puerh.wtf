@@ -25,7 +25,6 @@ export default async function VendorPage({ params }: VendorPageProps) {
 		<div className="space-y-6">
 			<section className="flex items-start gap-4">
 				{vendor.image && (
-					// eslint-disable-next-line @next/next/no-img-element
 					<img
 						src={vendor.image}
 						alt={vendor.title}

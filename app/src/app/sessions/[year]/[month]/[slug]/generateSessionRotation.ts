@@ -8,11 +8,7 @@
  * @param maxRotation - Maximum rotation in degrees (default: 15)
  * @returns A rotation value in degrees
  */
-export function generateSessionRotation(
-	slug: string,
-	minRotation: number = -15,
-	maxRotation: number = 15
-): number {
+export function generateSessionRotation(slug: string, minRotation = -15, maxRotation = 15): number {
 	// Simple hash function to convert string to number
 	let hash = 0
 	for (let i = 0; i < slug.length; i++) {

@@ -3,7 +3,7 @@ backend:
   repo: tonyketcham/puerh.wtf
   branch: main
 
-media_folder: app/static/images/uploads
+media_folder: app/public/images/uploads
 public_folder: /images/uploads
 publish_mode: editorial_workflow
 
@@ -14,7 +14,7 @@ collections:
     name: 'tastings'
     label_singular: 'Tea Tasting'
     description: 'Personal evaluations of teas'
-    folder: 'content/tastings'
+    folder: 'app/content/tastings'
     create: true
     delete: true
     slug: '{{production_year}}-{{slug}}'
@@ -422,7 +422,7 @@ collections:
     name: 'categories'
     label_singular: 'Category'
     description: 'The main tea cornerstones'
-    folder: 'content/categories'
+    folder: 'app/content/categories'
     create: true
     delete: true
     slug: '{{slug}}'
@@ -454,7 +454,7 @@ collections:
     name: 'styles'
     label_singular: 'Tea Styles'
     description: 'The different variations within a category'
-    folder: 'content/styles'
+    folder: 'app/content/styles'
     create: true
     delete: true
     slug: '{{slug}}'
@@ -499,7 +499,7 @@ collections:
     name: 'cultivars'
     label_singular: 'Varietal'
     description: 'The different strains in the game'
-    folder: 'content/cultivars'
+    folder: 'app/content/cultivars'
     create: true
     delete: true
     slug: '{{slug}}'
@@ -547,7 +547,7 @@ collections:
     name: 'origins'
     label_singular: 'Tea Origin'
     description: 'Places around the tea world'
-    folder: 'content/origins'
+    folder: 'app/content/origins'
     create: true
     delete: true
     slug: '{{location}}-{{municipality}}-{{country}}'
@@ -583,7 +583,7 @@ collections:
     name: 'vendors'
     label_singular: 'Tea Vendor'
     description: 'Sellers of tea'
-    folder: 'content/vendors'
+    folder: 'app/content/vendors'
     create: true
     delete: true
     slug: '{{title}}'
@@ -655,7 +655,7 @@ collections:
   - label: 'Authors'
     name: 'authors'
     label_singular: 'Author'
-    folder: 'content/authors'
+    folder: 'app/content/authors'
     create: true
     delete: true
     slug: '{{title}}'
@@ -714,7 +714,7 @@ collections:
 
   - label: 'Tags'
     label_singular: 'Tag'
-    folder: 'content/tags'
+    folder: 'app/content/tags'
     create: true
     delete: true
     name: 'tags'

@@ -7,8 +7,12 @@ export async function generateStaticParams() {
 	return categories.map((c) => ({ slug: c._slug }))
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-	const slug = params.slug
+interface CategoryPageProps {
+	params: Promise<{ slug: string }>
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+	const slug = (await params).slug
 
 	const [category, sessions] = await Promise.all([
 		getCategoryBySlug(slug),

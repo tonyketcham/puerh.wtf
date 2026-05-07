@@ -7,6 +7,7 @@ import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
 import GenreLegend from "@/lib/components/GenreLegend"
 import { Toolbar } from "@/lib/components/containers/Toolbar"
 import { StoreProvider } from "@/lib/store/StoreProvider"
+import { Suspense } from "react"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -39,7 +40,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<StoreProvider>
 					<div className="relative flex flex-row">
-						<Explorer sessions={sessions} vendors={vendors} categories={categories} />
+						<Suspense>
+							<Explorer sessions={sessions} vendors={vendors} categories={categories} />
+						</Suspense>
 						<div className="flex flex-col w-full ml-[340px]">
 							<main className="w-full p-8">{children}</main>
 						</div>

@@ -82,13 +82,17 @@ function FlavorProfile() {
 function Notes() {
 	const notes = useAtomValue(notesAtom) ?? []
 
-	return Object.entries(notes).map(([key, value]) => {
-		if (!value) return null
-		const config = noteDisplayConfig[key as keyof SessionNotes]
-		if (!config) return null
+	return (
+		<>
+			{Object.entries(notes).map(([key, value]) => {
+				if (!value) return null
+				const config = noteDisplayConfig[key as keyof SessionNotes]
+				if (!config) return null
 
-		return <DetailsListItem key={key} icon={config.icon} title={config.title} value={value} />
-	})
+				return <DetailsListItem key={key} icon={config.icon} title={config.title} value={value} />
+			})}
+		</>
+	)
 }
 
 function MetaData() {
@@ -105,8 +109,12 @@ function MetaData() {
 }
 
 function Cultivars({ values }: { values: Cultivar[] }) {
-	return values.map((value) => (
-		// <DetailsListItem key={value.id} icon={null} title="Cultivar" value={value.title} />
-		<Chip key={value.id}>{value.title}</Chip>
-	))
+	return (
+		<>
+			{values.map((value) => (
+				// <DetailsListItem key={value.id} icon={null} title="Cultivar" value={value.title} />
+				<Chip key={value.id}>{value.title}</Chip>
+			))}
+		</>
+	)
 }
