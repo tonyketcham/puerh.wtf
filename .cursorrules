@@ -1,0 +1,123 @@
+---
+description: Testing and Component Development Patterns
+globs: *.tsx, *.ts, *.test.ts
+alwaysApply: true
+---
+
+# Testing and Component Development Patterns
+
+## Class Name Composition
+- ALWAYS use the `cn()` utility function instead of template literals for className composition
+- Import from `@/lib/utils`
+- Example: `className={cn("base-class", condition && "conditional-class", variant)}`
+- Never use: `className={\`base-class ${condition ? "conditional" : ""}\`}`
+
+## Component Testing Pattern
+- Components that need testing MUST accept an optional `recordingKey?: string` prop
+- Apply the recordingKey as `data-recording-key={recordingKey}` on the main component element
+- This enables precise test targeting even with multiple component instances
+
+### Example Component Implementation:
+```tsx
+interface MyComponentProps {
+  data: SomeType
+  recordingKey?: string
+}
+
+export default function MyComponent({ data, recordingKey }: MyComponentProps) {
+  return (
+    <div className={cn("component-styles")} data-recording-key={recordingKey}>
+      {/* component content */}
+    </div>
+  )
+}
+```
+
+## Test Page Development
+- Create test pages in `src/app/tests/`
+- ALWAYS wrap test page content with `<TestPageWrapper>` to prevent production deployment
+- Use descriptive recordingKey values like "component-name-scenario"
+
+### Example Test Page:
+```tsx
+import TestPageWrapper from "@/lib/components/TestPageWrapper"
+import MyComponent from "@/lib/components/MyComponent"
+
+export default function MyComponentTestPage() {
+  return (
+    <TestPageWrapper>
+      <div className="test-page-container">
+        <MyComponent data={testData} recordingKey="my-component-max-values" />
+      </div>
+    </TestPageWrapper>
+  )
+}
+```
+
+## Page Object Model for Tests
+- Create element classes in `tests/utils/` for reusable component testing
+- Use the recordingKey pattern for element targeting
+- Encapsulate all component-specific test operations in the element class
+
+### Example Element Class:
+```typescript
+import { expect, type Page, type Locator } from "@playwright/test"
+
+export class MyComponentElement {
+  private page: Page
+  private recordingKey: string
+  private element: Locator
+
+  constructor(page: Page, recordingKey: string) {
+    this.page = page
+    this.recordingKey = recordingKey
+    this.element = page.locator(`[data-recording-key="${recordingKey}"]`)
+  }
+
+  async waitForLoad() {
+    await this.page.waitForSelector(`[data-recording-key="${this.recordingKey}"]`)
+  }
+
+  async expectToBeVisible() {
+    await expect(this.element).toBeVisible()
+  }
+
+  async takeScreenshot(filename: string) {
+    await expect(this.element).toHaveScreenshot(filename)
+  }
+}
+```
+
+## Test Implementation Guidelines
+- Import element classes: `import { MyComponentElement } from "./utils/my-component-element"`
+- Create element instances: `const component = new MyComponentElement(page, "recording-key")`
+- Always call `waitForLoad()` before assertions
+- Use descriptive test scenarios that demonstrate component behavior
+- Include visual regression testing with screenshots for UI components
+
+### Example Test:
+```typescript
+test("renders correctly with maximum values", async ({ page }) => {
+  await page.goto("/tests/my-component-max")
+  
+  const component = new MyComponentElement(page, "my-component-max-values")
+  await component.waitForLoad()
+  await component.expectToBeVisible()
+  await component.takeScreenshot("my-component-max-values.png")
+})
+```
+
+## Production Safety
+- TestPageWrapper automatically prevents test pages from rendering in production
+- Test pages show 404 message when NODE_ENV === "production"
+- Never deploy test pages or test utilities to production builds
+
+## Benefits of This Pattern
+1. **Durable Testing**: recordingKey ensures tests target specific component instances
+2. **Maintainable**: Page Object Model separates test logic from test implementation
+3. **Reusable**: Element classes can be used across multiple test files
+4. **Production Safe**: Test pages are automatically excluded from production
+5. **Multi-instance Support**: Multiple components can be tested on the same page
+6. **Consistent Styling**: cn() utility ensures proper class name merging
+
+Always follow these patterns when creating new components and tests to maintain consistency and reliability across the codebase. 

@@ -1,0 +1,92 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@config '../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
+}
+
+body {
+	@apply bg-background selection:bg-tea-soup-500/60 selection:text-black;
+	@apply transition-opacity duration-75 ease-in-out;
+	@apply font-fira-code text-white;
+}
+
+.background-box {
+	/* @apply box-decoration-clone bg-heicha-900/80 px-1 text-shadow-lg shadow-md; */
+	/* @apply bg-heicha-700/80 backdrop-blur px-1.5 rounded text-shadow-md block; */
+}
+
+* {
+	scrollbar-color: transparent transparent;
+	scrollbar-width: thin;
+}
+
+*:hover {
+	scrollbar-color: #26232677 transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply rounded-lg;
+}
+
+.image-zoom {
+	@apply hover:scale-110 transform-gpu transition-transform;
+}
+
+.simplebar-scrollbar::before {
+	@apply bg-white/40 w-1.5;
+}
+
+.simplebar-track.simplebar-vertical {
+	@apply w-3;
+}
+
+.tape-duplicator {
+	isolation: isolate;
+	z-index: 1;
+}
+
+.tape-duplicator::before,
+.tape-duplicator::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	clip-path: var(--clip-path);
+}
+
+.tape-duplicator::before {
+	background-image: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.6),
+		#fff,
+		rgba(255, 255, 255, 0.6)
+	);
+	transform: var(--transform) scale(1.01);
+	z-index: -2;
+}
+
+.tape-duplicator::after {
+	background-color: var(--background-color);
+	filter: var(--filter);
+	transform: var(--transform);
+	z-index: -1;
+}

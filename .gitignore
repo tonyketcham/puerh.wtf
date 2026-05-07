@@ -1,11 +1,6 @@
-*.log
-.cache
-.DS_Store
-src/.temp
-node_modules
-dist
+**/node_modules/**
 .env
 .env.*
-
-# Local Netlify folder
-.netlify
+.DS_Store
+.vercel
+test-results/.last-run.json
