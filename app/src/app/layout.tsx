@@ -4,8 +4,6 @@ import localFont from "next/font/local"
 import "../app.css"
 import Explorer from "../lib/components/Explorer"
 import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
-import GenreLegend from "@/lib/components/GenreLegend"
-import { Toolbar } from "@/lib/components/containers/Toolbar"
 import { StoreProvider } from "@/lib/store/StoreProvider"
 import { Suspense } from "react"
 
@@ -46,9 +44,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 						<div className="flex flex-col w-full ml-[340px]">
 							<main className="w-full p-8">{children}</main>
 						</div>
-						<Toolbar>
-							<GenreLegend categories={categories} />
-						</Toolbar>
 					</div>
 					<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
 				</StoreProvider>
