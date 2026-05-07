@@ -169,7 +169,12 @@ interface SpringConfig {
 interface BoxCarouselProps
 	extends Omit<
 		HTMLMotionProps<"div">,
-		"onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd"
+		| "onDrag"
+		| "onDragStart"
+		| "onDragEnd"
+		| "onAnimationStart"
+		| "onAnimationEnd"
+		| "transition"
 	> {
 	/**
 	 * Array of items to display in the carousel
