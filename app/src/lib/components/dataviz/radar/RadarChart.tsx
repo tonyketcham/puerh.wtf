@@ -237,7 +237,7 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 					const y = centerY + labelRadius * Math.sin(angle)
 
 					// Better text anchor positioning
-					let textAnchor = "middle"
+					let textAnchor: "start" | "middle" | "end" = "middle"
 					const normalizedAngle = (angle + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2)
 
 					if (normalizedAngle > Math.PI / 4 && normalizedAngle < (3 * Math.PI) / 4) {
