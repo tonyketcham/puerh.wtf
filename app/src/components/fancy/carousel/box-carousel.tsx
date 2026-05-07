@@ -20,6 +20,7 @@ import {
 	useTransform,
 	ValueAnimationOptions,
 } from "motion/react"
+import type { HTMLMotionProps } from "motion/react"
 
 import { cn } from "@/lib/utils/cn"
 
@@ -167,7 +168,7 @@ interface SpringConfig {
  */
 interface BoxCarouselProps
 	extends Omit<
-		React.HTMLProps<HTMLDivElement>,
+		HTMLMotionProps<"div">,
 		"onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd"
 	> {
 	/**
