@@ -2,6 +2,7 @@
 	"name": "puerh.wtf",
 	"version": "0.0.1",
 	"type": "module",
+	"packageManager": "pnpm@9.12.2",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"codegen": "flatbread codegen",
