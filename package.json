@@ -8,6 +8,14 @@
     "test": "pnpm --filter puerh.wtf test"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@parcel/watcher",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ],
     "peerDependencyRules": {
       "allowedVersions": {
         "graphql": "^16.0.1"
