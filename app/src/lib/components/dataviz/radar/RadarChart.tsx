@@ -61,7 +61,15 @@ export default function RadarChart({ data, recordingKey }: RadarChartProps) {
 		if (svgRef.current) {
 			svgRef.current.removeAttribute("data-animations-complete")
 		}
-	}, [data])
+
+		const maxDelay = Math.max(...randomizedDelays)
+		const lastLabelAnimationEnd = maxDelay + 0.4 + (axes.length - 1) * 0.03 + 0.4
+		const fallbackTimer = window.setTimeout(() => {
+			svgRef.current?.setAttribute("data-animations-complete", "true")
+		}, (lastLabelAnimationEnd + 0.1) * 1000)
+
+		return () => window.clearTimeout(fallbackTimer)
+	}, [axes.length, data, randomizedDelays])
 
 	// Set data attribute when all animations are complete
 	useEffect(() => {
