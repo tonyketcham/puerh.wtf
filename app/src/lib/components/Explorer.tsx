@@ -61,8 +61,6 @@ function useUrlSync(initial: { q: string; facets: FacetState }) {
 		})
 	}, [])
 
-	console.log({ facets })
-
 	// Write to URL on change (replace, no scroll)
 	useEffect(() => {
 		const params = new URLSearchParams()

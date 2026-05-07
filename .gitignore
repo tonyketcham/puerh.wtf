@@ -1,4 +1,6 @@
 **/node_modules/**
+.env
+.env.*
 .DS_Store
 .vercel
 test-results/.last-run.json
