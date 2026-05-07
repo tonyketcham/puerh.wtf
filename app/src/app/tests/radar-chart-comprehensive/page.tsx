@@ -122,7 +122,7 @@ export default function RadarChartComprehensiveTest() {
 								earth, nuts_roast, cream, stone, umami
 							</li>
 							<li>• Values range from 0 (no intensity) to 10 (maximum intensity)</li>
-							<li>• The chart currently uses only the 'start' values for visualization</li>
+							<li>• The chart currently uses only the &apos;start&apos; values for visualization</li>
 							<li>• All axes at 10 creates a perfect circle touching the outer ring</li>
 							<li>• All axes at 0 creates a single point at the center</li>
 						</ul>
