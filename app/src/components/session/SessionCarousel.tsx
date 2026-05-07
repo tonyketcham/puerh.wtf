@@ -170,7 +170,11 @@ export default function SessionCarousel({
 		<div className="relative" data-recording-key={recordingKey}>
 			<motion.div
 				ref={containerRef}
-				className="p-2 border-2 rounded-full border-heicha-400 drop-shadow-2xl drop-shadow-heicha-600/40 w-72"
+				className={cn(
+					"p-2 drop-shadow-2xl drop-shadow-heicha-600/40 w-72",
+					"bg-[radial-gradient(circle_1.5px_at_1.5px_1.5px,_rgba(255,255,255,0.2)_1.5px,_transparent_0)]",
+					"bg-[size:16px_16px]"
+				)}
 				style={{
 					transform: `rotate(${cssRotation}deg)`,
 					minHeight: height + 16, // Reserve height (height + padding)

@@ -75,7 +75,9 @@ interface FaceProps {
 const CubeFace = memo(({ transform, className, children, style, debug }: FaceProps) => (
 	<div
 		className={cn(
-			"absolute overflow-hidden p-3 border-2 border-white",
+			"absolute overflow-hidden border-1 border-white",
+			"before:content-[''] before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none before:z-10",
+			"before:[box-shadow:inset_0_0_32px_8px_rgba(255,255,255,0.25)]",
 			debug && "backface-visible opacity-50",
 			className
 		)}
@@ -103,7 +105,7 @@ const MediaRenderer = memo(
 					<video
 						src={item.src}
 						poster={item.poster}
-						className={cn("object-cover w-full h-full border border-white rounded", className)}
+						className={cn("object-cover w-full h-full rounded", className)}
 						muted
 						loop
 						autoPlay
@@ -116,7 +118,7 @@ const MediaRenderer = memo(
 					src={item.src}
 					alt={item.alt || ""}
 					draggable={false}
-					className={cn("object-cover w-full h-full border border-white rounded", className)}
+					className={cn("object-cover w-full h-full rounded", className)}
 				/>
 			)
 		}
@@ -719,7 +721,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 						currentBackFaceIndex = (newFrontFaceIndex + 2) % 4
 					} else {
 						newFrontFaceIndex = (currentFrontFaceIndex - 1 + 4) % 4
-						currentBackFaceIndex = (newFrontFaceIndex + 3) % 4
+						currentBackFaceIndex = (newFrontFaceIndex + 2) % 4
 					}
 
 					// Update the current item index first
@@ -728,7 +730,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 
 					// Calculate face indices based on the new current index
 					// Ensure all face indices are properly synchronized
-					const indexOffset = triggeredBy === "next" ? 2 : -1
+					const indexOffset = 2
 
 					if (currentBackFaceIndex === 0) {
 						setPrevIndex((targetIndex + indexOffset + items.length) % items.length)
@@ -1186,7 +1188,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			const isVertical = direction === "top" || direction === "bottom"
 			const x = isVertical ? rotation : 0
 			const y = isVertical ? 0 : rotation
-			return `translateZ(-${depth / 2}px) rotateX(${x}deg) rotateY(${y}deg)`
+			return `translateZ(-${depth / 2 - 12}px) rotateX(${x + 6}deg) rotateY(${y + 6}deg)`
 		})
 
 		const containerTransform = useTransform(scale, (s) => `scale(${s})`)
@@ -1380,7 +1382,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				</div>
 
 				<motion.div
-					className="relative w-full h-full [transform-style:preserve-3d]"
+					className="relative w-full h-full [transform-style:preserve-3d] rotate-x-45"
 					style={{
 						transform: transform,
 					}}
