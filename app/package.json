@@ -11,7 +11,7 @@
 		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
 		"build": "./scripts/build-with-exit-code.sh flatbread start -X npx -- next build",
 		"start": "next start",
-		"test": "./scripts/build-with-exit-code.sh flatbread start -- playwright test",
+		"test": "playwright test",
 		"lint": "eslint .",
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
