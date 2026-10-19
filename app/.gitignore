@@ -32,3 +32,6 @@
 /vue
 .flatbread-codegen-cache.json
 next-env.d.ts
+
+# geo pipeline caches (DEM tiles, Natural Earth, fonts); see scripts/geo
+/.cache/

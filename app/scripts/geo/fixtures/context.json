@@ -1,0 +1,31 @@
+{
+	"note": "Synthetic context lines for geo:test (not real geography): they cross the fixture box so clipping, simplification and naming are exercised.",
+	"lines": [
+		{
+			"type": "Feature",
+			"properties": { "layer": "rivers", "rank": 5, "name": "Fixture River", "name_zh": "测试河" },
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [[101.43, 21.94], [101.47, 21.97], [101.5, 21.985], [101.52, 22.0], [101.55, 22.02], [101.6, 22.05]]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": { "layer": "admin", "rank": 3, "name": "" },
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [[101.48, 22.08], [101.49, 22.02], [101.5, 21.96], [101.51, 21.9]]
+			}
+		}
+	],
+	"lakes": [
+		{
+			"type": "Feature",
+			"properties": { "layer": "lakes", "rank": 6, "name": "Fixture Lake", "name_zh": "测试湖" },
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[[101.53, 21.97], [101.6, 21.97], [101.6, 22.02], [101.53, 22.02], [101.53, 21.97]]]
+			}
+		}
+	]
+}
