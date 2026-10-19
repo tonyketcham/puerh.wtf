@@ -35,6 +35,21 @@ let pending: Pending | null = null
 /** What a title can belong to: an entity page, or a word of the flavor lexicon (/lexicon/[slug]). */
 export type MorphKind = PageKind | "descriptor"
 
+/**
+ * A second pair that may ride along with the title: an element on the old page that grows
+ * into one on the new page (the origin map inset → the origin page's hero map). The new page's
+ * element carries the name itself; the source borrows it for the snapshot like the title does.
+ */
+export type MorphCompanion = { el: Element | null | undefined; name: string; className: string }
+
+/** view-transition-class of the origin map morph (timing lives in map/map.css) */
+export const ORIGIN_MAP_CLASS = "origin-map"
+
+/** The view-transition-name of an origin's map (inset in Properties or a peek → page hero). */
+export function originMapTransitionName(slug: string): string {
+	return `origin-map-${slug.replace(/[^a-zA-Z0-9_-]/g, "_")}`
+}
+
 /** A valid CSS <custom-ident> for an entity's title. */
 export function titleTransitionName(kind: MorphKind, slug: string): string {
 	return `entity-${kind}-${slug.replace(/[^a-zA-Z0-9_-]/g, "_")}`
@@ -43,7 +58,7 @@ export function titleTransitionName(kind: MorphKind, slug: string): string {
 /** Clear borrowed names (the source may stay mounted, e.g. a Properties chip). */
 export function clearMorphSources() {
 	if (typeof document === "undefined") return
-	for (const el of document.querySelectorAll<HTMLElement>(`[${SOURCE_ATTR}]`)) {
+	for (const el of document.querySelectorAll<HTMLElement | SVGElement>(`[${SOURCE_ATTR}]`)) {
 		el.style.removeProperty("view-transition-name")
 		el.style.removeProperty("view-transition-class")
 		el.removeAttribute(SOURCE_ATTR)
@@ -81,7 +96,8 @@ export function navigateWithMorph(
 	href: string,
 	source: Element | null | undefined,
 	kind: MorphKind,
-	slug: string
+	slug: string,
+	companions: MorphCompanion[] = []
 ): boolean {
 	if (typeof document === "undefined" || !("startViewTransition" in document)) return false
 	if (`${location.pathname}` === href) return false
@@ -92,6 +108,12 @@ export function navigateWithMorph(
 		source.style.setProperty("view-transition-name", name)
 		source.style.setProperty("view-transition-class", TITLE_CLASS)
 		source.setAttribute(SOURCE_ATTR, "")
+	}
+	for (const c of companions) {
+		if (!(c.el instanceof HTMLElement || c.el instanceof SVGElement)) continue
+		c.el.style.setProperty("view-transition-name", c.name)
+		c.el.style.setProperty("view-transition-class", c.className)
+		c.el.setAttribute(SOURCE_ATTR, "")
 	}
 	const transition = document.startViewTransition(
 		() =>

@@ -9,6 +9,7 @@ import type { PageKind } from "@/lib/peek"
 import { formatRating } from "@/lib/sessionSort"
 import { openCommandBarAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import { cn } from "@/lib/utils/cn"
+import MapLayerToggles from "@/lib/components/map/MapLayerToggles"
 import { buildEntityModel } from "./model"
 import { entityPageAtom, useHydrated } from "./state"
 
@@ -156,6 +157,10 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 								</span>
 							))}
 						</div>
+						{/* the origin map's layers (plan §4.5), on /origins */}
+						{kind === "origin" && !slug && (
+							<MapLayerToggles className="pl-2.5 border-l border-white/[0.07]" />
+						)}
 					</div>
 					<div className="flex items-stretch shrink-0">
 						{right.map((part, i) => (

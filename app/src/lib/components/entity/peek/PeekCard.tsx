@@ -14,6 +14,8 @@ import type { EntityDetails, OriginPeekDetail } from "@/lib/entityDetails"
 import { readFilters } from "@/lib/filters"
 import { lexiconHref, lexiconPageOf } from "@/lib/lexicon"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
+import { entityHref } from "@/lib/entities"
+import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
 import { NOTE_STAGES, NOTE_STAGE_META } from "@/lib/noteStages"
 import {
 	isPageKind,
@@ -268,10 +270,11 @@ function OriginBody({ model, detail, peek, row }: BodyProps) {
 }
 
 /**
- * ── SLOT: origin map inset (plan §3.1, §4.5 · Phase 5) ──────────────────────────────
- * Phase 5 swaps this for the contour inset (`/maps/inset/[slug].json`, contours drawing on
- * 12 ms per band). Until then it draws only what's surveyed: the §4.1 precision marker at the
- * origin's point, one ring per session in its liquor color, and the coordinate as a comment.
+ * The origin's map strip (plan §3.1, §4.5): the precomputed contour inset
+ * (`/maps/inset/[slug].json`, fetched on first open) with contours drawing on 12 ms per band,
+ * the §4.1 precision marker and one ring per session in its liquor. A click grows it into the
+ * origin page's hero. Origins too coarse for an inset (provinces, countries) keep the surveyed
+ * point alone: the marker, the rings and the coordinate as a comment.
  */
 function OriginInset({
 	model,
@@ -291,6 +294,42 @@ function OriginInset({
 	const ringStep = Math.min(3.4, 30 / Math.max(1, rings.length))
 	const precision = detail?.precision ?? model.node?.originKind ?? "unknown"
 	const label = [model.node?.hanzi, model.title].filter(Boolean).join(" ")
+	const slug = model.node?.slug ?? model.target.key
+	const caption = placed ? (
+		<div className="absolute inset-x-2.5 bottom-1.5 flex items-end justify-between gap-2 text-[9.5px] leading-none text-white/40 pointer-events-none">
+			<span className="truncate map-label">
+				{`// ${label}`}
+				{detail?.elevation ? ` · ${formatRange(detail.elevation)} m` : ""}
+			</span>
+			<span className="tabular-nums shrink-0 text-white/30">
+				{formatLatLon(detail!.lat!, detail!.lon!)}
+				{detail?.radius_km ? ` ±${detail.radius_km} km` : ""}
+			</span>
+		</div>
+	) : null
+
+	if (placed && hasInset([{ slug }])) {
+		return (
+			<div
+				data-slot="origin-map-inset"
+				className="relative overflow-hidden rounded-[5px] ring-1 ring-inset ring-white/[0.07]"
+			>
+				<InsetMap
+					origins={[{ slug, title: model.title, hanzi: model.node?.hanzi ?? null }]}
+					rings={rings}
+					gardens={detail?.elevation ?? null}
+					accent={rings[0] ?? LIQUOR_FALLBACK.hex}
+					variant="peek"
+					drawKey={slug}
+					href={entityHref("origin", slug)}
+					className="w-full h-[84px]"
+					recordingKey="peek-origin-inset"
+				>
+					{caption}
+				</InsetMap>
+			</div>
+		)
+	}
 
 	if (!placed) {
 		return (
@@ -372,16 +411,7 @@ function OriginInset({
 					/>
 				))}
 			</svg>
-			<div className="absolute inset-x-2.5 bottom-1.5 flex items-end justify-between gap-2 text-[9.5px] leading-none text-white/40">
-				<span className="truncate">
-					{`// ${label}`}
-					{detail?.elevation ? ` · ${formatRange(detail.elevation)} m` : ""}
-				</span>
-				<span className="tabular-nums shrink-0 text-white/30">
-					{formatLatLon(detail!.lat!, detail!.lon!)}
-					{detail?.radius_km ? ` ±${detail.radius_km} km` : ""}
-				</span>
-			</div>
+			{caption}
 		</div>
 	)
 }

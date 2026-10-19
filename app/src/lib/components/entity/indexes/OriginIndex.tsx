@@ -1,11 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState } from "react"
-import { useAtomValue } from "jotai"
+import { Suspense, useMemo, useState } from "react"
+import { useAtomValue, useSetAtom } from "jotai"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ChevronRight } from "lucide-react"
 import Hatch from "@/lib/components/entity/Hatch"
+import { explorerHoverAtom } from "@/lib/components/explorer/state"
+import OriginsMap from "@/lib/components/map/OriginsMap"
+import type { MapPoint } from "@/lib/components/map/points"
 import { originNoteLabel } from "@/lib/components/entity/OriginTrail"
 import { sessionColor, sessionsOf, type RelationIndex } from "@/lib/relations"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
@@ -21,15 +24,20 @@ const SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 type Branch = { item: EntityListItem; count: number; direct: ExplorerSession[]; children: Branch[] }
 
 /**
- * /origins (plan §3.3), the tree half: China › Yunnan › Xishuangbanna › Yiwu (11), every node
- * with its rolled-up count and one liquor dot per session filed right there. Folders fold.
- * Below it, the "unplaced" tray: sessions without a surveyed origin, on a hatched terra
- * incognita strip.
- *
- * ── SLOT: the full origin map (plan §4.5 · Phase 5) takes the left two thirds; this tree
- * moves to the right column. ─────────────────────────────────────────────────────────────
+ * /origins (plan §3.3): the full origin map on the left two thirds (pinned while the page
+ * scrolls, so the first scroll lays the ridgeline hero flat), and the tree on the right:
+ * China › Yunnan › Xishuangbanna › Yiwu (11), every node with its rolled-up count and one
+ * liquor dot per session filed right there. Folders fold; a row under the pointer lights its
+ * rings on the map. Below both, the "unplaced" tray: sessions without a surveyed origin, on a
+ * hatched terra incognita strip.
  */
-export default function OriginIndex({ origins }: { origins: EntityListItem[] }) {
+export default function OriginIndex({
+	origins,
+	points,
+}: {
+	origins: EntityListItem[]
+	points: MapPoint[]
+}) {
 	const index = useAtomValue(relationIndexAtom)
 	const forest = useMemo(() => buildForest(origins, index), [origins, index])
 	const unplaced = useMemo(() => unplacedSessions(index), [index])
@@ -53,26 +61,39 @@ export default function OriginIndex({ origins }: { origins: EntityListItem[] }) 
 				summary={`// ${origins.length} places · ${tasted} with sessions · ${placedSessions} of ${index.sessions.length} sessions placed`}
 			/>
 
-			<div
-				role="tree"
-				aria-label="Origins"
-				className="py-2 rounded-xl ring-1 ring-inset ring-white/[0.06] bg-white/[0.01]"
-				data-recording-key="origin-tree"
-			>
-				<Rows
-					branches={forest}
-					depth={0}
-					guides=""
-					folded={folded}
-					toggle={toggle}
-					startIndex={0}
-				/>
+			<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
+				<div className="lg:sticky lg:top-[calc(var(--commandbar-h)+0.5rem)]">
+					{/* the map reads the Explorer filters from the URL */}
+					<Suspense fallback={<div className={MAP_BOX} />}>
+						<OriginsMap points={points} className={MAP_BOX} recordingKey="origins-map" />
+					</Suspense>
+				</div>
+
+				<div
+					role="tree"
+					aria-label="Origins"
+					className="py-2 rounded-xl ring-1 ring-inset ring-white/[0.06] bg-white/[0.01]"
+					data-recording-key="origin-tree"
+				>
+					<Rows
+						branches={forest}
+						depth={0}
+						guides=""
+						folded={folded}
+						toggle={toggle}
+						startIndex={0}
+					/>
+				</div>
 			</div>
 
 			{unplaced.length > 0 && <UnplacedTray groups={unplaced} />}
 		</div>
 	)
 }
+
+/** The map's box: the viewport below the command bar, above the status bar. */
+const MAP_BOX =
+	"h-[calc(100vh-var(--commandbar-h)-var(--statusbar-h)-1.5rem)] min-h-[26rem] rounded-xl ring-1 ring-inset ring-white/[0.07] bg-[#121012]"
 
 function Rows({
 	branches,
@@ -90,6 +111,7 @@ function Rows({
 	startIndex: number
 }) {
 	const reduce = useReducedMotion() ?? false
+	const setHover = useSetAtom(explorerHoverAtom)
 	return (
 		<>
 			{branches.map((b, i) => {
@@ -112,6 +134,11 @@ function Rows({
 								"transition-colors hover:bg-white/[0.03]",
 								!b.count && "text-white/40"
 							)}
+							// the map lights this branch's rings
+							onPointerEnter={() => b.count && setHover({ kind: "origin", slug: b.item.slug })}
+							onPointerLeave={() =>
+								setHover((h) => (h?.kind === "origin" && h.slug === b.item.slug ? null : h))
+							}
 							initial={reduce ? { opacity: 0 } : { opacity: 0, x: -4 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{
@@ -159,12 +186,16 @@ function Rows({
 									<span data-morph-title>{b.item.title}</span>
 								</EntityLink>
 								{b.item.hanzi && (
-									<span lang="zh" className="shrink-0 text-xs text-white/30">
+									<span
+										lang="zh"
+										// gives way before the name does in a narrow column
+										className="min-w-0 overflow-hidden whitespace-nowrap shrink-[8] text-xs text-white/30"
+									>
 										{b.item.hanzi}
 									</span>
 								)}
 								{b.item.originKind && (
-									<span className="hidden shrink-0 text-[10px] text-white/25 md:inline">
+									<span className="hidden shrink-0 text-[10px] text-white/25 2xl:inline">
 										{b.item.originKind}
 									</span>
 								)}

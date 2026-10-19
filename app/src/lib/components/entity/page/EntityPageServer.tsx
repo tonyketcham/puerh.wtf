@@ -6,6 +6,7 @@ import { related, sessionsOf } from "@/lib/relations"
 import { getEntityPage, getOriginPoints, getServerIndex } from "./data"
 import type { DotMapPoint } from "./DotMap"
 import EntityPage from "./EntityPage"
+import { getMapPoints } from "@/lib/components/map/points"
 import Markdown, { paragraphCount } from "./Markdown"
 import { buildEntityModel } from "./model"
 
@@ -51,5 +52,17 @@ export default async function EntityPageServer({ kind, slug }: { kind: PageKind;
 	const rest = hasLead ? paragraphCount(data.description) > 1 : !!data.description
 	const notes = rest ? <Markdown source={data.description} skipFirst={hasLead} /> : undefined
 
-	return <EntityPage data={data} cards={cards} lead={lead} notes={notes} points={points} />
+	// origins: the hero map frames the placed points within a node too coarse for an inset
+	const mapPoints = kind === "origin" ? getMapPoints() : undefined
+
+	return (
+		<EntityPage
+			data={data}
+			cards={cards}
+			lead={lead}
+			notes={notes}
+			points={points}
+			mapPoints={mapPoints}
+		/>
+	)
 }

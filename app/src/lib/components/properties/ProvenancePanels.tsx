@@ -9,7 +9,10 @@ import Hatch from "@/lib/components/entity/Hatch"
 import VesselRef from "@/lib/components/entity/VesselRef"
 import OriginTrail, { originNoteLabel } from "@/lib/components/entity/OriginTrail"
 import { relationIndexAtom, sessionAtom } from "@/lib/store/sessionAtom"
-import { ratingRank, type RelationIndex } from "@/lib/relations"
+import { ratingRank, sessionColor, type RelationIndex } from "@/lib/relations"
+import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
+import { entityHref } from "@/lib/entities"
+import { LIQUOR_FALLBACK } from "@/lib/liquor"
 import { formatRating } from "@/lib/sessionSort"
 import { formatVintageAge, vintageAgeAtSession } from "@/lib/age"
 import type { EntityKind } from "@/lib/entities"
@@ -23,7 +26,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 /**
  * The Properties panel's relational sections (plan §3.4), replacing the old "Metadata" rows:
  *
- * - Provenance: where it grew (origin trail, map inset slot, elevation, harvest, picking,
+ * - Provenance: where it grew (origin trail, contour inset, elevation, harvest, picking,
  *   style, cultivar, vintage, storage)
  * - Source: who sold it and what it was brewed in (vendor, listing, vessel)
  * - Record: how it went (rating + rank, author, tags as Explorer filters)
@@ -48,22 +51,45 @@ export default function ProvenancePanels() {
 
 	if (!session) return null
 
+	// Rows restagger per session (keyed by slug, like the title); the map inset is outside the
+	// keyed groups so it persists and can pan from the last origin to the next.
 	return (
-		<motion.div
-			key={session._slug}
-			initial="hidden"
-			animate="show"
-			variants={{ show: { transition: { staggerChildren: reduce ? 0 : 0.03 } } }}
-			data-recording-key="session-relations"
-		>
+		<div data-recording-key="session-relations">
 			<Provenance session={session} index={index} row={row} />
 			<Source session={session} index={index} row={row} />
 			<Record session={session} index={index} row={row} />
-		</motion.div>
+		</div>
 	)
 }
 
 type SectionProps = { session: SessionFull; index: RelationIndex; row: Variants }
+
+/** A group of rows that stagger in; key it by session slug so it replays on every session. */
+function Stagger({
+	delay = 0,
+	className,
+	children,
+}: {
+	delay?: number
+	className?: string
+	children: ReactNode
+}) {
+	const reduce = useReducedMotion() ?? false
+	return (
+		<motion.div
+			initial="hidden"
+			animate="show"
+			variants={{
+				show: {
+					transition: { staggerChildren: reduce ? 0 : 0.03, delayChildren: reduce ? 0 : delay },
+				},
+			}}
+			className={className}
+		>
+			{children}
+		</motion.div>
+	)
+}
 
 const countOf = (index: RelationIndex, kind: EntityKind) => (slug: string) =>
 	index.nodes[kind].get(slug)?.all.length
@@ -85,127 +111,166 @@ function Provenance({ session, index, row }: SectionProps) {
 	return (
 		<PanelSection title="Provenance">
 			<div className="space-y-4">
-				{origins.length > 0 && (
-					<motion.div variants={row}>
-						<OriginTrail
-							origins={origins}
-							variant="tree"
-							countOf={countOf(index, "origin")}
-							recordingKey="provenance-trail"
-						/>
-					</motion.div>
-				)}
-				{placed.length === 0 && (
-					<motion.div variants={row}>
-						<TerraIncognita
-							label={
-								origins.length
-									? `unknown · somewhere in ${region ?? "the region"}`
-									: originNoteLabel(session.origin_note)
-							}
-						/>
-					</motion.div>
-				)}
-
-				{/* ── SLOT: origin map inset (plan §3.4, §4.5 · Phase 4/5) ──────────────────────
-				    280×160 contour inset for `placed`, highlighting the contour at
-				    session.elevation in the liquor color, and panning between origins when the
-				    session changes. Mount it here, between the trail and the property rows. */}
-				<OriginInsetSlot origins={placed} elevation={session.elevation} />
-
-				<dl className="space-y-1.5">
-					{session.elevation ? (
-						<Prop label="elevation" row={row}>
-							{formatMeters(session.elevation)}
-							<Dim> ≈ {formatFeet(session.elevation)}</Dim>
-						</Prop>
-					) : null}
-					{harvestText(session) && (
-						<Prop label="harvest" row={row} title={session.season_note ?? undefined}>
-							{harvestText(session)}
-						</Prop>
+				<Stagger key={`trail-${session._slug}`} className="space-y-4 empty:hidden">
+					{origins.length > 0 && (
+						<motion.div variants={row}>
+							<OriginTrail
+								origins={origins}
+								variant="tree"
+								countOf={countOf(index, "origin")}
+								recordingKey="provenance-trail"
+							/>
+						</motion.div>
 					)}
-					{session.picking && (
-						<Prop label="picking" row={row}>
-							{session.picking}
-						</Prop>
+					{placed.length === 0 && (
+						<motion.div variants={row}>
+							<TerraIncognita
+								label={
+									origins.length
+										? `unknown · somewhere in ${region ?? "the region"}`
+										: originNoteLabel(session.origin_note)
+								}
+							/>
+						</motion.div>
 					)}
-					{style.length > 0 && (
-						<Prop label="style" row={row}>
-							<Refs>
-								{style.map((st) => (
-									<Fragment key={st.id}>
-										<EntityRef
-											kind="style"
-											slug={st._slug || st.id}
-											label={st.title}
-											color={st.color || st.category?.color}
-											count={countOf(index, "style")(st._slug || st.id)}
-										/>
-										{st.category && (
+				</Stagger>
+
+				{/* origin map inset (plan §3.4, §4.5): between the trail and the property rows */}
+				<OriginInset session={session} index={index} origins={placed} />
+
+				<Stagger key={`rows-${session._slug}`} delay={0.06}>
+					<dl className="space-y-1.5">
+						{session.elevation ? (
+							<Prop label="elevation" row={row}>
+								{formatMeters(session.elevation)}
+								<Dim> ≈ {formatFeet(session.elevation)}</Dim>
+							</Prop>
+						) : null}
+						{harvestText(session) && (
+							<Prop label="harvest" row={row} title={session.season_note ?? undefined}>
+								{harvestText(session)}
+							</Prop>
+						)}
+						{session.picking && (
+							<Prop label="picking" row={row}>
+								{session.picking}
+							</Prop>
+						)}
+						{style.length > 0 && (
+							<Prop label="style" row={row}>
+								<Refs>
+									{style.map((st) => (
+										<Fragment key={st.id}>
 											<EntityRef
-												kind="category"
-												slug={st.category._slug}
-												label={`‹${st.category.title}›`}
-												color={st.category.color}
-												variant="crumb"
-												glyph={false}
-												className="text-[11px]"
+												kind="style"
+												slug={st._slug || st.id}
+												label={st.title}
+												color={st.color || st.category?.color}
+												count={countOf(index, "style")(st._slug || st.id)}
 											/>
-										)}
-									</Fragment>
-								))}
-							</Refs>
-						</Prop>
-					)}
-					{cultivars.length > 0 && (
-						<Prop label="cultivar" row={row}>
-							<Refs>
-								{cultivars.map((c) => (
-									<EntityRef
-										key={c.id}
-										kind="cultivar"
-										slug={c._slug}
-										label={c.title}
-										count={countOf(index, "cultivar")(c._slug)}
-									/>
-								))}
-							</Refs>
-						</Prop>
-					)}
-					{year && (
-						<Prop label="vintage" row={row}>
-							<Refs>
-								<FilterRefs>
-									<EntityRef
-										kind="year"
-										slug={String(year)}
-										label={String(year)}
-										count={countOf(index, "year")(String(year))}
-										recordingKey="provenance-vintage"
-									/>
-								</FilterRefs>
-								{ageThen != null && <Dim>{formatVintageAge(ageThen)} at tasting</Dim>}
-							</Refs>
-						</Prop>
-					)}
-					{session.aging_conditions && (
-						<Prop label="storage" row={row}>
-							<span className="text-white/70">{session.aging_conditions}</span>
-						</Prop>
-					)}
-				</dl>
+											{st.category && (
+												<EntityRef
+													kind="category"
+													slug={st.category._slug}
+													label={`‹${st.category.title}›`}
+													color={st.category.color}
+													variant="crumb"
+													glyph={false}
+													className="text-[11px]"
+												/>
+											)}
+										</Fragment>
+									))}
+								</Refs>
+							</Prop>
+						)}
+						{cultivars.length > 0 && (
+							<Prop label="cultivar" row={row}>
+								<Refs>
+									{cultivars.map((c) => (
+										<EntityRef
+											key={c.id}
+											kind="cultivar"
+											slug={c._slug}
+											label={c.title}
+											count={countOf(index, "cultivar")(c._slug)}
+										/>
+									))}
+								</Refs>
+							</Prop>
+						)}
+						{year && (
+							<Prop label="vintage" row={row}>
+								<Refs>
+									<FilterRefs>
+										<EntityRef
+											kind="year"
+											slug={String(year)}
+											label={String(year)}
+											count={countOf(index, "year")(String(year))}
+											recordingKey="provenance-vintage"
+										/>
+									</FilterRefs>
+									{ageThen != null && <Dim>{formatVintageAge(ageThen)} at tasting</Dim>}
+								</Refs>
+							</Prop>
+						)}
+						{session.aging_conditions && (
+							<Prop label="storage" row={row}>
+								<span className="text-white/70">{session.aging_conditions}</span>
+							</Prop>
+						)}
+					</dl>
+				</Stagger>
 			</div>
 		</PanelSection>
 	)
 }
 
 /**
- * Where the per-session contour inset lands (Phase 4 map pipeline). Renders nothing until the
- * inset exists; kept as a component so the slot, its inputs and its place in the panel are fixed.
+ * The contour inset of where this tea grew (plan §3.4, §4.5): contours draw on low → high,
+ * the line at the session's recorded elevation is re-stroked in its liquor and labelled, the
+ * point carries its precision marker and the session's ring. Arrowing through the Explorer
+ * pans between origins (InsetMap keeps one instance across sessions); a click grows the map
+ * into the origin page's hero. Nothing when no placed origin has an inset.
  */
-function OriginInsetSlot(_props: { origins: OriginRef[]; elevation?: number | null }) {
-	return null
+function OriginInset({
+	session,
+	index,
+	origins,
+}: {
+	session: SessionFull
+	index: RelationIndex
+	origins: OriginRef[]
+}) {
+	const reduce = useReducedMotion() ?? false
+	const mapped = useMemo(
+		() => origins.map((o) => ({ slug: o._slug, title: o.title, hanzi: o.hanzi ?? null })),
+		[origins]
+	)
+	if (!hasInset(mapped)) return null
+	const listed = index.bySlug.get(session._slug)
+	const color = listed ? sessionColor(listed) : LIQUOR_FALLBACK.hex
+	const primary = mapped.find((o) => hasInset([o])) ?? mapped[0]
+	return (
+		<motion.div
+			initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.45, ease: EASE, delay: 0.05 }}
+		>
+			<InsetMap
+				origins={[primary, ...mapped.filter((o) => o !== primary)]}
+				rings={[color]}
+				elevation={session.elevation ?? null}
+				accent={color}
+				variant="panel"
+				drawKey={session._slug}
+				href={entityHref("origin", primary.slug)}
+				className="w-full aspect-[7/4] rounded-md ring-1 ring-inset ring-white/[0.07]"
+				recordingKey="provenance-inset"
+			/>
+		</motion.div>
+	)
 }
 
 /**
@@ -280,48 +345,50 @@ function Source({ session, index, row }: SectionProps) {
 
 	return (
 		<PanelSection title="Source">
-			<dl className="space-y-1.5">
-				{vendors.length > 0 && (
-					<Prop label="vendor" row={row}>
-						<Refs>
-							{vendors.map((v) => (
-								<span key={v._slug} className="inline-flex items-center max-w-full gap-2">
-									<VendorLogo src={v.image} title={v.title} />
-									<EntityRef
-										kind="vendor"
-										slug={v._slug}
-										label={v.title}
-										count={countOf(index, "vendor")(v._slug)}
-										recordingKey="source-vendor"
-									/>
+			<Stagger key={session._slug} delay={0.12}>
+				<dl className="space-y-1.5">
+					{vendors.length > 0 && (
+						<Prop label="vendor" row={row}>
+							<Refs>
+								{vendors.map((v) => (
+									<span key={v._slug} className="inline-flex items-center max-w-full gap-2">
+										<VendorLogo src={v.image} title={v.title} />
+										<EntityRef
+											kind="vendor"
+											slug={v._slug}
+											label={v.title}
+											count={countOf(index, "vendor")(v._slug)}
+											recordingKey="source-vendor"
+										/>
+									</span>
+								))}
+							</Refs>
+						</Prop>
+					)}
+					{listing && (
+						<Prop label="listing" row={row}>
+							<a
+								href={listing.href}
+								target="_blank"
+								rel="noopener"
+								title={session.purchase_link ?? undefined}
+								className="inline-flex items-center max-w-full gap-1 text-white/80 underline decoration-white/20 underline-offset-[3px] transition-colors hover:text-white hover:decoration-white/60 outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
+							>
+								<span aria-hidden className="text-white/40">
+									↗
 								</span>
-							))}
-						</Refs>
-					</Prop>
-				)}
-				{listing && (
-					<Prop label="listing" row={row}>
-						<a
-							href={listing.href}
-							target="_blank"
-							rel="noopener"
-							title={session.purchase_link ?? undefined}
-							className="inline-flex items-center max-w-full gap-1 text-white/80 underline decoration-white/20 underline-offset-[3px] transition-colors hover:text-white hover:decoration-white/60 outline-none focus-visible:ring-1 focus-visible:ring-white/40 rounded-sm"
-						>
-							<span aria-hidden className="text-white/40">
-								↗
-							</span>
-							<span className="truncate">{listing.host}</span>
-							{listing.archived && <Dim>(archived)</Dim>}
-						</a>
-					</Prop>
-				)}
-				{vessel && (
-					<Prop label="vessel" row={row}>
-						<VesselRef vessel={vessel} recordingKey="source-vessel" />
-					</Prop>
-				)}
-			</dl>
+								<span className="truncate">{listing.host}</span>
+								{listing.archived && <Dim>(archived)</Dim>}
+							</a>
+						</Prop>
+					)}
+					{vessel && (
+						<Prop label="vessel" row={row}>
+							<VesselRef vessel={vessel} recordingKey="source-vessel" />
+						</Prop>
+					)}
+				</dl>
+			</Stagger>
 		</PanelSection>
 	)
 }
@@ -364,56 +431,58 @@ function Record({ session, index, row }: SectionProps) {
 
 	return (
 		<PanelSection title="Record">
-			<dl className="space-y-1.5">
-				{rating != null && (
-					<Prop label="rating" row={row}>
-						<span className="flex items-center gap-2.5" data-recording-key="record-rating">
-							<span className="text-sm tabular-nums text-white">{formatRating(rating)}</span>
-							<RatingMeter value={rating} />
-							{rank && (
+			<Stagger key={session._slug} delay={0.18}>
+				<dl className="space-y-1.5">
+					{rating != null && (
+						<Prop label="rating" row={row}>
+							<span className="flex items-center gap-2.5" data-recording-key="record-rating">
+								<span className="text-sm tabular-nums text-white">{formatRating(rating)}</span>
+								<RatingMeter value={rating} />
+								{rank && (
+									<Dim>
+										#{rank.rank}
+										<span className="text-white/20">/{rank.of}</span>
+									</Dim>
+								)}
+							</span>
+						</Prop>
+					)}
+					{authors.length > 0 && (
+						<Prop label="by" row={row}>
+							{authors[0].title}
+							{authors.length > 1 && (
 								<Dim>
-									#{rank.rank}
-									<span className="text-white/20">/{rank.of}</span>
+									{" "}
+									(+
+									{authors
+										.slice(1)
+										.map((a) => a.title)
+										.join(", ")}
+									)
 								</Dim>
 							)}
-						</span>
-					</Prop>
-				)}
-				{authors.length > 0 && (
-					<Prop label="by" row={row}>
-						{authors[0].title}
-						{authors.length > 1 && (
-							<Dim>
-								{" "}
-								(+
-								{authors
-									.slice(1)
-									.map((a) => a.title)
-									.join(", ")}
-								)
-							</Dim>
-						)}
-					</Prop>
-				)}
-				{tags.length > 0 && (
-					<Prop label="tags" row={row}>
-						<FilterRefs>
-							<Refs>
-								{tags.map((t) => (
-									<EntityRef
-										key={t._slug}
-										kind="tag"
-										slug={t._slug}
-										label={t.title}
-										color={t.color}
-										recordingKey={`record-tag-${t._slug}`}
-									/>
-								))}
-							</Refs>
-						</FilterRefs>
-					</Prop>
-				)}
-			</dl>
+						</Prop>
+					)}
+					{tags.length > 0 && (
+						<Prop label="tags" row={row}>
+							<FilterRefs>
+								<Refs>
+									{tags.map((t) => (
+										<EntityRef
+											key={t._slug}
+											kind="tag"
+											slug={t._slug}
+											label={t.title}
+											color={t.color}
+											recordingKey={`record-tag-${t._slug}`}
+										/>
+									))}
+								</Refs>
+							</FilterRefs>
+						</Prop>
+					)}
+				</dl>
+			</Stagger>
 		</PanelSection>
 	)
 }

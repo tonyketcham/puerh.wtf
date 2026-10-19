@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils/cn"
 import AtAGlance from "./AtAGlance"
 import type { EntityPageData } from "./data"
 import type { DotMapPoint } from "./DotMap"
+import type { MapPoint } from "@/lib/components/map/points"
 import EntityTitle from "./EntityTitle"
 import Hero from "./Hero"
 import { buildEntityModel, liquorStops, type EntityModel } from "./model"
@@ -54,6 +55,7 @@ export default function EntityPage({
 	lead,
 	notes,
 	points = [],
+	mapPoints,
 }: {
 	data: EntityPageData
 	/** server-rendered SessionCards by session slug */
@@ -64,6 +66,8 @@ export default function EntityPage({
 	notes?: ReactNode
 	/** origins as dots for the vendor / cultivar hero */
 	points?: DotMapPoint[]
+	/** origin pages: placed origins for the hero map */
+	mapPoints?: MapPoint[]
 }) {
 	const index = useAtomValue(relationIndexAtom)
 	const model = useMemo(
@@ -103,7 +107,7 @@ export default function EntityPage({
 			</header>
 
 			<div className="space-y-14">
-				<Hero data={data} model={model} lead={lead} points={points} />
+				<Hero data={data} model={model} lead={lead} points={points} mapPoints={mapPoints} />
 
 				<Section id="glance" label="At a glance" recordingKey="entity-at-a-glance">
 					<AtAGlance model={model} index={index} title={data.title} />
