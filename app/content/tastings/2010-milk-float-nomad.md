@@ -12,7 +12,7 @@ origin:
 season: Spring
 production_year: 2010
 picking: Bud + up to 3 leaves
-elevation: 5000
+elevation: 1500
 aging_conditions: Bulang, loose for 10 years
 vendor:
   - 84de34f8-3878-4daf-aa6e-d4925338fbfb
