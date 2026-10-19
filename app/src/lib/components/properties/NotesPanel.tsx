@@ -26,6 +26,7 @@ import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import { descriptorRegex, splitDescriptors } from "@/lib/descriptors"
 import { buildStageImageMap } from "@/lib/noteStages"
 import { liftLiquor, rgbCss } from "@/lib/liquor"
+import { chain, usePeekTrigger } from "@/lib/components/entity/peek/usePeekTrigger"
 import type { NoteStage } from "@/lib/types/session"
 import { cn } from "@/lib/utils/cn"
 
@@ -295,46 +296,82 @@ const NoteText = memo(function NoteText({
 		<>
 			{segments.map((segment, i) => {
 				if (!segment.term) return <span key={i}>{segment.text}</span>
-				const term = segment.term
-				const matches = activeRegex ? activeRegex.test(segment.text) : false
-				const pinned = pinnedTerm === term
 				return (
-					<span
+					<DescriptorToken
 						key={i}
-						role="button"
-						tabIndex={0}
-						data-descriptor={term}
-						data-match={matches || undefined}
-						aria-pressed={pinned}
-						aria-label={`${segment.text}: find references`}
-						onMouseEnter={() => onPreview(term)}
-						onMouseLeave={() => onEndPreview(term)}
-						onFocus={() => onPreview(term)}
-						onBlur={() => onEndPreview(term)}
-						onClick={() => onToggle(term)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter" || e.key === " ") {
-								e.preventDefault()
-								onToggle(term)
-							}
-						}}
-						className={cn(
-							// a real inline span so multi-word tokens wrap like the text around them;
-							// only the underline speaks
-							"cursor-pointer rounded-[2px] [box-decoration-break:clone]",
-							"underline decoration-1 underline-offset-[3px] decoration-transparent",
-							"transition-[color,text-decoration-color,background-color] duration-150",
-							"hover:decoration-white/45 hover:text-white",
-							"focus:outline-none focus-visible:decoration-white/60 focus-visible:text-white",
-							matches &&
-								"text-[var(--descriptor-accent)] decoration-[var(--descriptor-accent)] hover:text-[var(--descriptor-accent)] hover:decoration-[var(--descriptor-accent)]",
-							pinned && "bg-[rgb(var(--liquor-rgb,237_196_70)/0.14)] decoration-2"
-						)}
-					>
-						{segment.text}
-					</span>
+						text={segment.text}
+						term={segment.term}
+						matches={activeRegex ? activeRegex.test(segment.text) : false}
+						pinned={pinnedTerm === segment.term}
+						onPreview={onPreview}
+						onEndPreview={onEndPreview}
+						onToggle={onToggle}
+					/>
 				)
 			})}
 		</>
 	)
 })
+
+/**
+ * One descriptor in a note. Hover previews its references and click pins them (find
+ * references); it is also an EntityPeek trigger, so dwelling opens the descriptor's peek
+ * (stage bar, sessions, companions) and ⌥-click or `p` pins that card.
+ */
+function DescriptorToken({
+	text,
+	term,
+	matches,
+	pinned,
+	onPreview,
+	onEndPreview,
+	onToggle,
+}: {
+	text: string
+	term: string
+	matches: boolean
+	pinned: boolean
+} & Pick<NoteTextProps, "onPreview" | "onEndPreview" | "onToggle">) {
+	const target = useMemo(() => ({ kind: "descriptor" as const, key: term }), [term])
+	const { handlers, status } = usePeekTrigger<HTMLSpanElement>(target)
+	return (
+		<span
+			{...handlers}
+			role="button"
+			tabIndex={0}
+			data-descriptor={term}
+			data-match={matches || undefined}
+			aria-pressed={pinned}
+			aria-label={`${text}: find references`}
+			onMouseEnter={() => onPreview(term)}
+			onMouseLeave={() => onEndPreview(term)}
+			onFocus={chain(handlers.onFocus, () => onPreview(term))}
+			onBlur={chain(handlers.onBlur, () => onEndPreview(term))}
+			onClick={chain(handlers.onClick, (e) => {
+				if (!e.defaultPrevented) onToggle(term)
+			})}
+			onKeyDown={chain(handlers.onKeyDown, (e) => {
+				if (e.defaultPrevented) return
+				if ((e.key === "Enter" && !e.shiftKey) || e.key === " ") {
+					e.preventDefault()
+					onToggle(term)
+				}
+			})}
+			className={cn(
+				// a real inline span so multi-word tokens wrap like the text around them;
+				// only the underline speaks
+				"cursor-pointer rounded-[2px] [box-decoration-break:clone] [-webkit-touch-callout:none]",
+				"underline decoration-1 underline-offset-[3px] decoration-transparent",
+				"transition-[color,text-decoration-color,background-color] duration-150",
+				"hover:decoration-white/45 hover:text-white",
+				"focus:outline-none focus-visible:decoration-white/60 focus-visible:text-white",
+				matches &&
+					"text-[var(--descriptor-accent)] decoration-[var(--descriptor-accent)] hover:text-[var(--descriptor-accent)] hover:decoration-[var(--descriptor-accent)]",
+				pinned && "bg-[rgb(var(--liquor-rgb,237_196_70)/0.14)] decoration-2",
+				status && "text-white decoration-white/60"
+			)}
+		>
+			{text}
+		</span>
+	)
+}

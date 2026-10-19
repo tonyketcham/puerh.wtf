@@ -6,6 +6,7 @@ import { motion, useReducedMotion, type Variants } from "motion/react"
 import PanelSection from "@/lib/components/containers/PanelSection"
 import EntityRef from "@/lib/components/entity/EntityRef"
 import Hatch from "@/lib/components/entity/Hatch"
+import VesselRef from "@/lib/components/entity/VesselRef"
 import OriginTrail, { originNoteLabel } from "@/lib/components/entity/OriginTrail"
 import { relationIndexAtom, sessionAtom } from "@/lib/store/sessionAtom"
 import { ratingRank, type RelationIndex } from "@/lib/relations"
@@ -317,7 +318,7 @@ function Source({ session, index, row }: SectionProps) {
 				)}
 				{vessel && (
 					<Prop label="vessel" row={row}>
-						{vessel}
+						<VesselRef vessel={vessel} recordingKey="source-vessel" />
 					</Prop>
 				)}
 			</dl>

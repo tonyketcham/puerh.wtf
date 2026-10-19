@@ -8,6 +8,8 @@ import { StoreProvider } from "@/lib/store/StoreProvider"
 import { Suspense } from "react"
 import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
 import CommandBar from "@/lib/components/command/CommandBar"
+import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
+import { getEntityDetails } from "@/lib/entityDetails"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -31,10 +33,11 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-	const [sessions, vendors, categories] = await Promise.all([
+	const [sessions, vendors, categories, entityDetails] = await Promise.all([
 		getExplorerSessions(),
 		getVendors(),
 		getCategories(),
+		getEntityDetails(),
 	])
 
 	return (
@@ -55,6 +58,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 					</div>
 					<Suspense>
 						<CommandBar sessions={sessions} vendors={vendors} categories={categories} />
+					</Suspense>
+					{/* one EntityPeek card for every entity ref on the page (it reads filter params) */}
+					<Suspense>
+						<EntityPeekHost details={entityDetails} />
 					</Suspense>
 					<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
 				</StoreProvider>
