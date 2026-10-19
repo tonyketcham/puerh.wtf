@@ -45,9 +45,15 @@ import {
 	EXPLORER_VIEWS,
 	explorerHoverAtom,
 	explorerViewAtom,
+	explorerDrawerOpenAtom,
+	EXPLORER_DOCK_QUERY,
 	type ExplorerView,
 } from "@/lib/components/explorer/state"
 import { stripSlash } from "@/lib/components/explorer/views"
+import { EXPLORER_DRAWER_ID } from "@/lib/components/explorer/ExplorerToggle"
+import { useMediaQuery } from "@/lib/utils/useMediaQuery"
+import { cn } from "@/lib/utils/cn"
+import { X } from "lucide-react"
 
 export interface ExplorerProps {
 	sessions: ExplorerSession[]
@@ -116,6 +122,42 @@ const VIEW_FACET: Record<ExplorerView, FacetKey | null> = {
 
 const VIEW_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 
+/**
+ * Below xl the Explorer is a modal drawer: a navigation puts it away, Escape closes it, focus
+ * moves in when it opens and back to the masthead toggle when it closes, and the page under
+ * it holds still. Docked (xl and up) none of this applies.
+ */
+function useDrawer(pathname: string | null) {
+	const [open, setOpen] = useAtom(explorerDrawerOpenAtom)
+	const drawer = !useMediaQuery(EXPLORER_DOCK_QUERY)
+	const drawerRef = useRef<HTMLDivElement>(null)
+	const closeDrawer = useCallback(() => setOpen(false), [setOpen])
+
+	useEffect(() => {
+		setOpen(false)
+	}, [pathname, setOpen])
+
+	const drawerOpen = drawer && open
+	useEffect(() => {
+		if (!drawerOpen) return
+		const root = document.documentElement
+		const overflow = root.style.overflow
+		root.style.overflow = "hidden"
+		drawerRef.current?.focus({ preventScroll: true })
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setOpen(false)
+		}
+		window.addEventListener("keydown", onKey)
+		return () => {
+			window.removeEventListener("keydown", onKey)
+			root.style.overflow = overflow
+			document.querySelector<HTMLElement>("[data-explorer-toggle]")?.focus({ preventScroll: true })
+		}
+	}, [drawerOpen, setOpen])
+
+	return { drawerOpen, closeDrawer, drawerRef }
+}
+
 // ⌘ on Apple platforms, Ctrl elsewhere. Server snapshot is "Ctrl" so hydration matches.
 const subscribeNoop = () => () => {}
 const getModKey = () =>
@@ -138,6 +180,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	const openCommandBar = useSetAtom(openCommandBarAtom)
 	const modKey = useSyncExternalStore(subscribeNoop, getModKey, getServerModKey)
 	const reduce = useReducedMotion()
+	const { drawerOpen, closeDrawer, drawerRef } = useDrawer(pathname)
 
 	const query = q.toLowerCase().trim()
 	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
@@ -336,15 +379,45 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 
 	return (
 		<MotionConfig reducedMotion="user">
+			{/* below xl: the scrim behind the drawer (a click on the page puts it away) */}
 			<div
-				// below lg the rail steps aside (app.css zeroes --explorer-w) and the layout shows a compact header
-				className="fixed top-0 left-0 bottom-[var(--statusbar-h)] z-20 hidden lg:flex flex-col w-[var(--explorer-w)] p-8 space-y-10 pointer-events-none font-fira-code"
+				aria-hidden
+				onClick={closeDrawer}
+				className={cn(
+					"fixed inset-0 z-[44] bg-black/55 transition-opacity duration-300 xl:hidden motion-reduce:transition-none",
+					drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+				)}
+			/>
+			<div
+				ref={drawerRef}
+				id={EXPLORER_DRAWER_ID}
+				// docked from xl; below it app.css zeroes --explorer-w and the Explorer slides in
+				// over the page from the masthead's toggle (CSS places it, so nothing jumps on hydration)
+				className={cn(
+					"fixed top-0 left-0 bottom-[var(--statusbar-h)] flex flex-col pointer-events-none font-fira-code outline-none",
+					"xl:z-20 xl:w-[var(--explorer-w)] xl:p-6 xl:space-y-8 2xl:p-8 2xl:space-y-10",
+					"max-xl:z-[45] max-xl:w-[min(22rem,calc(100vw-2.5rem))] max-xl:p-3 max-xl:duration-300 max-xl:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+					// visible at once on the way in (so it can take focus), hidden only once it is out
+					drawerOpen
+						? "max-xl:transition-[translate]"
+						: "max-xl:transition-[translate,visibility] max-xl:-translate-x-full max-xl:invisible"
+				)}
+				tabIndex={-1}
+				// a dialog only while it is out; closed, `invisible` already keeps it out of focus,
+				// clicks and the accessibility tree, and the docked rail stays live before hydration
+				role={drawerOpen ? "dialog" : undefined}
+				aria-modal={drawerOpen || undefined}
+				aria-label={drawerOpen ? "Explorer" : undefined}
 				data-recording-key={recordingKey}
 			>
-				<SiteHeader />
+				{/* the drawer sits under the compact masthead, which already carries the mark */}
+				<SiteHeader className="max-xl:hidden" />
 
 				{/* The actual sidebar panel. Make this interactive. */}
-				<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
+				<Panel
+					className="flex-1 contain-size"
+					backdropClassName="bg-[rgba(45,40,45,0.35)] max-xl:bg-[#171617]"
+				>
 					<div className="relative">
 						{/* header: the activity rail (a tablist) and search */}
 						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
@@ -354,6 +427,14 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
 								</div>
 								{searchButton}
+								<button
+									type="button"
+									onClick={closeDrawer}
+									aria-label="Close Explorer"
+									className="grid w-7 h-7 rounded-md outline-none shrink-0 place-items-center text-white/45 hover:text-white hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-white/50 xl:hidden"
+								>
+									<X size={14} strokeWidth={1.75} aria-hidden />
+								</button>
 							</div>
 						</div>
 						<div className="p-4">

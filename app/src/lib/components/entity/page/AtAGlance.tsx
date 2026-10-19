@@ -51,7 +51,7 @@ export default function AtAGlance({
 
 	return (
 		<div className="space-y-6">
-			<dl className="grid grid-cols-2 xl:grid-cols-4 gap-px overflow-hidden rounded-md bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
+			<dl className="grid grid-cols-2 @2xl/editor:grid-cols-4 gap-px overflow-hidden rounded-md bg-white/[0.06] ring-1 ring-inset ring-white/[0.06]">
 				<Stat
 					label="sessions"
 					value={stats.count}
@@ -107,7 +107,7 @@ export default function AtAGlance({
 				/>
 			</dl>
 
-			<div className="grid grid-cols-1 items-center gap-x-8 gap-y-6 md:grid-cols-[minmax(0,1fr)_minmax(200px,260px)]">
+			<div className="grid grid-cols-1 items-center gap-x-8 gap-y-6 @xl/editor:grid-cols-[minmax(0,1fr)_minmax(200px,260px)]">
 				<div className="min-w-0 space-y-6">
 					<VintageStrip model={model} index={index} />
 

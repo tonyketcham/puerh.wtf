@@ -124,7 +124,7 @@ function OriginHero({
 	return (
 		<div
 			data-slot="origin-hero-map"
-			className="relative grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1fr)_220px]"
+			className="relative grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @xl/editor:grid-cols-[minmax(0,1fr)_220px]"
 		>
 			{/* the zoomed contour map (plan §3.2, §4.5); a Properties or peek inset grows into it */}
 			<motion.div
@@ -170,9 +170,9 @@ function OriginHero({
 				</p>
 			</motion.div>
 
-			<dl className="flex flex-col justify-center gap-3 px-5 py-4 border-t sm:border-t-0 sm:border-l border-white/[0.06] text-xs">
+			<dl className="grid grid-cols-1 @sm/editor:grid-cols-2 @xl/editor:flex @xl/editor:flex-col justify-center gap-x-6 gap-y-3 px-5 py-4 border-t @xl/editor:border-t-0 @xl/editor:border-l border-white/[0.06] text-xs">
 				{placed && (
-					<HeroFact label="coords">
+					<HeroFact label="coords" className="@max-xl/editor:hidden">
 						<span className="tabular-nums">
 							{fmtLat(geo!.lat)} {fmtLon(geo!.lon)}
 						</span>
@@ -251,7 +251,7 @@ function VendorHero({
 	points: DotMapPoint[]
 }) {
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @lg/editor:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
 			<div className="flex items-center gap-4 p-5">
 				<Logo src={data.image} title={data.title} />
 				<div className="min-w-0 space-y-1.5 text-xs">
@@ -277,7 +277,7 @@ function VendorHero({
 					)}
 				</div>
 			</div>
-			<div className="relative border-t sm:border-t-0 sm:border-l border-white/[0.06] min-h-36">
+			<div className="relative border-t @lg/editor:border-t-0 @lg/editor:border-l border-white/[0.06] min-h-36">
 				{points.length ? (
 					<>
 						<DotMap
@@ -366,7 +366,7 @@ function ColorFieldHero({
 		).length
 	}, [points, model.sessions])
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @lg/editor:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 			<div className="relative">
 				<motion.div
 					aria-hidden
@@ -406,7 +406,7 @@ function ColorFieldHero({
 				</div>
 			</div>
 			{/* where the group grows (plan §2.4): only its own rings */}
-			<div className="relative border-t sm:border-t-0 sm:border-l border-white/[0.06] min-h-52">
+			<div className="relative border-t @lg/editor:border-t-0 @lg/editor:border-l border-white/[0.06] min-h-52">
 				{points.length ? (
 					<>
 						<div className="absolute inset-x-0 flex items-center top-7 bottom-6">
@@ -458,7 +458,7 @@ function CultivarHero({
 }) {
 	const size = leafSize(data.title)
 	return (
-		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @lg/editor:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 			<div className="flex gap-5 px-6 py-5">
 				<div className="flex flex-col items-center gap-2 shrink-0">
 					{data.hanzi ? (
@@ -481,7 +481,7 @@ function CultivarHero({
 					{lead ?? "// no description yet"}
 				</div>
 			</div>
-			<div className="relative border-t sm:border-t-0 sm:border-l border-white/[0.06] min-h-32">
+			<div className="relative border-t @lg/editor:border-t-0 @lg/editor:border-l border-white/[0.06] min-h-32">
 				{points.length ? (
 					<>
 						<DotMap points={points} width={300} height={140} labels={3} accent={model.accentText} />
@@ -502,9 +502,17 @@ function CultivarHero({
 
 // ---------------------------------------------------------------------------
 
-function HeroFact({ label, children }: { label: string; children: ReactNode }) {
+function HeroFact({
+	label,
+	className,
+	children,
+}: {
+	label: string
+	className?: string
+	children: ReactNode
+}) {
 	return (
-		<div className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-2">
+		<div className={cn("grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-2", className)}>
 			<dt className="text-[10.5px] text-white/35">{label}</dt>
 			<dd className="min-w-0 text-white/80">{children}</dd>
 		</div>

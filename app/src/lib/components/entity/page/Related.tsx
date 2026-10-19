@@ -43,7 +43,7 @@ export default function Related({
 	const groups = useMemo(() => buildGroups(model, index, data), [model, index, data])
 	if (!groups.length) return <p className="text-sm text-white/40">{"// nothing linked yet"}</p>
 	return (
-		<div className="grid grid-cols-1 gap-x-8 gap-y-7 md:grid-cols-2">
+		<div className="grid grid-cols-1 gap-x-8 gap-y-7 @xl/editor:grid-cols-2">
 			{groups.map((g, i) => (
 				<RelatedGroup
 					key={g.key}

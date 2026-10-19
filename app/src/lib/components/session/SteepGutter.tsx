@@ -770,8 +770,9 @@ export default function SteepGutter({
 	return (
 		<div
 			ref={wrapperRef}
-			// below lg there is no margin to hang the gutter in, so the column steps in to make room
-			className="relative flow-root pl-14 lg:pl-0"
+			// until the Explorer docks (xl) there is no margin to hang the gutter in, so the column
+			// steps in to make room
+			className="relative flow-root pl-14 xl:pl-0"
 			data-steep-gutter
 			data-steep-mode={mode ?? undefined}
 		>
@@ -779,7 +780,7 @@ export default function SteepGutter({
 
 			<nav
 				aria-label="Steeps"
-				className="absolute top-0 bottom-0 left-0 lg:left-auto lg:right-[calc(100%+12px)] w-12 border-r border-white/[0.06] select-none font-fira-code"
+				className="absolute top-0 bottom-0 left-0 xl:left-auto xl:right-[calc(100%+12px)] w-12 border-r border-white/[0.06] select-none font-fira-code"
 			>
 				{anchors.length > 0 ? (
 					<>

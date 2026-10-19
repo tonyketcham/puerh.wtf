@@ -47,15 +47,59 @@
 }
 
 /*
-  Below lg the IDE frame folds into one column: the Explorer rail steps aside (the command bar
-  and the compact site header carry navigation) and the Properties panel joins the page flow
-  under the editor, so neither side reserves width. Matches Tailwind's lg (64rem).
+  The IDE frame in three tiers, so the editor never drops below a readable measure:
+
+    ≥ 2xl (96rem)   Explorer 340 · editor · Properties 340
+    xl–2xl          Explorer 300 · editor · Properties 300
+    lg–xl (64rem)   Explorer as a drawer · editor · Properties 300
+    < lg            Explorer as a drawer · editor, with Properties in the flow under it
+
+  The editor's width is what the panels leave (main pads by --rightpanel-w), capped at
+  --editor-max; its contents size themselves with container queries, not the viewport.
 */
+:root {
+	--editor-max: 72rem;
+}
+
+@media (width < 96rem) {
+	:root {
+		--explorer-w: 300px;
+		--properties-w: 300px;
+	}
+}
+
+@media (width < 80rem) {
+	:root {
+		--explorer-w: 0px;
+	}
+}
+
 @media (width < 64rem) {
 	:root,
 	:root:has([data-properties-panel]) {
-		--explorer-w: 0px;
 		--rightpanel-w: 0px;
+	}
+
+	/*
+	  The Properties panel flows under the editor at its content's height (the page is the one
+	  scroller on a phone), so its SimpleBar stands down entirely. Auto height alone isn't
+	  enough: SimpleBar sizes itself from a placeholder it measures once, before the session's
+	  rows arrive, which left Source, Record and Notes scrolling inside a short box.
+	*/
+	[data-properties-panel] [data-simplebar] {
+		height: auto !important;
+		container-type: normal !important;
+	}
+	[data-properties-panel] :is(.simplebar-mask, .simplebar-offset) {
+		position: static;
+		overflow: visible;
+	}
+	[data-properties-panel] .simplebar-content-wrapper {
+		height: auto !important;
+		overflow: visible !important;
+	}
+	[data-properties-panel] :is(.simplebar-placeholder, .simplebar-track) {
+		display: none;
 	}
 }
 

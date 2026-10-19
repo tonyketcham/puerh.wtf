@@ -159,8 +159,28 @@ function Crumbs({ data, model }: { data: EntityPageData; model: EntityModel }) {
 							{root.label}
 						</Link>
 					</li>
-					{data.ancestors.map((a) => (
-						<li key={`${a.kind}:${a.slug}`} className="flex items-center min-w-[4ch] gap-1">
+					{/* a narrow editor folds all but the parent into an ellipsis (they stay for readers);
+					    the file tab shares the line, so this folds sooner than the session trail */}
+					{data.ancestors.length > 1 && (
+						<li
+							aria-hidden
+							title={data.ancestors
+								.slice(0, -1)
+								.map((a) => a.title)
+								.join(" › ")}
+							className="items-center hidden gap-1 shrink-0 @max-3xl/editor:flex text-white/35"
+						>
+							{sep}…
+						</li>
+					)}
+					{data.ancestors.map((a, i) => (
+						<li
+							key={`${a.kind}:${a.slug}`}
+							className={cn(
+								"flex items-center min-w-[4ch] gap-1",
+								i < data.ancestors.length - 1 && "@max-3xl/editor:sr-only"
+							)}
+						>
 							{sep}
 							<EntityRef
 								kind={a.kind}
@@ -171,7 +191,11 @@ function Crumbs({ data, model }: { data: EntityPageData; model: EntityModel }) {
 							/>
 						</li>
 					))}
-					<li className="flex items-center gap-1 shrink-0" aria-current="page">
+					{/* the title sits right under it; a narrow line spends its room on the way back */}
+					<li
+						className="flex items-center gap-1 shrink-0 @max-xl/editor:sr-only"
+						aria-current="page"
+					>
 						{sep}
 						<span className="text-white/90">{data.title}</span>
 						{data.hanzi && (
@@ -220,7 +244,8 @@ function FileTab({ data, model }: { data: EntityPageData; model: EntityModel }) 
 					)}
 				>
 					<Filter size={11} strokeWidth={2} aria-hidden />
-					{active ? "filtered" : "filter"}
+					{/* a phone-width line keeps the funnel; the word gives its room to the crumbs */}
+					<span className="@max-sm/editor:sr-only">{active ? "filtered" : "filter"}</span>
 				</button>
 			)}
 		</div>

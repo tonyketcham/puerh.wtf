@@ -105,6 +105,13 @@ export default function OriginTrail({
 	const shownTails = tree ? tails : tails.slice(0, MAX_TAILS)
 	const hidden = tails.length - shownTails.length
 
+	// In a narrow editor the breadcrumb keeps its ends (the country, then the parent and leaf, or
+	// the last shared node before a blend's tails) and folds the middle into an ellipsis, rather
+	// than truncating every crumb to a few letters. Folded crumbs stay for screen readers.
+	const keepFrom = tree ? 0 : Math.max(1, common.length - (tails.length ? 1 : 2))
+	const folded = (i: number) => i > 0 && i < keepFrom
+	const foldedTitles = common.filter((_, i) => folded(i)).map((n) => n.title)
+
 	return (
 		<nav aria-label="Origin" className={cn("min-w-0", className)} data-recording-key={recordingKey}>
 			<ol
@@ -124,12 +131,22 @@ export default function OriginTrail({
 							className={cn(
 								"flex items-center gap-1",
 								// when the line is short, ancestors give way (truncate); the leaf never does
-								!tails.length && i === common.length - 1 ? "shrink-0" : "min-w-[4ch]"
+								!tails.length && i === common.length - 1 ? "shrink-0" : "min-w-[4ch]",
+								folded(i) && "@max-xl/editor:sr-only"
 							)}
 							{...enter(i)}
 						>
 							{i > 0 && sep}
 							{crumb(node, !tails.length && i === common.length - 1)}
+							{i === 0 && foldedTitles.length > 0 && (
+								<span
+									aria-hidden
+									title={foldedTitles.join(" › ")}
+									className="items-center hidden gap-1 shrink-0 @max-xl/editor:inline-flex text-white/35"
+								>
+									{sep}…
+								</span>
+							)}
 						</motion.li>
 					))}
 					{!tree && shownTails.length > 0 && (

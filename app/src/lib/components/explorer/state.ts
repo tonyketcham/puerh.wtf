@@ -52,3 +52,12 @@ export type ExplorerHover = { kind: EntityKind; slug: string }
  * the origin map (Phase 5) lights its ring.
  */
 export const explorerHoverAtom = atom<ExplorerHover | null>(null)
+
+/**
+ * Below xl the Explorer is a drawer over the page (app.css zeroes --explorer-w); this is
+ * whether it is out. Docked from xl, where it is ignored.
+ */
+export const explorerDrawerOpenAtom = atom(false)
+
+/** The width from which the Explorer docks beside the editor (Tailwind's xl, 80rem). */
+export const EXPLORER_DOCK_QUERY = "(width >= 80rem)"

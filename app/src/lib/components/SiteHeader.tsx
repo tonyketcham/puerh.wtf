@@ -2,8 +2,12 @@ import Link from "next/link"
 import Github from "./icons/Github"
 import Instagram from "./icons/Instagram"
 import { cn } from "@/lib/utils/cn"
+import ExplorerToggle from "./explorer/ExplorerToggle"
 
-/** `compact` is the narrow-screen masthead: same mark, one size down, links at its side. */
+/**
+ * `compact` is the masthead while the Explorer is a drawer (below xl): same mark, one size
+ * down, with the drawer's toggle and the links at its side.
+ */
 export default function SiteHeader({
 	compact = false,
 	className,
@@ -17,7 +21,8 @@ export default function SiteHeader({
 				<h1
 					className={cn(
 						"text-bai-cha-100 select-none drop-shadow-split",
-						compact ? "text-[44px] leading-9" : "text-[64px] leading-13"
+						// the docked rail is 300px until 2xl: the full mark and its links don't fit side by side
+						compact ? "text-[44px] leading-9" : "text-[52px] leading-11 2xl:text-[64px] 2xl:leading-13"
 					)}
 				>
 					<span>puerh</span>
@@ -32,6 +37,7 @@ export default function SiteHeader({
 					compact ? "flex-row items-center gap-3" : "flex-col m-auto space-y-1.5 pt-4"
 				)}
 			>
+				{compact && <ExplorerToggle className="mr-1" />}
 				<a
 					aria-label="source code"
 					href="https://github.com/tonyketcham/puerh.wtf"

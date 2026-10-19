@@ -51,10 +51,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 							<Explorer sessions={sessions} vendors={vendors} categories={categories} />
 						</Suspense>
 						<div className="flex flex-col w-full min-w-0 ml-[var(--explorer-w)]">
-							{/* below lg the Explorer rail is hidden, so the masthead rides above the page */}
-							<SiteHeader compact className="pt-[calc(var(--commandbar-h)+0.5rem)] lg:hidden" />
-							{/* top: room for the command bar; bottom: room for the status bar (0 off session pages) */}
-							<main className="w-full min-w-0 px-4 pt-4 lg:p-8 lg:pt-[calc(var(--commandbar-h)+2rem)] pb-[calc(var(--statusbar-h)+2rem)] lg:pb-[calc(var(--statusbar-h)+2rem)]">
+							{/* below xl the Explorer is a drawer, so the masthead (with its toggle) rides above
+							    the page; it clears the fixed Properties panel like main does */}
+							<SiteHeader
+								compact
+								className="pt-[calc(var(--commandbar-h)+0.5rem)] lg:px-8 lg:mr-[var(--rightpanel-w)] xl:hidden"
+							/>
+							{/* top: room for the command bar (the masthead's job below xl); right: the fixed
+							    Properties panel; bottom: the status bar (0 off session pages). Below lg x clips
+							    whatever leans past a phone's edge (the carousel cube's faces) */}
+							<main className="w-full min-w-0 px-4 pt-4 max-lg:overflow-x-clip lg:px-8 lg:pr-[calc(var(--rightpanel-w)+2rem)] xl:pt-[calc(var(--commandbar-h)+2rem)] pb-[calc(var(--statusbar-h)+2rem)]">
 								{children}
 							</main>
 						</div>

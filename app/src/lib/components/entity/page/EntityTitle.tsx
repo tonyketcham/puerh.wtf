@@ -65,7 +65,8 @@ export default function EntityTitle({
 		<h1
 			className={cn(
 				"grid font-rock-3d leading-[1.02] text-shadow-2xl break-words",
-				"text-[clamp(44px,6.2vw,104px)]",
+				// sized by the editor column (cqi), which tracks the docked panels; the viewport does not
+				"text-[clamp(44px,8.5cqi,104px)]",
 				className
 			)}
 			data-entity-title

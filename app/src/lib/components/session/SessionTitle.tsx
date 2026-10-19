@@ -174,7 +174,7 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 
 	return (
 		<h1
-			className="grid font-rock-3d text-6xl sm:text-7xl lg:text-8xl text-shadow-2xl"
+			className="grid font-rock-3d text-6xl @lg/editor:text-7xl @3xl/editor:text-8xl text-shadow-2xl"
 			data-session-title
 		>
 			<motion.span
