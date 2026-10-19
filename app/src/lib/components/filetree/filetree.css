@@ -1,0 +1,137 @@
+/*
+ * The Explorer tree's data line: a rail drops from the folder's chevron and branches into each
+ * row's liquor swatch. Every row draws its own stretch of rail in its own liquor, so at rest the
+ * line reads as a faint strip of the whole log's colors.
+ *
+ * Hovering (or keyboard-focusing) a row lights the route from the folder down to it: every row
+ * above lights its whole stretch, the row itself lights to its branch, and the dashes flow
+ * downward into the swatch. The current page keeps its route lit, quietly, with no flow.
+ *
+ * Geometry (keep in step with File.tsx): rows are 36px, the rail sits at --rail-x and the branch
+ * curves 6px into the swatch column. The dash period (6px) divides every stretch (36, 18-6), so
+ * the flow stays in phase from row to row.
+ */
+
+.ft-list {
+	--rail-x: 13px;
+	--rail-dash: 6px;
+	--rail-ground: #1d1a1d;
+	/* how far the first row's rail reaches up, to the folder's chevron (a multiple of the dash) */
+	--rail-reach: 12px;
+	--seg: 255 255 255;
+}
+
+/* --seg: channels of the row's liquor (text-safe lift), set on the row (white by default) */
+.ft-seg,
+.ft-branch {
+	/* opaque at rest, so where the branch overlaps the rail nothing doubles up */
+	--seg-rest: color-mix(in oklab, rgb(var(--seg)) 40%, var(--rail-ground));
+	--seg-route: color-mix(in oklab, rgb(var(--seg)) 65%, var(--rail-ground));
+}
+
+.ft-seg {
+	position: absolute;
+	left: calc(var(--rail-x) - 0.5px);
+	width: 1px;
+	pointer-events: none;
+	background-color: var(--seg-rest);
+	background-size: 1px var(--rail-dash);
+	transition:
+		background-color 220ms ease,
+		filter 220ms ease;
+}
+/* above the branch (reaching up through the gap under the folder for the first row) */
+.ft-seg-top {
+	top: 0;
+	height: calc(50% - 6px);
+}
+.ft-row:first-child .ft-seg-top {
+	top: calc(var(--rail-reach) * -1);
+	height: calc(50% - 6px + var(--rail-reach));
+}
+/* below the branch, carrying on to the next row; the last row ends in its branch */
+.ft-seg-bottom {
+	top: calc(50% - 6px);
+	bottom: 0;
+}
+.ft-row:last-child .ft-seg-bottom {
+	display: none;
+}
+
+.ft-branch {
+	position: absolute;
+	left: calc(var(--rail-x) - 1px);
+	top: calc(50% - 7px);
+	width: 14px;
+	height: 8px;
+	overflow: visible;
+	pointer-events: none;
+	color: var(--seg-rest);
+	transition:
+		color 220ms ease,
+		filter 220ms ease;
+}
+/* ── the current page's route: lit, still ── */
+.ft-row:has(~ .ft-row [aria-current="page"]) .ft-seg,
+.ft-row:has([aria-current="page"]) .ft-seg-top {
+	background-color: var(--seg-route);
+}
+.ft-row:has([aria-current="page"]) .ft-branch {
+	color: rgb(var(--seg));
+}
+
+/* ── the hovered row's route: full color, flowing ── */
+.ft-row:has(~ .ft-row:hover) .ft-seg,
+.ft-row:has(~ .ft-row a:focus-visible) .ft-seg,
+.ft-row:hover .ft-seg-top,
+.ft-row:has(a:focus-visible) .ft-seg-top {
+	background-color: transparent;
+	background-image: linear-gradient(
+		to bottom,
+		rgb(var(--seg)) 0 4px,
+		transparent 4px var(--rail-dash)
+	);
+	filter: drop-shadow(0 0 2.5px rgb(var(--seg) / 0.85));
+	animation: ft-flow 420ms linear infinite;
+}
+.ft-row:hover .ft-branch,
+.ft-row:has(a:focus-visible) .ft-branch {
+	color: rgb(var(--seg));
+	filter: drop-shadow(0 0 2.5px rgb(var(--seg) / 0.85));
+}
+.ft-row:hover .ft-branch path,
+.ft-row:has(a:focus-visible) .ft-branch path {
+	stroke-dasharray: 4 2;
+	animation: ft-flow-branch 420ms linear infinite;
+}
+
+/* the swatch takes the drop: a small lift and a ring of its own color */
+.ft-swatch {
+	transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ft-row:hover .ft-swatch,
+.ft-row:has(a:focus-visible) .ft-swatch {
+	transform: scale(1.18);
+}
+
+@keyframes ft-flow {
+	to {
+		background-position: 0 var(--rail-dash);
+	}
+}
+@keyframes ft-flow-branch {
+	to {
+		stroke-dashoffset: -6;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ft-row .ft-seg,
+	.ft-row .ft-branch path {
+		animation: none !important;
+	}
+	.ft-row:hover .ft-swatch,
+	.ft-row:has(a:focus-visible) .ft-swatch {
+		transform: none;
+	}
+}

@@ -3,9 +3,10 @@
 import { useId, useState, type ReactNode } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import File from "./File"
-import { useFileTreeContext } from "./FileTreeContext"
 import type { TreeNode } from "../../types/tree"
 import { buildLink } from "../../utils/BuildLinkToGivenCollectionNode"
+import { cn } from "@/lib/utils/cn"
+import "./filetree.css"
 
 export const FolderIcon = () => (
 	<svg
@@ -14,7 +15,7 @@ export const FolderIcon = () => (
 		viewBox="0 0 16 16"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
-		className="shrink-0 w-4 h-4 text-white/60"
+		className="w-4 h-4 transition-colors shrink-0 text-white/50 group-hover:text-white/80"
 		aria-hidden="true"
 	>
 		<path
@@ -33,24 +34,23 @@ const ExpandCollapseIcon = ({ expanded }: { expanded: boolean }) => (
 		viewBox="0 0 6 6"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
-		className="w-2 h-2 text-white/60"
+		className="w-2 h-2 transition-colors text-white/50 group-hover:text-white"
 		aria-hidden="true"
 		initial={false}
 		animate={{ rotate: expanded ? 90 : 0 }}
 		transition={{ type: "spring", stiffness: 500, damping: 32 }}
 	>
-		<g opacity="0.8">
-			<path d="M2 1L4 3L2 5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-		</g>
+		<path d="M2 1L4 3L2 5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
 	</motion.svg>
 )
 
 const ROW_SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.7 } as const
+const COUNT_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 
 interface FolderProps {
 	title: string
 	nodes: TreeNode[]
-	/** unfiltered size; when larger than nodes.length the header shows "n / total" */
+	/** unfiltered size; when larger than nodes.length the header shows "n/total" */
 	total?: number
 	/** header actions, right of the title (kept outside the toggle button) */
 	actions?: ReactNode
@@ -69,10 +69,10 @@ export default function Folder({
 	const [expanded, setExpanded] = useState(initialExpanded)
 	const reduce = useReducedMotion()
 	const listId = useId()
-	const { order } = useFileTreeContext()
 	const filtered = total !== undefined && total !== nodes.length
 
-	// rows collapse/expand in height so siblings glide instead of jumping
+	// Filtered rows leave the flow once; siblings glide with layout transforms.
+	// Animating each row's height forced layout and scrollbar measurement every frame.
 	const rowMotion = reduce
 		? {
 				initial: { opacity: 0 },
@@ -81,43 +81,46 @@ export default function Folder({
 				transition: { duration: 0.12 },
 		  }
 		: {
-				initial: { opacity: 0, height: 0, overflow: "hidden" },
-				// clip only while resizing, so a lifted (dragging) row isn't cut off
-				animate: { opacity: 1, height: "auto", transitionEnd: { overflow: "visible" } },
-				exit: { opacity: 0, height: 0, overflow: "hidden" },
-				transition: { height: ROW_SPRING, layout: ROW_SPRING, opacity: { duration: 0.18 } },
+				initial: { opacity: 0, y: 4 },
+				animate: { opacity: 1, y: 0 },
+				exit: { opacity: 0, y: -4 },
+				transition: { y: ROW_SPRING, layout: ROW_SPRING, opacity: { duration: 0.18 } },
 		  }
 
 	return (
-		<div className="px-2 py-1.5">
-			<div className="flex items-center gap-1">
+		<div className="py-1">
+			<div className="flex items-center gap-1 pr-1">
 				<button
 					type="button"
 					onClick={() => setExpanded((v) => !v)}
 					aria-expanded={expanded}
 					aria-controls={listId}
-					className="flex flex-1 min-w-0 items-center px-2 space-x-2 text-left rounded-sm cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/25"
-					style={{ paddingLeft: `${indentationLevel * 1.25 + 0.25}rem` }}
+					className="flex items-center flex-1 h-8 min-w-0 gap-2 pr-2 text-left transition-colors rounded-lg outline-none cursor-pointer group hover:bg-white/[0.03] focus-visible:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22)]"
+					// the chevron sits on the rail column (filetree.css --rail-x)
+					style={{ paddingLeft: 7 + indentationLevel * 12 }}
 				>
-					<ExpandCollapseIcon expanded={expanded} />
+					<span className="grid w-3 shrink-0 place-items-center">
+						<ExpandCollapseIcon expanded={expanded} />
+					</span>
 					<FolderIcon />
-					<span className="flex-1 text-sm leading-4 text-white/60 group-hover:text-white">
+					<span className="flex-1 min-w-0 truncate text-[13px] leading-4 text-white/70 group-hover:text-white">
 						{title}
 					</span>
-					<AnimatePresence initial={false}>
-						{filtered && (
+					<span className="flex text-[11px] tabular-nums text-white/35 group-hover:text-white/60">
+						<AnimatePresence initial={false} mode="popLayout">
 							<motion.span
-								key="count"
-								className="text-[10px] tabular-nums text-white/40"
-								initial={{ opacity: 0, x: 4 }}
-								animate={{ opacity: 1, x: 0 }}
-								exit={{ opacity: 0, x: 4 }}
+								key={nodes.length}
+								className="inline-block"
+								initial={reduce ? { opacity: 0 } : { opacity: 0, y: -5 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={reduce ? { opacity: 0 } : { opacity: 0, y: 5 }}
+								transition={COUNT_SPRING}
 							>
 								{nodes.length}
-								<span className="text-white/25"> / {total}</span>
 							</motion.span>
-						)}
-					</AnimatePresence>
+						</AnimatePresence>
+						{filtered && <span className="text-white/20">/{total}</span>}
+					</span>
 				</button>
 				{actions}
 			</div>
@@ -126,6 +129,7 @@ export default function Folder({
 					<motion.ul
 						id={listId}
 						key="list"
+						className="relative ft-list"
 						initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0, overflow: "hidden" }}
 						animate={
 							reduce
@@ -135,10 +139,17 @@ export default function Folder({
 						exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0, overflow: "hidden" }}
 						transition={{ height: ROW_SPRING, opacity: { duration: 0.16 } }}
 					>
-						<li aria-hidden="true" className="h-1" />
-						<AnimatePresence initial={false}>
+						<AnimatePresence initial={false} mode="popLayout">
 							{nodes.map((node) => (
-								<motion.li key={node.id} layout="position" layoutDependency={order} {...rowMotion}>
+								<motion.li
+									key={node.id}
+									// the data line's rows (filetree.css): siblings, so a hovered row can light
+									// the route above it
+									className={cn(!node?.children && "ft-row")}
+									layout="position"
+									layoutDependency={nodes}
+									{...rowMotion}
+								>
 									{node?.children ? (
 										<Folder
 											title={node.title}
@@ -157,13 +168,12 @@ export default function Folder({
 						</AnimatePresence>
 						{nodes.length === 0 && (
 							<li
-								className="py-1.5 text-xs text-white/35"
-								style={{ paddingLeft: `${(indentationLevel + 1) * 1.25 + 0.5}rem` }}
+								className="py-2 text-[11px] text-white/35"
+								style={{ paddingLeft: 26 + indentationLevel * 12 }}
 							>
-								nothing matches
+								{"// nothing matches"}
 							</li>
 						)}
-						<li aria-hidden="true" className="h-1" />
 					</motion.ul>
 				)}
 			</AnimatePresence>

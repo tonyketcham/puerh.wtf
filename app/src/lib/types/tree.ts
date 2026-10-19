@@ -9,6 +9,7 @@ export type TreeNode = {
 	_collection?: string
 	date?: string
 	children?: TreeNode[]
+	vendor?: { title: string }[] | null
 	style?: {
 		category: Category
 	}[]

@@ -36,7 +36,8 @@ export default function FileTree({ data, referenceSlugs = null, order = "date" }
 
 	return (
 		<FileTreeContext.Provider value={context}>
-			<div className="flex flex-col select-none">
+			{/* rows run a little wider than the panel padding, like the entity views: names need the room */}
+			<div className="flex flex-col -mx-2 select-none">
 				{data.map((node) => (
 					<Folder
 						key={node.id}
