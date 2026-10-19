@@ -34,6 +34,11 @@ export interface YearRulerProps {
 	activeYears: string[]
 	/** replace the `years` facet */
 	onYearsChange: (years: string[]) => void
+	/**
+	 * Vintages to preview (the Explorer entity row under the pointer): a bead rises over each
+	 * of its vintages, so hovering Yiwu shows when Yiwu teas were pressed. Null for none.
+	 */
+	previewYears?: ReadonlySet<number> | null
 }
 
 type Handle = "lo" | "hi"
@@ -86,6 +91,7 @@ export default function YearRuler({
 	filteredSessions,
 	activeYears,
 	onYearsChange,
+	previewYears = null,
 }: YearRulerProps) {
 	const reduce = useReducedMotion()
 	const trackRef = useRef<HTMLDivElement | null>(null)
@@ -518,6 +524,27 @@ export default function YearRuler({
 								animate={{ scaleY: total ? kept / total : 0 }}
 								transition={t(SPRING)}
 							/>
+							<AnimatePresence>
+								{previewYears?.has(v) && (
+									<motion.span
+										key="bead"
+										className="absolute left-1/2 size-[5px] -ml-[2.5px] rounded-full"
+										style={{
+											bottom: h + 3,
+											background: LIQUOR,
+											boxShadow: `0 0 6px ${liquorA(0.7)}`,
+										}}
+										initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.4 }}
+										animate={{ opacity: 1, y: 0, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.1 } }}
+										transition={
+											reduce
+												? { duration: 0.1 }
+												: { type: "spring", stiffness: 640, damping: 26, delay: (v - minY) * 0.006 }
+										}
+									/>
+								)}
+							</AnimatePresence>
 						</div>
 					)
 				})}

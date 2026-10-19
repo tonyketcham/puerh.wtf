@@ -57,7 +57,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 						</div>
 					</div>
 					<Suspense>
-						<CommandBar sessions={sessions} vendors={vendors} categories={categories} />
+						<CommandBar
+							sessions={sessions}
+							vendors={vendors}
+							categories={categories}
+							details={entityDetails}
+						/>
 					</Suspense>
 					{/* one EntityPeek card for every entity ref on the page (it reads filter params) */}
 					<Suspense>

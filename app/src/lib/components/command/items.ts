@@ -1,14 +1,21 @@
 /**
  * Command bar index + search. Pure (no React): builds a searchable index of teas, flavor
- * descriptors, vendors, styles and tags once, then turns (query, mode) into result groups.
+ * descriptors and every entity a session points at (origins, vendors, styles and their
+ * categories, cultivars, tags, vintages) once, then turns (query, mode) into result groups.
+ *
+ * Quick-open prefixes scope the search to one kind (plan §2.1): `@` vendor, `#` tag,
+ * `^` origin, `~` style, `%` cultivar, `:` vintage; `>` runs commands.
  */
 import type { ExplorerSession, NoteStage } from "@/lib/types/session"
 import type { Vendor } from "@/lib/types/vendor"
 import type { Category } from "@/lib/types/category"
-import type { FacetKey, FilterState } from "@/lib/filters"
+import { ENTITY_FACET, isEntityFiltered, type FacetKey, type FilterState } from "@/lib/filters"
 import { descriptorRegex, extractDescriptors } from "@/lib/descriptors"
+import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
+import type { EntityDetails } from "@/lib/entityDetails"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
 import { originSearchText } from "@/lib/origins"
+import { ancestorsOf, buildRelationIndex, type EntityNode } from "@/lib/relations"
 import { NOTE_STAGES } from "@/lib/types/session"
 import { fuzzyFields, fuzzyMatch } from "./fuzzy"
 import type { RecentEntry } from "./recents"
@@ -32,12 +39,30 @@ export type TeaEntry = {
 
 export type FlavorEntry = { term: string; count: number; stages: NoteStage[] }
 
+/** An entity row: opens its page (when it has one) or toggles its Explorer filter. */
 export type FacetEntry = {
+	kind: EntityKind
 	facet: FacetKey
+	/** slug (vintages: the year) */
 	value: string
+	/** origins: the id, which old filter URLs may carry */
+	id?: string
 	label: string
+	/** sessions behind it (origins and categories roll up) */
 	count: number
 	color?: string
+	/** dim second line: an origin's hanzi and path, a style's category, a vendor's city */
+	sub?: string
+	/** origins and cultivars: the name in hanzi */
+	hanzi?: string
+	/** extra text the search matches (pinyin without tones, hanzi, slug) */
+	alt?: string
+	/** page route, or null for filter-only kinds (tags, vintages) */
+	href: string | null
+	/** origin tree depth, for the indented tree an empty `^` shows */
+	depth?: number
+	/** a style's category slug */
+	parent?: string
 }
 
 export type CommandIndex = {
@@ -45,17 +70,47 @@ export type CommandIndex = {
 	teasBySlug: Map<string, TeaEntry>
 	flavors: FlavorEntry[]
 	vendors: FacetEntry[]
+	categories: FacetEntry[]
 	styles: FacetEntry[]
+	/** depth-first through the tree, biggest branch first */
+	origins: FacetEntry[]
+	cultivars: FacetEntry[]
 	tags: FacetEntry[]
+	/** newest first */
+	years: FacetEntry[]
 }
 
 const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : null
 
+// (a local empty value: entityDetails.ts is server code, only its types come along)
+const NO_DETAILS: EntityDetails = { origin: {}, vendor: {}, style: {}, category: {}, cultivar: {} }
+
+const bare = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "")
+
+/** Same name, ignoring case and tone marks ("yiwu" names Yìwǔ). */
+const sameName = (a: string, b: string) => bare(a.toLowerCase()) === bare(b.trim().toLowerCase())
+
+const entry = (
+	kind: EntityKind,
+	node: Pick<EntityNode, "slug" | "title" | "all"> & Partial<EntityNode>,
+	extra: Partial<FacetEntry> = {}
+): FacetEntry => ({
+	kind,
+	facet: ENTITY_FACET[kind],
+	value: node.slug,
+	label: node.title,
+	count: node.all.length,
+	color: node.color ?? undefined,
+	href: entityHref(kind, node.slug),
+	...extra,
+})
+
 export function buildIndex(
 	sessions: ExplorerSession[],
 	vendors: Vendor[],
-	categories: Category[]
+	categories: Category[],
+	details: EntityDetails = NO_DETAILS
 ): CommandIndex {
 	const teas: TeaEntry[] = sessions.map((s) => {
 		const cat = s.style?.[0]?.category
@@ -113,54 +168,139 @@ export function buildIndex(
 	}
 	flavors.sort((a, b) => b.count - a.count || a.term.localeCompare(b.term))
 
-	const countBy = (pick: (s: ExplorerSession) => (string | undefined | null)[]) => {
-		const m = new Map<string, number>()
-		for (const s of sessions) for (const v of new Set(pick(s))) if (v) m.set(v, (m.get(v) ?? 0) + 1)
-		return m
-	}
-	const vendorCounts = countBy((s) => (s.vendor ?? []).map((v) => v._slug))
-	const styleCounts = countBy((s) => (s.style ?? []).map((st) => st.category?._slug))
-	const tagCounts = countBy((s) => (s.tags ?? []).map((t) => t?._slug))
-
-	const tagTitles = new Map<string, string>()
-	for (const s of sessions)
-		for (const t of s.tags ?? []) if (t?._slug) tagTitles.set(t._slug, t.title)
-
+	// Entities come from the relation index (counts roll up through the origin and style trees)
+	const rel = buildRelationIndex(sessions)
 	const byCount = (a: FacetEntry, b: FacetEntry) =>
 		b.count - a.count || a.label.localeCompare(b.label)
+
+	const vendorEntries: FacetEntry[] = vendors
+		.map((v) => rel.nodes.vendor.get(v._slug))
+		.filter((n): n is EntityNode => !!n && n.all.length > 0)
+		.map((n) => entry("vendor", n, { sub: details.vendor[n.slug]?.place }))
+		.sort(byCount)
+
+	const categoryEntries: FacetEntry[] = categories
+		.map((c) => {
+			const n = rel.nodes.category.get(c._slug)
+			if (!n?.all.length) return null
+			const styles = rel.children.category.get(c._slug)?.length ?? 0
+			return entry("category", n, {
+				color: c.color,
+				sub: `category · ${styles} ${styles === 1 ? "style" : "styles"}`,
+			})
+		})
+		.filter((e): e is FacetEntry => !!e)
+		.sort(byCount)
+
+	const styleEntries: FacetEntry[] = [...rel.nodes.style.values()]
+		.map((n) => {
+			const category = n.parent ? rel.nodes.category.get(n.parent) : undefined
+			return entry("style", n, {
+				sub: category?.title,
+				alt: category?.title,
+				parent: n.parent ?? undefined,
+			})
+		})
+		.sort(byCount)
+
+	// origins: depth-first, the biggest branch first, so an empty `^` reads as the tree
+	const origins: FacetEntry[] = []
+	const originCount = (slug: string) => rel.nodes.origin.get(slug)?.all.length ?? 0
+	const bySize = (a: string, b: string) =>
+		originCount(b) - originCount(a) ||
+		(rel.nodes.origin.get(a)?.title ?? a).localeCompare(rel.nodes.origin.get(b)?.title ?? b)
+	const visitOrigin = (slug: string, depth: number) => {
+		const n = rel.nodes.origin.get(slug)
+		if (!n) return
+		const path = ancestorsOf(rel, "origin", slug).map((a) => a.title)
+		origins.push(
+			entry("origin", n, {
+				id: n.id,
+				depth,
+				hanzi: n.hanzi ?? undefined,
+				// the nearest places say the most; the country is implied past two levels
+				sub: [n.hanzi, path.slice(-3).join(" › ")].filter(Boolean).join("  ") || undefined,
+				alt: [n.pinyin ? bare(n.pinyin) : "", n.hanzi, n.slug].filter(Boolean).join(" "),
+			})
+		)
+		for (const kid of [...(rel.children.origin.get(slug) ?? [])].sort(bySize))
+			visitOrigin(kid, depth + 1)
+	}
+	for (const root of [...rel.nodes.origin.values()]
+		.filter((n) => !n.parent)
+		.map((n) => n.slug)
+		.sort(bySize))
+		visitOrigin(root, 0)
+
+	const cultivarEntries: FacetEntry[] = [...rel.nodes.cultivar.values()]
+		.map((n) => {
+			const hanzi = details.cultivar[n.slug]?.hanzi
+			return entry("cultivar", n, { sub: hanzi, alt: hanzi })
+		})
+		.sort(byCount)
+
+	const tagEntries: FacetEntry[] = [...rel.nodes.tag.values()]
+		.map((n) => entry("tag", n))
+		.sort(byCount)
+
+	const thisYear = new Date().getFullYear()
+	const yearEntries: FacetEntry[] = [...rel.nodes.year.values()]
+		.map((n) => {
+			const age = thisYear - Number(n.slug)
+			return entry("year", n, {
+				sub: age > 0 ? `${age} ${age === 1 ? "year" : "years"} old` : "this year",
+			})
+		})
+		.sort((a, b) => Number(b.value) - Number(a.value))
 
 	return {
 		teas,
 		teasBySlug: new Map(teas.map((t) => [t.slug, t])),
 		flavors,
-		vendors: vendors
-			.map((v) => ({
-				facet: "vendors" as const,
-				value: v._slug,
-				label: v.title,
-				count: vendorCounts.get(v._slug) ?? 0,
-			}))
-			.filter((v) => v.count > 0)
-			.sort(byCount),
-		styles: categories
-			.map((c) => ({
-				facet: "styles" as const,
-				value: c._slug,
-				label: c.title,
-				color: c.color,
-				count: styleCounts.get(c._slug) ?? 0,
-			}))
-			.filter((c) => c.count > 0)
-			.sort(byCount),
-		tags: [...tagTitles]
-			.map(([slug, title]) => ({
-				facet: "tags" as const,
-				value: slug,
-				label: title,
-				count: tagCounts.get(slug) ?? 0,
-			}))
-			.sort(byCount),
+		vendors: vendorEntries,
+		categories: categoryEntries,
+		styles: styleEntries,
+		origins,
+		cultivars: cultivarEntries,
+		tags: tagEntries,
+		years: yearEntries,
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Quick-open prefixes
+// ---------------------------------------------------------------------------
+
+/** Kinds a prefix scopes the search to (`~` covers categories and styles). */
+export type ScopeKind = "vendor" | "tag" | "origin" | "style" | "cultivar" | "year"
+
+export const SCOPE_PREFIX: Record<string, ScopeKind> = {
+	"@": "vendor",
+	"#": "tag",
+	"^": "origin",
+	"~": "style",
+	"%": "cultivar",
+	":": "year",
+}
+
+export const SCOPE_META: Record<ScopeKind, { glyph: string; label: string; placeholder: string }> =
+	{
+		vendor: { glyph: "@", label: "Vendors", placeholder: "Open a vendor…" },
+		tag: { glyph: "#", label: "Tags", placeholder: "Filter by tag…" },
+		origin: {
+			glyph: "^",
+			label: "Origins",
+			placeholder: "Open an origin: village, mountain, province…",
+		},
+		style: { glyph: "~", label: "Styles", placeholder: "Open a style or category…" },
+		cultivar: { glyph: "%", label: "Cultivars", placeholder: "Open a cultivar…" },
+		year: { glyph: ":", label: "Vintages", placeholder: "Filter by vintage…" },
+	}
+
+/** A query that opens with a prefix ("^yiwu") as its scope and the rest; null when it has none. */
+export function parsePrefix(query: string): { scope: ScopeKind; rest: string } | null {
+	const scope = SCOPE_PREFIX[query[0] ?? ""]
+	return scope ? { scope, rest: query.slice(1).trimStart() } : null
 }
 
 // ---------------------------------------------------------------------------
@@ -174,6 +314,7 @@ export type Mode =
 	| { kind: "all" }
 	| { kind: "commands" }
 	| { kind: "scope"; scope: "sessions" | "descriptors" }
+	| { kind: "entity"; scope: ScopeKind }
 	| { kind: "arg"; command: ArgCommand }
 
 export type Item =
@@ -193,6 +334,8 @@ export type Item =
 			hl: number[]
 			recent?: boolean
 			active: boolean
+			/** indent (origin tree in an empty `^`) */
+			depth?: number
 	  }
 	| { kind: "command"; key: string; command: CommandDef; hl: number[] }
 
@@ -202,12 +345,16 @@ export type GroupKey =
 	| "latest"
 	| "teas"
 	| "flavors"
+	| "origins"
 	| "vendors"
 	| "styles"
+	| "cultivars"
 	| "tags"
+	| "years"
 	| "commands"
 
-export type Group = { key: GroupKey; label: string; items: Item[] }
+/** `key` is a GroupKey, or `cat:<slug>` for the per-category groups of an empty `~`. */
+export type Group = { key: string; label: string; items: Item[]; color?: string }
 
 export type CommandDef = {
 	id: CommandId
@@ -281,9 +428,12 @@ const GROUP_LABEL: Record<GroupKey, string> = {
 	latest: "Latest sessions",
 	teas: "Teas",
 	flavors: "Flavors",
+	origins: "Origins",
 	vendors: "Vendors",
 	styles: "Styles",
+	cultivars: "Cultivars",
 	tags: "Tags",
+	years: "Vintages",
 	commands: "Commands",
 }
 
@@ -350,28 +500,52 @@ function flavorItems(index: CommandIndex, query: string, limit: number, ctx: Sea
 	)
 }
 
-function facetItems(entries: FacetEntry[], query: string, limit: number, ctx: SearchContext) {
+const facetItem = (
+	facet: FacetEntry,
+	ctx: SearchContext,
+	hl: number[] = [],
+	extra: { recent?: boolean; depth?: number; keyPrefix?: string } = {}
+): Item => ({
+	kind: "facet",
+	key: `${extra.keyPrefix ?? ""}${facet.kind}:${facet.value}`,
+	facet,
+	hl,
+	recent: extra.recent,
+	depth: extra.depth,
+	active: isEntityFiltered(ctx.filters, facet.kind, facet.value, facet.id),
+})
+
+/**
+ * Entities matching the query, best first. Without a query, the list's own order (by count;
+ * origins as a tree), with the origin depth kept when `tree` is set.
+ */
+function facetItems(
+	entries: FacetEntry[],
+	query: string,
+	limit: number,
+	ctx: SearchContext,
+	{ tree = false }: { tree?: boolean } = {}
+) {
 	const q = query.trim()
+	if (!q)
+		return entries
+			.slice(0, limit)
+			.map((f) => facetItem(f, ctx, [], { depth: tree ? f.depth : undefined }))
 	const scored: { facet: FacetEntry; score: number; hl: number[] }[] = []
 	for (const facet of entries) {
-		if (!q) {
-			scored.push({ facet, score: facet.count, hl: [] })
-			continue
-		}
-		const r = fuzzyFields(q, [{ text: facet.label, key: "label" }])
+		const r = fuzzyFields(q, [
+			{ text: facet.label, key: "label" },
+			{ text: facet.alt, weight: 0.85 },
+		])
 		if (r && r.score >= 20)
-			scored.push({ facet, score: r.score + facet.count * 0.2, hl: r.highlights.label ?? [] })
+			scored.push({
+				facet,
+				score: r.score + Math.log2(facet.count + 1) * 4,
+				hl: r.highlights.label ?? [],
+			})
 	}
 	scored.sort((a, b) => b.score - a.score)
-	return scored.slice(0, limit).map(
-		({ facet, hl }): Item => ({
-			kind: "facet",
-			key: `${facet.facet}:${facet.value}`,
-			facet,
-			hl,
-			active: ctx.filters.facets[facet.facet].includes(facet.value),
-		})
-	)
+	return scored.slice(0, limit).map(({ facet, hl }) => facetItem(facet, ctx, hl))
 }
 
 function commandItems(ctx: SearchContext, query: string, limit = 10) {
@@ -395,6 +569,27 @@ function commandItems(ctx: SearchContext, query: string, limit = 10) {
 		.map(({ command, hl }): Item => ({ kind: "command", key: `cmd:${command.id}`, command, hl }))
 }
 
+/** The entity list a recent entry points into. Recents saved before categories had a kind of their own stored them as "style". */
+function recentFacet(index: CommandIndex, r: RecentEntry): FacetEntry | undefined {
+	const find = (list: FacetEntry[]) => list.find((f) => f.value === r.id)
+	switch (r.kind) {
+		case "vendor":
+			return find(index.vendors)
+		case "style":
+			return find(index.styles) ?? find(index.categories)
+		case "category":
+			return find(index.categories)
+		case "origin":
+			return find(index.origins)
+		case "cultivar":
+			return find(index.cultivars)
+		case "tag":
+			return find(index.tags)
+		case "year":
+			return find(index.years)
+	}
+}
+
 function recentItems(index: CommandIndex, recents: RecentEntry[], ctx: SearchContext): Item[] {
 	const out: Item[] = []
 	for (const r of recents) {
@@ -413,21 +608,53 @@ function recentItems(index: CommandIndex, recents: RecentEntry[], ctx: SearchCon
 					active: ctx.descriptor === flavor.term,
 				})
 		} else {
-			const list =
-				r.kind === "vendor" ? index.vendors : r.kind === "style" ? index.styles : index.tags
-			const facet = list.find((f) => f.value === r.id)
-			if (facet)
-				out.push({
-					kind: "facet",
-					key: `recent:${facet.facet}:${facet.value}`,
-					facet,
-					hl: [],
-					recent: true,
-					active: ctx.filters.facets[facet.facet].includes(facet.value),
-				})
+			const facet = recentFacet(index, r)
+			if (facet) out.push(facetItem(facet, ctx, [], { recent: true, keyPrefix: "recent:" }))
 		}
 	}
 	return out
+}
+
+/** One scope's results: an empty `~` groups styles under their categories; an empty `^` is the tree. */
+function scopeGroups(
+	index: CommandIndex,
+	scope: ScopeKind,
+	q: string,
+	ctx: SearchContext
+): Group[] {
+	switch (scope) {
+		case "vendor":
+			return group("vendors", facetItems(index.vendors, q, 60, ctx))
+		case "tag":
+			return group("tags", facetItems(index.tags, q, 60, ctx))
+		case "cultivar":
+			return group("cultivars", facetItems(index.cultivars, q, 60, ctx))
+		case "year":
+			return group("years", facetItems(index.years, q, 60, ctx))
+		case "origin":
+			return group("origins", facetItems(index.origins, q, 80, ctx, { tree: !q }))
+		case "style": {
+			if (q) {
+				// a category that matches outranks its styles
+				const items = [
+					...facetItems(index.categories, q, 4, ctx),
+					...facetItems(index.styles, q, 40, ctx),
+				]
+				return group("styles", items)
+			}
+			return index.categories.map((cat) => ({
+				key: `cat:${cat.value}`,
+				label: cat.label,
+				color: cat.color,
+				items: [
+					facetItem(cat, ctx),
+					...index.styles
+						.filter((st) => st.parent === cat.value)
+						.map((st) => facetItem(st, ctx, [], { depth: 1 })),
+				],
+			}))
+		}
+	}
 }
 
 export function search(
@@ -452,6 +679,8 @@ export function search(
 			return mode.scope === "sessions"
 				? group("teas", teaItems(index, q, 60))
 				: group("flavors", flavorItems(index, q, 40, ctx))
+		case "entity":
+			return scopeGroups(index, mode.scope, q, ctx)
 		case "all": {
 			if (!q) {
 				const recent = recentItems(index, recents, ctx)
@@ -467,14 +696,37 @@ export function search(
 					),
 				]
 			}
+			const entities = [
+				...group("origins", facetItems(index.origins, q, 4, ctx)),
+				...group("vendors", facetItems(index.vendors, q, 4, ctx)),
+				...group(
+					"styles",
+					[
+						...facetItems(index.categories, q, 2, ctx),
+						...facetItems(index.styles, q, 4, ctx),
+					].slice(0, 5)
+				),
+				...group("cultivars", facetItems(index.cultivars, q, 3, ctx)),
+				...group("tags", facetItems(index.tags, q, 4, ctx)),
+			]
+			// a query that names an entity outright ("yiwu", "white2tea") puts it above the teas
+			const named = (g: Group) => {
+				const top = g.items[0]
+				return top?.kind === "facet" && sameName(top.facet.label, q)
+			}
 			return [
+				...entities.filter(named),
 				...group("teas", teaItems(index, q, 8)),
 				...group("flavors", flavorItems(index, q, 6, ctx)),
-				...group("vendors", facetItems(index.vendors, q, 4, ctx)),
-				...group("styles", facetItems(index.styles, q, 4, ctx)),
-				...group("tags", facetItems(index.tags, q, 4, ctx)),
+				...entities.filter((g) => !named(g)),
 				...group("commands", commandItems(ctx, q, 3)),
 			]
 		}
 	}
 }
+
+/** What ↵ does on a row: open the entity's page, or (tags, vintages) toggle its filter. */
+export const facetOpens = (facet: FacetEntry) => !!facet.href
+
+/** The glyph of an entity kind (`^` origin, `@` vendor, `~` style…). */
+export const glyphOf = (kind: EntityKind) => ENTITY_META[kind].glyph

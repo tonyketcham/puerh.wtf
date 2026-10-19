@@ -21,7 +21,7 @@ import {
 	EMPTY_FACETS,
 	readFilters,
 	replaceFilters,
-	toggleFacet,
+	toggleEntityFilter,
 } from "@/lib/filters"
 import {
 	compareSlugAtom,
@@ -32,10 +32,16 @@ import {
 } from "@/lib/store/sessionAtom"
 import { requestSteepAtom } from "@/lib/components/session/readingState"
 import {
+	facetOpens,
+	parsePrefix,
 	search,
+	SCOPE_META,
+	SCOPE_PREFIX,
 	type CommandIndex,
+	type FacetEntry,
 	type Item,
 	type Mode,
+	type ScopeKind,
 	type SearchContext,
 	type TeaEntry,
 } from "./items"
@@ -64,6 +70,8 @@ function initialMode(
 		return { mode: { kind: "scope", scope }, query }
 	if (query.startsWith(">"))
 		return { mode: { kind: "commands" }, query: query.slice(1).trimStart() }
+	const prefixed = parsePrefix(query)
+	if (prefixed) return { mode: { kind: "entity", scope: prefixed.scope }, query: prefixed.rest }
 	return { mode: { kind: "all" }, query }
 }
 
@@ -79,10 +87,19 @@ const PLACEHOLDER: Record<string, string> = {
 function placeholderFor(mode: Mode) {
 	if (mode.kind === "arg") return PLACEHOLDER[mode.command]
 	if (mode.kind === "scope") return PLACEHOLDER[mode.scope]
+	if (mode.kind === "entity") return SCOPE_META[mode.scope].placeholder
 	return PLACEHOLDER[mode.kind]
 }
 
-type Chip = { key: string; label: string; terminal?: boolean; arrow?: boolean; pop: Mode }
+type Chip = {
+	key: string
+	label: string
+	terminal?: boolean
+	arrow?: boolean
+	/** quick-open prefix shown in the chip (`^` Origins) */
+	glyph?: string
+	pop: Mode
+}
 
 function chipsFor(mode: Mode): Chip[] {
 	switch (mode.kind) {
@@ -105,6 +122,15 @@ function chipsFor(mode: Mode): Chip[] {
 				{
 					key: `scope-${mode.scope}`,
 					label: mode.scope === "sessions" ? "Teas" : "Flavors",
+					pop: { kind: "all" },
+				},
+			]
+		case "entity":
+			return [
+				{
+					key: `entity-${mode.scope}`,
+					label: SCOPE_META[mode.scope].label,
+					glyph: SCOPE_META[mode.scope].glyph,
 					pop: { kind: "all" },
 				},
 			]
@@ -256,6 +282,13 @@ export default function Palette({
 			// typed or pasted in one go ("> compare with dayi"): keep parsing the rest below
 			value = value.slice(1)
 			nextMode = { kind: "commands" }
+		} else if (mode.kind === "all") {
+			// quick-open prefix ("^yiwu", "@ white2tea"): the prefix becomes the scope chip
+			const prefixed = parsePrefix(value)
+			if (prefixed) {
+				setQueryAndMode(prefixed.rest, { kind: "entity", scope: prefixed.scope })
+				return
+			}
 		}
 		if ((nextMode ?? mode).kind === "commands") {
 			// the space typed after ">" lands here once the chip has replaced the ">": drop it
@@ -308,8 +341,17 @@ export default function Palette({
 		timers.current.push(window.setTimeout(() => openTea(pick), 700))
 	}, [index, sessionSlug, reduceMotion, openTea])
 
+	const rememberFacet = useCallback(
+		(facet: FacetEntry) => remember({ kind: facet.kind, id: facet.value }),
+		[remember]
+	)
+
+	/**
+	 * Run a row. `filter` (⇧↵, ⇧-click) asks an entity to filter the Explorer instead of
+	 * opening its page; tags and vintages have no page, so they always filter.
+	 */
 	const run = useCallback(
-		(item: Item | undefined) => {
+		(item: Item | undefined, filter = false) => {
 			if (!item || rolling) return
 			switch (item.kind) {
 				case "tea":
@@ -346,11 +388,12 @@ export default function Palette({
 				}
 				case "facet": {
 					const { facet } = item
-					remember({
-						kind: facet.facet === "vendors" ? "vendor" : facet.facet === "styles" ? "style" : "tag",
-						id: facet.value,
-					})
-					replaceFilters((cur) => toggleFacet(cur, facet.facet, facet.value))
+					rememberFacet(facet)
+					if (!filter && facetOpens(facet) && facet.href) {
+						navigate(facet.href)
+						return
+					}
+					replaceFilters((cur) => toggleEntityFilter(cur, facet.kind, facet.value, facet.id))
 					onClose()
 					return
 				}
@@ -375,6 +418,7 @@ export default function Palette({
 			mode,
 			setCompareSlug,
 			remember,
+			rememberFacet,
 			onClose,
 			openTea,
 			setDescriptor,
@@ -394,7 +438,10 @@ export default function Palette({
 		runRef.current = run
 		flatRef.current = flat
 	})
-	const onRowRun = useCallback((i: number) => runRef.current(flatRef.current[i]), [])
+	const onRowRun = useCallback(
+		(i: number, filter: boolean) => runRef.current(flatRef.current[i], filter),
+		[]
+	)
 	const onRowHover = useCallback((i: number) => {
 		navSource.current = "pointer"
 		setActiveIndex(i)
@@ -434,7 +481,7 @@ export default function Palette({
 				break
 			case e.key === "Enter":
 				e.preventDefault()
-				run(flat[active])
+				run(flat[active], e.shiftKey)
 				break
 			case e.key === "Tab": {
 				e.preventDefault()
@@ -474,6 +521,7 @@ export default function Palette({
 
 	const chips = chipsFor(mode)
 	const argCommand = mode.kind === "arg" ? mode.command : null
+	const activeItem = active >= 0 ? flat[active] : undefined
 	let rowIndex = 0
 
 	return (
@@ -509,6 +557,11 @@ export default function Palette({
 							)}
 						>
 							{chip.terminal && <SquareTerminal size={11} aria-hidden />}
+							{chip.glyph && (
+								<span aria-hidden className="text-[#edc446]">
+									{chip.glyph}
+								</span>
+							)}
 							{chip.label}
 							{chip.arrow && <ChevronRight size={11} aria-hidden className="-mr-0.5 opacity-60" />}
 						</motion.button>
@@ -573,7 +626,16 @@ export default function Palette({
 											id={`cmd-grp-${g.key}`}
 											className="sticky top-0 z-20 flex items-center justify-between px-5 h-7 text-[10px] uppercase tracking-[0.18em] text-white/35 bg-[#191619]"
 										>
-											<span>{g.label}</span>
+											<span className="flex items-center gap-2">
+												{g.color && (
+													<span
+														aria-hidden
+														className="size-1.5 rounded-full"
+														style={{ backgroundColor: g.color }}
+													/>
+												)}
+												{g.label}
+											</span>
 											<span className="tabular-nums tracking-normal text-white/20">
 												{g.items.length}
 											</span>
@@ -614,8 +676,29 @@ export default function Palette({
 					</span>
 					<span className="flex items-center gap-1">
 						<Kbd>↵</Kbd>
-						{argCommand === "compare" ? "compare" : argCommand === "brew" ? "brew" : "open"}
+						{argCommand === "compare"
+							? "compare"
+							: argCommand === "brew"
+							? "brew"
+							: activeItem?.kind === "facet" && !facetOpens(activeItem.facet)
+							? "filter"
+							: "open"}
 					</span>
+					<AnimatePresence initial={false}>
+						{activeItem?.kind === "facet" && facetOpens(activeItem.facet) && (
+							<motion.span
+								key="filter-hint"
+								className="flex items-center gap-1"
+								initial={{ opacity: 0, x: -4 }}
+								animate={{ opacity: 1, x: 0 }}
+								exit={{ opacity: 0, x: -4, transition: { duration: 0.08 } }}
+								transition={reduceMotion ? { duration: 0 } : CHIP_SPRING}
+							>
+								<Kbd>⇧↵</Kbd>
+								filter
+							</motion.span>
+						)}
+					</AnimatePresence>
 					<span className="flex items-center gap-1">
 						<Kbd>tab</Kbd>
 						groups
@@ -628,6 +711,14 @@ export default function Palette({
 				<div className="flex items-center gap-1 whitespace-nowrap">
 					{mode.kind === "all" ? (
 						<>
+							<span
+								className="flex items-center gap-0.5 mr-1.5"
+								title="Search one kind: @ vendor, # tag, ^ origin, ~ style, % cultivar, : vintage"
+							>
+								{Object.keys(SCOPE_PREFIX).map((p) => (
+									<Kbd key={p}>{p}</Kbd>
+								))}
+							</span>
 							<Kbd>&gt;</Kbd>
 							commands
 						</>
@@ -643,6 +734,15 @@ export default function Palette({
 	)
 }
 
+const ENTITY_HINT: Record<ScopeKind, string> = {
+	vendor: "Try white2tea, Yunnan Sourcing or Mei Leaf.",
+	tag: "Tags are moods: try gushu or transformer.",
+	origin: "Try a village, a mountain or a province: Yiwu, Jingmai, Fujian. Hanzi work too.",
+	style: "Try a category like Sheng or a style like Dian Hong.",
+	cultivar: "Try Da Ye Zhong or Zi Juan.",
+	year: "Try a vintage like 2018.",
+}
+
 function EmptyResults({ query, mode }: { query: string; mode: Mode }) {
 	const q = query.trim()
 	let hint: React.ReactNode
@@ -650,11 +750,13 @@ function EmptyResults({ query, mode }: { query: string; mode: Mode }) {
 	else if (mode.kind === "arg") hint = "Try a vintage like 2018, a vendor, or part of the name."
 	else if (mode.kind === "scope" && mode.scope === "descriptors")
 		hint = "Flavors come from tasting notes. Try apricot, camphor, or petrichor."
+	else if (mode.kind === "entity") hint = ENTITY_HINT[mode.scope]
 	else
 		hint = (
 			<>
 				Try a vintage like <span className="text-white/70">2018</span>, a vendor, or a flavor like{" "}
-				<span className="text-white/70">apricot</span>. Type{" "}
+				<span className="text-white/70">apricot</span>. Start with{" "}
+				<span className="text-[#edc446]">@ # ^ ~ % :</span> to search one kind, or{" "}
 				<span className="text-[#edc446]">&gt;</span> for commands.
 			</>
 		)

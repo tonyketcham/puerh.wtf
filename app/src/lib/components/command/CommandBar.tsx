@@ -17,6 +17,7 @@ import { countActiveFilters, readFilters } from "@/lib/filters"
 import type { ExplorerSession } from "@/lib/types/session"
 import type { Vendor } from "@/lib/types/vendor"
 import type { Category } from "@/lib/types/category"
+import type { EntityDetails } from "@/lib/entityDetails"
 import { buildIndex } from "./items"
 import Palette, { ICON_LAYOUT_ID, MORPH_SPRING, SURFACE_LAYOUT_ID } from "./Palette"
 import { Kbd, usePlatform } from "./parts"
@@ -25,6 +26,8 @@ export interface CommandBarProps {
 	sessions: ExplorerSession[]
 	vendors: Vendor[]
 	categories: Category[]
+	/** places, hanzi and descriptions for entity rows (the same data the peeks read) */
+	details?: EntityDetails
 }
 
 function isEditable(target: EventTarget | null) {
@@ -44,12 +47,13 @@ function isEditable(target: EventTarget | null) {
 /**
  * Top-center command bar (the site's search). At rest: a slim "command center" trigger
  * centered over the editor column. Open: the trigger morphs (shared layoutId) into a palette
- * dialog with teas, flavors, vendors, styles, tags and ">" commands.
+ * dialog with teas, flavors, origins, vendors, styles, cultivars, tags and ">" commands;
+ * quick-open prefixes (@ # ^ ~ % :) scope it to one kind.
  *
  * State: commandBarAtom (open/query/scope; anyone may open it via openCommandBarAtom).
  * Filters: URL search params via replaceFilters (shared with the Explorer).
  */
-export default function CommandBar({ sessions, vendors, categories }: CommandBarProps) {
+export default function CommandBar({ sessions, vendors, categories, details }: CommandBarProps) {
 	const [state, setState] = useAtom(commandBarAtom)
 	const open = state.open
 	const hydrated = useAtomValue(explorerSessionsAtom)
@@ -78,8 +82,8 @@ export default function CommandBar({ sessions, vendors, categories }: CommandBar
 		return () => window.clearTimeout(id)
 	}, [])
 	const index = useMemo(
-		() => (armed || open ? buildIndex(source, vendors, categories) : null),
-		[armed, open, source, vendors, categories]
+		() => (armed || open ? buildIndex(source, vendors, categories, details) : null),
+		[armed, open, source, vendors, categories, details]
 	)
 
 	const close = useCallback(() => setState((s) => ({ ...s, open: false })), [setState])

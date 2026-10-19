@@ -6,36 +6,47 @@ import type { ExplorerSession } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
-import PanelSection from "@/lib/components/containers/PanelSection"
-import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { Search as SearchIcon } from "lucide-react"
-import { MotionConfig } from "motion/react"
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react"
 import { useAtom, useSetAtom } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
 import {
 	EMPTY_FACETS,
 	hasAnyFilter,
+	matchesFilters,
 	readFilters,
 	replaceFilters,
+	toggleEntityFilter,
 	type FacetKey,
 	type FacetState,
 	type FilterState,
 } from "@/lib/filters"
 import { sessionMatchesDescriptor } from "@/lib/descriptors"
-import {
-	LEGACY_ORIGIN_SLUGS,
-	canonicalOriginKey,
-	originChain,
-	originKeys,
-	originSearchText,
-} from "@/lib/origins"
+import { LEGACY_ORIGIN_SLUGS, originChain } from "@/lib/origins"
+import { buildRelationIndex, sessionsOf } from "@/lib/relations"
+import type { PageKind } from "@/lib/peek"
 import { descriptorAtom, explorerSortAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
 import { sortSessions } from "@/lib/sessionSort"
 import SessionSortToggle from "@/lib/components/explorer/SessionSortToggle"
 import YearRuler from "@/lib/components/explorer/YearRuler"
 import FilterTokens, { type FilterToken } from "@/lib/components/explorer/FilterTokens"
 import DescriptorReferences from "@/lib/components/explorer/DescriptorReferences"
+import ActivityRail, {
+	EXPLORER_PANEL_ID,
+	explorerTabId,
+} from "@/lib/components/explorer/ActivityRail"
+import OriginsView from "@/lib/components/explorer/OriginsView"
+import VendorsView from "@/lib/components/explorer/VendorsView"
+import StylesView from "@/lib/components/explorer/StylesView"
+import {
+	EXPLORER_VIEWS,
+	explorerHoverAtom,
+	explorerViewAtom,
+	type ExplorerView,
+} from "@/lib/components/explorer/state"
+import { stripSlash } from "@/lib/components/explorer/views"
 
 export interface ExplorerProps {
 	sessions: ExplorerSession[]
@@ -77,74 +88,11 @@ function useUrlSync() {
 
 	const setQ = useCallback((q: string) => replaceFilters((current) => ({ ...current, q })), [])
 
-	return { q: urlState.q, setQ, facets: urlState.facets, setFacets }
-}
-
-function normalize(text?: string | null) {
-	return (text || "").toLowerCase()
-}
-
-/** Lowercased text plus its diacritic-free spelling, so "yiwu" finds Yìwǔ and "da ye" Dà Yè Zhòng. */
-function searchForms(text: string) {
-	const lower = normalize(text)
-	const bare = lower.normalize("NFD").replace(/\p{M}/gu, "")
-	return bare === lower ? [lower] : [lower, bare]
+	return { q: urlState.q, setQ, facets: urlState.facets, setFacets, urlState, pathname }
 }
 
 const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
-
-function passesFilters(
-	s: ExplorerSession,
-	facets: FacetState,
-	query: string,
-	{ ignoreYears = false }: { ignoreYears?: boolean } = {}
-) {
-	if (facets.styles.length) {
-		const catSlugs = (s.style || []).map((st) => st.category._slug)
-		if (!facets.styles.some((slug) => catSlugs.includes(slug))) return false
-	}
-	if (!ignoreYears && facets.years.length) {
-		if (!facets.years.includes(yearOf(s))) return false
-	}
-	if (facets.vendors.length) {
-		const vendorSlugs = (s.vendor || []).map((v) => v._slug)
-		if (!facets.vendors.some((slug) => vendorSlugs.includes(slug))) return false
-	}
-	if (facets.cultivars.length) {
-		const cultivarSlugs = (s.cultivar || []).map((c) => c._slug)
-		if (!facets.cultivars.some((slug) => cultivarSlugs.includes(slug))) return false
-	}
-	if (facets.tags.length) {
-		const tagSlugs = (s.tags || []).map((t) => t?._slug || "")
-		if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
-	}
-	if (facets.origins.length) {
-		// slug or id of the origin or any ancestor (so a Yiwu filter keeps its villages); legacy
-		// long slugs from old shared URLs map to the current ones
-		const keys = (s.origin || []).flatMap(originKeys)
-		if (!facets.origins.some((value) => keys.includes(canonicalOriginKey(value)))) return false
-	}
-
-	if (!query) return true
-	const haystack = [
-		s.title,
-		s.tea_name || "",
-		String(s.production_year || ""),
-		...(s.vendor || []).map((v) => v.title),
-		...(s.cultivar || []).map((c) => c.title),
-		...(s.tags || []).map((t) => t?.title || ""),
-		...(s.origin || []).flatMap((o) => [...originSearchText(o), o?._slug]),
-		s.origin_note || "",
-		...(s.style || []).flatMap((st) => [st.title, st.category?.title]),
-	]
-		.filter(Boolean)
-		.flatMap((t) => searchForms(String(t)))
-	if (haystack.some((t) => t.includes(query))) return true
-	// flavors: the command bar writes ?q=<descriptor> when a flavor is picked, so q also finds
-	// sessions whose tasting notes mention it (plural-tolerant, word-bounded)
-	return query.length >= 3 && sessionMatchesDescriptor(s, query)
-}
 
 const FACET_KIND: Record<FacetKey, string> = {
 	styles: "style",
@@ -155,48 +103,67 @@ const FACET_KIND: Record<FacetKey, string> = {
 	tags: "tag",
 }
 
+/** The facet an entity view leaves out of its own counts, so its list keeps every option. */
+const VIEW_FACET: Record<ExplorerView, FacetKey | null> = {
+	sessions: null,
+	origins: "origins",
+	vendors: "vendors",
+	styles: "styles",
+}
+
+const VIEW_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
+
 // ⌘ on Apple platforms, Ctrl elsewhere. Server snapshot is "Ctrl" so hydration matches.
 const subscribeNoop = () => () => {}
 const getModKey = () =>
 	/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent) ? "⌘" : "Ctrl"
 const getServerModKey = () => "Ctrl"
 
+/**
+ * The left sidebar: site header plus the Explorer panel. An activity rail switches the panel
+ * between Sessions (the file tree) and the entity views, Origins (a tree), Vendors and Styles
+ * (plan §2.5). The vintage ruler and the filter tokens sit above every view: filters narrow
+ * the entity views' counts too, each view ignoring its own facet.
+ */
 export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
-	const { q, setQ, facets, setFacets } = useUrlSync()
+	const { q, setQ, facets, setFacets, urlState, pathname } = useUrlSync()
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
 	const [sort, setSort] = useAtom(explorerSortAtom)
+	const [view, setView] = useAtom(explorerViewAtom)
+	const [hover, setHover] = useAtom(explorerHoverAtom)
 	const openCommandBar = useSetAtom(openCommandBarAtom)
 	const modKey = useSyncExternalStore(subscribeNoop, getModKey, getServerModKey)
+	const reduce = useReducedMotion()
 
-	const query = normalize(q).trim()
+	const query = q.toLowerCase().trim()
+	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
 
 	// Filtering
 	const filteredSessions = useMemo(
-		() => sessions.filter((s) => passesFilters(s, facets, query)),
+		() => sessions.filter((s) => matchesFilters(s, facets, query)),
 		[sessions, facets, query]
 	)
 	// Everything but the year facet: the ruler's density, so it stays informative mid-selection
 	const sessionsExceptYears = useMemo(
 		() =>
 			facets.years.length
-				? sessions.filter((s) => passesFilters(s, facets, query, { ignoreYears: true }))
+				? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: ["years"] }))
 				: filteredSessions,
 		[sessions, facets, query, filteredSessions]
+	)
+	// The open entity view counts sessions passing every filter but its own
+	const viewFacet = VIEW_FACET[view]
+	const viewPool = useMemo(
+		() =>
+			viewFacet && facets[viewFacet].length
+				? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: [viewFacet] }))
+				: filteredSessions,
+		[viewFacet, sessions, facets, query, filteredSessions]
 	)
 	// display order (sessions arrive newest first, so date needs no sort)
 	const sortedSessions = useMemo(
 		() => (sort === "date" ? filteredSessions : sortSessions(filteredSessions, sort)),
 		[filteredSessions, sort]
-	)
-
-	// Vendors/categories lists are narrowed by the free-text query only
-	const filteredVendors = useMemo(
-		() => (query ? vendors.filter((v) => normalize(v.title).includes(query)) : vendors),
-		[vendors, query]
-	)
-	const filteredCategories = useMemo(
-		() => (query ? categories.filter((c) => normalize(c.title).includes(query)) : categories),
-		[categories, query]
 	)
 
 	// Descriptor "find references"
@@ -210,6 +177,15 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		return { total: all.size, visible }
 	}, [descriptorTerm, sessions, sortedSessions])
 
+	// The entity row under the pointer previews its vintages on the ruler
+	const previewYears = useMemo(() => {
+		if (!hover) return null
+		const years = sessionsOf(index, hover.kind, hover.slug)
+			.map((s) => Math.trunc(Number(s.production_year)))
+			.filter((y) => Number.isFinite(y) && y > 0)
+		return years.length ? new Set(years) : null
+	}, [hover, index])
+
 	// Active filter tokens (labels resolved from the data, so command-bar filters read nicely)
 	const labels = useMemo(() => {
 		const map = {
@@ -220,6 +196,8 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			tags: new Map<string, { label: string }>(),
 		}
 		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const st of index.nodes.style.values())
+			map.styles.set(st.slug, { label: st.title, color: st.color ?? undefined })
 		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
 		for (const s of sessions) {
 			// label every node of the chain, so a filter on a parent (e.g. ?origins=yunnan) reads nicely
@@ -236,7 +214,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			if (label) map.origins.set(legacy, label)
 		}
 		return map
-	}, [categories, vendors, sessions])
+	}, [categories, vendors, sessions, index])
 
 	const vintages = useMemo(
 		() => [...new Set(sessions.map(yearOf).filter(Boolean).map(Number))].sort((a, b) => a - b),
@@ -295,15 +273,44 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 
 	const clearAll = useCallback(() => replaceFilters({ q: "", facets: EMPTY_FACETS }), [])
 
+	const onToggleFilter = useCallback(
+		(kind: PageKind, slug: string) => {
+			const id = kind === "origin" ? index.nodes.origin.get(slug)?.id : undefined
+			replaceFilters((current) => toggleEntityFilter(current, kind, slug, id))
+		},
+		[index]
+	)
+
 	const filtered = hasAnyFilter({ q, facets })
 
-	const rightSlot = (
+	// views slide toward the side of the rail they were picked from
+	const [direction, setDirection] = useState(0)
+	const changeView = useCallback(
+		(next: ExplorerView) => {
+			setDirection(Math.sign(EXPLORER_VIEWS.indexOf(next) - EXPLORER_VIEWS.indexOf(view)))
+			setView(next)
+			// the hovered row is about to unmount without a pointerleave
+			setHover(null)
+		},
+		[view, setView, setHover]
+	)
+
+	const viewProps = {
+		index,
+		pool: viewPool,
+		filters: urlState,
+		narrowed: filtered,
+		pathname: stripSlash(pathname ?? ""),
+		onToggleFilter,
+	}
+
+	const searchButton = (
 		<button
 			type="button"
 			onClick={() => openCommandBar({ query: q, scope: "sessions" })}
 			aria-label="Search sessions"
 			aria-keyshortcuts="Meta+K Control+K"
-			className="flex items-center h-7 gap-1.5 px-2 text-white/55 border rounded-md border-heicha-500 bg-white/[0.02] hover:text-white hover:border-white/15 hover:bg-white/[0.05] transition-colors outline-none focus-visible:ring-1 focus-visible:ring-white/40"
+			className="flex items-center h-7 gap-1.5 px-2 shrink-0 text-white/55 border rounded-md border-heicha-500 bg-white/[0.02] hover:text-white hover:border-white/15 hover:bg-white/[0.05] transition-colors outline-none focus-visible:ring-1 focus-visible:ring-white/40"
 		>
 			<SearchIcon size={13} strokeWidth={2.25} />
 			<kbd className="font-fira-code text-[10px] leading-none text-white/40 tracking-tight">
@@ -322,55 +329,102 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 
 				{/* The actual sidebar panel. Make this interactive. */}
 				<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
-					<PanelSection title="Explorer" rightSlot={rightSlot}>
-						<YearRuler
-							sessions={sessions}
-							filteredSessions={sessionsExceptYears}
-							activeYears={facets.years}
-							onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
-						/>
-						<FilterTokens tokens={tokens} onClearAll={clearAll} />
-						{/* only a pinned descriptor earns the bar (it shifts the tree); a hover preview
-						    just dims rows and drops in dots, which costs no layout */}
-						<DescriptorReferences
-							descriptor={descriptor?.pinned ? descriptor : null}
-							total={references?.total ?? 0}
-							hidden={references ? references.total - references.visible.length : 0}
-							onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}
-							onClear={() => setDescriptor(null)}
-						/>
-						<FileTree
-							referenceSlugs={references?.visible ?? null}
-							order={sort}
-							data={[
-								{
-									id: "sessions",
-									title: "Sessions",
-									children: sortedSessions,
-									total: filtered ? sessions.length : undefined,
-									actions: (
-										<SessionSortToggle
-											value={sort}
-											onChange={setSort}
-											recordingKey="explorer-session-sort"
-										/>
-									),
-								},
-								{
-									id: "vendors",
-									title: "Vendors",
-									children: filteredVendors,
-									total: query ? vendors.length : undefined,
-								},
-								{
-									id: "categories",
-									title: "Categories",
-									children: filteredCategories,
-									total: query ? categories.length : undefined,
-								},
-							]}
-						/>
-					</PanelSection>
+					<div className="relative">
+						{/* header: the activity rail (a tablist) and search */}
+						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
+							<div className="flex items-center gap-2 py-2.5 pl-2.5 pr-4 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
+								<h2 className="sr-only">Explorer</h2>
+								<div className="flex-1 min-w-0">
+									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
+								</div>
+								{searchButton}
+							</div>
+						</div>
+						<div className="p-4">
+							<YearRuler
+								sessions={sessions}
+								filteredSessions={sessionsExceptYears}
+								activeYears={facets.years}
+								onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
+								previewYears={view === "sessions" ? null : previewYears}
+							/>
+							<FilterTokens tokens={tokens} onClearAll={clearAll} />
+							{/* only a pinned descriptor earns the bar (it shifts the tree); a hover preview
+							    just dims rows and drops in dots, which costs no layout */}
+							<DescriptorReferences
+								descriptor={descriptor?.pinned ? descriptor : null}
+								total={references?.total ?? 0}
+								hidden={references ? references.total - references.visible.length : 0}
+								onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}
+								onClear={() => setDescriptor(null)}
+							/>
+							<div
+								id={EXPLORER_PANEL_ID}
+								role="tabpanel"
+								aria-labelledby={explorerTabId(view)}
+								className="relative"
+							>
+								<AnimatePresence mode="popLayout" initial={false} custom={direction}>
+									<motion.div
+										key={view}
+										custom={direction}
+										variants={{
+											enter: (d: number) =>
+												reduce ? { opacity: 0 } : { opacity: 0, x: d * 14, filter: "blur(2px)" },
+											center: { opacity: 1, x: 0, filter: "blur(0px)" },
+											exit: (d: number) =>
+												reduce ? { opacity: 0 } : { opacity: 0, x: d * -14, filter: "blur(2px)" },
+										}}
+										initial="enter"
+										animate="center"
+										exit="exit"
+										transition={
+											// direction 0: the remembered view arriving after hydration, not a pick
+											direction === 0
+												? { duration: 0 }
+												: reduce
+												? { duration: 0.12 }
+												: {
+														...VIEW_SPRING,
+														opacity: { duration: 0.16 },
+														filter: { duration: 0.16 },
+												  }
+										}
+									>
+										{view === "sessions" && (
+											<FileTree
+												referenceSlugs={references?.visible ?? null}
+												order={sort}
+												data={[
+													{
+														id: "sessions",
+														title: "Sessions",
+														children: sortedSessions,
+														total: filtered ? sessions.length : undefined,
+														actions: (
+															<SessionSortToggle
+																value={sort}
+																onChange={setSort}
+																recordingKey="explorer-session-sort"
+															/>
+														),
+													},
+												]}
+											/>
+										)}
+										{/* entity rows run a little wider than the padding: names need the room */}
+										{view !== "sessions" && (
+											<div className="-mx-2">
+												{view === "origins" && <OriginsView {...viewProps} />}
+												{view === "vendors" && <VendorsView {...viewProps} vendors={vendors} />}
+												{view === "styles" && <StylesView {...viewProps} categories={categories} />}
+											</div>
+										)}
+									</motion.div>
+								</AnimatePresence>
+							</div>
+						</div>
+					</div>
 				</Panel>
 			</div>
 		</MotionConfig>

@@ -4,7 +4,16 @@
  * without it.
  */
 
-export type RecentKind = "tea" | "flavor" | "vendor" | "style" | "tag"
+export type RecentKind =
+	| "tea"
+	| "flavor"
+	| "vendor"
+	| "style"
+	| "category"
+	| "origin"
+	| "cultivar"
+	| "tag"
+	| "year"
 
 export type RecentEntry = { kind: RecentKind; id: string }
 

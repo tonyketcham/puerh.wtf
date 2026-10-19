@@ -9,20 +9,19 @@ import {
 	Dices,
 	FunnelX,
 	GitCompareArrows,
-	Hash,
 	House,
 	Sparkles,
-	Store,
 	Timer,
 } from "lucide-react"
-import { cn } from "@/lib/utils/cn"
+import { cn } from "@/lib/utils"
 import { liquorTextRgb, rgbCss } from "@/lib/liquor"
 import { formatSeconds, formatTemp } from "@/lib/steeps"
 import { NOTE_STAGE_META } from "@/lib/noteStages"
 import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import FlavorGlyph from "./FlavorGlyph"
 import { Highlight, LiquorSwatch } from "./parts"
-import type { ArgCommand, CommandId, Item } from "./items"
+import { ENTITY_META } from "@/lib/entities"
+import { facetOpens, glyphOf, type ArgCommand, type CommandId, type Item } from "./items"
 
 export const PILL_SPRING = { type: "spring", stiffness: 600, damping: 44, mass: 0.7 } as const
 
@@ -43,8 +42,12 @@ type RowProps = {
 	rolling: string | null
 	reduceMotion: boolean
 	onHover: (index: number) => void
-	onRun: (index: number) => void
+	/** `filter`: ⇧-click, which filters by an entity instead of opening it */
+	onRun: (index: number, filter: boolean) => void
 }
+
+/** Indent per origin-tree level when an empty `^` lists the tree. */
+const TREE_INDENT_PX = 12
 
 function accentOf(item: Item): string {
 	// text-safe lift: the accent draws the active bar and the flavor glyph strokes
@@ -75,7 +78,7 @@ function ResultRowImpl({
 			onPointerMove={(e: PointerEvent) => {
 				if (e.pointerType !== "touch" && !active) onHover(index)
 			}}
-			onClick={() => onRun(index)}
+			onClick={(e) => onRun(index, e.shiftKey)}
 			className={cn(
 				"relative flex items-center gap-3 px-3 mx-2 rounded-lg cursor-pointer select-none scroll-my-8",
 				tall ? "h-12" : "h-10",
@@ -220,26 +223,42 @@ function RowBody({
 		}
 		case "facet": {
 			const { facet } = item
+			const opens = facetOpens(facet)
+			// in a tree (an empty ^ or ~) the rows above already say where it sits
+			const sub = item.depth !== undefined ? facet.hanzi : facet.sub
 			return (
 				<>
-					<span className="flex items-center justify-center w-[14px] shrink-0 text-white/45">
-						{facet.facet === "styles" ? (
+					{item.depth ? (
+						<span aria-hidden className="shrink-0" style={{ width: item.depth * TREE_INDENT_PX }} />
+					) : null}
+					<span className="flex items-center justify-center w-[14px] shrink-0 text-white/40">
+						{facet.kind === "category" ? (
 							<span
-								className="w-2 h-2 rounded-full"
-								style={{ backgroundColor: facet.color }}
+								className="w-2 h-2 rounded-[2px]"
+								style={{ backgroundColor: facet.color, boxShadow: `0 0 6px -1px ${facet.color}` }}
 								aria-hidden
 							/>
-						) : facet.facet === "vendors" ? (
-							<Store size={13} aria-hidden />
 						) : (
-							<Hash size={13} aria-hidden />
+							// the entity's kind glyph, which is also its quick-open prefix
+							<span
+								aria-hidden
+								className="text-[13px] leading-none"
+								style={facet.color ? { color: facet.color } : undefined}
+							>
+								{glyphOf(facet.kind)}
+							</span>
 						)}
 					</span>
 					<span className="flex items-baseline flex-1 min-w-0 gap-2">
-						<Highlight text={facet.label} indices={item.hl} className="text-[13px] truncate" />
+						<Highlight
+							text={facet.label}
+							indices={item.hl}
+							className="text-[13px] truncate shrink-0 max-w-[60%]"
+						/>
 						<span className="text-[11px] text-white/35 shrink-0">
 							· {facet.count} {facet.count === 1 ? "tea" : "teas"}
 						</span>
+						{sub && <span className="min-w-0 text-[11px] text-white/25 truncate">{sub}</span>}
 					</span>
 					{item.active ? (
 						<StateBadge>
@@ -247,7 +266,7 @@ function RowBody({
 						</StateBadge>
 					) : (
 						<span className="text-[10px] uppercase tracking-[0.14em] text-white/25 shrink-0">
-							{active ? "filter" : ""}
+							{active ? (opens ? ENTITY_META[facet.kind].label : "filter") : ""}
 						</span>
 					)}
 				</>
