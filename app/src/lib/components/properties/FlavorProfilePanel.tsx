@@ -7,6 +7,7 @@ import RadarChart, { type RadarCompare } from "@/lib/components/dataviz/radar/Ra
 import PhaseScrubber from "@/lib/components/dataviz/radar/PhaseScrubber"
 import { radarAccent, radarCompareAccent, withAlpha } from "@/lib/components/dataviz/radar/geometry"
 import PanelSection from "@/lib/components/containers/PanelSection"
+import { CrossIcon, RadarDiffIcon } from "@/lib/components/icons/TeaIcons"
 import {
 	commandBarAtom,
 	compareSessionAtom,
@@ -287,14 +288,7 @@ export default function FlavorProfilePanel() {
 										title="Clear (Esc)"
 										className="grid shrink-0 size-5 place-items-center rounded-full text-white/45 transition-colors hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
 									>
-										<svg aria-hidden viewBox="0 0 10 10" className="size-2.5">
-											<path
-												d="M2 2 L8 8 M8 2 L2 8"
-												stroke="currentColor"
-												strokeWidth="1.4"
-												strokeLinecap="round"
-											/>
-										</svg>
+										<CrossIcon className="size-3" />
 									</button>
 								</motion.div>
 							)}
@@ -336,9 +330,7 @@ export default function FlavorProfilePanel() {
 									title="Drag a tea from the Explorer onto the radar, or pick one"
 									className="inline-flex items-center gap-1 h-5 px-1.5 rounded-md text-[10px] text-white/45 opacity-0 transition-[opacity,color,background-color] duration-150 group-hover/radar:opacity-100 focus-visible:opacity-100 hover:text-white hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40"
 								>
-									<span aria-hidden className="font-medium">
-										±
-									</span>
+									<RadarDiffIcon className="size-3" />
 									compare…
 								</button>
 							</motion.div>
@@ -369,10 +361,10 @@ export default function FlavorProfilePanel() {
 								>
 									<span
 										aria-hidden
-										className="grid size-4 place-items-center rounded-[4px] text-[11px] font-medium leading-none"
+										className="grid size-4 place-items-center rounded-[4px]"
 										style={{ background: withAlpha(accent, over ? 35 : 18), color: accent }}
 									>
-										±
+										<RadarDiffIcon className="size-3" />
 									</span>
 									{over ? "drop to diff" : "drop on the radar to diff"}
 								</motion.div>

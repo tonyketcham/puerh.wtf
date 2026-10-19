@@ -276,7 +276,7 @@ function DialogSurface({
 			aria-label="Search and commands"
 			inert={!isPresent || undefined}
 			style={{ borderRadius: 14 }}
-			className="relative w-full max-w-[640px] overflow-hidden border pointer-events-auto border-white/[0.1] bg-[#171417]/[0.92] backdrop-blur-2xl font-fira-code shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_30px_80px_-20px_rgba(0,0,0,0.85),0_0_0_1px_rgba(0,0,0,0.4)]"
+			className="relative w-full max-w-[640px] overflow-hidden border pointer-events-auto border-white/[0.1] bg-[#191619] font-fira-code shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_30px_80px_-20px_rgba(0,0,0,0.85),0_0_0_1px_rgba(0,0,0,0.4)]"
 		>
 			<motion.div
 				layout="position"

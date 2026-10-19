@@ -8,6 +8,7 @@ import { liquorVars } from "@/lib/liquor"
 import SessionTitle from "@/lib/components/session/SessionTitle"
 import SteepGutter from "@/lib/components/session/SteepGutter"
 import DescriptorHighlighter from "@/lib/components/session/DescriptorHighlighter"
+import FlowAroundArticle from "@/lib/components/session/FlowAroundArticle"
 
 interface SessionPageProps {
 	params: Promise<{
@@ -59,21 +60,20 @@ export default async function SessionPage(props: SessionPageProps) {
 
 			{/* keyed: a fresh gutter (mentions, measurements, arbitration refs) per session */}
 			<SteepGutter key={`gutter-${session._slug}`} slug={session._slug} brewing={session.brewing}>
-				{session.images && session.images.length > 0 && (
-					<div className="float-right clear-right mb-8 ml-8">
-						<SessionCarousel
-							images={session.images}
-							cssRotation={rotation}
-							recordingKey="session-hero-carousel"
-						/>
-					</div>
-				)}
-
-				{/* Never mutate this element's DOM: measure it, and highlight via CSS Custom Highlight API */}
-				<article
-					className="prose prose-invert max-w-none"
-					data-session-article
-					dangerouslySetInnerHTML={{ __html: session._content.html }}
+				{/* The cube sits inside the notes; the prose flows around both sides of it.
+				    Only FlowAroundArticle rebuilds the article's DOM: everyone else measures it and
+				    highlights via the CSS Custom Highlight API */}
+				<FlowAroundArticle
+					html={session._content.html}
+					obstacle={
+						session.images && session.images.length > 0 ? (
+							<SessionCarousel
+								images={session.images}
+								cssRotation={rotation}
+								recordingKey="session-hero-carousel"
+							/>
+						) : null
+					}
 				/>
 			</SteepGutter>
 

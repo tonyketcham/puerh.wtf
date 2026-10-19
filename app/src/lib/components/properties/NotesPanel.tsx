@@ -1,6 +1,14 @@
 "use client"
 
-import { memo, useCallback, useLayoutEffect, useMemo, useRef, type CSSProperties } from "react"
+import {
+	memo,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	type CSSProperties,
+} from "react"
 import { useAtom, useAtomValue } from "jotai"
 import { motion, useReducedMotion } from "motion/react"
 import DetailsListItem from "@/lib/components/DetailsListItem"
@@ -14,6 +22,7 @@ import {
 	type DescriptorSelection,
 } from "@/lib/store/sessionAtom"
 import { NOTE_STAGES, NOTE_STAGE_META } from "@/lib/noteStages"
+import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import { descriptorRegex, splitDescriptors } from "@/lib/descriptors"
 import { buildStageImageMap } from "@/lib/noteStages"
 import { liftLiquor, rgbCss } from "@/lib/liquor"
@@ -52,6 +61,39 @@ function tokenize(text: string): Segment[] {
 }
 
 // ---------------------------------------------------------------------------
+// Hover intent
+
+/** idle → first preview: long enough to ignore a pointer just passing through */
+const ENTER_DELAY = 110
+/** preview → neighbouring token or row */
+const SWITCH_DELAY = 60
+/** leaving a token/row: covers the gap to the next one so the preview never blinks off */
+const LEAVE_GRACE = 160
+
+/** One pending timeout; scheduling replaces it. Stable identity, cleared on unmount. */
+function useTimer() {
+	const ref = useRef<number | null>(null)
+	const timer = useMemo(
+		() => ({
+			clear() {
+				if (ref.current != null) window.clearTimeout(ref.current)
+				ref.current = null
+			},
+			schedule(fn: () => void, ms: number) {
+				if (ref.current != null) window.clearTimeout(ref.current)
+				ref.current = window.setTimeout(() => {
+					ref.current = null
+					fn()
+				}, ms)
+			},
+		}),
+		[]
+	)
+	useEffect(() => timer.clear, [timer])
+	return timer
+}
+
+// ---------------------------------------------------------------------------
 
 /**
  * Notes section of the Properties panel.
@@ -77,6 +119,9 @@ export default function NotesPanel() {
 	)
 
 	// --- descriptor hover / pin ----------------------------------------------------------
+	// Hover intent: a pointer sweeping down the notes must not publish every token it crosses
+	// (each one re-renders the explorer, re-highlights the article and moves the cube), and the
+	// gap between two tokens must not clear the preview (that remounts the references pill).
 
 	/** a pinned selection temporarily replaced by a hover preview */
 	const restoreRef = useRef<DescriptorSelection | null>(null)
@@ -85,39 +130,63 @@ export default function NotesPanel() {
 		descriptorRef.current = descriptor
 	}, [descriptor])
 
+	const termTimer = useTimer()
+	const stageTimer = useTimer()
+
 	const previewTerm = useCallback(
 		(term: string) => {
 			const current = descriptorRef.current
-			if (current?.term === term) return
-			if (current?.pinned) restoreRef.current = current
-			setDescriptor({ term, pinned: false })
+			if (current?.term === term) {
+				termTimer.clear() // back on the shown token: cancel a pending leave
+				return
+			}
+			const previewing = !!current && !current.pinned
+			termTimer.schedule(
+				() => {
+					const latest = descriptorRef.current
+					if (latest?.term === term) return
+					if (latest?.pinned) restoreRef.current = latest
+					setDescriptor({ term, pinned: false })
+				},
+				previewing ? SWITCH_DELAY : ENTER_DELAY
+			)
 		},
-		[setDescriptor]
+		[setDescriptor, termTimer]
 	)
 
 	const endPreview = useCallback(
 		(term: string) => {
-			const restore = restoreRef.current
-			restoreRef.current = null
-			setDescriptor((prev) => (prev && !prev.pinned && prev.term === term ? restore : prev))
+			termTimer.schedule(() => {
+				const restore = restoreRef.current
+				restoreRef.current = null
+				setDescriptor((prev) => (prev && !prev.pinned && prev.term === term ? restore : prev))
+			}, LEAVE_GRACE)
 		},
-		[setDescriptor]
+		[setDescriptor, termTimer]
 	)
 
 	const togglePin = useCallback(
 		(term: string) => {
+			termTimer.clear()
 			restoreRef.current = null
 			setDescriptor((prev) => (prev?.pinned && prev.term === term ? null : { term, pinned: true }))
 		},
-		[setDescriptor]
+		[setDescriptor, termTimer]
 	)
 
 	// --- stage hover ---------------------------------------------------------------------
 
-	const enterStage = useCallback((stage: NoteStage) => setHoveredStage(stage), [setHoveredStage])
+	const enterStage = useCallback(
+		(stage: NoteStage) => stageTimer.schedule(() => setHoveredStage(stage), SWITCH_DELAY),
+		[setHoveredStage, stageTimer]
+	)
 	const leaveStage = useCallback(
-		(stage: NoteStage) => setHoveredStage((prev) => (prev === stage ? null : prev)),
-		[setHoveredStage]
+		(stage: NoteStage) =>
+			stageTimer.schedule(
+				() => setHoveredStage((prev) => (prev === stage ? null : prev)),
+				LEAVE_GRACE
+			),
+		[setHoveredStage, stageTimer]
 	)
 
 	return (
@@ -134,7 +203,7 @@ export default function NotesPanel() {
 						return (
 							<DetailsListItem
 								key={stage}
-								icon={meta.icon}
+								icon={<NoteStageIcon stage={stage} />}
 								title={meta.title}
 								active={active}
 								data-note-stage={stage}

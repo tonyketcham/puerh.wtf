@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { motion, useReducedMotion } from "motion/react"
 import { useAtom, useAtomValue } from "jotai"
 import { cn } from "@/lib/utils/cn"
 import BoxCarousel, {
@@ -13,8 +13,8 @@ import BoxCarousel, {
 } from "@/components/fancy/carousel/box-carousel"
 import { currentLiquorAtom, hoveredNoteStageAtom } from "@/lib/store/sessionAtom"
 import { liftLiquor, rgbCss } from "@/lib/liquor"
-import { NOTE_STAGE_META, buildStageImageMap } from "@/lib/noteStages"
-import type { NoteStage } from "@/lib/types/session"
+import { buildStageImageMap } from "@/lib/noteStages"
+import CubeCaption, { createCubeCaptionStore } from "./CubeCaption"
 
 type ImageItem = {
 	image: string
@@ -23,6 +23,12 @@ type ImageItem = {
 
 /** How long the cube lingers on a note's photo after the pointer leaves the note */
 const RETURN_DELAY_MS = 650
+
+const navButton = cn(
+	"flex items-center justify-center size-7 shrink-0 transition-colors duration-200 rounded-lg",
+	"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
+	"focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--liquor-text,#8a8a8a)]"
+)
 
 // ---------------------------------------------------------------------------
 
@@ -58,6 +64,11 @@ interface SessionCarouselProps {
 	initialRotationOffset?: number
 }
 
+/**
+ * Render budget: a face change while the page scrolls re-renders only the caption. The cube is
+ * memoized with stable props, and the visible face lives in a tiny store only CubeCaption
+ * subscribes to — this component holds no per-face state.
+ */
 export default function SessionCarousel({
 	images,
 	direction = "right",
@@ -121,6 +132,7 @@ export default function SessionCarousel({
 	)
 	/** Remount the cube when the photo set changes (session navigation) */
 	const itemsKey = useMemo(() => items.map((item) => item.src).join("|"), [items])
+	const alts = useMemo(() => items.map((item) => item.alt), [items])
 
 	const stageMap = useMemo(() => buildStageImageMap(images), [images])
 
@@ -129,8 +141,8 @@ export default function SessionCarousel({
 	// -------------------------------------------------------------------------
 
 	const [hoveredStage, setHoveredStage] = useAtom(hoveredNoteStageAtom)
-	const [visibleIndex, setVisibleIndex] = useState(0)
 	const visibleIndexRef = useRef(0)
+	const [captionStore] = useState(createCubeCaptionStore)
 
 	/** true while the cube itself is hovered/dragged/focused: it drives the atom, not vice versa */
 	const cubeActiveRef = useRef(false)
@@ -168,14 +180,21 @@ export default function SessionCarousel({
 
 	useEffect(() => clearReturnTimer, [])
 
-	// Cube → notes
+	// Cube → caption + notes. Called from the cube's turn (often a page-scroll frame): the caption
+	// store and the notes highlight both update as transitions, after the frame.
 	const handleIndexChange = useCallback(
 		(index: number) => {
+			// shortest way round the cube, so last → first still counts as "next"
+			const n = items.length || 1
+			const delta = (((index - visibleIndexRef.current) % n) + n) % n
 			visibleIndexRef.current = index
-			setVisibleIndex(index)
-			if (cubeActiveRef.current) setHoveredStage(stageMap.stages[index] ?? null)
+			captionStore.set({ index, direction: delta === 0 || delta <= n / 2 ? 1 : -1 })
+			if (cubeActiveRef.current) {
+				const stage = stageMap.stages[index] ?? null
+				startTransition(() => setHoveredStage(stage))
+			}
 		},
-		[setHoveredStage, stageMap]
+		[captionStore, setHoveredStage, stageMap, items.length]
 	)
 
 	const handleInteractingChange = useCallback(
@@ -199,31 +218,22 @@ export default function SessionCarousel({
 		snapshotRef.current = null
 		cubeActiveRef.current = false
 		visibleIndexRef.current = 0
-		setVisibleIndex(0)
-	}, [itemsKey])
+		captionStore.set({ index: 0, direction: 1 })
+	}, [itemsKey, captionStore])
 
 	const liquor = useAtomValue(currentLiquorAtom)
 	const accent = useMemo(() => rgbCss(liftLiquor(liquor.rgb)), [liquor])
 
-	const visibleStage = stageMap.stages[visibleIndex] ?? null
-	const linked = visibleStage != null && hoveredStage === visibleStage
-	const caption = visibleStage
-		? NOTE_STAGE_META[visibleStage].title
-		: items[visibleIndex]?.alt || `Photo ${visibleIndex + 1}`
-
 	const handlePrevious = () => carouselRef.current?.prev()
 	const handleNext = () => carouselRef.current?.next()
-
-	const navButton = cn(
-		"flex items-center justify-center size-7 shrink-0 transition-colors duration-200 rounded-lg",
-		"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
-		"focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--liquor-text,#8a8a8a)]"
-	)
 
 	return (
 		<div className="relative" data-recording-key={recordingKey} data-photo-cube>
 			<motion.div
 				ref={containerRef}
+				// the outline the notes flow around (FlowAroundArticle)
+				data-flow-shape
+				data-flow-rotate={cssRotation}
 				className={cn(
 					"p-2 drop-shadow-2xl drop-shadow-heicha-600/40 w-72",
 					"bg-[radial-gradient(circle_1.5px_at_1.5px_1.5px,_rgba(255,255,255,0.2)_1.5px,_transparent_0)]",
@@ -267,6 +277,9 @@ export default function SessionCarousel({
 						pauseOnHover={pauseOnHover}
 						pauseOnDrag={pauseOnDrag}
 						initialRotationOffset={initialRotationOffset}
+						wireframeOffset={8}
+						edgeRadius={44}
+						wireframeColor={accent}
 						onIndexChange={handleIndexChange}
 						onInteractingChange={handleInteractingChange}
 					/>
@@ -276,49 +289,20 @@ export default function SessionCarousel({
 			{/* Navigation + caption: which note this face belongs to */}
 			{items.length > 0 && (
 				<div className="flex justify-center mt-4">
-					<div className="flex items-center gap-1.5 px-1.5 py-1.5 border bg-heicha-700/80 backdrop-blur-xl border-heicha-500/50 rounded-xl">
+					<div
+						data-flow-shape
+						className="flex items-center gap-1.5 px-1.5 py-1.5 border bg-heicha-700/80 backdrop-blur-xl border-heicha-500/50 rounded-xl"
+					>
 						<button onClick={handlePrevious} className={navButton} aria-label="Previous photo">
 							<ChevronLeft className="size-4" />
 						</button>
 
-						<div
-							className="relative flex items-center justify-center h-7 overflow-hidden w-36 font-fira-code text-[11px]"
-							aria-hidden
-						>
-							<AnimatePresence mode="popLayout" initial={false}>
-								<motion.span
-									key={`${visibleIndex}-${caption}`}
-									className="absolute inset-0 flex items-center justify-center gap-1.5 px-1 whitespace-nowrap"
-									initial={
-										prefersReducedMotion
-											? { opacity: 0 }
-											: { opacity: 0, y: 8, filter: "blur(2px)" }
-									}
-									animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-									exit={
-										prefersReducedMotion
-											? { opacity: 0 }
-											: { opacity: 0, y: -8, filter: "blur(2px)" }
-									}
-									transition={{ type: "spring", stiffness: 420, damping: 34 }}
-								>
-									{visibleStage && (
-										<span className="text-[10px] leading-none">
-											{NOTE_STAGE_META[visibleStage].icon}
-										</span>
-									)}
-									<span
-										className="truncate transition-colors duration-300"
-										style={{ color: linked ? accent : "rgb(255 255 255 / 0.6)" }}
-									>
-										{caption}
-									</span>
-									<span className="tabular-nums text-white/30">
-										{visibleIndex + 1}/{items.length}
-									</span>
-								</motion.span>
-							</AnimatePresence>
-						</div>
+						<CubeCaption
+							store={captionStore}
+							stages={stageMap.stages}
+							alts={alts}
+							accent={accent}
+						/>
 
 						<button onClick={handleNext} className={navButton} aria-label="Next photo">
 							<ChevronRight className="size-4" />

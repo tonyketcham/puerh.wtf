@@ -301,8 +301,10 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 							onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
 						/>
 						<FilterTokens tokens={tokens} onClearAll={clearAll} />
+						{/* only a pinned descriptor earns the bar (it shifts the tree); a hover preview
+						    just dims rows and drops in dots, which costs no layout */}
 						<DescriptorReferences
-							descriptor={descriptor}
+							descriptor={descriptor?.pinned ? descriptor : null}
 							total={references?.total ?? 0}
 							hidden={references ? references.total - references.visible.length : 0}
 							onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}

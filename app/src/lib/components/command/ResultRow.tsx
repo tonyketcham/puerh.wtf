@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils/cn"
 import { liquorTextRgb, rgbCss } from "@/lib/liquor"
 import { formatSeconds, formatTemp } from "@/lib/steeps"
 import { NOTE_STAGE_META } from "@/lib/noteStages"
+import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import FlavorGlyph from "./FlavorGlyph"
 import { Highlight, LiquorSwatch } from "./parts"
 import type { ArgCommand, CommandId, Item } from "./items"
@@ -204,12 +205,12 @@ function RowBody({
 						</span>
 					</span>
 					<span
-						className="flex gap-0.5 text-[11px] shrink-0 opacity-70"
+						className="flex gap-1 shrink-0 text-white/60"
 						aria-label={flavor.stages.map((s) => NOTE_STAGE_META[s].title).join(", ")}
 					>
 						{flavor.stages.slice(0, 4).map((s) => (
 							<span key={s} title={NOTE_STAGE_META[s].title}>
-								{NOTE_STAGE_META[s].icon}
+								<NoteStageIcon stage={s} className="size-3" />
 							</span>
 						))}
 					</span>

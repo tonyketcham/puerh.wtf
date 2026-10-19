@@ -46,6 +46,19 @@
 	--rightpanel-w: var(--properties-w);
 }
 
+/*
+  Rock 3D's space glyph advances a full 1em (text faces sit near 0.25em), it ships no kerning
+  pairs, and its glyphs carry ~0.1–0.2em of side bearing. Left alone, word gaps run 4–5x the
+  letter gaps and short words (Hou Gu, Cha, Pu) read as loose letters. In the components layer
+  so tracking-* / word-spacing utilities still override it.
+*/
+@layer components {
+	.font-rock-3d {
+		word-spacing: -0.6em;
+		letter-spacing: -0.03em;
+	}
+}
+
 body {
 	@apply bg-background;
 	@apply transition-opacity duration-75 ease-in-out;

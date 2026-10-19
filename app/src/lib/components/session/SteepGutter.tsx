@@ -37,6 +37,7 @@ import {
 	SPRING_SOFT,
 	type ReadingMode,
 } from "./readingState"
+import { ARTICLE_REFLOW_EVENT } from "./FlowAroundArticle"
 
 export interface SteepGutterProps {
 	/** current session slug (reset/measure key) */
@@ -307,8 +308,8 @@ type ActivateOpts = { phase?: boolean; hash?: boolean; force?: boolean }
  *   back, with the same hysteresis), so one-mention and no-mention pages still reach "finish".
  * - Deep links: #steep-N activates (and scrolls to) a steep; changes update the hash in place.
  *
- * Never mutates [data-session-article]: positions come from Ranges, highlights from the CSS
- * Custom Highlight API.
+ * Never mutates [data-session-article] (only FlowAroundArticle does): positions come from Ranges,
+ * highlights from the CSS Custom Highlight API.
  */
 export default function SteepGutter({
 	slug,
@@ -617,6 +618,8 @@ export default function SteepGutter({
 		ro.observe(wrapper)
 		ro.observe(document.body)
 		window.addEventListener("resize", queue)
+		// the article rebuilt its lines around the cube: held Ranges point at detached text
+		window.addEventListener(ARTICLE_REFLOW_EVENT, queue)
 		let cancelled = false
 		const ready = document.fonts?.ready ?? Promise.resolve()
 		ready.then(() => {
@@ -631,6 +634,7 @@ export default function SteepGutter({
 			window.clearTimeout(fallback)
 			ro.disconnect()
 			window.removeEventListener("resize", queue)
+			window.removeEventListener(ARTICLE_REFLOW_EVENT, queue)
 		}
 	}, [initialize, measure])
 

@@ -1,6 +1,7 @@
 import SessionCard from "@/lib/components/SessionCard"
 import Heading2 from "@/lib/components/typography/Heading2"
 import { getSessions } from "@/lib/api"
+import { GaiwanIcon } from "@/lib/components/icons/TeaIcons"
 
 export default async function HomePage() {
 	const sessions = await getSessions({ limit: 10, withImages: true })
@@ -18,7 +19,10 @@ export default async function HomePage() {
 			</section>
 			<section className="space-y-2.5">
 				<h3 className="flex items-center gap-3 my-4 text-sm text-tea-soup-400">
-					<span>🫖 recents</span>
+					<span className="flex items-center gap-1.5">
+						<GaiwanIcon />
+						recents
+					</span>
 					<span className="tabular-nums text-white/25">{sessions.length}</span>
 					<span aria-hidden="true" className="flex-1 h-px bg-white/5" />
 				</h3>

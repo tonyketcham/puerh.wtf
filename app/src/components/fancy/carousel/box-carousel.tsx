@@ -96,15 +96,18 @@ const MediaRenderer = memo(
 		item,
 		className,
 		debug = false,
+		still = false,
 	}: {
 		item?: CarouselItem
 		className?: string
 		debug?: boolean
+		/** Show a video's poster instead of playing it (bevel slices of a video face) */
+		still?: boolean
 	}) => {
 		if (!item) return null
 
 		if (!debug) {
-			if (item.type === "video") {
+			if (item.type === "video" && !still) {
 				return (
 					<video
 						src={item.src}
@@ -119,9 +122,11 @@ const MediaRenderer = memo(
 
 			return (
 				<img
-					src={item.src}
+					src={item.type === "video" ? item.poster : item.src}
 					alt={item.alt || ""}
 					draggable={false}
+					// a face swapping photos mid-turn must never block a frame on a decode
+					decoding="async"
 					className={cn("object-cover w-full h-full rounded", className)}
 				/>
 			)
@@ -354,12 +359,279 @@ interface BoxCarouselProps
 	 * @default 0
 	 */
 	initialRotationOffset?: number
+
+	/**
+	 * Distance in px of a hollow wireframe box drawn outside the cube on every side, like an
+	 * offset stroke. Omit to draw none.
+	 */
+	wireframeOffset?: number
+
+	/**
+	 * Radius in px of the cube's rounded edges and corners, built as real 3D bevels (the
+	 * offset wireframe stays a hard box). 0 draws the plain cube.
+	 * @default 0
+	 */
+	edgeRadius?: number
+
+	/**
+	 * Stroke color of the offset wireframe
+	 * @default "rgb(255 255 255 / 0.5)"
+	 */
+	wireframeColor?: string
 }
 
 const mod = (a: number, n: number) => ((a % n) + n) % n
 
+// --- Rounded box geometry ------------------------------------------------------------------
+// CSS faces are flat, so the rounded cube is tiled: each of the 6 sides is a grid whose
+// centre cell is the flat face and whose outer cells bend around the edges/corners. A cell
+// is a plain div mapped onto its patch with matrix3d, showing its slice of the face photo,
+// so the photo wraps continuously over the bevel.
+
+type Vec3 = [number, number, number]
+/** A side of the box: outward normal `n`; `u`/`v` are the photo's right/down on that side */
+type Side = { n: Vec3; u: Vec3; v: Vec3 }
+
+const X: Vec3 = [1, 0, 0]
+const Y: Vec3 = [0, 1, 0] // CSS: +y is down
+const Z: Vec3 = [0, 0, 1] // CSS: +z is toward the viewer
+const neg = (a: Vec3): Vec3 => [-a[0], -a[1], -a[2]]
+const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
+const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
+const mul = (a: Vec3, s: number): Vec3 => [a[0] * s, a[1] * s, a[2] * s]
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+const cross = (a: Vec3, b: Vec3): Vec3 => [
+	a[1] * b[2] - a[2] * b[1],
+	a[2] * b[0] - a[0] * b[2],
+	a[0] * b[1] - a[1] * b[0],
+]
+const unit = (a: Vec3) => mul(a, 1 / Math.hypot(...a))
+
+/** The 4 ring sides (matching the physical face order of each direction) + the 2 caps */
+const SIDES: Record<RotationDirection, { ring: Side[]; caps: Side[] }> = {
+	right: {
+		ring: [
+			{ n: X, u: neg(Z), v: Y },
+			{ n: Z, u: X, v: Y },
+			{ n: neg(X), u: Z, v: Y },
+			{ n: neg(Z), u: neg(X), v: Y },
+		],
+		caps: [
+			{ n: neg(Y), u: X, v: Z },
+			{ n: Y, u: X, v: neg(Z) },
+		],
+	},
+	left: {
+		ring: [
+			{ n: neg(X), u: Z, v: Y },
+			{ n: Z, u: X, v: Y },
+			{ n: X, u: neg(Z), v: Y },
+			{ n: neg(Z), u: neg(X), v: Y },
+		],
+		caps: [
+			{ n: neg(Y), u: X, v: Z },
+			{ n: Y, u: X, v: neg(Z) },
+		],
+	},
+	top: {
+		ring: [
+			{ n: neg(Y), u: X, v: Z },
+			{ n: Z, u: X, v: Y },
+			{ n: Y, u: X, v: neg(Z) },
+			{ n: neg(Z), u: X, v: neg(Y) },
+		],
+		caps: [
+			{ n: neg(X), u: Z, v: Y },
+			{ n: X, u: neg(Z), v: Y },
+		],
+	},
+	bottom: {
+		ring: [
+			{ n: Y, u: X, v: neg(Z) },
+			{ n: Z, u: X, v: Y },
+			{ n: neg(Y), u: X, v: Z },
+			{ n: neg(Z), u: X, v: neg(Y) },
+		],
+		caps: [
+			{ n: neg(X), u: Z, v: Y },
+			{ n: X, u: neg(Z), v: Y },
+		],
+	},
+}
+
+/** Bevel segments per side per edge (a 90° edge is 2× this) */
+const BEVEL_SEGMENTS = 3
+/** Overlap (px) each cell draws past its far edges, hiding hairline seams between cells */
+const SEAM = 0.75
+
+/**
+ * Cut positions across a side of half-size `a`: the flat middle plus, on each end, cuts at
+ * even angles around the bevel (the side owns the first 45° of each edge it borders).
+ */
+const cutsFor = (a: number, r: number) => {
+	if (r <= 0) return [-a, a]
+	const inner = a - r
+	const out: number[] = []
+	for (let i = BEVEL_SEGMENTS; i >= 0; i--)
+		out.push(-(inner + r * Math.tan((i * Math.PI) / (4 * BEVEL_SEGMENTS))))
+	for (let i = 0; i <= BEVEL_SEGMENTS; i++)
+		out.push(inner + r * Math.tan((i * Math.PI) / (4 * BEVEL_SEGMENTS)))
+	return out
+}
+
+type Cell = {
+	key: string
+	/** Physical ring face index, or null for a cap */
+	face: number | null
+	/** Size and offset of the cell's slice of the side's photo */
+	w: number
+	h: number
+	ox: number
+	oy: number
+	/** The flat middle of the side */
+	flat: boolean
+	/** How far the cell has turned off its side, 0 (flat) → 1 (halfway round an edge/corner) */
+	turn: number
+	transform: string
+}
+
+const buildRoundedBox = (
+	direction: RotationDirection,
+	width: number,
+	height: number,
+	depth: number,
+	radius: number
+): Cell[] => {
+	const half: Vec3 = [width / 2, height / 2, depth / 2]
+	const r = Math.max(0, Math.min(radius, ...half))
+	const inner = half.map((h) => h - r) as Vec3
+	const extent = (axis: Vec3) => Math.abs(dot(axis, half))
+
+	/** Push a point on the hard box's surface onto the rounded box */
+	const round = (q: Vec3): Vec3 => {
+		const c = q.map((x, i) => Math.max(-inner[i], Math.min(inner[i], x))) as Vec3
+		const d = sub(q, c)
+		const len = Math.hypot(...d)
+		return len > 1e-6 ? add(c, mul(d, r / len)) : q
+	}
+	/** Box space (centred) → the container's CSS space (origin at its top-left) */
+	const css = (p: Vec3): Vec3 => [p[0] + width / 2, p[1] + height / 2, p[2]]
+	const fmt = (x: number) => +x.toFixed(4)
+
+	const { ring, caps } = SIDES[direction]
+	const cells: Cell[] = []
+	;[...ring, ...caps].forEach((side, s) => {
+		const au = extent(side.u)
+		const av = extent(side.v)
+		const at = (su: number, sv: number) =>
+			css(round(add(add(mul(side.n, extent(side.n)), mul(side.u, su)), mul(side.v, sv))))
+		const us = cutsFor(au, r)
+		const vs = cutsFor(av, r)
+		for (let i = 0; i < us.length - 1; i++) {
+			for (let j = 0; j < vs.length - 1; j++) {
+				const w = us[i + 1] - us[i]
+				const h = vs[j + 1] - vs[j]
+				const p00 = at(us[i], vs[j])
+				const ax = mul(sub(at(us[i + 1], vs[j]), p00), 1 / w)
+				const ay = mul(sub(at(us[i], vs[j + 1]), p00), 1 / h)
+				const az = unit(cross(ax, ay))
+				cells.push({
+					key: `${s}-${i}-${j}`,
+					face: s < 4 ? s : null,
+					w,
+					h,
+					ox: us[i] + au,
+					oy: vs[j] + av,
+					flat: i === us.length / 2 - 1 && j === vs.length / 2 - 1,
+					// a corner's far tip turns ~54.7° off the side, an edge's 45°: both read as 1
+					turn: Math.min(1, Math.acos(Math.min(1, dot(az, side.n))) / (Math.PI / 4)),
+					transform: `matrix3d(${[...ax, 0, ...ay, 0, ...az, 0, ...p00, 1].map(fmt).join(",")})`,
+				})
+			}
+		}
+	})
+	return cells
+}
+
+/**
+ * One side of the rounded box: its cells, all showing slices of `item`. Memoized and keyed by
+ * side, so a turn that changes which item a face shows re-renders only that face's cells (with
+ * 4 photos, none at all), never the ~300 cells of the whole box.
+ *
+ * Returns the cells unwrapped: a wrapper element would flatten the 3D rendering context.
+ */
+const RoundedSide = memo(
+	({
+		cells,
+		item,
+		width,
+		height,
+		debug,
+		debugColor,
+	}: {
+		cells: Cell[]
+		item?: CarouselItem
+		width: number
+		height: number
+		debug: boolean
+		debugColor?: string
+	}) => (
+		<>
+			{cells.map((cell) => (
+				<div
+					key={cell.key}
+					className={cn(
+						"absolute top-0 left-0 overflow-hidden origin-top-left backface-hidden",
+						cell.face == null && "bg-heicha-800"
+					)}
+					style={{
+						width: cell.w + SEAM,
+						height: cell.h + SEAM,
+						transform: cell.transform,
+						boxShadow: "inset 0 0 0 0.5px rgb(255 255 255 / 0.3)",
+						...(debug && debugColor && { backgroundColor: debugColor }),
+					}}
+				>
+					{item && (
+						<div className="absolute" style={{ left: -cell.ox, top: -cell.oy, width, height }}>
+							<MediaRenderer
+								item={item}
+								debug={debug}
+								still={!cell.flat}
+								className="rounded-none"
+							/>
+						</div>
+					)}
+					{/* Baked falloff: the bevel darkens as it turns away, which is what reads as round */}
+					{cell.turn > 0 && (
+						<div className="absolute inset-0 bg-black" style={{ opacity: 0.6 * cell.turn ** 1.5 }} />
+					)}
+				</div>
+			))}
+		</>
+	)
+)
+
+RoundedSide.displayName = "RoundedSide"
+
 /** The cube is always shown tilted by this much on both axes (see `transform` below) */
 const TILT_DEG = 6
+
+// Stable defaults: inline object defaults would be new every render and churn every callback
+// (and the memo) that depends on them
+const DEFAULT_TRANSITION: ValueAnimationTransition = {
+	type: "spring",
+	stiffness: 150,
+	damping: 21,
+	mass: 1.1,
+}
+const DEFAULT_SNAP_TRANSITION: ValueAnimationTransition = {
+	type: "spring",
+	damping: 30,
+	stiffness: 200,
+}
+const DEFAULT_DRAG_SPRING: SpringConfig = { stiffness: 300, damping: 30 }
+const FACE_COLORS = ["#ff9999", "#99ff99", "#9999ff", "#ffff99"]
 
 /**
  * Face content model.
@@ -383,7 +655,7 @@ type FaceModel = {
 
 const windowOf = (m: FaceModel) => [m.step - 1, m.step, m.step + 1, m.step + 2 * m.dir]
 
-const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
+const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 	(
 		{
 			items,
@@ -393,9 +665,9 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			perspective = 600,
 			debug = false,
 			direction = "left",
-			transition = { type: "spring", stiffness: 150, damping: 21, mass: 1.1 },
-			snapTransition = { type: "spring", damping: 30, stiffness: 200 },
-			dragSpring = { stiffness: 300, damping: 30 },
+			transition = DEFAULT_TRANSITION,
+			snapTransition = DEFAULT_SNAP_TRANSITION,
+			dragSpring = DEFAULT_DRAG_SPRING,
 			autoPlay = false,
 			autoPlayInterval = 3000,
 			continuousRotation = false,
@@ -414,6 +686,9 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			enableDrag = true,
 			dragSensitivity = 0.5,
 			initialRotationOffset = 0,
+			wireframeOffset,
+			edgeRadius = 0,
+			wireframeColor = "rgb(255 255 255 / 0.5)",
 			...props
 		},
 		ref
@@ -444,14 +719,31 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			dir: 1,
 		}))
 		const modelRef = useRef(model)
-		const commit = useCallback((next: FaceModel) => {
-			modelRef.current = next
-			setModel(next)
-		}, [])
 
 		const contentAt = useCallback(
 			(m: FaceModel, k: number) => (n ? m.overrides.get(k) ?? mod(k + m.base, n) : 0),
 			[n]
+		)
+
+		const onIndexChangeRef = useRef(onIndexChange)
+		onIndexChangeRef.current = onIndexChange
+		/** last index reported to onIndexChange (the initial index is never reported) */
+		const reportedIndexRef = useRef(contentAt(model, model.step))
+
+		// Every model change goes through here. The index is reported right away, from the same
+		// event as the turn, rather than from an effect after this component re-renders: the
+		// listener's own update then batches with ours instead of costing a second render pass.
+		const commit = useCallback(
+			(next: FaceModel) => {
+				modelRef.current = next
+				setModel(next)
+				const index = contentAt(next, next.step)
+				if (index !== reportedIndexRef.current) {
+					reportedIndexRef.current = index
+					onIndexChangeRef.current?.(index)
+				}
+			},
+			[contentAt]
 		)
 
 		// Discrete step tracking: React state only changes when the front face changes
@@ -467,17 +759,6 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		})
 
 		const currentItemIndex = contentAt(model, model.step)
-
-		const onIndexChangeRef = useRef(onIndexChange)
-		onIndexChangeRef.current = onIndexChange
-		const firstIndexRef = useRef(true)
-		useEffect(() => {
-			if (firstIndexRef.current) {
-				firstIndexRef.current = false
-				return
-			}
-			onIndexChangeRef.current?.(currentItemIndex)
-		}, [currentItemIndex])
 
 		// --- Turning -------------------------------------------------------------------------
 
@@ -721,23 +1002,39 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		// --- Page scroll ----------------------------------------------------------------------
 
 		useEffect(() => {
-			if (!enablePageScrollControl) return
+			const el = containerRef.current
+			if (!enablePageScrollControl || !el) return
+			// Whether the cube is in view comes from an IntersectionObserver, so a scroll event
+			// never reads layout (getBoundingClientRect here forced a layout every scroll frame)
+			const inView = (rect: DOMRectReadOnly) =>
+				!(rect.top - scrollOffset > window.innerHeight || rect.bottom < 0)
+			let visible = inView(el.getBoundingClientRect())
+			const io = new IntersectionObserver(
+				(entries) => {
+					const entry = entries[entries.length - 1]
+					if (entry) visible = entry.isIntersecting
+				},
+				// the cube counts as in view until its top is `scrollOffset` past the fold
+				{ rootMargin: `0px 0px ${scrollOffset}px 0px` }
+			)
+			io.observe(el)
+
 			let lastY = window.scrollY
 			const onScroll = () => {
 				const y = window.scrollY
 				const delta = y - lastY
 				lastY = y
-				const el = containerRef.current
-				if (!el || Math.abs(delta) < 1 || dragRef.current) return
-				const rect = el.getBoundingClientRect()
-				if (rect.top - scrollOffset > window.innerHeight || rect.bottom < 0) return
+				if (!visible || Math.abs(delta) < 1 || dragRef.current) return
 				// the reader took over: drop any programmatic turn
 				if (targetStepRef.current != null) stopTurning()
 				rotation.set(rotation.get() + delta * pageScrollSensitivity * 0.1 * spinSign)
 				scheduleSettle()
 			}
 			window.addEventListener("scroll", onScroll, { passive: true })
-			return () => window.removeEventListener("scroll", onScroll)
+			return () => {
+				window.removeEventListener("scroll", onScroll)
+				io.disconnect()
+			}
 		}, [
 			enablePageScrollControl,
 			scrollOffset,
@@ -820,41 +1117,56 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			const y = isVertical ? 0 : deg
 			return `translateZ(-${d / 2 - 12}px) rotateX(${x + TILT_DEG}deg) rotateY(${y + TILT_DEG}deg)`
 		})
-
-		// Determine face transforms based on the desired rotation axis
-		const faceTransforms = (() => {
+		// Determine face transforms based on the desired rotation axis; `grow` pushes every face
+		// outward by that many px (the offset wireframe is the same box, grown)
+		const faceTransformsFor = (grow: number) => {
+			const h = height / 2 + grow
+			const w = width / 2 + grow
+			const d = depth / 2 + grow
 			switch (direction) {
 				case "top":
 					return [
-						`rotateX(90deg) translateZ(${height / 2}px)`,
-						`rotateY(0deg) translateZ(${depth / 2}px)`,
-						`rotateX(-90deg) translateZ(${height / 2}px)`,
-						`rotateY(180deg) translateZ(${depth / 2}px) rotateZ(180deg)`,
+						`rotateX(90deg) translateZ(${h}px)`,
+						`rotateY(0deg) translateZ(${d}px)`,
+						`rotateX(-90deg) translateZ(${h}px)`,
+						`rotateY(180deg) translateZ(${d}px) rotateZ(180deg)`,
 					]
 				case "right":
 					return [
-						`rotateY(90deg) translateZ(${width / 2}px)`,
-						`rotateY(0deg) translateZ(${depth / 2}px)`,
-						`rotateY(-90deg) translateZ(${width / 2}px)`,
-						`rotateY(180deg) translateZ(${depth / 2}px)`,
+						`rotateY(90deg) translateZ(${w}px)`,
+						`rotateY(0deg) translateZ(${d}px)`,
+						`rotateY(-90deg) translateZ(${w}px)`,
+						`rotateY(180deg) translateZ(${d}px)`,
 					]
 				case "bottom":
 					return [
-						`rotateX(-90deg) translateZ(${height / 2}px)`,
-						`rotateY(0deg) translateZ(${depth / 2}px)`,
-						`rotateX(90deg) translateZ(${height / 2}px)`,
-						`rotateY(180deg) translateZ(${depth / 2}px) rotateZ(180deg)`,
+						`rotateX(-90deg) translateZ(${h}px)`,
+						`rotateY(0deg) translateZ(${d}px)`,
+						`rotateX(90deg) translateZ(${h}px)`,
+						`rotateY(180deg) translateZ(${d}px) rotateZ(180deg)`,
 					]
 				case "left":
 				default:
 					return [
-						`rotateY(-90deg) translateZ(${width / 2}px)`,
-						`rotateY(0deg) translateZ(${depth / 2}px)`,
-						`rotateY(90deg) translateZ(${width / 2}px)`,
-						`rotateY(180deg) translateZ(${depth / 2}px)`,
+						`rotateY(-90deg) translateZ(${w}px)`,
+						`rotateY(0deg) translateZ(${d}px)`,
+						`rotateY(90deg) translateZ(${w}px)`,
+						`rotateY(180deg) translateZ(${d}px)`,
 					]
 			}
-		})()
+		}
+		const faceTransforms = faceTransformsFor(0)
+		/** The rounded box's cells grouped by side: the 4 ring faces, then both caps */
+		const roundedSides = useMemo(() => {
+			if (edgeRadius <= 0) return null
+			const faces: Cell[][] = [[], [], [], []]
+			const caps: Cell[] = []
+			for (const cell of buildRoundedBox(direction, width, height, depth, edgeRadius)) {
+				if (cell.face == null) caps.push(cell)
+				else faces[cell.face].push(cell)
+			}
+			return { faces, caps }
+		}, [direction, width, height, depth, edgeRadius])
 
 		// Which item each physical face shows
 		const faceItems = useMemo(() => {
@@ -864,7 +1176,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			return out
 		}, [model, n, contentAt])
 
-		const faceColors = ["#ff9999", "#99ff99", "#9999ff", "#ffff99"]
+		const faceColors = FACE_COLORS
 
 		return (
 			<motion.div
@@ -908,26 +1220,74 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					className="relative w-full h-full [transform-style:preserve-3d]"
 					style={{ transform }}
 				>
-					{faceTransforms.map((faceTransform, i) => (
-						<CubeFace
-							key={i}
-							transform={faceTransform}
-							style={debug ? { width, height, backgroundColor: faceColors[i] } : { width, height }}
-							debug={debug}
-						>
-							<MediaRenderer
-								item={faceItems[i] != null ? items[faceItems[i]!] : undefined}
+					{roundedSides ? (
+						<>
+							{roundedSides.faces.map((cells, face) => (
+								<RoundedSide
+									key={face}
+									cells={cells}
+									item={faceItems[face] != null ? items[faceItems[face]!] : undefined}
+									width={width}
+									height={height}
+									debug={debug}
+									debugColor={faceColors[face]}
+								/>
+							))}
+							<RoundedSide
+								cells={roundedSides.caps}
+								width={width}
+								height={height}
 								debug={debug}
 							/>
-						</CubeFace>
-					))}
+						</>
+					) : (
+						faceTransforms.map((faceTransform, i) => (
+								<CubeFace
+									key={i}
+									transform={faceTransform}
+									style={
+										debug ? { width, height, backgroundColor: faceColors[i] } : { width, height }
+									}
+									debug={debug}
+								>
+									<MediaRenderer
+										item={faceItems[i] != null ? items[faceItems[i]!] : undefined}
+										debug={debug}
+									/>
+								</CubeFace>
+							))
+					)}
+
+					{/* Same 3D space as the faces, so the photos hide the box's far edges */}
+					{wireframeOffset != null &&
+						faceTransformsFor(wireframeOffset).map((faceTransform, i) => (
+							<div
+								key={`wire-${i}`}
+								className="absolute border pointer-events-none"
+								style={{
+									left: -wireframeOffset,
+									top: -wireframeOffset,
+									width: width + 2 * wireframeOffset,
+									height: height + 2 * wireframeOffset,
+									transform: faceTransform,
+									borderColor: wireframeColor,
+								}}
+								aria-hidden
+							/>
+						))}
 				</motion.div>
 			</motion.div>
 		)
 	}
 )
 
-BoxCarousel.displayName = "BoxCarousel"
+BoxCarouselImpl.displayName = "BoxCarousel"
+
+/**
+ * Memoized: a parent re-rendering (e.g. its caption following onIndexChange) must not re-render
+ * the cube. Pass stable props (memoized items, useCallback handlers) to keep it that way.
+ */
+const BoxCarousel = memo(BoxCarouselImpl)
 
 export default BoxCarousel
 export type { CarouselItem, RotationDirection, SpringConfig }

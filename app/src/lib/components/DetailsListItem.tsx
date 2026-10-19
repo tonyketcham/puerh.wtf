@@ -29,7 +29,9 @@ export default function DetailsListItem({
 }: DetailsListItemProps) {
 	const reduced = useReducedMotion()
 	const linkable = active !== undefined
-	const spring = reduced ? { duration: 0 } : { type: "spring" as const, stiffness: 520, damping: 40 }
+	const spring = reduced
+		? { duration: 0 }
+		: { type: "spring" as const, stiffness: 520, damping: 40 }
 
 	return (
 		<li
@@ -58,17 +60,18 @@ export default function DetailsListItem({
 				</>
 			)}
 			<div className="relative flex items-center space-x-2">
-				<div className="inline-block">
-					<div className="relative bg-blend-screen">
-						<div className="relative bg-black">{icon}</div>
-						<div
-							className="absolute inset-0 pointer-events-none bg-amber-400"
-							style={{
-								mixBlendMode: "color",
-							}}
-						></div>
-					</div>
-				</div>
+				{icon && (
+					<span
+						className="flex shrink-0 transition-colors duration-200"
+						style={{
+							color: active
+								? "var(--liquor-text, #edc446)"
+								: "rgb(var(--liquor-rgb, 237 196 70) / 0.7)",
+						}}
+					>
+						{icon}
+					</span>
+				)}
 				<span className="flex-1 font-fira-code text-brand">{title}</span>
 				{aside}
 			</div>

@@ -231,13 +231,11 @@ export default function DescriptorHighlighter() {
 						<motion.div
 							key="descriptor-refs"
 							layout={!reduced}
-							initial={
-								reduced ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.97, filter: "blur(4px)" }
-							}
-							animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-							exit={
-								reduced ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98, filter: "blur(2px)" }
-							}
+							// transform + opacity only: a filter blur here repaints the backdrop-blurred pill
+							// every frame
+							initial={reduced ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.97 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							exit={reduced ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
 							transition={spring}
 							style={{ borderRadius: 10 }}
 							className={cn(

@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState, type DragEvent } from "react"
-import { AnimatePresence, motion } from "motion/react"
+import { memo, useState, type DragEvent } from "react"
+import { motion } from "motion/react"
 import type { TreeNode } from "../../types/tree"
 import ColoredFileIcon from "./ColoredFileIcon"
 import { useFileTreeContext } from "./FileTreeContext"
@@ -19,11 +19,10 @@ interface FileProps {
 }
 
 const LIFT_SPRING = { type: "spring", stiffness: 520, damping: 30, mass: 0.6 } as const
-const DOT_SPRING = { type: "spring", stiffness: 600, damping: 24 } as const
 
 const stripSlash = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p)
 
-export default function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
+function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 	const pathname = usePathname()
 	const { referenceMatches } = useFileTreeContext()
 	const [dragging, setDragging] = useState(false)
@@ -59,19 +58,18 @@ export default function File({ node, hrefFunction, indentationLevel = 0 }: FileP
 		<motion.div
 			className={cn(
 				"relative flex items-start gap-2 rounded-md py-1.5 pr-2 text-sm",
-				"transition-[background-color,box-shadow] duration-150",
+				// dimming is a CSS transition, not a per-row motion animation: a descriptor change
+				// touches every row at once
+				"transition-[background-color,box-shadow,opacity] duration-200",
 				"group-hover:bg-white/[0.04] group-focus-visible:bg-white/[0.06]",
 				isCurrentPage && "bg-white/[0.06]",
+				dimmed && "opacity-45",
 				dragging &&
 					"bg-[#262226] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.08)]"
 			)}
 			style={{ paddingLeft: `${indentationLevel * 1.25 + 0.5}rem` }}
-			animate={{
-				y: dragging ? -2 : 0,
-				scale: dragging ? 1.02 : 1,
-				opacity: dimmed ? 0.45 : 1,
-			}}
-			transition={{ y: LIFT_SPRING, scale: LIFT_SPRING, opacity: { duration: 0.2 } }}
+			animate={{ y: dragging ? -2 : 0, scale: dragging ? 1.02 : 1 }}
+			transition={{ y: LIFT_SPRING, scale: LIFT_SPRING }}
 		>
 			{isCurrentPage && (
 				<motion.span
@@ -95,29 +93,27 @@ export default function File({ node, hrefFunction, indentationLevel = 0 }: FileP
 				)}
 				<span className={isCurrentPage ? "text-white" : ""}>{` ${node.title}`}</span>
 			</span>
-			<AnimatePresence initial={false}>
-				{isReference && (
-					<motion.span
-						key="ref-dot"
-						className="mt-[7px] size-1.5 shrink-0 rounded-full"
-						style={{
-							background: mark ? rgbCss(mark) : undefined,
-							boxShadow: mark
-								? `0 0 0 2px ${rgbCss(mark, 0.18)}, 0 0 6px ${rgbCss(mark, 0.6)}`
-								: undefined,
-						}}
-						initial={{ scale: 0, opacity: 0 }}
-						animate={{
-							scale: 1,
-							opacity: 1,
-							transition: { ...DOT_SPRING, delay: Math.min(matchOrder ?? 0, 16) * 0.028 },
-						}}
-						exit={{ scale: 0, opacity: 0, transition: { duration: 0.12 } }}
-					>
-						<span className="sr-only">(mentions the selected descriptor)</span>
-					</motion.span>
-				)}
-			</AnimatePresence>
+			{/* always in the flow so a dot appearing never narrows the title and rewraps the row */}
+			{isSession && (
+				<span
+					aria-hidden={!isReference}
+					className={cn(
+						"mt-[7px] size-1.5 shrink-0 rounded-full transition-[transform,opacity]",
+						isReference
+							? "scale-100 opacity-100 duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+							: "scale-0 opacity-0 duration-150 ease-out"
+					)}
+					style={{
+						background: mark ? rgbCss(mark) : undefined,
+						boxShadow: mark
+							? `0 0 0 2px ${rgbCss(mark, 0.18)}, 0 0 6px ${rgbCss(mark, 0.6)}`
+							: undefined,
+						transitionDelay: isReference ? `${Math.min(matchOrder ?? 0, 16) * 28}ms` : "0ms",
+					}}
+				>
+					{isReference && <span className="sr-only">(mentions the selected descriptor)</span>}
+				</span>
+			)}
 		</motion.div>
 	)
 
@@ -139,3 +135,5 @@ export default function File({ node, hrefFunction, indentationLevel = 0 }: FileP
 
 	return <div className={sharedClasses}>{content}</div>
 }
+
+export default memo(File)

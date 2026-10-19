@@ -3,6 +3,7 @@ import RadarChart from "./dataviz/radar/RadarChart"
 import DetailListEntry from "./DetailListEntry"
 import PartitionedDivider from "./PartitionedDivider"
 import TeaStyleBadge from "./TeaStyleBadge"
+import { NotebookIcon, TagIcon } from "@/lib/components/icons/TeaIcons"
 
 interface SessionDetailsSidebarProps {
 	session: SessionFull
@@ -29,7 +30,10 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 			<ul className="w-full p-2 space-y-3 overflow-hidden text-xs text-bai-cha-200">
 				<li>
 					<section>
-						<h3 className="my-4 text-sm text-tea-soup-400">💽 deets</h3>
+						<h3 className="flex items-center gap-1.5 my-4 text-sm text-tea-soup-400">
+							<TagIcon />
+							deets
+						</h3>
 						<ul className="w-full space-y-2">
 							<DetailListEntry label="excerpt" alignment="start">
 								<p className="text-right">{session.excerpt}</p>
@@ -120,7 +124,10 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 				<PartitionedDivider />
 				<li>
 					<section>
-						<h3 className="my-4 text-sm text-tea-soup-400">📓 notes</h3>
+						<h3 className="flex items-center gap-1.5 my-4 text-sm text-tea-soup-400">
+							<NotebookIcon />
+							notes
+						</h3>
 						<ul className="w-full space-y-2">
 							{Object.entries(session.notes).map(([label, description]) => (
 								<DetailListEntry key={label} label={label} alignment="start">

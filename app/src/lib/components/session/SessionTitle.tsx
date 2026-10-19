@@ -24,18 +24,32 @@ export interface SessionTitleProps {
 	productionYear?: number | null
 }
 
-/** Wave tile (px): a shallow sine, period 48, amplitude ~2.5px. Black = visible in a mask. */
-const WAVE_W = 48
-const WAVE_H = 6
-const waveTile = (fillBelow: boolean) =>
-	`url("data:image/svg+xml,${encodeURIComponent(
-		`<svg xmlns='http://www.w3.org/2000/svg' width='${WAVE_W}' height='${WAVE_H}' viewBox='0 0 ${WAVE_W} ${WAVE_H}' preserveAspectRatio='none'><path d='M0 3 C 8 0.5 16 0.5 24 3 S 40 5.5 48 3 ${
+/** Wave tile (px): one sine period, ~4px amplitude at the 96px title. Black = visible in a mask. */
+const WAVE_W = 64
+const WAVE_H = 10
+const waveTile = (fillBelow: boolean) => {
+	const mid = WAVE_H / 2
+	const amp = mid - 1
+	const q = WAVE_W / 4
+	// two half-periods drawn as cubic béziers (crest, then trough); tiles seamlessly
+	const wave = `M0 ${mid} C ${q * 0.6} ${mid - amp} ${q * 1.4} ${mid - amp} ${q * 2} ${mid} S ${
+		q * 3.4
+	} ${mid + amp} ${WAVE_W} ${mid}`
+	return `url("data:image/svg+xml,${encodeURIComponent(
+		`<svg xmlns='http://www.w3.org/2000/svg' width='${WAVE_W}' height='${WAVE_H}' viewBox='0 0 ${WAVE_W} ${WAVE_H}' preserveAspectRatio='none'><path d='${wave} ${
 			fillBelow ? `V${WAVE_H} H0` : "V0 H0"
 		} Z' fill='black'/></svg>`
 	)}")`
+}
 const WAVE_BELOW = waveTile(true)
 const WAVE_ABOVE = waveTile(false)
 const SOLID = "linear-gradient(#000, #000)"
+/**
+ * Masks clip at the border box, but Rock 3D's glyphs and the hard text-shadow paint past the
+ * line box. Pad the masked spans so their box covers the ink; negative margins (or the negative
+ * inset on the absolute copy) keep the layout unchanged.
+ */
+const BLEED = "0.25em"
 /** The pour on non-scrollable pages. */
 const POUR = { type: "spring", duration: 1.2, bounce: 0.12 } as const
 const LEVEL_SPRING = { type: "spring", stiffness: 120, damping: 22, mass: 1 } as const
@@ -58,7 +72,7 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 	const active = useAtomValue(activeSteepAtom)
 	const fill = useMemo(() => liquorAccent(getLiquorColor(slug)), [slug])
 
-	const ref = useRef<HTMLHeadingElement>(null)
+	const ref = useRef<HTMLSpanElement>(null)
 	const [measured, setMeasured] = useState(false)
 	const height = useMotionValue(0)
 	const level = useMotionValue(0)
@@ -136,7 +150,10 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 	})
 	const waveTop = useTransform(surface, (s) => s - WAVE_H / 2)
 	const solidBelowTop = useTransform(surface, (s) => s + WAVE_H / 2 - 0.5)
-	const solidAboveTop = useTransform([surface, height], ([s, h]: number[]) => s - WAVE_H / 2 - h - 40 + 0.5)
+	const solidAboveTop = useTransform(
+		[surface, height],
+		([s, h]: number[]) => s - WAVE_H / 2 - h - 40 + 0.5
+	)
 
 	// liquor copy: wave (filled below) + solid block from the surface down
 	const belowPosition = useMotionTemplate`${waveX}px ${waveTop}px, 0px ${solidBelowTop}px`
@@ -150,17 +167,20 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 		WebkitMaskRepeat: "repeat-x, no-repeat",
 	}
 
+	// Both copies sit in the same grid cell, so they share one box and wrap identically at every
+	// width (an absolute copy can't: the in-flow copy's negative margin collapses through the h1,
+	// which pushed the two copies 0.25em out of register). Grid items' margins never collapse.
+	const stacked: CSSProperties = { gridArea: "1 / 1", padding: BLEED, margin: `-${BLEED}` }
+
 	return (
-		<h1
-			ref={ref}
-			className="relative font-rock-3d text-8xl text-shadow-2xl"
-			data-session-title
-		>
+		<h1 className="grid font-rock-3d text-8xl text-shadow-2xl" data-session-title>
 			<motion.span
+				ref={ref}
 				className="block"
 				style={
 					measured
 						? {
+								...stacked,
 								...maskBase,
 								maskImage: `${WAVE_ABOVE}, ${SOLID}`,
 								WebkitMaskImage: `${WAVE_ABOVE}, ${SOLID}`,
@@ -168,8 +188,8 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 								WebkitMaskSize: maskSize,
 								maskPosition: abovePosition,
 								WebkitMaskPosition: abovePosition,
-							}
-						: undefined
+						  }
+						: stacked
 				}
 			>
 				{title}
@@ -177,8 +197,9 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 			{measured && (
 				<motion.span
 					aria-hidden
-					className="absolute inset-0 block pointer-events-none select-none"
+					className="block pointer-events-none select-none"
 					style={{
+						...stacked,
 						...maskBase,
 						color: fill,
 						maskImage: `${WAVE_BELOW}, ${SOLID}`,

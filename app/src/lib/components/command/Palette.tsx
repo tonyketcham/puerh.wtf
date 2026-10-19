@@ -42,6 +42,7 @@ import {
 import { pushRecent, readRecents, type RecentEntry } from "./recents"
 import { ResultRow } from "./ResultRow"
 import { Kbd } from "./parts"
+import { GaiwanIcon } from "@/lib/components/icons/TeaIcons"
 
 export const SURFACE_LAYOUT_ID = "commandbar-surface"
 export const ICON_LAYOUT_ID = "commandbar-icon"
@@ -550,48 +551,56 @@ export default function Palette({
 					role="listbox"
 					aria-label="Results"
 					onMouseDown={(e) => e.preventDefault()}
-					className="relative overflow-y-auto overscroll-contain max-h-[min(26rem,calc(100dvh-10rem))] py-1.5"
+					className="relative overflow-y-auto overscroll-contain max-h-[min(26rem,calc(100dvh-10rem))]"
 				>
-					{!index ? (
-						<div className="px-5 py-6 text-[12px] text-white/40">Indexing the tea shelf…</div>
-					) : flat.length === 0 ? (
-						<EmptyResults query={query} mode={mode} />
-					) : (
-						// scoped so the active pill never flies in from a previous open
-						<LayoutGroup id={pillGroup}>
-							{groups.map((g) => (
-								<div key={g.key} role="group" aria-labelledby={`cmd-grp-${g.key}`} className="pb-1">
+					{/* padding lives inside the scroller so sticky headers pin flush to its top edge */}
+					<div className="py-1.5">
+						{!index ? (
+							<div className="px-5 py-6 text-[12px] text-white/40">Indexing the tea shelf…</div>
+						) : flat.length === 0 ? (
+							<EmptyResults query={query} mode={mode} />
+						) : (
+							// scoped so the active pill never flies in from a previous open
+							<LayoutGroup id={pillGroup}>
+								{groups.map((g) => (
 									<div
-										id={`cmd-grp-${g.key}`}
-										className="sticky top-0 z-10 flex items-center justify-between px-5 h-7 text-[10px] uppercase tracking-[0.18em] text-white/35 bg-[#171417]/95 backdrop-blur-sm"
+										key={g.key}
+										role="group"
+										aria-labelledby={`cmd-grp-${g.key}`}
+										className="pb-1"
 									>
-										<span>{g.label}</span>
-										<span className="tabular-nums tracking-normal text-white/20">
-											{g.items.length}
-										</span>
+										<div
+											id={`cmd-grp-${g.key}`}
+											className="sticky top-0 z-20 flex items-center justify-between px-5 h-7 text-[10px] uppercase tracking-[0.18em] text-white/35 bg-[#191619]"
+										>
+											<span>{g.label}</span>
+											<span className="tabular-nums tracking-normal text-white/20">
+												{g.items.length}
+											</span>
+										</div>
+										{g.items.map((item) => {
+											const i = rowIndex++
+											return (
+												<ResultRow
+													key={item.key}
+													item={item}
+													index={i}
+													active={i === active}
+													argCommand={argCommand}
+													rolling={
+														item.kind === "command" && item.command.id === "random" ? rolling : null
+													}
+													reduceMotion={reduceMotion}
+													onHover={onRowHover}
+													onRun={onRowRun}
+												/>
+											)
+										})}
 									</div>
-									{g.items.map((item) => {
-										const i = rowIndex++
-										return (
-											<ResultRow
-												key={item.key}
-												item={item}
-												index={i}
-												active={i === active}
-												argCommand={argCommand}
-												rolling={
-													item.kind === "command" && item.command.id === "random" ? rolling : null
-												}
-												reduceMotion={reduceMotion}
-												onHover={onRowHover}
-												onRun={onRowRun}
-											/>
-										)
-									})}
-								</div>
-							))}
-						</LayoutGroup>
-					)}
+								))}
+							</LayoutGroup>
+						)}
+					</div>
 				</motion.div>
 			</motion.div>
 
@@ -651,9 +660,7 @@ function EmptyResults({ query, mode }: { query: string; mode: Mode }) {
 		)
 	return (
 		<div className="flex flex-col items-center gap-2 px-6 py-8 text-center">
-			<span aria-hidden className="text-lg opacity-60">
-				🫖
-			</span>
+			<GaiwanIcon className="size-6 text-white/40" />
 			<p className="text-[12px] text-white/70">
 				{q ? (
 					<>

@@ -140,7 +140,7 @@ export default function Folder({
 									) : (
 										<File
 											node={node}
-											hrefFunction={(node) => buildLink(node)}
+											hrefFunction={buildLink}
 											indentationLevel={indentationLevel + 1}
 										/>
 									)}
