@@ -10,6 +10,7 @@ export type Scalars = {
   ID: { input: string; output: string; }
   /** The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text. */
   String: { input: string; output: string; }
+  /** The `Boolean` scalar type represents `true` or `false`. */
   Boolean: { input: boolean; output: boolean; }
   /** The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. */
   Int: { input: number; output: number; }
@@ -172,6 +173,8 @@ export type Query = {
   Varietal?: Maybe<Varietal>;
   /** Find one Vendor by its ID */
   Vendor?: Maybe<Vendor>;
+  /** Find one Vessel by its ID */
+  Vessel?: Maybe<Vessel>;
   /** Return a set of Authors */
   allAuthors?: Maybe<Array<Maybe<Author>>>;
   /** Return a set of Categories */
@@ -188,6 +191,8 @@ export type Query = {
   allVarietals?: Maybe<Array<Maybe<Varietal>>>;
   /** Return a set of Vendors */
   allVendors?: Maybe<Array<Maybe<Vendor>>>;
+  /** Return a set of Vessels */
+  allVessels?: Maybe<Array<Maybe<Vessel>>>;
 };
 
 
@@ -227,6 +232,11 @@ export type QueryVarietalArgs = {
 
 
 export type QueryVendorArgs = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryVesselArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -302,6 +312,15 @@ export type QueryAllVendorsArgs = {
   sortBy?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type QueryAllVesselsArgs = {
+  filter?: InputMaybe<Scalars['JSON']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Order>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Session = {
   __typename?: 'Session';
   /** The collection name */
@@ -332,6 +351,7 @@ export type Session = {
   purchase_link?: Maybe<Scalars['String']['output']>;
   rating?: Maybe<Scalars['Float']['output']>;
   season_note?: Maybe<Scalars['String']['output']>;
+  storage?: Maybe<Array<Maybe<Session_Storage>>>;
   /** All Styles that are referenced by this Session */
   style?: Maybe<Array<Maybe<Style>>>;
   /** All Tagses that are referenced by this Session */
@@ -340,6 +360,8 @@ export type Session = {
   title?: Maybe<Scalars['String']['output']>;
   /** All Vendors that are referenced by this Session */
   vendor?: Maybe<Array<Maybe<Vendor>>>;
+  /** All Vessels that are referenced by this Session */
+  vessel?: Maybe<Array<Maybe<Vessel>>>;
 };
 
 
@@ -384,6 +406,14 @@ export type SessionTagsArgs = {
 
 
 export type SessionVendorArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Order>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type SessionVesselArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Order>;
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -496,6 +526,15 @@ export type Session_Notes = {
   mouthfeel?: Maybe<Scalars['String']['output']>;
   taste?: Maybe<Scalars['String']['output']>;
   wet_leaf_nose?: Maybe<Scalars['String']['output']>;
+};
+
+export type Session_Storage = {
+  __typename?: 'Session_Storage';
+  approx?: Maybe<Scalars['Boolean']['output']>;
+  from?: Maybe<Scalars['Float']['output']>;
+  humidity?: Maybe<Scalars['String']['output']>;
+  place?: Maybe<Scalars['String']['output']>;
+  to?: Maybe<Scalars['Float']['output']>;
 };
 
 export type Session__Content = {
@@ -680,5 +719,44 @@ export type Vendor__ContentExcerptArgs = {
 
 
 export type Vendor__ContentTimeToReadArgs = {
+  speed?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type Vessel = {
+  __typename?: 'Vessel';
+  /** The collection name */
+  _collection?: Maybe<Scalars['String']['output']>;
+  _content?: Maybe<Vessel__Content>;
+  _filename?: Maybe<Scalars['String']['output']>;
+  _path?: Maybe<Scalars['String']['output']>;
+  _slug?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  hanzi?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  image?: Maybe<Scalars['String']['output']>;
+  kind?: Maybe<Scalars['String']['output']>;
+  material?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  volume_ml?: Maybe<Scalars['Float']['output']>;
+};
+
+export type Vessel__Content = {
+  __typename?: 'Vessel__content';
+  /** A plaintext excerpt taken from the main content */
+  excerpt?: Maybe<Scalars['String']['output']>;
+  /** The content as HTML */
+  html?: Maybe<Scalars['String']['output']>;
+  raw?: Maybe<Scalars['String']['output']>;
+  /** How long (in minutes) it would take an average reader to read the main content. */
+  timeToRead?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type Vessel__ContentExcerptArgs = {
+  length?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type Vessel__ContentTimeToReadArgs = {
   speed?: InputMaybe<Scalars['Int']['input']>;
 };

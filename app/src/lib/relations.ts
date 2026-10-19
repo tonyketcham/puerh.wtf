@@ -104,6 +104,8 @@ export function entityKeys(
 			return unique((session.style || []).map((st) => st.category?._slug).filter(Boolean))
 		case "cultivar":
 			return unique((session.cultivar || []).map((c) => c._slug).filter(Boolean))
+		case "vessel":
+			return unique((session.vessel || []).map((v) => v?._slug).filter(Boolean))
 		case "tag":
 			return unique((session.tags || []).map((t) => t?._slug).filter(Boolean))
 		case "year": {
@@ -125,6 +127,7 @@ const kindRecord = <T>(make: () => T): Record<EntityKind, T> => ({
 	style: make(),
 	category: make(),
 	cultivar: make(),
+	vessel: make(),
 	tag: make(),
 	year: make(),
 })
@@ -187,6 +190,9 @@ export function buildRelationIndex(sessions: readonly ExplorerSession[]): Relati
 			if (st.id) aliases.style.set(st.id, slug)
 		}
 		for (const c of s.cultivar || []) ensure("cultivar", c._slug, { id: c.id, title: c.title })
+		for (const v of s.vessel || [])
+			if (v?._slug)
+				ensure("vessel", v._slug, { id: v.id, title: v.title, hanzi: v.hanzi, image: v.image })
 		for (const t of s.tags || [])
 			if (t?._slug) ensure("tag", t._slug, { title: t.title, color: t.color })
 		const year = yearKey(s)

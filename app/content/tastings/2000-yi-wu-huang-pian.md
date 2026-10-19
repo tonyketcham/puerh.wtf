@@ -15,6 +15,11 @@ season_note: Spring
 production_year: 2000
 picking: Huang Pian
 aging_conditions: 17+ yrs dry in Kunming
+storage:
+  - place: kunming
+    from: 2000
+    to: 2017
+    humidity: dry
 vendor:
   - 4279ab9e-2bba-4bd2-99c4-954cfc8aa10d
 purchase_link: https://yunnansourcing.com/products/2000-yi-wu-huang-pian-matured-leaves-raw-pu-erh-tea-cake
@@ -67,6 +72,8 @@ tags:
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 89
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 6

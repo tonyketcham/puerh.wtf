@@ -20,6 +20,7 @@ const PLURAL: Record<PageKind, string> = {
 	style: "styles",
 	category: "styles",
 	cultivar: "cultivars",
+	vessel: "vessels",
 }
 
 /**
@@ -83,6 +84,17 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 		if (data?.kind === "vendor" && data.place) left.push(<span key="place">{data.place}</span>)
 		if (data?.kind === "style" && data.ancestors[0])
 			left.push(<span key="cat">{data.ancestors[0].title.toLowerCase()}</span>)
+		if (data?.kind === "vessel" && data.vessel) {
+			const v = data.vessel
+			if (v.kind) left.push(<span key="vkind">{v.kind}</span>)
+			if (v.material) left.push(<span key="material">{v.material}</span>)
+			if (v.volume_ml)
+				left.push(
+					<span key="volume" className="tabular-nums" title="What it holds">
+						{v.volume_ml} ml
+					</span>
+				)
+		}
 		if (data?.kind === "cultivar" && data.hanzi)
 			left.push(
 				<span key="hanzi" lang="zh">
@@ -110,7 +122,7 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 		const tasted = kind === "category" ? index.nodes.style.size : nodes.size
 		left.push(
 			<span key="count">
-				{tasted} {PLURAL[kind]} tasted
+				{tasted} {PLURAL[kind]} {kind === "vessel" ? "in use" : "tasted"}
 			</span>
 		)
 		left.push(<span key="sessions">{index.sessions.length} sessions</span>)

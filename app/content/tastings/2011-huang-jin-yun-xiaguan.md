@@ -10,6 +10,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2011
 aging_conditions: Dry Hong Kong
+storage:
+  - place: hong-kong
+    humidity: dry
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/939452398/2011-golden-xiaguan-sampler-60g
@@ -61,6 +64,8 @@ tags:
   - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
   - bce623b4-e571-462a-b95b-988beb6dce4c
 rating: 84.7
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
 brewing:
   temperature: 205
   material_amount: 6

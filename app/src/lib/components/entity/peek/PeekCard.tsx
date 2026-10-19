@@ -10,7 +10,10 @@ import FlavorGlyph from "@/lib/components/command/FlavorGlyph"
 import Hatch from "@/lib/components/entity/Hatch"
 import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import { descriptorRegex, extractDescriptors, findDescriptorMatches } from "@/lib/descriptors"
-import type { EntityDetails, OriginPeekDetail } from "@/lib/entityDetails"
+import type { EntityDetails, OriginPeekDetail, VesselPeekDetail } from "@/lib/entityDetails"
+import { brewFacts, brewProfile, timeDomain } from "@/lib/components/entity/vessel/brew"
+import UseStrip from "@/lib/components/entity/vessel/UseStrip"
+import VesselPhoto from "@/lib/components/entity/vessel/VesselPhoto"
 import { readFilters } from "@/lib/filters"
 import { lexiconHref, lexiconPageOf } from "@/lib/lexicon"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
@@ -68,9 +71,7 @@ export default function PeekCard({ model, state, index, details, peek, engaged }
 	const { target, stats } = model
 	const meta = PEEK_META[target.kind]
 	const detail = isPageKind(target.kind)
-		? (details[target.kind][model.node?.slug ?? target.key] as
-				| (OriginPeekDetail & { hanzi?: string; place?: string; website?: string })
-				| undefined)
+		? (details[target.kind][model.node?.slug ?? target.key] as PeekDetail | undefined)
 		: undefined
 	const hanzi = model.node?.hanzi || detail?.hanzi
 	const accent = model.node?.color || stats.liquor[0] || LIQUOR_FALLBACK.hex
@@ -203,10 +204,14 @@ export default function PeekCard({ model, state, index, details, peek, engaged }
 // Kind bodies
 // ---------------------------------------------------------------------------
 
+/** Any kind's details, as the card reads them (each kind fills its own fields). */
+type PeekDetail = OriginPeekDetail &
+	Omit<VesselPeekDetail, "description"> & { place?: string; website?: string }
+
 type BodyProps = {
 	model: PeekModel
 	index: RelationIndex
-	detail: (OriginPeekDetail & { place?: string; website?: string }) | undefined
+	detail: PeekDetail | undefined
 	peek: PeekController
 	row: Variants
 	accent: string
@@ -659,38 +664,51 @@ function DescriptorBody({ model, peek, row, accent }: BodyProps) {
 	)
 }
 
-/** A vessel stub (the vessels collection is §3.5): how it gets brewed, on average. */
-function VesselBody({ model, row }: BodyProps) {
-	const brews = model.sessions.map((s) => s.brewing).filter(Boolean)
-	const mean = (
-		pick: (b: NonNullable<ExplorerSession["brewing"]>) => number | null | undefined
-	) => {
-		const values = brews.map((b) => Number(pick(b!))).filter((v) => Number.isFinite(v) && v > 0)
-		return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
-	}
-	const temp = mean((b) => b.temperature)
-	const ml = mean((b) => b.liquid_amount)
-	const grams = mean((b) => b.material_amount)
-	const first = mean((b) => b.first_infusion_duration)
-	const facts = [
-		ml && { k: "fill", v: `${Math.round(ml)} ml` },
-		grams && ml && { k: "ratio", v: `1:${Math.round(ml / grams)}` },
-		temp && { k: "water", v: `${Math.round(temp)}°F` },
-		first && { k: "first", v: `${Math.round(first)} s` },
-	].filter(Boolean) as { k: string; v: string }[]
-	if (!facts.length) return null
+/**
+ * A vessel (plan §3.5): the vessel in use beside its shape, body and volume; the mean brew of
+ * every session poured from it; and when it was in rotation, on the whole log's timeline.
+ */
+function VesselBody({ model, index, detail, row, accent }: BodyProps) {
+	const profile = useMemo(() => brewProfile(model.sessions), [model.sessions])
+	const domain = useMemo(() => timeDomain(index.sessions), [index.sessions])
+	const facts = brewFacts(profile)
+	const spec = [detail?.kind, detail?.material, detail?.volume_ml ? `${detail.volume_ml} ml` : null]
+		.filter(Boolean)
+		.join(" · ")
 	return (
-		<motion.dl variants={row} className="grid grid-cols-4 gap-1 -mt-1">
-			{facts.map((f) => (
-				<div
-					key={f.k}
-					className="px-2 py-1.5 rounded-[4px] bg-white/[0.03] ring-1 ring-inset ring-white/[0.05]"
-				>
-					<dt className="text-[9px] uppercase tracking-[0.12em] text-white/30">{f.k}</dt>
-					<dd className="text-[11px] tabular-nums text-white/75">{f.v}</dd>
-				</div>
-			))}
-		</motion.dl>
+		<>
+			<motion.div variants={row} className="flex items-center gap-3 -mt-1">
+				<VesselPhoto
+					src={detail?.image ?? model.node?.image}
+					kind={detail?.kind}
+					title={model.title}
+					color={accent}
+					glyphClassName="w-4/5"
+					className="rounded-[5px] size-11 shrink-0"
+				/>
+				{spec && <span className="min-w-0 text-[11px] leading-snug text-white/60">{spec}</span>}
+			</motion.div>
+			{facts.length > 0 && (
+				<motion.dl variants={row} className="grid grid-cols-4 gap-1">
+					{facts.map((f) => (
+						<div
+							key={f.k}
+							title={f.title}
+							className="px-2 py-1.5 rounded-[4px] bg-white/[0.03] ring-1 ring-inset ring-white/[0.05]"
+						>
+							<dt className="text-[9px] uppercase tracking-[0.12em] text-white/30">{f.k}</dt>
+							<dd className="text-[11px] tabular-nums text-white/75">{f.v}</dd>
+						</div>
+					))}
+				</motion.dl>
+			)}
+			{domain && model.sessions.length > 0 && (
+				<motion.div variants={row} className="space-y-1">
+					<span className="text-[10px] text-white/30">in rotation</span>
+					<UseStrip sessions={model.sessions} domain={domain} recordingKey="peek-vessel-use" />
+				</motion.div>
+			)}
+		</>
 	)
 }
 
@@ -844,7 +862,7 @@ function Actions({
 		// Descriptors and vessels go straight to their best-rated session (intended): the compare
 		// picker matches teas by name, so a query can't narrow it to "sessions that say ‘camphor’"
 		// or "brewed in this gaiwan", and an unfiltered picker would drop the card's context.
-		if (candidates.length === 1 || !isPageKind(target.kind)) {
+		if (candidates.length === 1 || !isPageKind(target.kind) || target.kind === "vessel") {
 			setCompare(featuredSessions(candidates, current, 1).shown[0]._slug)
 		} else {
 			// pick among them with the command bar's own compare picker

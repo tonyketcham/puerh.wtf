@@ -16,6 +16,7 @@ import {
 import { formatSeconds, formatTemp, ratio } from "@/lib/steeps"
 import { vintageAgeYears } from "@/lib/age"
 import { cn } from "@/lib/utils/cn"
+import EntityRef from "@/lib/components/entity/EntityRef"
 import SlidingText from "./SlidingText"
 import { requestSteepAtom } from "./readingState"
 
@@ -26,7 +27,7 @@ const PHASE_TICKS = 5
  * Height is var(--statusbar-h) (28px while [data-statusbar-layout] is in the DOM); the
  * Explorer, Properties panel and main content already inset themselves by that var.
  *
- * Left:  [liquor block: active steep · planned time] [brewing: °C / °F · g / ml · ratio · vessel]
+ * Left:  [liquor block: active steep · planned time] [brewing: °C / °F · g / ml · ratio] [∪ vessel]
  * Right: [vintage age] [session date] [flavor phase start ▸▸▸ finish] [liquor swatch + hex] [⌘K]
  */
 export default function StatusBar() {
@@ -51,7 +52,9 @@ export default function StatusBar() {
 	const leafRatio = ratio(brewing?.material_amount, brewing?.liquid_amount)
 	const grams = brewing?.material_amount
 	const ml = brewing?.liquid_amount
-	const vessel = brewing?.vessel?.trim()
+	// the vessel as an entity (peek, then its page); the free-text note when it isn't one
+	const vessel = session?.vessel?.find((v) => !!v?._slug) ?? null
+	const vesselNote = brewing?.vessel?.trim()
 
 	const activeSteep = steeps.find((s) => s.n === active) ?? null
 	const total = steeps.reduce((max, s) => Math.max(max, s.n), 0)
@@ -62,7 +65,7 @@ export default function StatusBar() {
 		temp && `${temp.c}°C / ${temp.f}°F`,
 		(grams || ml) && [grams && `${trimNum(grams)}g`, ml && `${trimNum(ml)}ml`].filter(Boolean).join(" / "),
 		leafRatio,
-		vessel,
+		!vessel && vesselNote,
 	].filter(Boolean) as string[]
 
 	return (
@@ -126,6 +129,19 @@ export default function StatusBar() {
 											</span>
 										))}
 									</span>
+								</Segment>
+							)}
+
+							{vessel && (
+								<Segment title={vesselNote ? `Brewed in: ${vesselNote}` : "Vessel"} className="min-w-0 pl-1.5">
+									<EntityRef
+										kind="vessel"
+										slug={vessel._slug}
+										label={vessel.title}
+										variant="crumb"
+										className="text-[11px] text-white/55"
+										recordingKey="statusbar-vessel"
+									/>
 								</Segment>
 							)}
 						</div>

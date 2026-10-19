@@ -12,6 +12,7 @@ export type RecentKind =
 	| "category"
 	| "origin"
 	| "cultivar"
+	| "vessel"
 	| "tag"
 	| "year"
 

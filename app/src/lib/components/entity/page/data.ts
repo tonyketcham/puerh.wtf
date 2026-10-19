@@ -47,6 +47,15 @@ export type EntityFact = {
 
 export type EntityLink = { label: string; href: string }
 
+/** What a vessel is (content/vessels). */
+export type VesselSpec = {
+	/** gaiwan, teapot, shiboridashi, chawan */
+	kind: string | null
+	material: string | null
+	/** what it holds, in ml */
+	volume_ml: number | null
+}
+
 export type EntityPageData = {
 	kind: PageKind
 	slug: string
@@ -74,6 +83,8 @@ export type EntityPageData = {
 	links: EntityLink[]
 	/** origins only: the closest other placed origins, outside its own branch */
 	nearby: { crumb: EntityCrumb; km: number }[]
+	/** vessels only */
+	vessel: VesselSpec | null
 }
 
 /** An entity as an index page lists it (all of a kind, tasted or not). */
@@ -91,6 +102,8 @@ export type EntityListItem = {
 	/** origin: parent origin slug; style: category slug */
 	parent: string | null
 	originKind: OriginKind | null
+	/** vessels only */
+	vessel: VesselSpec | null
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +129,8 @@ type Raw = RawRef & {
 	country?: string | null
 	groups?: (string | null)[] | null
 	links?: Record<string, string | null> | null
+	material?: string | null
+	volume_ml?: number | null
 	geo?: Record<string, unknown> | null
 	category?: (RawRef & { color?: string | null }) | null
 	styles?: (RawRef & { category?: RawRef | null })[] | null
@@ -210,6 +225,24 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 			}
 		`,
 	},
+	vessel: {
+		root: "allVessels",
+		query: gql`
+			query EntityPageVessels {
+				allVessels(sortBy: "_slug") {
+					_slug
+					id
+					title
+					hanzi
+					kind
+					material
+					volume_ml
+					image
+					description
+				}
+			}
+		`,
+	},
 	cultivar: {
 		root: "allVarietals",
 		query: gql`
@@ -297,6 +330,14 @@ function geoOf(raw: Raw): OriginGeo | null {
 		elevation_m: range.length ? [range[0], range[range.length - 1]] : null,
 		confidence: (text(g?.confidence) as OriginGeo["confidence"]) || "low",
 		source: text(g?.source) || "",
+	}
+}
+
+function vesselOf(raw: Raw): VesselSpec {
+	return {
+		kind: text(raw.kind),
+		material: text(raw.material),
+		volume_ml: num(raw.volume_ml) ?? null,
 	}
 }
 
@@ -436,6 +477,7 @@ export async function getEntityList(kind: PageKind): Promise<EntityListItem[]> {
 				? r.category?._slug ?? null
 				: null,
 		originKind: kind === "origin" ? (text(r.kind) as OriginKind | null) : null,
+		vessel: kind === "vessel" ? vesselOf(r) : null,
 	}))
 }
 
@@ -464,6 +506,7 @@ export async function getEntityPage(kind: PageKind, slug: string): Promise<Entit
 		place: null,
 		links: [],
 		nearby: [],
+		vessel: null,
 	}
 
 	switch (kind) {
@@ -570,6 +613,19 @@ export async function getEntityPage(kind: PageKind, slug: string): Promise<Entit
 					}))
 					.sort((a, b) => a.title.localeCompare(b.title)),
 				facts: base.color ? [{ label: "color", value: base.color.toLowerCase() }] : [],
+			}
+		}
+		case "vessel": {
+			const vessel = vesselOf(raw)
+			return {
+				...base,
+				vessel,
+				facts: [
+					vessel.kind && { label: "shape", value: vessel.kind },
+					vessel.material && { label: "material", value: vessel.material },
+					vessel.volume_ml && { label: "volume", value: `${vessel.volume_ml} ml` },
+					base.hanzi && { label: "hanzi", value: base.hanzi },
+				].filter(Boolean) as EntityFact[],
 			}
 		}
 		case "cultivar": {

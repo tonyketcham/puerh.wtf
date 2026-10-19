@@ -39,6 +39,27 @@ const ORIGIN_FIELDS = Array.from({ length: ORIGIN_DEPTH - 1 }).reduce<string>(
 	ORIGIN_NODE_FIELDS
 )
 
+/** The vessel a session was brewed in (top-level ref; brewing.vessel stays the free-text note). */
+const VESSEL_FIELDS = `
+	id
+	_slug
+	title
+	hanzi
+	kind
+	material
+	volume_ml
+	image
+`
+
+/** Storage stints, hand-parsed from aging_conditions (plan §3.5). */
+const STORAGE_FIELDS = `
+	place
+	from
+	to
+	humidity
+	approx
+`
+
 const BREWING_FIELDS = `
 	temperature
 	material_amount
@@ -155,6 +176,12 @@ export async function getExplorerSessions(options?: {
 				}
 				brewing {
 					${BREWING_FIELDS}
+				}
+				vessel {
+					${VESSEL_FIELDS}
+				}
+				storage {
+					${STORAGE_FIELDS}
 				}
 				images {
 					alt
@@ -277,6 +304,12 @@ export async function getSession(slug: string): Promise<SessionFull> {
 				}
 				brewing {
 					${BREWING_FIELDS}
+				}
+				vessel {
+					${VESSEL_FIELDS}
+				}
+				storage {
+					${STORAGE_FIELDS}
 				}
 				author {
 					_slug

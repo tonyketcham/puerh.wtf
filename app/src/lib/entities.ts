@@ -2,10 +2,19 @@
  * Entity kinds a session points at, and how each one is addressed (plan §2.1–2.3).
  *
  * Glyphs double as the command bar's quick-open prefixes: `@` vendor, `#` tag, `^` origin,
- * `~` style, `:` year. Pure module (no React) so the relation index and server code can use it.
+ * `~` style, `%` cultivar, `:` year (`∪` vessel is a glyph only). Pure module (no React) so the
+ * relation index and server code can use it.
  */
 
-export type EntityKind = "origin" | "vendor" | "style" | "category" | "cultivar" | "tag" | "year"
+export type EntityKind =
+	| "origin"
+	| "vendor"
+	| "style"
+	| "category"
+	| "cultivar"
+	| "vessel"
+	| "tag"
+	| "year"
 
 export const ENTITY_KINDS: readonly EntityKind[] = [
 	"origin",
@@ -13,6 +22,7 @@ export const ENTITY_KINDS: readonly EntityKind[] = [
 	"style",
 	"category",
 	"cultivar",
+	"vessel",
 	"tag",
 	"year",
 ] as const
@@ -36,6 +46,7 @@ export const ENTITY_META: Record<EntityKind, EntityKindMeta> = {
 	style: { glyph: "~", label: "style", route: "styles", routeReady: true },
 	category: { glyph: "~", label: "category", route: "categories", routeReady: true },
 	cultivar: { glyph: "%", label: "cultivar", route: "cultivars", routeReady: true },
+	vessel: { glyph: "∪", label: "vessel", route: "teaware", routeReady: true },
 	tag: { glyph: "#", label: "tag", route: null, routeReady: false },
 	year: { glyph: ":", label: "vintage", route: null, routeReady: false },
 }

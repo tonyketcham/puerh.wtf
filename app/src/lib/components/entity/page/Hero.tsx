@@ -9,6 +9,7 @@ import type { MapPoint } from "@/lib/components/map/points"
 import { cn } from "@/lib/utils/cn"
 import type { EntityPageData } from "./data"
 import DotMap, { type DotMapPoint } from "./DotMap"
+import VesselHero from "@/lib/components/entity/vessel/VesselHero"
 import LeafGlyph, { leafSize } from "./LeafGlyph"
 import type { EntityModel } from "./model"
 import { ORIGIN_MAP_CLASS, originMapTransitionName } from "./viewTransition"
@@ -24,6 +25,7 @@ const CREAM = "#fff2ca"
  * - vendor: logo, city, links and a dot-map of the origins they sourced
  * - style / category: the category color as a field, with the description's lead as prose
  * - cultivar: hanzi and the leaf-size glyph beside the lead
+ * - vessel: the vessel in use beside its spec, mean brew and rotation (VesselHero)
  */
 export default function Hero({
 	data,
@@ -49,6 +51,8 @@ export default function Hero({
 			return <ColorFieldHero data={data} model={model} lead={lead} />
 		case "cultivar":
 			return <CultivarHero data={data} lead={lead} points={points} model={model} />
+		case "vessel":
+			return <VesselHero data={data} model={model} lead={lead} />
 	}
 }
 

@@ -8,7 +8,7 @@ import { MAP_LAYERS, mapLayersAtom, toggleMapLayerAtom } from "./mapState"
 /**
  * The origin map's layer switches, set into the status bar like an IDE's view toggles:
  *
- *   layers  ● contours · ○ ridges · ● rivers · ○ supply lines
+ *   layers  ● contours · ○ ridges · ● rivers · ○ storage · ○ supply lines
  */
 export default function MapLayerToggles({ className }: { className?: string }) {
 	const layers = useAtomValue(mapLayersAtom)

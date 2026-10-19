@@ -84,7 +84,14 @@ const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : null
 
 // (a local empty value: entityDetails.ts is server code, only its types come along)
-const NO_DETAILS: EntityDetails = { origin: {}, vendor: {}, style: {}, category: {}, cultivar: {} }
+const NO_DETAILS: EntityDetails = {
+	origin: {},
+	vendor: {},
+	style: {},
+	category: {},
+	cultivar: {},
+	vessel: {},
+}
 
 const bare = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "")
 

@@ -14,6 +14,11 @@ harvest:
 season_note: Early Spring
 production_year: 2007
 aging_conditions: "13 years wet in Yang's Taiwanese storage"
+storage:
+  - place: taiwan
+    from: 2007
+    to: 2020
+    humidity: wet
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 excerpt: 'Animal Crossing: Wild World extreme Tom Nook speedrun (any % complete)'
@@ -63,6 +68,8 @@ tags:
   - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
   - bce623b4-e571-462a-b95b-988beb6dce4c
 rating: 79.121
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 212
   material_amount: 6.09

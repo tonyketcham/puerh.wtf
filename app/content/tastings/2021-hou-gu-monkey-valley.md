@@ -14,6 +14,10 @@ season_note: Early Spring
 production_year: 2021
 picking: Young bud up to 2 young leaves
 aging_conditions: 6 months in a fridge in my basement
+storage:
+  - place: home
+    from: 2021
+    to: 2021
 vendor:
   - b744b7f2-1067-49ef-9a1f-5570d0761ba6
 excerpt: A nutty, baked Mao Feng
@@ -60,6 +64,8 @@ notes:
 tags:
   - 45bc51d4-ca88-4795-94f7-9aa42115feb3
 rating: 62
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 174
   material_amount: 4.19

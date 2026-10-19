@@ -6,7 +6,6 @@ import { motion, useReducedMotion, type Variants } from "motion/react"
 import PanelSection from "@/lib/components/containers/PanelSection"
 import EntityRef from "@/lib/components/entity/EntityRef"
 import Hatch from "@/lib/components/entity/Hatch"
-import VesselRef from "@/lib/components/entity/VesselRef"
 import OriginTrail, { originNoteLabel } from "@/lib/components/entity/OriginTrail"
 import { relationIndexAtom, sessionAtom } from "@/lib/store/sessionAtom"
 import { ratingRank, sessionColor, type RelationIndex } from "@/lib/relations"
@@ -19,6 +18,7 @@ import type { EntityKind } from "@/lib/entities"
 import type { SessionFull } from "@/lib/types/session"
 import type { OriginRef } from "@/lib/types/origin"
 import { cn } from "@/lib/utils/cn"
+import StorageTimeline from "./StorageTimeline"
 
 /** Content ease from the plan's motion tokens (§3): 0.45s on [0.22, 1, 0.36, 1]. */
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -215,9 +215,15 @@ function Provenance({ session, index, row }: SectionProps) {
 								</Refs>
 							</Prop>
 						)}
-						{session.aging_conditions && (
+						{(session.storage?.length || session.aging_conditions) && (
 							<Prop label="storage" row={row}>
-								<span className="text-white/70">{session.aging_conditions}</span>
+								<StorageTimeline
+									stints={session.storage}
+									vintage={year}
+									tasted={session.date}
+									raw={session.aging_conditions}
+									recordingKey="provenance-storage"
+								/>
 							</Prop>
 						)}
 					</dl>
@@ -340,8 +346,10 @@ function TerraIncognita({ label }: { label: string }) {
 function Source({ session, index, row }: SectionProps) {
 	const vendors = session.vendor || []
 	const listing = session.purchase_link ? parseListing(session.purchase_link) : null
-	const vessel = session.brewing?.vessel?.trim()
-	if (!vendors.length && !listing && !vessel) return null
+	const vessels = (session.vessel || []).filter((v) => !!v?._slug)
+	// the free-text note, for a session whose vessel isn't in the collection
+	const note = session.brewing?.vessel?.trim()
+	if (!vendors.length && !listing && !vessels.length && !note) return null
 
 	return (
 		<PanelSection title="Source">
@@ -382,9 +390,24 @@ function Source({ session, index, row }: SectionProps) {
 							</a>
 						</Prop>
 					)}
-					{vessel && (
-						<Prop label="vessel" row={row}>
-							<VesselRef vessel={vessel} recordingKey="source-vessel" />
+					{(vessels.length > 0 || note) && (
+						<Prop label="vessel" row={row} title={note && vessels.length ? note : undefined}>
+							{vessels.length ? (
+								<Refs>
+									{vessels.map((v) => (
+										<EntityRef
+											key={v._slug}
+											kind="vessel"
+											slug={v._slug}
+											label={v.title}
+											count={countOf(index, "vessel")(v._slug)}
+											recordingKey="source-vessel"
+										/>
+									))}
+								</Refs>
+							) : (
+								note
+							)}
 						</Prop>
 					)}
 				</dl>

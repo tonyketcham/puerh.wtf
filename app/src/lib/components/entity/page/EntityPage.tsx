@@ -31,11 +31,12 @@ export const INDEX_OF: Record<PageKind, { label: string; href: string; kind: Pag
 	style: { label: "styles", href: "/styles/", kind: "style" },
 	category: { label: "styles", href: "/styles/", kind: "style" },
 	cultivar: { label: "cultivars", href: "/cultivars/", kind: "cultivar" },
+	vessel: { label: "teaware", href: "/teaware/", kind: "vessel" },
 }
 
 /**
  * The entity page template (plan §3.2), "Go to Definition" for vendors, origins, styles,
- * categories and cultivars:
+ * categories, cultivars and vessels:
  *
  *   breadcrumb ................................................ [yiwu.origin]
  *   TITLE (Rock 3D, filled with its sessions' liquors)
@@ -273,6 +274,18 @@ function Subtitle({ data, model }: { data: EntityPageData; model: EntityModel })
 					</span>
 				)
 			parts.push("cultivar")
+			break
+		case "vessel":
+			if (data.hanzi)
+				parts.push(
+					<span lang="zh" className="text-white/70">
+						{data.hanzi}
+					</span>
+				)
+			if (data.vessel?.kind) parts.push(data.vessel.kind)
+			if (data.vessel?.material) parts.push(data.vessel.material)
+			if (data.vessel?.volume_ml)
+				parts.push(<span className="tabular-nums">{data.vessel.volume_ml} ml</span>)
 			break
 	}
 	if (!parts.length) return null

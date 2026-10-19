@@ -41,6 +41,41 @@ export type SessionPreview = BaseSession & {
 	origin?: OriginRef[] | null
 	/** why there's no origin (blends, undisclosed sourcing) */
 	origin_note?: OriginNote | null
+	/** what it was brewed in (brewing.vessel keeps the free-text note) */
+	vessel?: SessionVessel[] | null
+	/** where it aged, in order (aging_conditions keeps the raw text) */
+	storage?: StorageStint[] | null
+}
+
+/** The shape of a brewing vessel (content/vessels). */
+export type VesselKind = "gaiwan" | "teapot" | "shiboridashi" | "chawan"
+
+/** A brewing vessel as sessions reference it. */
+export type SessionVessel = {
+	id: string
+	_slug: string
+	title: string
+	hanzi?: string | null
+	kind?: VesselKind | string | null
+	material?: string | null
+	/** what it holds, in ml */
+	volume_ml?: number | null
+	image?: string | null
+}
+
+export type StorageHumidity = "dry" | "natural" | "wet"
+
+/**
+ * One stint of storage, hand-parsed from `aging_conditions` (plan §3.5): a place key (see
+ * lib/storage.ts), the years it covers when the text says, and the humidity when it says.
+ * `approx` marks a hedged reading ("~20 years", "perhaps TW storage?").
+ */
+export type StorageStint = {
+	place: string
+	from?: number | null
+	to?: number | null
+	humidity?: StorageHumidity | null
+	approx?: boolean | null
 }
 
 /** A tag: a colored mood chip. Tags act as Explorer filters (?tags=), not pages. */

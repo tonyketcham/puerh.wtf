@@ -302,6 +302,14 @@ function buildGroups(model: EntityModel, index: RelationIndex, data: EntityPageD
 			push({ key: "vendors", label: "vendors", kind: "vendor", rows: rel("vendor") })
 			break
 		}
+		case "vessel": {
+			// what goes in it: the categories and styles it brews, and where they grew
+			push({ key: "categories", label: "brews", kind: "category", rows: rel("category") })
+			push({ key: "styles", label: "styles", kind: "style", rows: rel("style") })
+			push({ key: "origins", label: "origins", kind: "origin", rows: rel("origin", false) })
+			push({ key: "vendors", label: "vendors", kind: "vendor", rows: rel("vendor") })
+			break
+		}
 	}
 	push({
 		key: "tags",

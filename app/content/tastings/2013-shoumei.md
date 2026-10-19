@@ -10,6 +10,15 @@ origin:
 production_year: 2013
 picking: a mix of tips and large, mature leaves; Da Bai (large white leaves)
 aging_conditions: dry/natural conditions in Fujian from 2013-2018, Guangzhou til 2020
+storage:
+  - place: fujian
+    from: 2013
+    to: 2018
+    humidity: natural
+  - place: guangzhou
+    from: 2018
+    to: 2020
+    humidity: natural
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2013-shoumei?_pos=2&_sid=ae88e5619&_ss=r
@@ -58,6 +67,8 @@ notes:
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 81
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 5

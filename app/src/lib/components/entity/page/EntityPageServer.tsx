@@ -11,7 +11,7 @@ import Markdown, { paragraphCount } from "./Markdown"
 import { buildEntityModel } from "./model"
 
 /** Kinds whose hero sets the description's first paragraph as prose (the rest goes to Notes). */
-const LEAD_KINDS: readonly PageKind[] = ["style", "category", "cultivar"]
+const LEAD_KINDS: readonly PageKind[] = ["style", "category", "cultivar", "vessel"]
 
 /**
  * Server half of an entity page: loads the entity, renders its SessionCards (they compute

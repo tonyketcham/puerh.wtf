@@ -1,6 +1,6 @@
 /**
  * URL search params are the shared filter state for the Explorer and the command bar:
- *   ?q=<text>&styles=a,b&origins=…&years=2018,2019&vendors=…&cultivars=…&tags=…
+ *   ?q=<text>&styles=a,b&origins=…&years=2018,2019&vendors=…&cultivars=…&tags=…&vessels=…
  * (styles = category or style slugs: a category is the top of the style tree, so `sheng` keeps
  * every Sheng style and `blended-sheng` only that one; origins = origin slug/id, rolling up the
  * tree; years = production years as integers.)
@@ -13,7 +13,15 @@ import { sessionMatchesDescriptor } from "@/lib/descriptors"
 import { canonicalOriginKey, originKeys, originSearchText } from "@/lib/origins"
 import type { ExplorerSession } from "@/lib/types/session"
 
-export const FACET_KEYS = ["styles", "origins", "years", "vendors", "cultivars", "tags"] as const
+export const FACET_KEYS = [
+	"styles",
+	"origins",
+	"years",
+	"vendors",
+	"cultivars",
+	"tags",
+	"vessels",
+] as const
 export type FacetKey = typeof FACET_KEYS[number]
 export type FacetState = Record<FacetKey, string[]>
 
@@ -29,6 +37,7 @@ export const EMPTY_FACETS: FacetState = {
 	vendors: [],
 	cultivars: [],
 	tags: [],
+	vessels: [],
 }
 
 type ParamsLike = { get(name: string): string | null }
@@ -44,6 +53,7 @@ export function readFilters(params: ParamsLike | null | undefined): FilterState 
 			vendors: readList("vendors"),
 			cultivars: readList("cultivars"),
 			tags: readList("tags"),
+			vessels: readList("vessels"),
 		},
 	}
 }
@@ -126,6 +136,7 @@ export const ENTITY_FACET: Record<EntityKind, FacetKey> = {
 	style: "styles",
 	category: "styles",
 	cultivar: "cultivars",
+	vessel: "vessels",
 	tag: "tags",
 	year: "years",
 }
@@ -212,6 +223,10 @@ export function matchesFilters(
 		const tagSlugs = (s.tags || []).map((t) => t?._slug || "")
 		if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
 	}
+	if (on("vessels")) {
+		const vesselSlugs = (s.vessel || []).map((v) => v?._slug || "")
+		if (!facets.vessels.some((slug) => vesselSlugs.includes(slug))) return false
+	}
 	if (on("origins")) {
 		// slug or id of the origin or any ancestor (so a Yiwu filter keeps its villages); legacy
 		// long slugs from old shared URLs map to the current ones
@@ -227,6 +242,7 @@ export function matchesFilters(
 		...(s.vendor || []).map((v) => v.title),
 		...(s.cultivar || []).map((c) => c.title),
 		...(s.tags || []).map((t) => t?.title || ""),
+		...(s.vessel || []).map((v) => v?.title || ""),
 		...(s.origin || []).flatMap((o) => [...originSearchText(o), o?._slug]),
 		s.origin_note || "",
 		...(s.style || []).flatMap((st) => [st.title, st.category?.title]),

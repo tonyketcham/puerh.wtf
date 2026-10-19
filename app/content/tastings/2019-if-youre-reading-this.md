@@ -7,6 +7,10 @@ style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 production_year: 2019
 aging_conditions: ">1 year in w2t's grasps"
+storage:
+  - place: white2tea
+    from: 2019
+    to: 2020
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2019-if-youre-reading-this?_pos=1&_sid=73360eff5&_ss=r
@@ -55,6 +59,8 @@ notes:
 tags:
   - dc360789-6d18-449f-83e2-6cbad9b49035
 rating: 83
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 200
   material_amount: 8

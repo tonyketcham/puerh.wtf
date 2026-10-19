@@ -67,6 +67,8 @@ notes:
   empty_cup: minerals, multigrain toast that doesn't suck (a lot of multigrain
     toast sucks I'll fuckin say it), pomegranate
   cha_qi: zoomin full funky monkey Friday on a god damn Thursday
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 200
   material_amount: 5

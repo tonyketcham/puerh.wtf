@@ -7,6 +7,8 @@ style:
   - 86055bdc-7461-429a-9a47-11d9b2b8af0a
 production_year: 2018
 aging_conditions: Taiwan stored
+storage:
+  - place: taiwan
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/797446458/camphor-laochatou-30g
@@ -60,6 +62,8 @@ tags:
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
 rating: 88.95
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 205
   material_amount: 5.95

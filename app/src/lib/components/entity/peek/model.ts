@@ -3,7 +3,7 @@
  * the entity node, its ancestors, the sessions behind it and their stats.
  */
 import { sessionMatchesDescriptor } from "@/lib/descriptors"
-import { isPageKind, vesselKey, type PeekTarget } from "@/lib/peek"
+import { isPageKind, type PeekTarget } from "@/lib/peek"
 import {
 	ancestorsOf,
 	computeStats,
@@ -43,17 +43,11 @@ export function buildPeekModel(index: RelationIndex, target: PeekTarget): PeekMo
 			stats: computeStats(sessions),
 		}
 	}
-	const sessions =
-		kind === "descriptor"
-			? index.sessions.filter((s) => sessionMatchesDescriptor(s, key))
-			: index.sessions.filter((s) => vesselKey(s.brewing?.vessel) === key)
-	const title =
-		kind === "vessel"
-			? sessions.find((s) => s.brewing?.vessel)?.brewing?.vessel?.trim() ?? key
-			: key
+	// descriptors: every session whose notes use the word
+	const sessions = index.sessions.filter((s) => sessionMatchesDescriptor(s, key))
 	return {
 		target,
-		title,
+		title: key,
 		node: null,
 		ancestors: [],
 		sessions: [...sessions],

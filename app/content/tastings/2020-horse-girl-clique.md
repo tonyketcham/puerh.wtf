@@ -64,6 +64,8 @@ tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
 rating: 89
+vessel:
+  - 91958c6c-0f2e-478d-8237-448d5f8d3f05
 brewing:
   temperature: 200
   material_amount: 3

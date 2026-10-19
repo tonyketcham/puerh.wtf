@@ -14,6 +14,13 @@ harvest:
 season_note: Spring
 production_year: 2007
 aging_conditions: Menghai for 7.5 years, Guangzhou for 7 years
+storage:
+  - place: menghai
+    from: 2007
+    to: 2014
+  - place: guangzhou
+    from: 2014
+    to: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2007-repave-hekai?_pos=1&_sid=bb2165103&_ss=r
@@ -63,6 +70,8 @@ tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
   - bce623b4-e571-462a-b95b-988beb6dce4c
 rating: 82.4
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 205
   material_amount: 7

@@ -16,6 +16,10 @@ production_year: 2010
 picking: Bud + up to 3 leaves
 elevation: 1500
 aging_conditions: Bulang, loose for 10 years
+storage:
+  - place: bulang
+    from: 2010
+    to: 2020
 vendor:
   - 84de34f8-3878-4daf-aa6e-d4925338fbfb
 purchase_link: https://meileaf.com/tea/milk-float-nomad/
@@ -63,6 +67,8 @@ notes:
     custard, miscellaneous softwood, and sweets
   cha_qi: Warming, focusing + creative
   empty_cup: Woody cologne, cake
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 5

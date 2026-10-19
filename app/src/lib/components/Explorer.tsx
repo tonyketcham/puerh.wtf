@@ -101,6 +101,7 @@ const FACET_KIND: Record<FacetKey, string> = {
 	vendors: "vendor",
 	cultivars: "cultivar",
 	tags: "tag",
+	vessels: "vessel",
 }
 
 /** The facet an entity view leaves out of its own counts, so its list keeps every option. */
@@ -194,6 +195,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			origins: new Map<string, { label: string }>(),
 			cultivars: new Map<string, { label: string }>(),
 			tags: new Map<string, { label: string }>(),
+			vessels: new Map<string, { label: string }>(),
 		}
 		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
 		for (const st of index.nodes.style.values())
@@ -208,6 +210,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			}
 			for (const c of s.cultivar || []) map.cultivars.set(c._slug, { label: c.title })
 			for (const t of s.tags || []) if (t?._slug) map.tags.set(t._slug, { label: t.title })
+			for (const v of s.vessel || []) if (v?._slug) map.vessels.set(v._slug, { label: v.title })
 		}
 		for (const [legacy, slug] of Object.entries(LEGACY_ORIGIN_SLUGS)) {
 			const label = map.origins.get(slug)
@@ -226,7 +229,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		if (q) {
 			out.push({ id: "q", kind: "find", label: `“${q}”`, onRemove: () => setQ("") })
 		}
-		for (const key of ["styles", "vendors", "origins", "cultivars", "tags"] as const) {
+		for (const key of ["styles", "vendors", "origins", "cultivars", "vessels", "tags"] as const) {
 			for (const value of facets[key]) {
 				const meta = labels[key].get(value) as { label: string; color?: string } | undefined
 				out.push({

@@ -125,8 +125,42 @@ collections:
       - label: 'Aging Conditions'
         name: 'aging_conditions'
         widget: 'string'
+        hint: 'Free text as you would say it; the structured Storage below drives the timeline and map'
         required: false
         default: null
+
+      - label: 'Storage'
+        label_singular: 'Stint'
+        name: 'storage'
+        widget: 'list'
+        summary: '{{fields.place}} {{fields.from}}–{{fields.to}} {{fields.humidity}}'
+        collapsed: true
+        required: false
+        hint: 'Where it aged, in order. Places: guangzhou, hong-kong, kunming, menghai, bulang, xishuangbanna, fujian, taiwan, malaysia, united-states, white2tea, home, unknown (add new ones in app/src/lib/storage.ts)'
+        fields:
+          - label: 'Place'
+            name: 'place'
+            widget: 'string'
+          - label: 'From (year)'
+            name: 'from'
+            widget: 'number'
+            value_type: 'int'
+            required: false
+          - label: 'To (year)'
+            name: 'to'
+            widget: 'number'
+            value_type: 'int'
+            required: false
+          - label: 'Humidity'
+            name: 'humidity'
+            widget: 'select'
+            options: ['dry', 'natural', 'wet']
+            required: false
+          - label: 'Approximate'
+            name: 'approx'
+            widget: 'boolean'
+            hint: 'The text hedges ("~20 years", "perhaps Taiwan?")'
+            required: false
 
       - label: 'Vendor'
         name: 'vendor'
@@ -426,10 +460,21 @@ collections:
             widget: 'number'
             min: 0
 
-          - label: 'Vessel Type'
+          - label: 'Vessel Note'
             name: 'vessel'
             widget: 'string'
-            default: 'Jianshui Zitao Xishi pot'
+            hint: 'Free text; pick the vessel itself in "Vessel" below'
+            required: false
+
+      - label: 'Vessel'
+        name: 'vessel'
+        widget: 'relation'
+        collection: 'vessels'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title', 'kind', 'material']
+        display_fields: ['title']
+        required: false
 
       - label: 'Images'
         label_singular: 'Image'
@@ -789,6 +834,60 @@ collections:
       - label: 'Excerpt'
         name: 'excerpt'
         widget: 'string'
+
+  - label: 'Teaware'
+    name: 'vessels'
+    label_singular: 'Vessel'
+    description: 'Gaiwans, pots and pouring bowls'
+    folder: 'app/content/vessels'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{title}} · {{kind}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+        hint: 'Short: it becomes the /teaware/ slug'
+
+      - label: 'Hanzi'
+        name: 'hanzi'
+        widget: 'string'
+        required: false
+
+      - label: 'Shape'
+        name: 'kind'
+        widget: 'select'
+        options: ['gaiwan', 'teapot', 'shiboridashi', 'chawan']
+
+      - label: 'Material'
+        name: 'material'
+        widget: 'string'
+        hint: 'Clay or glaze, e.g. "Jianshui zitao clay", "porcelain"'
+        required: false
+
+      - label: 'Volume (mL)'
+        name: 'volume_ml'
+        widget: 'number'
+        value_type: 'int'
+        min: 0
+        required: false
+
+      - label: 'Photo'
+        name: 'image'
+        widget: 'image'
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
 
   - label: 'Tags'
     label_singular: 'Tag'

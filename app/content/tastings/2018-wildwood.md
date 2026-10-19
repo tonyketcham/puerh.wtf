@@ -64,6 +64,8 @@ notes:
     strong throat and chest feel
 tags: []
 rating: 78.4
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 205
   material_amount: 5.1

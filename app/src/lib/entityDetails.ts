@@ -1,6 +1,7 @@
 /**
  * The few entity fields a peek card shows that the relation index doesn't carry: descriptions,
- * vendor cities and sites, cultivar hanzi, origin coordinates and garden elevations.
+ * vendor cities and sites, cultivar hanzi, origin coordinates and garden elevations, and what a
+ * vessel is made of and holds.
  *
  * Loaded once by the root layout (one Flatbread round trip, next to getExplorerSessions) and
  * handed to the EntityPeek host, so opening a peek never fetches. Entries without anything to
@@ -36,12 +37,24 @@ export type TextPeekDetail = {
 	hanzi?: string
 }
 
+export type VesselPeekDetail = {
+	description?: string
+	hanzi?: string
+	/** gaiwan, teapot, shiboridashi, chawan */
+	kind?: string
+	material?: string
+	volume_ml?: number
+	/** a session photo that shows it */
+	image?: string
+}
+
 export type EntityDetails = {
 	origin: Record<string, OriginPeekDetail>
 	vendor: Record<string, VendorPeekDetail>
 	style: Record<string, TextPeekDetail>
 	category: Record<string, TextPeekDetail>
 	cultivar: Record<string, TextPeekDetail>
+	vessel: Record<string, VesselPeekDetail>
 }
 
 export const EMPTY_ENTITY_DETAILS: EntityDetails = {
@@ -50,6 +63,7 @@ export const EMPTY_ENTITY_DETAILS: EntityDetails = {
 	style: {},
 	category: {},
 	cultivar: {},
+	vessel: {},
 }
 
 /** A peek shows three lines of description at most. */
@@ -85,6 +99,7 @@ function bySlug<T extends Record<string, unknown>, R extends Record<string, unkn
 }
 
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : undefined)
+const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined)
 
 type Raw = Record<string, unknown> & { _slug?: string | null }
 
@@ -124,6 +139,15 @@ export async function getEntityDetails(): Promise<EntityDetails> {
 			allVarietals {
 				_slug
 				hanzi
+				description
+			}
+			allVessels {
+				_slug
+				hanzi
+				kind
+				material
+				volume_ml
+				image
 				description
 			}
 		}
@@ -168,6 +192,14 @@ export async function getEntityDetails(): Promise<EntityDetails> {
 		cultivar: bySlug(data.allVarietals, (c: Raw) => ({
 			description: clip(c.description as string),
 			hanzi: typeof c.hanzi === "string" && c.hanzi.trim() ? c.hanzi.trim() : undefined,
+		})),
+		vessel: bySlug(data.allVessels, (v: Raw) => ({
+			description: clip(v.description as string),
+			hanzi: str(v.hanzi),
+			kind: str(v.kind),
+			material: str(v.material),
+			volume_ml: num(v.volume_ml),
+			image: str(v.image),
 		})),
 	}
 }

@@ -11,6 +11,11 @@ origin:
   - aa7fe22e-c86f-4318-ba17-55361a79eb30
 production_year: 2009
 aging_conditions: 11 years dry in Ghuangzou
+storage:
+  - place: guangzhou
+    from: 2009
+    to: 2020
+    humidity: dry
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2009-jingmai?variant=31961892061321
@@ -63,6 +68,8 @@ tags:
   - 16565067-592b-4e62-91aa-f8d2c920b602
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
 rating: 86.35
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 204
   material_amount: 7

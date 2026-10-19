@@ -58,6 +58,7 @@ import { mapLayersAtom } from "./mapState"
 import { AreaMark, CenterDot, PxGroup, Rings, UnknownGlyph } from "./Marks"
 import type { MapPoint } from "./points"
 import RidgeLayer, { ridgePlacement, useRidges } from "./RidgeLayer"
+import { StorageLabels, StorageMarks, useStorageLayer } from "./StorageLayer"
 import { SupplyArcs, SupplyTags, useSupplyVendors, type SupplyPair } from "./SupplyLines"
 
 /**
@@ -201,6 +202,16 @@ export default function OriginsMap({
 		return [...pairs.values()]
 	}, [markers])
 	const vendors = useSupplyVendors(supply)
+
+	// storage: where the aged teas sat, from each one's origin to its stores
+	const originAt = useCallback(
+		(slug: string): Point | null => {
+			const m = bySlug.get(slug)
+			return m ? [m.p.x, m.p.y] : null
+		},
+		[bySlug]
+	)
+	const storage = useStorageLayer(index.sessions, originAt)
 
 	// -------------------------------------------------------------------------
 	// Hero relief: scroll flattens the ridgelines into the plan view (index only)
@@ -691,6 +702,14 @@ export default function OriginsMap({
 				<motion.g style={{ opacity: mapDim }}>
 					<FrameLayers camera={camera} layers={layers} />
 					<Graticule />
+					{layers.storage && (
+						<StorageMarks
+							nodes={storage.nodes}
+							arcs={storage.arcs}
+							passes={passes}
+							reduce={reduce}
+						/>
+					)}
 					{layers.supply && <SupplyArcs pairs={supply} reduce={reduce} />}
 					<MapMarks
 						markers={markers}
@@ -713,6 +732,7 @@ export default function OriginsMap({
 				className="absolute inset-0 overflow-hidden pointer-events-none"
 				style={{ opacity: overlayOpacity }}
 			>
+				{layers.storage && <StorageLabels nodes={storage.nodes} />}
 				{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
 				{revealed &&
 					markers.map((m) => (
