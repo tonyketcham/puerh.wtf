@@ -2,9 +2,8 @@
 
 import { useLayoutEffect, useMemo, type CSSProperties } from "react"
 import { motion, useReducedMotion } from "motion/react"
-import type { PageKind } from "@/lib/peek"
 import { cn } from "@/lib/utils/cn"
-import { TITLE_CLASS, titleMounted, titleTransitionName } from "./viewTransition"
+import { TITLE_CLASS, titleMounted, titleTransitionName, type MorphKind } from "./viewTransition"
 
 /** Masks and clips stop at the border box, but Rock 3D and its hard shadow paint past it. */
 const BLEED = "0.2em"
@@ -30,7 +29,7 @@ export default function EntityTitle({
 	className,
 	recordingKey,
 }: {
-	kind: PageKind
+	kind: MorphKind
 	slug: string
 	title: string
 	/** liquor colors, oldest first; empty → the white title alone */

@@ -12,6 +12,7 @@ import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import { descriptorRegex, extractDescriptors, findDescriptorMatches } from "@/lib/descriptors"
 import type { EntityDetails, OriginPeekDetail } from "@/lib/entityDetails"
 import { readFilters } from "@/lib/filters"
+import { lexiconHref, lexiconPageOf } from "@/lib/lexicon"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
 import { NOTE_STAGES, NOTE_STAGE_META } from "@/lib/noteStages"
 import {
@@ -191,7 +192,7 @@ export default function PeekCard({ model, state, index, details, peek, engaged }
 
 			{count > 0 && <Sessions model={model} peek={peek} row={row} />}
 
-			<Actions model={model} peek={peek} row={row} />
+			<Actions model={model} peek={peek} row={row} index={index} />
 		</motion.div>
 	)
 }
@@ -773,20 +774,36 @@ const cardTitle = (el: HTMLElement) =>
 	el.closest(`#${PEEK_CARD_ID}`)?.querySelector("[data-peek-title]")
 
 /** [Open yiwu.origin ↵]  [Filter ⇧↵]  [Compare] */
-function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController; row: Variants }) {
+function Actions({
+	model,
+	peek,
+	row,
+	index,
+}: {
+	model: PeekModel
+	peek: PeekController
+	row: Variants
+	index: RelationIndex
+}) {
 	const { target } = model
 	const params = useSearchParams()
 	const current = useAtomValue(sessionSlugAtom)
 	const setCompare = useSetAtom(compareSlugAtom)
 	const setDescriptor = useSetAtom(descriptorAtom)
 	const openCommandBar = useSetAtom(openCommandBarAtom)
-	const href = peekHref(target)
+	// a word listed in two or more sessions has a lexicon page; rarer ones find references
+	const word = useMemo(
+		() => (target.kind === "descriptor" ? lexiconPageOf(index.sessions, target.key) : null),
+		[target, index.sessions]
+	)
+	const href = word ? lexiconHref(word.slug) : peekHref(target)
+	const fileName = word ? `${word.slug}.${PEEK_META.descriptor.label}` : peekFileName(target)
 	const filter = peekFilter(target, model.title)
 	// Open morphs the card's name (not the button) into the page title
 	const openMorph = useMorphClick(
-		isPageKind(target.kind) ? target.kind : "origin",
-		target.key,
-		isPageKind(target.kind) ? href : null,
+		word ? "descriptor" : isPageKind(target.kind) ? target.kind : "origin",
+		word ? word.slug : target.key,
+		word || isPageKind(target.kind) ? href : null,
 		cardTitle
 	)
 	const filtered = filter ? filter.active(readFilters(params)) : false
@@ -811,14 +828,14 @@ function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController;
 			{href ? (
 				<Link
 					href={href}
-					prefetch={peekRouteReady(target) ? undefined : false}
+					prefetch={word || peekRouteReady(target) ? undefined : false}
 					className={actionClass("primary")}
-					title={`Open ${peekFileName(target)}`}
+					title={`Open ${fileName}`}
 					// the card's name grows into the page title (route view transition)
 					onClick={openMorph}
 				>
 					<span className="min-w-0 truncate">
-						Open <span className="text-white/55">{peekFileName(target)}</span>
+						Open <span className="text-white/55">{fileName}</span>
 					</span>
 					<Kbd>↵</Kbd>
 				</Link>

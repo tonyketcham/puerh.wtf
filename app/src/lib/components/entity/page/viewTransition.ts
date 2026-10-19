@@ -32,8 +32,11 @@ const MOUNT_TIMEOUT_MS = 2500
 type Pending = { name: string; resolve: () => void }
 let pending: Pending | null = null
 
+/** What a title can belong to: an entity page, or a word of the flavor lexicon (/lexicon/[slug]). */
+export type MorphKind = PageKind | "descriptor"
+
 /** A valid CSS <custom-ident> for an entity's title. */
-export function titleTransitionName(kind: PageKind, slug: string): string {
+export function titleTransitionName(kind: MorphKind, slug: string): string {
 	return `entity-${kind}-${slug.replace(/[^a-zA-Z0-9_-]/g, "_")}`
 }
 
@@ -48,7 +51,7 @@ export function clearMorphSources() {
 }
 
 /** Called by EntityTitle when it mounts: the new page is in the DOM, take the new snapshot. */
-export function titleMounted(kind: PageKind, slug: string) {
+export function titleMounted(kind: MorphKind, slug: string) {
 	clearMorphSources()
 	if (pending && pending.name === titleTransitionName(kind, slug)) {
 		pending.resolve()
@@ -77,7 +80,7 @@ export function navigateWithMorph(
 	router: Router,
 	href: string,
 	source: Element | null | undefined,
-	kind: PageKind,
+	kind: MorphKind,
 	slug: string
 ): boolean {
 	if (typeof document === "undefined" || !("startViewTransition" in document)) return false
@@ -115,7 +118,7 @@ export function navigateWithMorph(
  * selector (a descendant, like a card's name) or a function to pick another.
  */
 export function useMorphClick(
-	kind: PageKind,
+	kind: MorphKind,
 	slug: string,
 	href: string | null,
 	source?: string | ((el: HTMLElement) => Element | null | undefined)
