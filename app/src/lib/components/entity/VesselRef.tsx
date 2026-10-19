@@ -28,6 +28,8 @@ export default function VesselRef({
 		<button
 			type="button"
 			{...handlers}
+			// a click pins the card (aria-expanded / aria-controls come with the handlers)
+			aria-haspopup="dialog"
 			onClick={chain(handlers.onClick, (e) => {
 				if (!e.defaultPrevented && target) peek.togglePin(target, e.currentTarget)
 			})}

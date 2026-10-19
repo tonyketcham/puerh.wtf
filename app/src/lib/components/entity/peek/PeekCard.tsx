@@ -115,7 +115,11 @@ export default function PeekCard({ model, state, index, details, peek, engaged }
 					{rolledUp && <span className="text-white/30"> · {model.direct} direct</span>}
 				</span>
 				{state.pinned ? (
-					<IconButton label="Close (Esc)" onClick={peek.close} className="-mr-1">
+					<IconButton
+						label="Close (Esc)"
+						onClick={() => peek.close({ restoreFocusTo: state.anchor })}
+						className="-mr-1"
+					>
 						<CloseIcon size={12} strokeWidth={2} />
 					</IconButton>
 				) : (
@@ -778,6 +782,9 @@ function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController;
 
 	const compare = () => {
 		if (!current || !candidates.length) return
+		// Descriptors and vessels go straight to their best-rated session (intended): the compare
+		// picker matches teas by name, so a query can't narrow it to "sessions that say ‘camphor’"
+		// or "brewed in this gaiwan", and an unfiltered picker would drop the card's context.
 		if (candidates.length === 1 || !isPageKind(target.kind)) {
 			setCompare(featuredSessions(candidates, current, 1).shown[0]._slug)
 		} else {

@@ -20,6 +20,12 @@ type Store = ReturnType<typeof useStore>
 // one card for the app, so one set of timers (module scope: shared by every trigger)
 const timers = { open: 0, close: 0 }
 let tokens = 0
+/**
+ * The trigger focus was just handed back to (Esc from inside the card). After a keydown,
+ * Chromium treats that scripted focus as :focus-visible, so its onFocus would reopen the card
+ * Esc just closed. Swallowed by that one focus intent, or cleared when the trigger blurs.
+ */
+let returningFocusTo: HTMLElement | null = null
 
 export type PeekController = ReturnType<typeof createPeekController>
 
@@ -60,10 +66,15 @@ export function createPeekController(store: Store) {
 		set({ target, anchor, pinned, via, token: ++tokens, history: [], focusCard })
 	}
 
-	const close = () => {
+	const close = ({ restoreFocusTo }: { restoreFocusTo?: HTMLElement } = {}) => {
 		clearOpen()
 		clearClose()
 		if (get()) set(null)
+		if (!restoreFocusTo?.isConnected) return
+		returningFocusTo = restoreFocusTo
+		restoreFocusTo.focus({ preventScroll: true })
+		// focus didn't land (not focusable, or no onFocus to swallow it): don't leave it armed
+		if (document.activeElement !== restoreFocusTo) returningFocusTo = null
 	}
 
 	return {
@@ -72,6 +83,10 @@ export function createPeekController(store: Store) {
 
 		/** Pointer or focus arrived on a trigger: open after the intent delay (or morph sooner). */
 		intend(target: PeekTarget, anchor: HTMLElement, via: PeekVia) {
+			if (via === "focus" && returningFocusTo === anchor) {
+				returningFocusTo = null
+				return
+			}
 			clearClose()
 			if (isShowing(target, anchor)) {
 				clearOpen()
@@ -89,6 +104,7 @@ export function createPeekController(store: Store) {
 
 		/** Pointer or focus left a trigger or the card: close after a grace unless it comes back. */
 		leave(anchor?: HTMLElement) {
+			if (anchor && returningFocusTo === anchor) returningFocusTo = null
 			clearOpen()
 			const current = get()
 			if (!current || current.pinned) return

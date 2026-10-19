@@ -17,13 +17,17 @@ import { peekAtom } from "@/lib/store/peekAtom"
 import { peekId, type PeekTarget } from "@/lib/peek"
 import { usePeekController } from "./controller"
 
-/** id of the card element, for aria-describedby / aria-controls on the open trigger */
+/** id of the card element, for aria-controls on the open trigger */
 export const PEEK_CARD_ID = "entity-peek"
+/** id of the card's one-line summary ("Origin · 10 sessions"), for aria-describedby */
+export const PEEK_SUMMARY_ID = "entity-peek-summary"
 
 /** Touch: hold this long to peek instead of following the link. */
 const LONG_PRESS_MS = 450
 /** A finger that drifts this far is scrolling, not pressing. */
 const PRESS_SLOP = 8
+/** After a long-press lifts, the click it may still raise lands within this window. */
+const PRESS_CLICK_MS = 400
 
 export type PeekTriggerStatus = "open" | "pinned" | null
 
@@ -32,6 +36,8 @@ export type PeekTriggerHandlers<T extends HTMLElement> = {
 	"data-peek": string | undefined
 	"data-peek-state": PeekTriggerStatus | undefined
 	"aria-describedby": string | undefined
+	"aria-expanded": boolean | undefined
+	"aria-controls": string | undefined
 	onPointerEnter: (e: PointerEvent<T>) => void
 	onPointerLeave: (e: PointerEvent<T>) => void
 	onPointerDown: (e: PointerEvent<T>) => void
@@ -72,7 +78,13 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 	// state, not a ref: which element this is decides what the status selector compares against
 	const [element, setElement] = useState<T | null>(null)
 	const press = useRef<{ timer: number; x: number; y: number; fired: boolean } | null>(null)
-	const suppressClick = useRef(false)
+	/**
+	 * Swallow the click a long-press may still raise: armed (Infinity) while the press holds,
+	 * then a short window after it lifts. Android raises contextmenu and no click at all, so it
+	 * must expire on its own rather than wait for a click that never comes.
+	 */
+	const suppressClickUntil = useRef(0)
+	const suppressingClick = () => performance.now() < suppressClickUntil.current
 	const id = target ? peekId(target) : undefined
 
 	// keep the latest target without re-creating every handler when a parent re-renders
@@ -104,11 +116,21 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 	}, [])
 	useEffect(() => cancelPress, [cancelPress])
 
+	/** The finger lifted (or the browser took the gesture): a fired press may still raise a click. */
+	const releasePress = () => {
+		if (press.current?.fired)
+			suppressClickUntil.current = performance.now() + PRESS_CLICK_MS
+		cancelPress()
+	}
+
 	const handlers: PeekTriggerHandlers<T> = {
 		ref: setElement,
 		"data-peek": id,
 		"data-peek-state": status ?? undefined,
-		"aria-describedby": status ? PEEK_CARD_ID : undefined,
+		// describe by the one-line summary, not the whole dialog; the card itself is aria-controls
+		"aria-describedby": status ? PEEK_SUMMARY_ID : undefined,
+		"aria-expanded": id ? !!status : undefined,
+		"aria-controls": status ? PEEK_CARD_ID : undefined,
 
 		onPointerEnter(e) {
 			const t = targetRef.current
@@ -121,6 +143,8 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 		},
 
 		onPointerDown(e) {
+			// a fresh press: whatever the last long-press armed is stale now
+			suppressClickUntil.current = 0
 			const t = targetRef.current
 			if (!t || e.pointerType === "mouse") return
 			cancelPress()
@@ -132,7 +156,7 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 				timer: window.setTimeout(() => {
 					if (!press.current) return
 					press.current.fired = true
-					suppressClick.current = true
+					suppressClickUntil.current = Infinity
 					peek.show(t, el, "press", { pinned: true })
 					navigator.vibrate?.(8)
 				}, LONG_PRESS_MS),
@@ -143,15 +167,14 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 			if (p && !p.fired && Math.hypot(e.clientX - p.x, e.clientY - p.y) > PRESS_SLOP) cancelPress()
 		},
 		onPointerUp() {
-			if (press.current && !press.current.fired) cancelPress()
-			else press.current = null
+			releasePress()
 		},
 		onPointerCancel() {
-			cancelPress()
+			releasePress()
 		},
 		onContextMenu(e) {
 			// a long-press opened the card: don't also raise the OS link menu
-			if (press.current?.fired || suppressClick.current) e.preventDefault()
+			if (press.current?.fired || suppressingClick()) e.preventDefault()
 		},
 
 		onFocus(e) {
@@ -169,8 +192,8 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 		onClick(e) {
 			const t = targetRef.current
 			if (!t) return
-			if (suppressClick.current) {
-				suppressClick.current = false
+			if (suppressingClick()) {
+				suppressClickUntil.current = 0
 				e.preventDefault()
 				return
 			}

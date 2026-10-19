@@ -22,7 +22,7 @@ import { PEEK_META, peekId } from "@/lib/peek"
 import { usePeekController } from "./controller"
 import { buildPeekModel } from "./model"
 import PeekCard from "./PeekCard"
-import { PEEK_CARD_ID } from "./usePeekTrigger"
+import { PEEK_CARD_ID, PEEK_SUMMARY_ID } from "./usePeekTrigger"
 
 const CARD_W = 320
 /** before the first content lands, assume a typical card so flip() picks the right side */
@@ -152,11 +152,20 @@ export default function EntityPeekHost({
 		if (!state) return
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key !== "Escape" || store.get(commandBarAtom).open) return
-			// claim it, so the descriptor pill (and others that honor defaultPrevented) stay put
-			e.preventDefault()
-			const inCard = !!cardRef.current?.contains(document.activeElement)
-			peek.close()
-			if (inCard && state.anchor.isConnected) state.anchor.focus({ preventScroll: true })
+			const card = cardRef.current
+			const active = document.activeElement
+			const inCard = !!card?.contains(active)
+			const engagedHere =
+				state.pinned ||
+				inCard ||
+				state.anchor.contains(active) ||
+				!!card?.matches(":hover") ||
+				state.anchor.matches(":hover")
+			// claim it only when this card is what Esc is aimed at, so the descriptor pill (and
+			// others that honor defaultPrevented) stay put; a lingering hover card just closes
+			if (engagedHere) e.preventDefault()
+			// focus goes back to the trigger without its focus intent reopening the card
+			peek.close(inCard ? { restoreFocusTo: state.anchor } : undefined)
 		}
 		const onPointerDown = (e: PointerEvent) => {
 			const t = e.target as Node | null
@@ -212,7 +221,8 @@ export default function EntityPeekHost({
 					} as CSSProperties
 				}
 			>
-				<AnimatePresence>
+				{/* wait: an exiting card and a quick reopen never both hold the id and layoutId */}
+				<AnimatePresence mode="wait">
 					{open && model && (
 						<motion.div
 							key="peek"
@@ -266,6 +276,12 @@ export default function EntityPeekHost({
 							}}
 							className="relative overflow-x-hidden overflow-y-auto max-h-[var(--peek-max-h,80vh)] overscroll-contain font-fira-code text-white bg-[#121012] ring-1 ring-inset ring-[#fff2ca]/10 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95),0_2px_8px_-2px_rgba(0,0,0,0.6)]"
 						>
+							{/* the trigger's aria-describedby: one line, not the whole dialog */}
+							<span id={PEEK_SUMMARY_ID} hidden>
+								{`${PEEK_META[model.target.kind].label} · ${model.stats.count} ${
+									model.stats.count === 1 ? "session" : "sessions"
+								}`}
+							</span>
 							<AnimatePresence mode="popLayout" initial={false}>
 								<motion.div
 									key={peekId(model.target)}
