@@ -63,12 +63,16 @@ export default defineConfig({
 			path: "content/cultivars",
 			collection: "Varietal",
 			refs: {
-				style: "Style",
+				styles: "Style",
 			},
 		},
 		{
 			path: "content/origins",
 			collection: "Origin",
+			refs: {
+				// self-ref: village → mountain-area → county → prefecture → province → country
+				parent: "Origin",
+			},
 		},
 		{
 			path: "content/tags",

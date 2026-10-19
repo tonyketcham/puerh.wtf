@@ -65,13 +65,44 @@ collections:
         collection: 'origins'
         multiple: true
         value_field: 'id'
-        search_fields: ['location', 'municipality', 'country']
-        display_fields: ['location', 'municipality', 'country']
+        search_fields: ['title', 'hanzi', 'pinyin']
+        display_fields: ['title', 'kind']
         required: false
 
-      - label: 'Season'
-        name: 'season'
+      - label: 'Origin Note'
+        name: 'origin_note'
+        widget: 'select'
+        hint: 'Why there is no origin: a blend, the vendor did not say, or unknown'
+        options: ['blend', 'undisclosed', 'unknown']
+        required: false
+
+      - label: 'Harvest'
+        name: 'harvest'
+        widget: 'object'
+        required: false
+        fields:
+          - label: 'Season'
+            name: 'season'
+            widget: 'select'
+            options: ['spring', 'summer', 'autumn', 'winter']
+            required: false
+          - label: 'Month (1-12)'
+            name: 'month'
+            widget: 'number'
+            value_type: 'int'
+            min: 1
+            max: 12
+            required: false
+          - label: 'Years'
+            name: 'years'
+            widget: 'list'
+            field: { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
+            required: false
+
+      - label: 'Season Note'
+        name: 'season_note'
         widget: 'string'
+        hint: 'Free-text harvest detail, e.g. "mid-April" or "first and second flush"'
         required: false
 
       - label: 'Production Year'
@@ -550,29 +581,75 @@ collections:
     folder: 'app/content/origins'
     create: true
     delete: true
-    slug: '{{location}}-{{municipality}}-{{country}}'
-    identifier_field: 'id'
-    summary: '{{location}} - {{municipality}} - {{country}}'
+    slug: '{{title}}'
+    identifier_field: 'title'
+    summary: '{{title}} · {{kind}}'
     extension: 'md'
     fields:
       - label: 'ID'
         name: 'id'
         widget: 'id'
 
-      - label: 'Location'
-        name: 'location'
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+
+      - label: 'Hanzi / Kanji'
+        name: 'hanzi'
         widget: 'string'
         required: false
 
-      - label: 'Municipality'
-        name: 'municipality'
+      - label: 'Pinyin'
+        name: 'pinyin'
         widget: 'string'
         required: false
 
-      - label: 'Country'
-        name: 'country'
-        widget: 'string'
+      - label: 'Kind'
+        name: 'kind'
+        widget: 'select'
+        options:
+          ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'forest', 'unknown']
+
+      - label: 'Parent'
+        name: 'parent'
+        widget: 'relation'
+        collection: 'origins'
+        value_field: 'id'
+        search_fields: ['title', 'hanzi', 'pinyin']
+        display_fields: ['title', 'kind']
         required: false
+
+      - label: 'Groups'
+        name: 'groups'
+        widget: 'list'
+        hint: 'Cross-cutting sets, e.g. six-ancient-tea-mountains'
+        required: false
+
+      - label: 'Geo'
+        name: 'geo'
+        widget: 'object'
+        required: false
+        fields:
+          - { label: 'Latitude', name: 'lat', widget: 'number', value_type: 'float' }
+          - { label: 'Longitude', name: 'lon', widget: 'number', value_type: 'float' }
+          - label: 'Precision'
+            name: 'precision'
+            widget: 'select'
+            hint: 'What the point actually means'
+            options:
+              ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'unknown']
+          - { label: 'Radius (km)', name: 'radius_km', widget: 'number', value_type: 'float' }
+          - label: 'Elevation range (m)'
+            name: 'elevation_m'
+            widget: 'list'
+            hint: '[min, max] in meters'
+            field: { label: 'Meters', name: 'm', widget: 'number', value_type: 'int' }
+            required: false
+          - label: 'Confidence'
+            name: 'confidence'
+            widget: 'select'
+            options: ['high', 'medium', 'low']
+          - { label: 'Source URL', name: 'source', widget: 'string' }
 
       - label: 'Description'
         name: 'description'
