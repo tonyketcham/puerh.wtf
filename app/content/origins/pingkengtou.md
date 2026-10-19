@@ -10,6 +10,7 @@ geo:
   lon: 116.665
   precision: township
   radius_km: 5
+  elevation_m: [700, 1200]
   confidence: low
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E4%B9%8C%E5%B2%BD%E6%9D%91
 ---

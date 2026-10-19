@@ -10,6 +10,7 @@ geo:
   lon: 118.03
   precision: county
   radius_km: 15
+  elevation_m: [200, 700]
   confidence: medium
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E6%AD%A6%E5%A4%B7%E5%B1%B1%E5%B8%82
 description: Big yancha locale

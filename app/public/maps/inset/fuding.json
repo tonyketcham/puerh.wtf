@@ -10,7 +10,7 @@
 	"zoom": 9,
 	"interval": 100,
 	"indexInterval": 500,
-	"origin": {"precision":"county","confidence":"high","point":[0,0],"radius":138.5,"elevation_m":null},
+	"origin": {"precision":"county","confidence":"high","point":[0,0],"radius":138.5,"elevation_m":[100,900]},
 	"shared": {"point":[8427.6,-1732.3],"viewBox":[8255.9,-1904.8,343.4,345]},
 	"elevations": [100,200,300,400,500,600,700,800,900,1000,1100],
 	"bands": [

@@ -12,6 +12,7 @@ geo:
   lon: 101.215
   precision: mountain-area
   radius_km: 4
+  elevation_m: [1100, 1600]
   confidence: low
   source: https://m.thepaper.cn/newsDetail_forward_27145484
 description: One of the six original famous tea mountains from the Qing dynasty.

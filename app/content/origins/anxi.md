@@ -10,6 +10,7 @@ geo:
   lon: 117.905
   precision: county
   radius_km: 30
+  elevation_m: [300, 1000]
   confidence: high
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%89%E6%BA%AA%E5%8E%BF
 ---

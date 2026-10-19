@@ -10,6 +10,7 @@ geo:
   lon: 100.6
   precision: mountain-area
   radius_km: 6
+  elevation_m: [1200, 1800]
   confidence: high
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%97%E7%B3%AF%E5%B1%B1
 description: One of the famous 6 mountains regarded as the origin of pu-erh.

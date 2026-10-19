@@ -12,6 +12,7 @@ geo:
   lon: 101.324
   precision: village
   radius_km: 6
+  elevation_m: [1300, 1900]
   confidence: high
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E5%80%9A%E9%82%A6
 ---

@@ -10,6 +10,7 @@ geo:
   lon: 100.6
   precision: village
   radius_km: 1
+  elevation_m: [1600, 1800]
   confidence: medium
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%8A%E5%9D%A1%E5%AF%A8
 description: The most famous village of Nannuo

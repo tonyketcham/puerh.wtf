@@ -180,7 +180,9 @@ export const BUDGETS = {
 	frame: 150, // any other single shared frame
 	cluster: 250,
 	ridges: 60,
-	font: 15,
+	// 15 KB in plan §4.4; raised for the five native Taiwanese and Japanese forms (台灣 嘉義 朝宮
+	// 滋賀 静岡) the simplified set doesn't share, which cost ~1 KB together
+	font: 16,
 }
 
 export const ATTRIBUTION = [

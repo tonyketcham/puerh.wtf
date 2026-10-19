@@ -10,6 +10,7 @@ geo:
   lon: 120.7
   precision: mountain-area
   radius_km: 12
+  elevation_m: [1000, 2000]
   confidence: medium
   source: https://nominatim.openstreetmap.org/search?format=json&q=Shizhuo%2C%20Alishan
 ---

@@ -12,6 +12,7 @@ geo:
   lon: 101.34
   precision: mountain-area
   radius_km: 8
+  elevation_m: [900, 1500]
   confidence: low
   source: https://zh.wikipedia.org/wiki/象明彝族乡
 ---

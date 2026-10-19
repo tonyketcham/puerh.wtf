@@ -10,7 +10,7 @@
 	"zoom": 11,
 	"interval": 50,
 	"indexInterval": 250,
-	"origin": {"precision":"mountain-area","confidence":"low","point":[0,0],"radius":60,"elevation_m":null},
+	"origin": {"precision":"mountain-area","confidence":"low","point":[0,0],"radius":60,"elevation_m":[1000,1500]},
 	"shared": {"point":[-375,1512],"viewBox":[-431.7,1455,113.4,113.9]},
 	"elevations": [600,650,700,750,800,850,900,950,1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650],
 	"bands": [

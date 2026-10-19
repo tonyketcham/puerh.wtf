@@ -10,7 +10,7 @@
 	"zoom": 11,
 	"interval": 50,
 	"indexInterval": 250,
-	"origin": {"precision":"township","confidence":"high","point":[0,0],"radius":45,"elevation_m":null},
+	"origin": {"precision":"township","confidence":"high","point":[0,0],"radius":45,"elevation_m":[350,500]},
 	"shared": {"point":[14625.6,-6993.9],"viewBox":[14556.4,-7062.2,138.4,136.5]},
 	"elevations": [50,100,150,200,250,300,350,400,450,500,550,600,650],
 	"bands": [

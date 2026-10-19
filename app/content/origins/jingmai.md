@@ -10,6 +10,7 @@ geo:
   lon: 99.988
   precision: mountain-area
   radius_km: 5
+  elevation_m: [1100, 1700]
   confidence: high
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AF%E8%BF%88
 ---

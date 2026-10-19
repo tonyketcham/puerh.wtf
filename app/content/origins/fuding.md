@@ -10,6 +10,7 @@ geo:
   lon: 120.211
   precision: county
   radius_km: 25
+  elevation_m: [100, 900]
   confidence: high
   source: https://nominatim.openstreetmap.org/search?format=json&q=%E7%A6%8F%E9%BC%8E%E5%B8%82
 description: Home to many white teas

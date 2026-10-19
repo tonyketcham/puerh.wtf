@@ -10,6 +10,7 @@ geo:
   lon: 100.495
   precision: mountain-area
   radius_km: 6
+  elevation_m: [1500, 1900]
   confidence: medium
   source: https://www.geonames.org/search.html?q=Hekai&country=CN
 ---

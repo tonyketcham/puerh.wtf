@@ -10,7 +10,7 @@
 	"zoom": 11,
 	"interval": 50,
 	"indexInterval": 250,
-	"origin": {"precision":"village","confidence":"medium","point":[0,0],"radius":15,"elevation_m":null},
+	"origin": {"precision":"village","confidence":"medium","point":[0,0],"radius":15,"elevation_m":[1200,1450]},
 	"shared": {"point":[-250.9,1571.9],"viewBox":[-307.5,1515,113.2,113.7]},
 	"elevations": [600,650,700,750,800,850,900,950,1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900],
 	"bands": [
