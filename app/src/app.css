@@ -21,10 +21,42 @@
 	}
 }
 
+/*
+  Shared layout tokens (cross-lane contract).
+  --explorer-w / --properties-w: fixed side panel widths.
+  --rightpanel-w: width occupied on the right (properties panel present → 340px, else 0).
+  --commandbar-h: top strip reserved for the command bar; main content is padded by it.
+  --statusbar-h: bottom status bar; 28px only while a [data-statusbar-layout] is mounted.
+  --liquor / --liquor-rgb / --liquor-ink: current session's tea liquor color (set on
+  [data-session-root] by the page and on <html> by SetSessionState; unset elsewhere).
+*/
+:root {
+	--explorer-w: 340px;
+	--properties-w: 340px;
+	--rightpanel-w: 0px;
+	--commandbar-h: 56px;
+	--statusbar-h: 0px;
+}
+
+:root:has([data-statusbar-layout]) {
+	--statusbar-h: 28px;
+}
+
+:root:has([data-properties-panel]) {
+	--rightpanel-w: var(--properties-w);
+}
+
 body {
-	@apply bg-background selection:bg-tea-soup-500/60 selection:text-black;
+	@apply bg-background;
 	@apply transition-opacity duration-75 ease-in-out;
 	@apply font-fira-code text-white;
+}
+
+/* Text selection takes the tea's liquor color; falls back to tea-soup-500 off session pages */
+::selection {
+	background-color: rgb(var(--liquor-rgb, 138 138 138) / 0.55);
+	/* 55% of any liquor over the #121012 ground stays dark enough that white reads best */
+	color: #fff;
 }
 
 .background-box {
@@ -55,38 +87,4 @@ body {
 
 .simplebar-track.simplebar-vertical {
 	@apply w-3;
-}
-
-.tape-duplicator {
-	isolation: isolate;
-	z-index: 1;
-}
-
-.tape-duplicator::before,
-.tape-duplicator::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	clip-path: var(--clip-path);
-}
-
-.tape-duplicator::before {
-	background-image: linear-gradient(
-		135deg,
-		rgba(255, 255, 255, 0.6),
-		#fff,
-		rgba(255, 255, 255, 0.6)
-	);
-	transform: var(--transform) scale(1.01);
-	z-index: -2;
-}
-
-.tape-duplicator::after {
-	background-color: var(--background-color);
-	filter: var(--filter);
-	transform: var(--transform);
-	z-index: -1;
 }

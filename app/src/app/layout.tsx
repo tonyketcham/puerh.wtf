@@ -6,6 +6,8 @@ import Explorer from "../lib/components/Explorer"
 import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
 import { StoreProvider } from "@/lib/store/StoreProvider"
 import { Suspense } from "react"
+import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
+import CommandBar from "@/lib/components/command/CommandBar"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -29,22 +31,31 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-	const sessions = await getExplorerSessions()
-	const vendors = await getVendors()
-	const categories = await getCategories()
+	const [sessions, vendors, categories] = await Promise.all([
+		getExplorerSessions(),
+		getVendors(),
+		getCategories(),
+	])
 
 	return (
 		<html lang="en">
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<StoreProvider>
+					<HydrateExplorerSessions sessions={sessions} />
 					<div className="relative flex flex-row">
 						<Suspense>
 							<Explorer sessions={sessions} vendors={vendors} categories={categories} />
 						</Suspense>
-						<div className="flex flex-col w-full ml-[340px]">
-							<main className="w-full p-8">{children}</main>
+						<div className="flex flex-col w-full ml-[var(--explorer-w)]">
+							{/* top: room for the command bar; bottom: room for the status bar (0 off session pages) */}
+							<main className="w-full p-8 pt-[calc(var(--commandbar-h)+2rem)] pb-[calc(var(--statusbar-h)+2rem)]">
+								{children}
+							</main>
 						</div>
 					</div>
+					<Suspense>
+						<CommandBar sessions={sessions} vendors={vendors} categories={categories} />
+					</Suspense>
 					<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
 				</StoreProvider>
 			</body>

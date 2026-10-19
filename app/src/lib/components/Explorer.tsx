@@ -2,516 +2,338 @@
 
 import SiteHeader from "./SiteHeader"
 import FileTree from "./filetree/FileTree"
-import type { SessionPreview } from "../types/session"
+import type { ExplorerSession } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
 import PanelSection from "@/lib/components/containers/PanelSection"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
-import { Search as SearchIcon, X as CloseIcon } from "lucide-react"
-import { motion, AnimatePresence } from "motion/react"
+import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { Search as SearchIcon } from "lucide-react"
+import { MotionConfig } from "motion/react"
+import { useAtom, useSetAtom } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
-import { cn } from "@/lib/utils/cn"
+import {
+	EMPTY_FACETS,
+	hasAnyFilter,
+	readFilters,
+	replaceFilters,
+	type FacetKey,
+	type FacetState,
+	type FilterState,
+} from "@/lib/filters"
+import { sessionMatchesDescriptor } from "@/lib/descriptors"
+import { descriptorAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
+import YearRuler from "@/lib/components/explorer/YearRuler"
+import FilterTokens, { type FilterToken } from "@/lib/components/explorer/FilterTokens"
+import DescriptorReferences from "@/lib/components/explorer/DescriptorReferences"
 
 export interface ExplorerProps {
-	sessions: SessionPreview[]
+	sessions: ExplorerSession[]
 	vendors: Vendor[]
 	categories: Category[]
 	recordingKey?: string
 }
 
-type FacetState = {
-	styles: string[]
-	origins: string[]
-	years: string[]
-	vendors: string[]
-	cultivars: string[]
-	tags: string[]
-}
-
-type TypeaheadItem = {
-	id: string
-	label: string
-	subLabel?: string
-	type: "tea" | "vendor" | "tag" | "style"
-	action: () => void
-}
-
-function useUrlSync(initial: { q: string; facets: FacetState }) {
-	const router = useRouter()
+/**
+ * URL search params are the source of truth for filters (shared with the command bar).
+ * - Reacts to any external URL change (command bar, back/forward).
+ * - Writes via history.replaceState (no server round-trip, no scroll).
+ * - Plain <Link> navigations drop the query string; filters are carried over to the new pathname
+ *   (to clear them, replace on the same pathname, e.g. replaceFilters({ q: "", facets: EMPTY_FACETS })).
+ */
+function useUrlSync() {
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
-	const [q, setQ] = useState(initial.q)
-	const [facets, setFacets] = useState<FacetState>(initial.facets)
+	const urlState = useMemo(() => readFilters(searchParams), [searchParams])
 
-	// Initialize from URL once
+	// Carry filters across navigations that dropped them
+	const lastRef = useRef<{ pathname: string; state: FilterState }>({ pathname, state: urlState })
 	useEffect(() => {
-		const qParam = searchParams.get("q") || ""
-		const readList = (k: string) => (searchParams.get(k) || "").split(",").filter(Boolean)
-		setQ(qParam)
-		setFacets({
-			styles: readList("styles"),
-			origins: readList("origins"),
-			years: readList("years"),
-			vendors: readList("vendors"),
-			cultivars: readList("cultivars"),
-			tags: readList("tags"),
-		})
+		const last = lastRef.current
+		if (last.pathname !== pathname && !hasAnyFilter(urlState) && hasAnyFilter(last.state)) {
+			replaceFilters(last.state)
+			lastRef.current = { pathname, state: last.state }
+			return
+		}
+		lastRef.current = { pathname, state: urlState }
+	}, [pathname, urlState])
+
+	const setFacets = useCallback((next: FacetState | ((current: FacetState) => FacetState)) => {
+		replaceFilters((current) => ({
+			...current,
+			facets: typeof next === "function" ? next(current.facets) : next,
+		}))
 	}, [])
 
-	// Write to URL on change (replace, no scroll)
-	useEffect(() => {
-		const params = new URLSearchParams()
-		if (q) params.set("q", q)
-		const setList = (key: keyof FacetState) => {
-			const arr = facets[key]
-			if (arr.length) params.set(key, arr.join(","))
-		}
-		setList("styles")
-		setList("origins")
-		setList("years")
-		setList("vendors")
-		setList("cultivars")
-		setList("tags")
-		router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`)
-	}, [q, facets, pathname, router])
+	const setQ = useCallback((q: string) => replaceFilters((current) => ({ ...current, q })), [])
 
-	return { q, setQ, facets, setFacets }
+	return { q: urlState.q, setQ, facets: urlState.facets, setFacets }
 }
 
 function normalize(text?: string | null) {
 	return (text || "").toLowerCase()
 }
 
-function unique<T>(arr: T[]): T[] {
-	return Array.from(new Set(arr))
+const yearOf = (s: ExplorerSession) =>
+	s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
+
+function passesFilters(
+	s: ExplorerSession,
+	facets: FacetState,
+	query: string,
+	{ ignoreYears = false }: { ignoreYears?: boolean } = {}
+) {
+	if (facets.styles.length) {
+		const catSlugs = (s.style || []).map((st) => st.category._slug)
+		if (!facets.styles.some((slug) => catSlugs.includes(slug))) return false
+	}
+	if (!ignoreYears && facets.years.length) {
+		if (!facets.years.includes(yearOf(s))) return false
+	}
+	if (facets.vendors.length) {
+		const vendorSlugs = (s.vendor || []).map((v) => v._slug)
+		if (!facets.vendors.some((slug) => vendorSlugs.includes(slug))) return false
+	}
+	if (facets.cultivars.length) {
+		const cultivarSlugs = (s.cultivar || []).map((c) => c._slug)
+		if (!facets.cultivars.some((slug) => cultivarSlugs.includes(slug))) return false
+	}
+	if (facets.tags.length) {
+		const tagSlugs = (s.tags || []).map((t) => t?._slug || "")
+		if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
+	}
+	if (facets.origins.length) {
+		const originSlugs = (s.origin || []).flatMap((o) => [o?._slug || "", o?.id || ""])
+		if (!facets.origins.some((slug) => originSlugs.includes(slug))) return false
+	}
+
+	if (!query) return true
+	const haystack = [
+		s.title,
+		s.tea_name || "",
+		String(s.production_year || ""),
+		...(s.vendor || []).map((v) => v.title),
+		...(s.cultivar || []).map((c) => c.title),
+		...(s.tags || []).map((t) => t?.title || ""),
+		...(s.origin || []).flatMap((o) => [o?.location, o?.municipality, o?.country, o?._slug]),
+		...(s.style || []).flatMap((st) => [st.title, st.category?.title]),
+	]
+		.filter(Boolean)
+		.map((t) => normalize(String(t)))
+	if (haystack.some((t) => t.includes(query))) return true
+	// flavors: the command bar writes ?q=<descriptor> when a flavor is picked, so q also finds
+	// sessions whose tasting notes mention it (plural-tolerant, word-bounded)
+	return query.length >= 3 && sessionMatchesDescriptor(s, query)
 }
 
+const FACET_KIND: Record<FacetKey, string> = {
+	styles: "style",
+	origins: "origin",
+	years: "vintage",
+	vendors: "vendor",
+	cultivars: "cultivar",
+	tags: "tag",
+}
+
+// ⌘ on Apple platforms, Ctrl elsewhere. Server snapshot is "Ctrl" so hydration matches.
+const subscribeNoop = () => () => {}
+const getModKey = () =>
+	/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent) ? "⌘" : "Ctrl"
+const getServerModKey = () => "Ctrl"
+
 export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
-	// URL-synced search state
-	const { q, setQ, facets, setFacets } = useUrlSync({
-		q: "",
-		facets: { styles: [], origins: [], years: [], vendors: [], cultivars: [], tags: [] },
-	})
+	const { q, setQ, facets, setFacets } = useUrlSync()
+	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
+	const openCommandBar = useSetAtom(openCommandBarAtom)
+	const modKey = useSyncExternalStore(subscribeNoop, getModKey, getServerModKey)
 
-	const [searchOpen, setSearchOpen] = useState(false)
-	const inputRef = useRef<HTMLInputElement | null>(null)
+	const query = normalize(q).trim()
 
-	useEffect(() => {
-		if (searchOpen) {
-			inputRef.current?.focus()
-		}
-	}, [searchOpen])
-
-	// Derived facet options
-	const facetOptions = useMemo(() => {
-		const styles = categories.map((c) => ({ value: c._slug, label: c.title }))
-		const years = unique(
-			sessions
-				.map((s) => (s.production_year ? String(Math.trunc(Number(s.production_year))) : null))
-				.filter(Boolean) as string[]
-		).sort((a, b) => Number(b) - Number(a))
-		const originsRaw = sessions.flatMap((s) => s.origin || [])
-		const origins = unique(
-			originsRaw.map((o) => ({
-				value: o?._slug ?? o?.id ?? "",
-				label: o?.location || o?.municipality || o?.country || (o?._slug ?? ""),
-			}))
-		).filter((o) => o.value)
-		const cultivarRaw = sessions.flatMap((s) => s.cultivar || [])
-		const cultivars = unique(cultivarRaw.map((c) => ({ value: c._slug, label: c.title }))).filter(
-			(c) => !!c.value
-		)
-		const tagsRaw = sessions.flatMap((s) => s.tags || [])
-		const tags = unique(
-			tagsRaw.map((t) => ({ value: t?._slug ?? "", label: t?.title ?? "" }))
-		).filter((t) => !!t.value)
-		const vendorList = vendors.map((v) => ({ value: v._slug, label: v.title }))
-		return { styles, years, origins, cultivars, tags, vendors: vendorList }
-	}, [sessions, vendors, categories])
-
-	// Filtering logic for sessions
-	const filteredSessions = useMemo(() => {
-		const query = normalize(q)
-		const hasQ = query.length > 0
-		return sessions.filter((s) => {
-			// Facets
-			if (facets.styles.length) {
-				const catSlugs = (s.style || []).map((st) => st.category._slug)
-				if (!facets.styles.some((slug) => catSlugs.includes(slug))) return false
-			}
-			if (facets.years.length) {
-				const yearStr = s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
-				if (!facets.years.includes(yearStr)) return false
-			}
-			if (facets.vendors.length) {
-				const vendorSlugs = (s.vendor || []).map((v) => v._slug)
-				if (!facets.vendors.some((slug) => vendorSlugs.includes(slug))) return false
-			}
-			if (facets.cultivars.length) {
-				const cultivarSlugs = (s.cultivar || []).map((c) => c._slug)
-				if (!facets.cultivars.some((slug) => cultivarSlugs.includes(slug))) return false
-			}
-			if (facets.tags.length) {
-				const tagSlugs = (s.tags || []).map((t) => t?._slug || "")
-				if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
-			}
-			if (facets.origins.length) {
-				const originSlugs = (s.origin || []).map((o) => o?._slug || o?.id || "")
-				if (!facets.origins.some((slug) => originSlugs.includes(slug))) return false
-			}
-
-			// Query matching
-			if (!hasQ) return true
-			const haystack = [
-				s.title,
-				s.tea_name || "",
-				String(s.production_year || ""),
-				...(s.vendor || []).map((v) => v.title),
-				...(s.cultivar || []).map((c) => c.title),
-				...(s.tags || []).map((t) => t?.title || ""),
-				...(s.origin || []).flatMap((o) => [o?.location, o?.municipality, o?.country, o?._slug]),
-			]
-				.filter(Boolean)
-				.map((t) => normalize(String(t)))
-			return haystack.some((t) => t.includes(query))
-		})
-	}, [sessions, facets, q])
-
-	// Filter vendors/categories lists by query only (simple quick filter)
-	const filteredVendors = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return vendors
-		return vendors.filter((v) => normalize(v.title).includes(query))
-	}, [vendors, q])
-
-	const filteredCategories = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return categories
-		return categories.filter((c) => normalize(c.title).includes(query))
-	}, [categories, q])
-
-	// Typeahead
-	const typeaheadItems: TypeaheadItem[] = useMemo(() => {
-		const items: TypeaheadItem[] = []
-		const add = (it: TypeaheadItem) => items.push(it)
-		// Teas
-		for (const s of sessions.slice(0, 300)) {
-			add({
-				id: `tea:${s.id}`,
-				label: s.title,
-				subLabel: s.production_year ? String(Math.trunc(Number(s.production_year))) : undefined,
-				type: "tea",
-				action: () => {
-					location.href = buildLink(s)
-				},
-			})
-		}
-		// Vendors
-		for (const v of vendors) {
-			add({
-				id: `vendor:${v._slug}`,
-				label: v.title,
-				type: "vendor",
-				action: () => setFacets((f) => ({ ...f, vendors: unique([...f.vendors, v._slug]) })),
-			})
-		}
-		// Tags
-		const tags = unique(
-			sessions.flatMap((s) =>
-				(s.tags || []).map((t) => ({ slug: t?._slug || "", title: t?.title || "" }))
-			)
-		).filter((t) => t.slug)
-		for (const t of tags) {
-			add({
-				id: `tag:${t.slug}`,
-				label: t.title,
-				type: "tag",
-				action: () => setFacets((f) => ({ ...f, tags: unique([...f.tags, t.slug]) })),
-			})
-		}
-		// Styles (categories)
-		for (const c of categories) {
-			add({
-				id: `style:${c._slug}`,
-				label: c.title,
-				type: "style",
-				action: () => setFacets((f) => ({ ...f, styles: unique([...f.styles, c._slug]) })),
-			})
-		}
-		return items
-	}, [sessions, vendors, categories, setFacets])
-
-	const [showSuggestions, setShowSuggestions] = useState(false)
-	const suggestions = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return [] as TypeaheadItem[]
-		return typeaheadItems.filter((it) => normalize(it.label).includes(query)).slice(0, 8)
-	}, [q, typeaheadItems])
-
-	// Saved views (localStorage)
-	const saveCurrentView = () => {
-		const name = window.prompt("Save current filters as:")
-		if (!name) return
-		const payload = { q, facets }
-		const key = "explorer_saved_views"
-		const existing = JSON.parse(localStorage.getItem(key) || "{}") as Record<string, unknown>
-		existing[name] = payload
-		localStorage.setItem(key, JSON.stringify(existing))
-	}
-	const [savedViews, setSavedViews] = useState<
-		{ name: string; data: { q: string; facets: FacetState } }[]
-	>([])
-	useEffect(() => {
-		try {
-			const existing = JSON.parse(localStorage.getItem("explorer_saved_views") || "{}") as Record<
-				string,
-				{ q: string; facets: FacetState }
-			>
-			setSavedViews(Object.entries(existing).map(([name, data]) => ({ name, data })))
-		} catch {
-			setSavedViews([])
-		}
-	}, [showSuggestions])
-	const loadSavedView = (data: { q: string; facets: FacetState }) => {
-		setQ(data.q)
-		setFacets(data.facets)
-	}
-
-	// Simple chips UI for active facets
-	const removeFacet = (key: keyof FacetState, val: string) => {
-		setFacets((f) => ({ ...f, [key]: (f[key] as string[]).filter((v) => v !== val) }))
-	}
-
-	const rightSlot = (
-		<div
-			className={cn("flex items-center gap-1", searchOpen && "flex-1")}
-			data-recording-key="explorer-search-controls"
-		>
-			<motion.div
-				className={cn("relative h-7", searchOpen ? "w-full" : "w-7")}
-				animate={{ width: searchOpen ? "100%" : 28 }}
-				transition={{ type: "spring", stiffness: 300, damping: 30 }}
-			>
-				{/* Collapsed icon button */}
-				<AnimatePresence initial={false}>
-					{!searchOpen && (
-						<motion.button
-							key="search-collapsed"
-							aria-label="Open search"
-							onClick={() => setSearchOpen(true)}
-							className="flex items-center justify-center border rounded-md w-7 h-7 border-heicha-500 text-white/80 hover:text-white"
-							data-recording-key="explorer-search-toggle"
-							initial={{ opacity: 0, x: 8 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 8 }}
-							transition={{ duration: 0.15 }}
-						>
-							<SearchIcon size={14} />
-						</motion.button>
-					)}
-				</AnimatePresence>
-
-				{/* Expanded input */}
-				<AnimatePresence initial={false}>
-					{searchOpen && (
-						<motion.div
-							key="search-expanded"
-							className="absolute inset-0 flex items-center"
-							initial={{ clipPath: "inset(0 0 0 100%)" }}
-							animate={{ clipPath: "inset(0 0 0 0%)" }}
-							exit={{ clipPath: "inset(0 0 0 100%)" }}
-							transition={{ duration: 0.2 }}
-						>
-							<div className="relative w-full">
-								<SearchIcon
-									size={14}
-									className="absolute -translate-y-1/2 left-2 top-1/2 text-white/60"
-								/>
-								<input
-									ref={inputRef}
-									value={q}
-									onChange={(e) => {
-										setQ(e.target.value)
-										setShowSuggestions(true)
-									}}
-									placeholder="Search..."
-									className={cn(
-										"w-full pr-8 text-white border rounded-md pl-7 h-7 border-heicha-500 bg-heicha-800/70 text-[13px] placeholder-white/40",
-										"focus:outline-none focus:ring-1 focus:ring-white/20"
-									)}
-									data-recording-key="explorer-search-input"
-									onKeyDown={(e) => {
-										if (e.key === "Escape") {
-											setSearchOpen(false)
-											setShowSuggestions(false)
-										}
-									}}
-								/>
-								<button
-									aria-label="Close search"
-									onClick={() => {
-										setSearchOpen(false)
-										setShowSuggestions(false)
-									}}
-									className="absolute -translate-y-1/2 right-1 top-1/2 text-white/70 hover:text-white"
-								>
-									<CloseIcon size={14} />
-								</button>
-								{showSuggestions && suggestions.length > 0 && (
-									<div className="absolute z-50 mt-1 overflow-hidden border rounded-md shadow-xl w-72 border-heicha-500 bg-heicha-800/95">
-										<ul>
-											{suggestions.map((sug) => (
-												<li
-													key={sug.id}
-													className="px-3 py-2 text-sm cursor-pointer text-white/80 hover:bg-white/10"
-													onMouseDown={(e) => {
-														e.preventDefault()
-														sug.action()
-														setShowSuggestions(false)
-													}}
-												>
-													<span className="opacity-90">{sug.label}</span>
-													{sug.subLabel && (
-														<span className="ml-2 text-white/50">{sug.subLabel}</span>
-													)}
-													<span className="ml-2 text-xs text-white/40">{sug.type}</span>
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</motion.div>
-
-			{/* <button
-				onClick={saveCurrentView}
-				title="Save view"
-				className="px-2 text-xs border rounded-md h-7 border-heicha-500 text-white/70 hover:text-white"
-				data-recording-key="explorer-save-view"
-			>
-				★
-			</button>
-			<div className="relative">
-				<button
-					title="Saved views"
-					className="px-2 text-xs border rounded-md h-7 border-heicha-500 text-white/70 hover:text-white"
-					onClick={() => setShowSuggestions((v) => !v)}
-				>
-					Views
-				</button>
-				{showSuggestions && savedViews.length > 0 && (
-					<div className="absolute right-0 z-50 w-56 mt-1 overflow-hidden border rounded-md shadow-xl border-heicha-500 bg-heicha-800/95">
-						<ul>
-							{savedViews.map(({ name, data }) => (
-								<li
-									key={name}
-									className="px-3 py-2 text-sm cursor-pointer text-white/80 hover:bg-white/10"
-									onMouseDown={(e) => {
-										e.preventDefault()
-										loadSavedView(data)
-										setShowSuggestions(false)
-									}}
-								>
-									{name}
-								</li>
-							))}
-						</ul>
-					</div>
-				)}
-			</div> */}
-		</div>
+	// Filtering
+	const filteredSessions = useMemo(
+		() => sessions.filter((s) => passesFilters(s, facets, query)),
+		[sessions, facets, query]
+	)
+	// Everything but the year facet: the ruler's density, so it stays informative mid-selection
+	const sessionsExceptYears = useMemo(
+		() =>
+			facets.years.length
+				? sessions.filter((s) => passesFilters(s, facets, query, { ignoreYears: true }))
+				: filteredSessions,
+		[sessions, facets, query, filteredSessions]
 	)
 
-	// Active filters chips row
-	const chips = (
-		<div className="flex flex-wrap gap-1">
-			{facets.styles.map((s) => (
-				<button
-					key={`style-${s}`}
-					onClick={() => removeFacet("styles", s)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					style:{s}
-				</button>
-			))}
-			{facets.vendors.map((v) => (
-				<button
-					key={`vendor-${v}`}
-					onClick={() => removeFacet("vendors", v)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					vendor:{v}
-				</button>
-			))}
-			{facets.tags.map((t) => (
-				<button
-					key={`tag-${t}`}
-					onClick={() => removeFacet("tags", t)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					tag:{t}
-				</button>
-			))}
-			{facets.cultivars.map((c) => (
-				<button
-					key={`cultivar-${c}`}
-					onClick={() => removeFacet("cultivars", c)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					cultivar:{c}
-				</button>
-			))}
-			{facets.origins.map((o) => (
-				<button
-					key={`origin-${o}`}
-					onClick={() => removeFacet("origins", o)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					origin:{o}
-				</button>
-			))}
-			{facets.years.map((y) => (
-				<button
-					key={`year-${y}`}
-					onClick={() => removeFacet("years", y)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					year:{y}
-				</button>
-			))}
-		</div>
+	// Vendors/categories lists are narrowed by the free-text query only
+	const filteredVendors = useMemo(
+		() => (query ? vendors.filter((v) => normalize(v.title).includes(query)) : vendors),
+		[vendors, query]
+	)
+	const filteredCategories = useMemo(
+		() => (query ? categories.filter((c) => normalize(c.title).includes(query)) : categories),
+		[categories, query]
+	)
+
+	// Descriptor "find references"
+	const descriptorTerm = descriptor?.term ?? null
+	const references = useMemo(() => {
+		if (!descriptorTerm) return null
+		const all = new Set(
+			sessions.filter((s) => sessionMatchesDescriptor(s, descriptorTerm)).map((s) => s._slug)
+		)
+		const visible = filteredSessions.filter((s) => all.has(s._slug)).map((s) => s._slug)
+		return { total: all.size, visible }
+	}, [descriptorTerm, sessions, filteredSessions])
+
+	// Active filter tokens (labels resolved from the data, so command-bar filters read nicely)
+	const labels = useMemo(() => {
+		const map = {
+			styles: new Map<string, { label: string; color?: string }>(),
+			vendors: new Map<string, { label: string }>(),
+			origins: new Map<string, { label: string }>(),
+			cultivars: new Map<string, { label: string }>(),
+			tags: new Map<string, { label: string }>(),
+		}
+		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
+		for (const s of sessions) {
+			for (const o of s.origin || []) {
+				if (!o) continue
+				const label = o.location || o.municipality || o.country || o._slug
+				if (o._slug) map.origins.set(o._slug, { label })
+				if (o.id) map.origins.set(o.id, { label })
+			}
+			for (const c of s.cultivar || []) map.cultivars.set(c._slug, { label: c.title })
+			for (const t of s.tags || []) if (t?._slug) map.tags.set(t._slug, { label: t.title })
+		}
+		return map
+	}, [categories, vendors, sessions])
+
+	const vintages = useMemo(
+		() => [...new Set(sessions.map(yearOf).filter(Boolean).map(Number))].sort((a, b) => a - b),
+		[sessions]
+	)
+
+	const tokens = useMemo(() => {
+		const out: FilterToken[] = []
+		if (q) {
+			out.push({ id: "q", kind: "find", label: `“${q}”`, onRemove: () => setQ("") })
+		}
+		for (const key of ["styles", "vendors", "origins", "cultivars", "tags"] as const) {
+			for (const value of facets[key]) {
+				const meta = labels[key].get(value) as { label: string; color?: string } | undefined
+				out.push({
+					id: `${key}:${value}`,
+					kind: FACET_KIND[key],
+					label: meta?.label ?? value,
+					color: meta?.color,
+					onRemove: () => setFacets((f) => ({ ...f, [key]: f[key].filter((v) => v !== value) })),
+				})
+			}
+		}
+		// years: collapse consecutive vintages into one range token ("2005–2015")
+		const years = [...new Set(facets.years.map(Number))]
+			.filter(Number.isFinite)
+			.sort((a, b) => a - b)
+		const runs: number[][] = []
+		for (const y of years) {
+			const last = runs[runs.length - 1]
+			const prev = last?.[last.length - 1]
+			const iy = vintages.indexOf(y)
+			const ip = prev === undefined ? -1 : vintages.indexOf(prev)
+			// adjacent on the calendar, or adjacent vintages with no sessions in between
+			const contiguous =
+				prev !== undefined && (y === prev + 1 || (iy > -1 && ip > -1 && iy === ip + 1))
+			if (last && contiguous) last.push(y)
+			else runs.push([y])
+		}
+		for (const run of runs) {
+			const label = run.length === 1 ? String(run[0]) : `${run[0]}–${run[run.length - 1]}`
+			const remove = new Set(run.map(String))
+			out.push({
+				id: `years:${run[0]}`,
+				kind: FACET_KIND.years,
+				label,
+				onRemove: () =>
+					setFacets((f) => ({
+						...f,
+						years: f.years.filter((y) => !remove.has(String(Math.trunc(Number(y))))),
+					})),
+			})
+		}
+		return out
+	}, [q, facets, labels, vintages, setFacets, setQ])
+
+	const clearAll = useCallback(() => replaceFilters({ q: "", facets: EMPTY_FACETS }), [])
+
+	const filtered = hasAnyFilter({ q, facets })
+
+	const rightSlot = (
+		<button
+			type="button"
+			onClick={() => openCommandBar({ query: q, scope: "sessions" })}
+			aria-label="Search sessions"
+			aria-keyshortcuts="Meta+K Control+K"
+			className="flex items-center h-7 gap-1.5 px-2 text-white/55 border rounded-md border-heicha-500 bg-white/[0.02] hover:text-white hover:border-white/15 hover:bg-white/[0.05] transition-colors outline-none focus-visible:ring-1 focus-visible:ring-white/40"
+		>
+			<SearchIcon size={13} strokeWidth={2.25} />
+			<kbd className="font-fira-code text-[10px] leading-none text-white/40 tracking-tight">
+				{modKey === "⌘" ? "⌘K" : "Ctrl K"}
+			</kbd>
+		</button>
 	)
 
 	return (
-		<div
-			className="fixed inset-y-0 left-0 z-20 flex flex-col w-[340px] p-8 space-y-10 pointer-events-none font-fira-code"
-			data-recording-key={recordingKey}
-		>
-			<SiteHeader />
+		<MotionConfig reducedMotion="user">
+			<div
+				className="fixed top-0 left-0 bottom-[var(--statusbar-h)] z-20 flex flex-col w-[var(--explorer-w)] p-8 space-y-10 pointer-events-none font-fira-code"
+				data-recording-key={recordingKey}
+			>
+				<SiteHeader />
 
-			{/* The actual sidebar panel. Make this interactive. */}
-			<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
-				<PanelSection title="Explorer" rightSlot={rightSlot}>
-					<div className="mb-2">{chips}</div>
-					<FileTree
-						data={[
-							{ id: "sessions", title: "Sessions", children: filteredSessions },
-							{ id: "vendors", title: "Vendors", children: filteredVendors },
-							{
-								id: "categories",
-								title: "Categories",
-								children: filteredCategories,
-							},
-						]}
-					/>
-				</PanelSection>
-			</Panel>
-		</div>
+				{/* The actual sidebar panel. Make this interactive. */}
+				<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
+					<PanelSection title="Explorer" rightSlot={rightSlot}>
+						<YearRuler
+							sessions={sessions}
+							filteredSessions={sessionsExceptYears}
+							activeYears={facets.years}
+							onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
+						/>
+						<FilterTokens tokens={tokens} onClearAll={clearAll} />
+						<DescriptorReferences
+							descriptor={descriptor}
+							total={references?.total ?? 0}
+							hidden={references ? references.total - references.visible.length : 0}
+							onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}
+							onClear={() => setDescriptor(null)}
+						/>
+						<FileTree
+							referenceSlugs={references?.visible ?? null}
+							data={[
+								{
+									id: "sessions",
+									title: "Sessions",
+									children: filteredSessions,
+									total: filtered ? sessions.length : undefined,
+								},
+								{
+									id: "vendors",
+									title: "Vendors",
+									children: filteredVendors,
+									total: query ? vendors.length : undefined,
+								},
+								{
+									id: "categories",
+									title: "Categories",
+									children: filteredCategories,
+									total: query ? categories.length : undefined,
+								},
+							]}
+						/>
+					</PanelSection>
+				</Panel>
+			</div>
+		</MotionConfig>
 	)
 }

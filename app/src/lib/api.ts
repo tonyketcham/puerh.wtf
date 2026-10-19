@@ -1,11 +1,38 @@
 import { gql, GraphQLClient } from "graphql-request"
-import type { SessionFull, SessionPreview, SessionPreviewWithFeatureImage } from "./types/session"
+import {
+	FLAVOR_AXES,
+	type ExplorerSession,
+	type SessionFull,
+	type SessionPreviewWithFeatureImage,
+} from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
 
 const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
 	headers: {},
 })
+
+// Shared GraphQL selection sets (interpolated into the gql strings below)
+const FLAVOR_AXES_FIELDS = FLAVOR_AXES.map((axis) => `${axis} { start finish }`).join("\n")
+
+const NOTES_FIELDS = `
+	dry_leaf_nose
+	wet_leaf_nose
+	mouthfeel
+	taste
+	finish
+	empty_cup
+	cha_qi
+`
+
+const BREWING_FIELDS = `
+	temperature
+	material_amount
+	liquid_amount
+	vessel
+	first_infusion_duration
+	infusion_increment
+`
 
 export async function getSessions(options?: {
 	order?: "ASC" | "DESC"
@@ -60,7 +87,7 @@ export async function getExplorerSessions(options?: {
 	order?: "ASC" | "DESC"
 	sortBy?: string
 	limit?: number
-}): Promise<SessionPreview[]> {
+}): Promise<ExplorerSession[]> {
 	const { order = "DESC", sortBy = "date", limit } = options || {}
 
 	const query = gql`
@@ -106,11 +133,25 @@ export async function getExplorerSessions(options?: {
 					location
 					municipality
 				}
+				rating
+				notes {
+					${NOTES_FIELDS}
+				}
+				flavor_axes {
+					${FLAVOR_AXES_FIELDS}
+				}
+				brewing {
+					${BREWING_FIELDS}
+				}
+				images {
+					alt
+					image
+				}
 			}
 		}
 	`
 
-	const { allSessions }: { allSessions: SessionPreview[] } = await flatbread.request(query, {
+	const { allSessions }: { allSessions: ExplorerSession[] } = await flatbread.request(query, {
 		order,
 		sortBy,
 		limit,
@@ -211,55 +252,29 @@ export async function getSession(slug: string): Promise<SessionFull> {
 					title
 				}
 				notes {
-					dry_leaf_nose
-					wet_leaf_nose
-					finish
-					empty_cup
-					mouthfeel
-					taste
-					cha_qi
+					${NOTES_FIELDS}
 				}
 				flavor_axes {
-					vegetal {
-						start
-						finish
-					}
-					floral {
-						start
-						finish
-					}
-					fruits {
-						start
-						finish
-					}
-					spices {
-						start
-						finish
-					}
-					wood {
-						start
-						finish
-					}
-					earth {
-						start
-						finish
-					}
-					nuts_roast {
-						start
-						finish
-					}
-					cream {
-						start
-						finish
-					}
-					stone {
-						start
-						finish
-					}
-					umami {
-						start
-						finish
-					}
+					${FLAVOR_AXES_FIELDS}
+				}
+				brewing {
+					${BREWING_FIELDS}
+				}
+				author {
+					_slug
+					title
+					image
+				}
+				tags {
+					_slug
+					title
+				}
+				origin {
+					_slug
+					id
+					country
+					location
+					municipality
 				}
 				images {
 					alt

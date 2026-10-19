@@ -1,0 +1,210 @@
+{
+	"1988-wuyi": {
+		"hex": "#eaa754",
+		"rgb": [234, 167, 84],
+		"oklch": [0.7761, 0.1268, 69.53],
+		"source": "/images/uploads/1988-wuyi_4.jpeg",
+		"alt": "tea in the cup with a light gold color like McDonald's fries",
+		"confidence": "alt"
+	},
+	"2005-dayi-7542-batch-504": {
+		"hex": "#9a5a15",
+		"rgb": [154, 90, 21],
+		"oklch": [0.5289, 0.1139, 61.41],
+		"source": "/images/uploads/7969d900-dde2-441b-a75a-17824677e82f-min.jpg",
+		"alt": "tea in the cup",
+		"confidence": "alt"
+	},
+	"2007-repave": {
+		"hex": "#a1530e",
+		"rgb": [161, 83, 14],
+		"oklch": [0.5273, 0.1258, 54.57],
+		"source": "/images/uploads/71c3e00f-92a2-4992-aff1-129acba73fc7-min.jpg",
+		"alt": "liquor in the cup",
+		"confidence": "alt"
+	},
+	"2010-dayi-7542": {
+		"hex": "#7b2d02",
+		"rgb": [123, 45, 2],
+		"oklch": [0.4056, 0.1186, 42.85],
+		"source": "/images/uploads/img_8530.jpeg",
+		"alt": "auburn colored tea liquor",
+		"confidence": "alt"
+	},
+	"2010-luoshuidong": {
+		"hex": "#b88720",
+		"rgb": [184, 135, 32],
+		"oklch": [0.6546, 0.1257, 80.78],
+		"source": "/images/uploads/02c298ed-31fe-43fc-bb9d-72a68042821b-min.jpg",
+		"alt": "Liquor in the beaker",
+		"confidence": "alt"
+	},
+	"2011-huang-jin-yun-xiaguan": {
+		"hex": "#9a5b51",
+		"rgb": [154, 91, 81],
+		"oklch": [0.5393, 0.0847, 30.05],
+		"source": "/images/uploads/img_1116.jpeg",
+		"alt": "dark red tea liquor in the cup, deep into the session",
+		"confidence": "alt"
+	},
+	"2011-xiaguan-jin-se-yin-xiang": {
+		"hex": "#b35710",
+		"rgb": [179, 87, 16],
+		"oklch": [0.5598, 0.1406, 50.57],
+		"source": "/images/uploads/ccae6bb9-9387-4baa-b401-17edb4a57b51-min.jpg",
+		"alt": "Tea in the beaker",
+		"confidence": "alt"
+	},
+	"2016-dayi-7542": {
+		"hex": "#693814",
+		"rgb": [105, 56, 20],
+		"oklch": [0.3962, 0.0838, 53.78],
+		"source": "/images/uploads/img_9102.jpeg",
+		"alt": "tea in the cup",
+		"confidence": "alt"
+	},
+	"2018-purple-lemon-sheng": {
+		"hex": "#bfa54a",
+		"rgb": [191, 165, 74],
+		"oklch": [0.7274, 0.1149, 93.7],
+		"source": "/images/uploads/img_6794.jpeg",
+		"alt": "tea liquor in a cup",
+		"confidence": "alt"
+	},
+	"2018-wildwood": {
+		"hex": "#b39647",
+		"rgb": [179, 150, 71],
+		"oklch": [0.6826, 0.1034, 88.72],
+		"source": "/images/uploads/842a1e05-632a-4d81-8165-afd1ce63aaab.jpg",
+		"alt": "liquor in the cup",
+		"confidence": "alt"
+	},
+	"2019-asamiya-black": {
+		"hex": "#b94801",
+		"rgb": [185, 72, 1],
+		"oklch": [0.5473, 0.1602, 43.54],
+		"source": "/images/uploads/img_8093.jpeg",
+		"alt": "brewed tea",
+		"confidence": "alt"
+	},
+	"2019-sour-sap": {
+		"hex": "#5a480e",
+		"rgb": [90, 72, 14],
+		"oklch": [0.4087, 0.0764, 90.87],
+		"source": "/images/uploads/img_5602.jpg",
+		"alt": "Liquor in the cup, pale green-yellow",
+		"confidence": "alt"
+	},
+	"2019-yiwu-gouyoulin": {
+		"hex": "#b6994c",
+		"rgb": [182, 153, 76],
+		"oklch": [0.6926, 0.1022, 88.89],
+		"source": "/images/uploads/b4b5c3fd-2927-4609-b6f0-af725cf3cffa-min.jpg",
+		"alt": "Tea in the hand-to-mouth transport device",
+		"confidence": "alt"
+	},
+	"2020-diamond-peak": {
+		"hex": "#a99e67",
+		"rgb": [169, 158, 103],
+		"oklch": [0.6963, 0.0756, 99.15],
+		"source": "/images/uploads/diamond-peak-img_5755.jpg",
+		"alt": "Liquor in wide cup with a pale yellow-green tinge.",
+		"confidence": "alt"
+	},
+	"2020-fur-peak": {
+		"hex": "#696a4e",
+		"rgb": [105, 106, 78],
+		"oklch": [0.5162, 0.0422, 110.48],
+		"source": "/images/uploads/fur-peak-img_5673.jpg",
+		"alt": "Pale, almost clear liquor in a wide-mouth cup after first infusion.",
+		"confidence": "alt"
+	},
+	"2020-gapu-sheng-cha-gaba-pu": {
+		"hex": "#dd9a5c",
+		"rgb": [221, 154, 92],
+		"oklch": [0.7398, 0.1127, 62.4],
+		"source": "/images/uploads/ef39ef4f-7039-4e18-992f-71bb23292662-min.jpg",
+		"alt": "pu soup",
+		"confidence": "alt"
+	},
+	"2020-jin-mu-dan": {
+		"hex": "#6a2f1c",
+		"rgb": [106, 47, 28],
+		"oklch": [0.3825, 0.0895, 38.29],
+		"source": "/images/uploads/55edf06b-ba6b-44b8-aae3-e35ce940b8e1-min.jpg",
+		"alt": "liquor in the cup",
+		"confidence": "alt"
+	},
+	"2020-moon-bear-white": {
+		"hex": "#6f3b0c",
+		"rgb": [111, 59, 12],
+		"oklch": [0.4093, 0.092, 56.8],
+		"source": "/images/uploads/9ae47ec9-d80a-468b-9f22-a601fad5090e.jpeg",
+		"alt": "Moon Bear brewed in the cup",
+		"confidence": "alt"
+	},
+	"2020-mori-machi-dark": {
+		"hex": "#7c3f06",
+		"rgb": [124, 63, 6],
+		"oklch": [0.4359, 0.1045, 54.85],
+		"source": "/images/uploads/875e3c65-0f83-4b1f-8a31-788f9f7301b3.jpg",
+		"alt": "She's in the damn cup again (liquid mode)",
+		"confidence": "alt"
+	},
+	"2020-paradise-snapper": {
+		"hex": "#7a621d",
+		"rgb": [122, 98, 29],
+		"oklch": [0.5077, 0.0905, 89.67],
+		"source": "/images/uploads/paradise-snapper-img_5655.jpg",
+		"alt": "First infusion's light yellow liquor",
+		"confidence": "alt"
+	},
+	"2020-planetary-shark-feed": {
+		"hex": "#865c43",
+		"rgb": [134, 92, 67],
+		"oklch": [0.5139, 0.0672, 52.04],
+		"source": "/images/uploads/f9897f3b-ca0e-4bf6-9539-c8dea9409f95-min.jpg",
+		"alt": "liquor in the cup",
+		"confidence": "alt"
+	},
+	"2020-tie-guan-yin-old-style": {
+		"hex": "#a7853a",
+		"rgb": [167, 133, 58],
+		"oklch": [0.6349, 0.1022, 84.5],
+		"source": "/images/uploads/b1a2c04e-4acc-4369-bc49-c20969e5e7c5-min.jpg",
+		"alt": "liquor in the cup",
+		"confidence": "alt"
+	},
+	"2020-tub-highness": {
+		"hex": "#9b771f",
+		"rgb": [155, 119, 31],
+		"oklch": [0.5893, 0.11, 84.93],
+		"source": "/images/uploads/b2184f8e-3d42-4898-866d-7d57fb983904-min.jpg",
+		"alt": "Even better little cup",
+		"confidence": "alt"
+	},
+	"2021-hou-gu-monkey-valley": {
+		"hex": "#977446",
+		"rgb": [151, 116, 70],
+		"oklch": [0.5839, 0.0765, 73.09],
+		"source": "/images/uploads/f7aec579-4667-490c-b10a-a4d87acd6e5a.jpeg",
+		"alt": "cup of tea",
+		"confidence": "alt"
+	},
+	"2021-jingmai-miyun": {
+		"hex": "#e2bf4e",
+		"rgb": [226, 191, 78],
+		"oklch": [0.8147, 0.1354, 91.58],
+		"source": "/images/uploads/img_0804.jpeg",
+		"alt": "brew in the beaker",
+		"confidence": "alt"
+	},
+	"2021-yesheng-gushu-hongcha": {
+		"hex": "#be8715",
+		"rgb": [190, 135, 21],
+		"oklch": [0.6618, 0.1325, 78.6],
+		"source": "/images/uploads/4d223c9f-1c3d-47d0-9081-6201da4787c2.jpeg",
+		"alt": "tea in the beaker",
+		"confidence": "alt"
+	}
+}

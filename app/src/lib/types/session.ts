@@ -3,7 +3,6 @@ import type { Content } from "@/lib/types/content"
 import type {
 	Session as GqlSession,
 	Varietal as GqlVarietal,
-	Session_Flavor_Axes as GqlSessionFlavorAxes,
 	Session_Notes as GqlSessionNotes,
 } from "@/generated/graphql"
 
@@ -48,17 +47,42 @@ export type SessionPreview = BaseSession & {
 		| null
 }
 
+/** A photo attached to a session. `image` is a site-root path like /images/uploads/x.jpeg (or a legacy https URL). */
+export type SessionImage = {
+	image: string
+	alt: string
+}
+
+/** Brewing parameters. temperature is °F, material_amount grams, liquid_amount ml, durations seconds. */
+export type SessionBrewing = {
+	temperature?: number | null
+	material_amount?: number | null
+	liquid_amount?: number | null
+	vessel?: string | null
+	first_infusion_duration?: number | null
+	infusion_increment?: number | null
+}
+
+export type SessionAuthor = {
+	_slug: string
+	title: string
+	image?: string | null
+}
+
 export type SessionPreviewWithFeatureImage = SessionPreview & {
-	images:
-		| {
-				image: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["image"]
-				>
-				alt: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["alt"]
-				>
-		  }[]
-		| null
+	images: SessionImage[] | null
+}
+
+/**
+ * Shape returned by getExplorerSessions(): the explorer / command bar / compare index of every
+ * session. Lighter than SessionFull (no body html), but carries everything needed to search,
+ * compare (radar overlay) and find descriptor references. Fields may be null on older tastings.
+ */
+export type ExplorerSession = SessionPreviewWithFeatureImage & {
+	rating?: number | null
+	notes: Partial<SessionNotes> | null
+	flavor_axes: SessionFlavorAxes | null
+	brewing: SessionBrewing | null
 }
 
 export type Cultivar = Pick<NonNullObject<NonNullable<GqlVarietal>>, "id" | "_slug" | "title">
@@ -87,22 +111,29 @@ export type SessionFull = SessionPreviewWithFeatureImage & {
 	genre: GqlSession["genre"]
 	notes: SessionNotes
 	flavor_axes: SessionFlavorAxes
+	brewing: SessionBrewing | null
+	author: SessionAuthor[] | null
 
-	images:
-		| {
-				image: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["image"]
-				>
-				alt: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["images"]>[number]>>["alt"]
-				>
-		  }[]
-		| null
+	images: SessionImage[] | null
 
 	_content: Content
 }
 
 export type SessionNotes = Omit<NonNullObject<NonNullable<GqlSessionNotes>>, "__typename">
+
+/** Stage keys of the tasting notes. */
+export type NoteStage = keyof SessionNotes
+
+/** Note stages in tasting order (dry leaf → cha qi). */
+export const NOTE_STAGES: readonly NoteStage[] = [
+	"dry_leaf_nose",
+	"wet_leaf_nose",
+	"mouthfeel",
+	"taste",
+	"finish",
+	"empty_cup",
+	"cha_qi",
+] as const
 
 export type SessionFlavorAxes = {
 	vegetal: FlavorAxesTransition
@@ -117,10 +148,26 @@ export type SessionFlavorAxes = {
 	umami: FlavorAxesTransition
 }
 
+export type FlavorAxis = keyof SessionFlavorAxes
+
+/** The 10 flavor axes in canonical radar order. */
+export const FLAVOR_AXES: readonly FlavorAxis[] = [
+	"vegetal",
+	"floral",
+	"fruits",
+	"spices",
+	"wood",
+	"earth",
+	"nuts_roast",
+	"cream",
+	"stone",
+	"umami",
+] as const
+
 /**
  * How a tea transforms in profile over the session of the tasting.
  */
-type FlavorAxesTransition = {
+export type FlavorAxesTransition = {
 	start: number
 	finish: number
 }

@@ -14,11 +14,13 @@ import React, {
 import {
 	animate,
 	motion,
+	useAnimationFrame,
 	useMotionValue,
+	useMotionValueEvent,
 	useReducedMotion,
 	useSpring,
 	useTransform,
-	ValueAnimationOptions,
+	ValueAnimationTransition,
 } from "motion/react"
 
 import { cn } from "@/lib/utils/cn"
@@ -137,6 +139,12 @@ const MediaRenderer = memo(
 
 MediaRenderer.displayName = "MediaRenderer"
 
+/** Opaque view snapshot: pass back to `restore()` to return to exactly this view. */
+export type BoxCarouselSnapshot = {
+	rotation: number
+	index: number
+}
+
 export interface BoxCarouselRef {
 	/**
 	 * Advance to the next item in the carousel.
@@ -149,9 +157,22 @@ export interface BoxCarouselRef {
 	prev: () => void
 
 	/**
+	 * Rotate to an arbitrary item. Takes the shortest path: a single 90° turn whose incoming
+	 * face is loaded with the target (no multi-face spins). Spring-driven and interruption-safe:
+	 * calling it again mid-turn retargets from the current velocity.
+	 */
+	goTo: (index: number) => void
+
+	/**
 	 * Get the index of the currently visible item.
 	 */
 	getCurrentItemIndex: () => number
+
+	/** Capture the current view (exact rotation + visible item). */
+	getSnapshot: () => BoxCarouselSnapshot
+
+	/** Return to a snapshot: the exact rotation if that face still shows the item, else goTo(index). */
+	restore: (snapshot: BoxCarouselSnapshot) => void
 }
 
 type RotationDirection = "top" | "bottom" | "left" | "right"
@@ -203,26 +224,26 @@ interface BoxCarouselProps
 
 	/**
 	 * The axis and direction of rotation
-	 * @default "vertical"
 	 * "top" | "bottom" | "left" | "right"
+	 * @default "left"
 	 */
 	direction?: RotationDirection
 
 	/**
-	 * Transition configuration for rotation animation
-	 * @default { duration: 1.25, ease: [0.953, 0.001, 0.019, 0.995] }
+	 * Transition for next / prev / goTo turns
+	 * @default { type: "spring", stiffness: 150, damping: 21, mass: 1.1 }
 	 */
-	transition?: ValueAnimationOptions
+	transition?: ValueAnimationTransition
 
 	/**
-	 * Transition configuration for snapping after drag
+	 * Transition for snapping after drag
 	 * @default { type: "spring", damping: 30, stiffness: 200 }
 	 */
-	snapTransition?: ValueAnimationOptions
+	snapTransition?: ValueAnimationTransition
 
 	/**
-	 * Spring physics config for drag interaction
-	 * @default { stiffness: 200, damping: 30 }
+	 * Spring physics for the hover scale
+	 * @default { stiffness: 300, damping: 30 }
 	 */
 	dragSpring?: SpringConfig
 
@@ -240,54 +261,49 @@ interface BoxCarouselProps
 
 	/**
 	 * Enable continuous rotation (smooth, infinite rotation)
-	 * Takes precedence over autoPlay if both are enabled
+	 * Takes precedence over autoPlay if both are enabled. Disabled when any scroll control is on.
 	 * @default false
 	 */
 	continuousRotation?: boolean
 
 	/**
 	 * Speed of continuous rotation in degrees per second
-	 * Positive values rotate in the direction specified by `direction`
-	 * Negative values rotate in the opposite direction
 	 * @default 30
 	 */
 	continuousSpeed?: number
 
 	/**
-	 * Speed multiplier during turns (90-degree transitions)
-	 * Higher values make turns faster, creating a dynamic rotation effect
+	 * Speed multiplier during turns (near 90-degree boundaries) in continuous mode
 	 * @default 3
 	 */
 	turnSpeedMultiplier?: number
 
 	/**
-	 * Scale factor when hovered (as percentage, e.g., 1.05 = 5% larger)
+	 * Scale factor when hovered (e.g., 1.05 = 5% larger)
 	 * @default 1.05
 	 */
 	hoverScale?: number
 
 	/**
-	 * Enable scroll wheel control for rotation
-	 * When enabled, scroll wheel will control rotation instead of continuous rotation
+	 * Enable scroll wheel control for rotation (wheel over the cube rotates it)
 	 * @default false
 	 */
 	enableScrollControl?: boolean
 
 	/**
-	 * Sensitivity of scroll wheel control (higher = more rotation per scroll)
+	 * Sensitivity of scroll wheel control
 	 * @default 1
 	 */
 	scrollSensitivity?: number
 
 	/**
-	 * Enable page scroll control for rotation
-	 * When enabled, carousel rotation is tied to page scroll position
+	 * Tie rotation to page scroll while the cube is in the viewport
 	 * @default false
 	 */
 	enablePageScrollControl?: boolean
 
 	/**
-	 * Sensitivity of page scroll control (higher = more rotation per scroll pixel)
+	 * Sensitivity of page scroll control
 	 * @default 0.5
 	 */
 	pageScrollSensitivity?: number
@@ -311,9 +327,15 @@ interface BoxCarouselProps
 	pauseOnDrag?: boolean
 
 	/**
-	 * Callback when the current item index changes
+	 * Callback when the visible item index changes
 	 */
 	onIndexChange?: (index: number) => void
+
+	/**
+	 * Called when the user starts/stops interacting with the cube
+	 * (pointer over it, dragging it, or keyboard focus).
+	 */
+	onInteractingChange?: (interacting: boolean) => void
 
 	/**
 	 * Enable drag interaction
@@ -328,11 +350,38 @@ interface BoxCarouselProps
 	dragSensitivity?: number
 
 	/**
-	 * Initial rotation offset in degrees
+	 * Resting rotation offset in degrees (the cube's "pose"; kept by every snap)
 	 * @default 0
 	 */
 	initialRotationOffset?: number
 }
+
+const mod = (a: number, n: number) => ((a % n) + n) % n
+
+/** The cube is always shown tilted by this much on both axes (see `transform` below) */
+const TILT_DEG = 6
+
+/**
+ * Face content model.
+ *
+ * The cube is treated as an infinite strip of virtual faces k ∈ ℤ (k = 0 at rest, +1 per
+ * "next"). Virtual face k is drawn on physical face mod(k + 1, 4) and shows
+ * `overrides.get(k) ?? items[mod(k + base, n)]`. Only the 4 faces in the window around the
+ * current step are rendered, so content only ever changes on the face that is hidden at the
+ * back — every item is reachable however the cube is turned (drag, wheel, page scroll).
+ *
+ * goTo() re-bases the strip so the adjacent face holds the target, freezing the currently
+ * visible faces as overrides so nothing on screen changes content.
+ */
+type FaceModel = {
+	base: number
+	overrides: Map<number, number>
+	step: number
+	/** last direction of travel (decides which side the back face is loaded for) */
+	dir: 1 | -1
+}
+
+const windowOf = (m: FaceModel) => [m.step - 1, m.step, m.step + 1, m.step + 2 * m.dir]
 
 const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 	(
@@ -344,9 +393,9 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			perspective = 600,
 			debug = false,
 			direction = "left",
-			transition = { duration: 1.25, ease: [0.953, 0.001, 0.019, 0.995] },
+			transition = { type: "spring", stiffness: 150, damping: 21, mass: 1.1 },
 			snapTransition = { type: "spring", damping: 30, stiffness: 200 },
-			dragSpring = { stiffness: 200, damping: 30 },
+			dragSpring = { stiffness: 300, damping: 30 },
 			autoPlay = false,
 			autoPlayInterval = 3000,
 			continuousRotation = false,
@@ -361,6 +410,7 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			pauseOnHover = true,
 			pauseOnDrag = true,
 			onIndexChange,
+			onInteractingChange,
 			enableDrag = true,
 			dragSensitivity = 0.5,
 			initialRotationOffset = 0,
@@ -368,849 +418,414 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		},
 		ref
 	) => {
-		const [currentItemIndex, setCurrentItemIndex] = useState(0)
-		const [currentFrontFaceIndex, setCurrentFrontFaceIndex] = useState(1)
-
+		const n = items.length
 		const prefersReducedMotion = useReducedMotion()
 
-		const _transition = prefersReducedMotion ? { duration: 0 } : transition
-		const itemIndex = (offset: number) =>
-			items.length ? ((offset % items.length) + items.length) % items.length : 0
+		// +1: "next" increases the rotation angle; -1: "next" decreases it
+		const dirSign = direction === "top" || direction === "right" ? 1 : -1
+		// legacy wheel / page-scroll / auto-spin sense (kept from the original component)
+		const spinSign = direction === "top" || direction === "left" ? -1 : 1
+		const isVertical = direction === "top" || direction === "bottom"
+		const restOffset = initialRotationOffset
 
-		// 0 ⇢ will be shown if the user presses "prev"
-		const [prevIndex, setPrevIndex] = useState(() => itemIndex(-1))
+		/** Single source of truth for rotation (degrees about the direction's axis) */
+		const rotation = useMotionValue(initialRotationOffset)
 
-		// 1 ⇢ item that is currently visible
-		const [currentIndex, setCurrentIndex] = useState(() => itemIndex(0))
-
-		// 2 ⇢ will be shown on the next "next"
-		const [nextIndex, setNextIndex] = useState(() => itemIndex(1))
-
-		// 3 ⇢ two steps ahead (the face that is at the back right now)
-		const [afterNextIndex, setAfterNextIndex] = useState(() => itemIndex(2))
-
-		const [currentRotation, setCurrentRotation] = useState(initialRotationOffset)
-		const [isHovered, setIsHovered] = useState(false)
-
-		const rotationCount = useRef(1)
-		const isRotating = useRef(false)
-		const pendingIndexChange = useRef<number | null>(null)
-		const isDragging = useRef(false)
-		const startPosition = useRef({ x: 0, y: 0 })
-		const startRotation = useRef(0)
-		const continuousAnimationRef = useRef<{ stop: () => void } | null>(null)
-		const lastUpdateTime = useRef<number>(0)
-		const scrollAccumulator = useRef(0)
-		const lastPageScrollY = useRef(0)
-		const carouselElementRef = useRef<HTMLElement | null>(null)
-
-		// Single source of truth for rotation
-		const rotationMotionValue = useMotionValue(initialRotationOffset)
-		const baseRotateX = useMotionValue(0)
-		const baseRotateY = useMotionValue(0)
-
-		// Track rotation offset from user interactions (drag, manual navigation)
-		const userRotationOffset = useRef(initialRotationOffset)
-
-		// Track previous scroll position to determine scroll direction
-		const previousScrollY = useRef(0)
-
-		// Use springs for smoother animation during drag
-		const springRotateX = useSpring(baseRotateX, dragSpring)
-		const springRotateY = useSpring(baseRotateY, dragSpring)
-
-		// Unified rotation update function - single source of truth
-		const updateRotation = useCallback(
-			(
-				newRotation: number,
-				source: "continuous" | "drag" | "scroll" | "pageScroll" | "manual" | "initial" = "manual"
-			) => {
-				// Update the single source of truth
-				rotationMotionValue.set(newRotation)
-				setCurrentRotation(newRotation)
-
-				// Track user-initiated rotation changes (not from page scroll)
-				if (source !== "pageScroll") {
-					userRotationOffset.current = newRotation
-				}
-
-				// Apply to appropriate axis based on direction
-				const isVertical = direction === "top" || direction === "bottom"
-				if (isVertical) {
-					baseRotateX.set(newRotation)
-				} else {
-					baseRotateY.set(newRotation)
-				}
-			},
-			[direction, rotationMotionValue, baseRotateX, baseRotateY]
+		const stepOf = useCallback((deg: number) => Math.round((dirSign * deg) / 90) + 0, [dirSign])
+		const angleOf = useCallback(
+			(step: number) => dirSign * step * 90 + restOffset,
+			[dirSign, restOffset]
 		)
 
-		// Apply initial rotation offset
-		useEffect(() => {
-			if (initialRotationOffset !== 0) {
-				updateRotation(initialRotationOffset, "initial")
-			}
-		}, [initialRotationOffset, updateRotation])
-
-		// Continuous rotation helper functions
-		const shouldPauseContinuous = useCallback(() => {
-			return (
-				(pauseOnHover && isHovered) ||
-				(pauseOnDrag && isDragging.current) ||
-				isRotating.current ||
-				prefersReducedMotion
-			)
-		}, [pauseOnHover, isHovered, pauseOnDrag, prefersReducedMotion])
-
-		const startContinuousRotation = useCallback(() => {
-			if (!continuousRotation || shouldPauseContinuous()) return
-
-			// Stop any existing animation
-			if (continuousAnimationRef.current) {
-				continuousAnimationRef.current.stop()
-			}
-
-			lastUpdateTime.current = performance.now()
-
-			// Calculate rotation direction multiplier
-			let directionMultiplier = 1
-			if (direction === "top" || direction === "left") {
-				directionMultiplier = -1
-			}
-
-			// Store the starting rotation to track progress
-			const startingRotation = rotationMotionValue.get()
-			let lastTrackedQuarter = Math.floor((((startingRotation % 360) + 360) % 360) / 90)
-
-			const animateFrame = () => {
-				const currentTime = performance.now()
-				const deltaTime = (currentTime - lastUpdateTime.current) / 1000 // Convert to seconds
-				lastUpdateTime.current = currentTime
-
-				if (shouldPauseContinuous()) {
-					return
-				}
-
-				const currentValue = rotationMotionValue.get()
-
-				// Calculate dynamic speed based on proximity to quarter boundaries
-				const normalizedCurrent = ((currentValue % 360) + 360) % 360
-				const positionInQuarter = normalizedCurrent % 90
-
-				// Distance from nearest quarter boundary (0 at boundary, 45 at middle)
-				const distanceFromBoundary = Math.min(positionInQuarter, 90 - positionInQuarter)
-
-				// Speed multiplier: faster near boundaries (turns), slower in middle
-				// Creates a smooth curve where speed increases as we approach turns
-				const speedCurve = 1 + (turnSpeedMultiplier - 1) * (1 - distanceFromBoundary / 45)
-				const dynamicSpeed = continuousSpeed * speedCurve
-
-				const rotationIncrement = dynamicSpeed * directionMultiplier * deltaTime
-				const newValue = currentValue + rotationIncrement
-
-				// Use unified rotation update
-				updateRotation(newValue, "continuous")
-
-				// Check if we've completed a full 90-degree rotation to update indices
-				const normalizedNewValue = ((newValue % 360) + 360) % 360
-				const newQuarter = Math.floor(normalizedNewValue / 90)
-
-				if (newQuarter !== lastTrackedQuarter) {
-					// Calculate how many quarters we've moved
-					let quarterDiff = newQuarter - lastTrackedQuarter
-
-					// Handle wrapping around 0/360
-					if (quarterDiff > 2) {
-						quarterDiff -= 4
-					} else if (quarterDiff < -2) {
-						quarterDiff += 4
-					}
-
-					// Update item index based on quarter movement
-					const indexChange = quarterDiff * directionMultiplier
-
-					let newItemIndex = currentItemIndex
-					for (let i = 0; i < Math.abs(indexChange); i++) {
-						if (indexChange > 0) {
-							newItemIndex = (newItemIndex + 1) % items.length
-						} else {
-							newItemIndex = newItemIndex === 0 ? items.length - 1 : newItemIndex - 1
-						}
-					}
-
-					if (newItemIndex !== currentItemIndex) {
-						setCurrentItemIndex(newItemIndex)
-						onIndexChange?.(newItemIndex)
-					}
-
-					lastTrackedQuarter = newQuarter
-				}
-
-				requestAnimationFrame(animateFrame)
-			}
-
-			const initialFrame = requestAnimationFrame(animateFrame)
-
-			continuousAnimationRef.current = {
-				stop: () => {
-					cancelAnimationFrame(initialFrame)
-				},
-			}
-		}, [
-			continuousRotation,
-			continuousSpeed,
-			direction,
-			shouldPauseContinuous,
-			rotationMotionValue,
-			updateRotation,
-			currentItemIndex,
-			items.length,
-			onIndexChange,
-			turnSpeedMultiplier,
-		])
-
-		const stopContinuousRotation = useCallback(() => {
-			if (continuousAnimationRef.current) {
-				continuousAnimationRef.current.stop()
-				continuousAnimationRef.current = null
-			}
+		const [model, setModel] = useState<FaceModel>(() => ({
+			base: 0,
+			overrides: new Map(),
+			step: stepOf(initialRotationOffset),
+			dir: 1,
+		}))
+		const modelRef = useRef(model)
+		const commit = useCallback((next: FaceModel) => {
+			modelRef.current = next
+			setModel(next)
 		}, [])
 
-		// Scroll wheel handler
-		const handleWheel = useCallback(
-			(e: WheelEvent) => {
-				if (!enableScrollControl) return
-
-				e.preventDefault()
-
-				// Stop continuous rotation during scroll control
-				if (continuousRotation) {
-					stopContinuousRotation()
-				}
-
-				// Accumulate scroll delta for smoother control
-				const scrollDelta = e.deltaY * scrollSensitivity * 0.5
-				scrollAccumulator.current += scrollDelta
-
-				// Calculate rotation direction multiplier
-				let directionMultiplier = 1
-				if (direction === "top" || direction === "left") {
-					directionMultiplier = -1
-				}
-
-				const currentValue = rotationMotionValue.get()
-				const newValue = currentValue + scrollDelta * directionMultiplier
-
-				// Apply the rotation using unified function
-				updateRotation(newValue, "scroll")
-
-				// Update item index when crossing 90-degree boundaries
-				const normalizedNewValue = ((newValue % 360) + 360) % 360
-				const normalizedCurrentValue = ((currentValue % 360) + 360) % 360
-
-				const newQuarter = Math.floor(normalizedNewValue / 90)
-				const currentQuarter = Math.floor(normalizedCurrentValue / 90)
-
-				if (newQuarter !== currentQuarter) {
-					// Determine rotation direction
-					let rotationDirection = 0
-					if (Math.abs(newValue - currentValue) < 180) {
-						rotationDirection = newValue > currentValue ? 1 : -1
-					} else {
-						// Handle wrapping around 0/360
-						rotationDirection = newValue > currentValue ? -1 : 1
-					}
-
-					const indexChange = rotationDirection * directionMultiplier
-
-					let newItemIndex = currentItemIndex
-					if (indexChange > 0) {
-						newItemIndex = (currentItemIndex + 1) % items.length
-					} else {
-						newItemIndex = currentItemIndex === 0 ? items.length - 1 : currentItemIndex - 1
-					}
-
-					if (newItemIndex !== currentItemIndex) {
-						setCurrentItemIndex(newItemIndex)
-						onIndexChange?.(newItemIndex)
-					}
-				}
-			},
-			[
-				enableScrollControl,
-				direction,
-				scrollSensitivity,
-				rotationMotionValue,
-				updateRotation,
-				currentItemIndex,
-				items.length,
-				onIndexChange,
-				continuousRotation,
-				stopContinuousRotation,
-			]
+		const contentAt = useCallback(
+			(m: FaceModel, k: number) => (n ? m.overrides.get(k) ?? mod(k + m.base, n) : 0),
+			[n]
 		)
 
-		// Page scroll handler
-		const handlePageScroll = useCallback(() => {
-			if (!enablePageScrollControl || !carouselElementRef.current) return
+		// Discrete step tracking: React state only changes when the front face changes
+		useMotionValueEvent(rotation, "change", (deg) => {
+			const step = stepOf(deg)
+			const m = modelRef.current
+			if (step === m.step) return
+			const next: FaceModel = { ...m, step, dir: step > m.step ? 1 : -1 }
+			const keep = new Set(windowOf(next))
+			const overrides = new Map<number, number>()
+			m.overrides.forEach((v, k) => keep.has(k) && overrides.set(k, v))
+			commit({ ...next, overrides })
+		})
 
-			const currentScrollY = window.scrollY
-			const scrollDelta = currentScrollY - previousScrollY.current
-			previousScrollY.current = currentScrollY
+		const currentItemIndex = contentAt(model, model.step)
 
-			// Only proceed if there's actual scroll movement
-			if (Math.abs(scrollDelta) < 1) return
-
-			const element = carouselElementRef.current
-			const rect = element.getBoundingClientRect()
-			const viewportHeight = window.innerHeight
-
-			// Check if element is in viewport
-			const elementTop = rect.top - scrollOffset
-			const elementBottom = rect.bottom
-
-			if (elementTop <= viewportHeight && elementBottom >= 0) {
-				// Calculate rotation delta based on scroll direction and sensitivity
-				// Use much smaller sensitivity (scrollDelta is typically 1-100 pixels)
-				const rotationDelta = scrollDelta * pageScrollSensitivity * 0.1
-
-				// Calculate rotation direction multiplier
-				let directionMultiplier = 1
-				if (direction === "top" || direction === "left") {
-					directionMultiplier = -1
-				}
-
-				// Apply rotation delta to current user offset
-				const newValue = userRotationOffset.current + rotationDelta * directionMultiplier
-
-				// Update the user offset since this is a user-initiated scroll
-				userRotationOffset.current = newValue
-
-				// Smoothly update rotation using unified function
-				updateRotation(newValue, "pageScroll")
-
-				// Update item index based on rotation
-				const normalizedValue = ((newValue % 360) + 360) % 360
-				const currentQuarter = Math.floor(normalizedValue / 90)
-				const expectedIndex = Math.floor(((normalizedValue / 90) * items.length) / 4) % items.length
-
-				if (expectedIndex !== currentItemIndex) {
-					setCurrentItemIndex(expectedIndex)
-					onIndexChange?.(expectedIndex)
-				}
+		const onIndexChangeRef = useRef(onIndexChange)
+		onIndexChangeRef.current = onIndexChange
+		const firstIndexRef = useRef(true)
+		useEffect(() => {
+			if (firstIndexRef.current) {
+				firstIndexRef.current = false
+				return
 			}
-		}, [
-			enablePageScrollControl,
-			scrollOffset,
-			pageScrollSensitivity,
-			direction,
-			updateRotation,
-			items.length,
-			currentItemIndex,
-			onIndexChange,
-		])
+			onIndexChangeRef.current?.(currentItemIndex)
+		}, [currentItemIndex])
 
-		const handleAnimationComplete = useCallback(
-			(triggeredBy: string) => {
-				if (isRotating.current && pendingIndexChange.current !== null) {
-					isRotating.current = false
+		// --- Turning -------------------------------------------------------------------------
 
-					const targetIndex = pendingIndexChange.current
+		/** Step the cube is heading to while a turn animation runs (null when at rest/dragging) */
+		const targetStepRef = useRef<number | null>(null)
+		const animationRef = useRef<{ stop: () => void } | null>(null)
 
-					let newFrontFaceIndex: number
-					let currentBackFaceIndex: number
-
-					if (triggeredBy === "next") {
-						newFrontFaceIndex = (currentFrontFaceIndex + 1) % 4
-						currentBackFaceIndex = (newFrontFaceIndex + 2) % 4
-					} else {
-						newFrontFaceIndex = (currentFrontFaceIndex - 1 + 4) % 4
-						currentBackFaceIndex = (newFrontFaceIndex + 2) % 4
-					}
-
-					// Update the current item index first
-					setCurrentItemIndex(targetIndex)
-					onIndexChange?.(targetIndex)
-
-					// Calculate face indices based on the new current index
-					// Ensure all face indices are properly synchronized
-					const indexOffset = 2
-
-					if (currentBackFaceIndex === 0) {
-						setPrevIndex((targetIndex + indexOffset + items.length) % items.length)
-					} else if (currentBackFaceIndex === 1) {
-						setCurrentIndex((targetIndex + indexOffset + items.length) % items.length)
-					} else if (currentBackFaceIndex === 2) {
-						setNextIndex((targetIndex + indexOffset + items.length) % items.length)
-					} else if (currentBackFaceIndex === 3) {
-						setAfterNextIndex((targetIndex + indexOffset + items.length) % items.length)
-					}
-
-					// Clear pending change before updating front face index
-					pendingIndexChange.current = null
-					rotationCount.current++
-
-					setCurrentFrontFaceIndex(newFrontFaceIndex)
-				}
-			},
-			[currentFrontFaceIndex, items.length, onIndexChange]
+		const restingStep = useCallback(
+			() => targetStepRef.current ?? stepOf(rotation.get()),
+			[rotation, stepOf]
 		)
 
-		// Drag functionality - using direct event handlers like css-box
-		const handleDragStart = useCallback(
-			(e: React.MouseEvent | React.TouchEvent) => {
-				if (!enableDrag || isRotating.current || pendingIndexChange.current !== null) return
-
-				isDragging.current = true
-				const point = "touches" in e ? e.touches[0] : e
-				startPosition.current = { x: point.clientX, y: point.clientY }
-
-				// Get the actual current rotation value for accurate drag start
-				startRotation.current = rotationMotionValue.get()
-
-				// Stop continuous rotation during drag
-				if (continuousRotation && pauseOnDrag) {
-					stopContinuousRotation()
-				}
-
-				// Prevent default to avoid text selection
-				e.preventDefault()
-			},
-			[
-				enableDrag,
-				direction,
-				rotationMotionValue,
-				continuousRotation,
-				pauseOnDrag,
-				stopContinuousRotation,
-			]
-		)
-
-		const handleDragMove = useCallback(
-			(e: MouseEvent | TouchEvent) => {
-				if (!isDragging.current || isRotating.current || pendingIndexChange.current !== null) return
-
-				const point = "touches" in e ? e.touches[0] : e
-				const deltaX = point.clientX - startPosition.current.x
-				const deltaY = point.clientY - startPosition.current.y
-
-				const isVertical = direction === "top" || direction === "bottom"
-				const delta = isVertical ? deltaY : deltaX
-				const rotationDelta = (delta * dragSensitivity) / 2
-
-				let newRotation = startRotation.current
-
-				if (direction === "top" || direction === "right") {
-					newRotation += rotationDelta
-				} else {
-					newRotation -= rotationDelta
-				}
-
-				// Constrain rotation to ±120 degrees from start position. Otherwise the index recalculation will be off. TBD - find a better solution
-				const minRotation = startRotation.current - 120
-				const maxRotation = startRotation.current + 120
-				newRotation = Math.max(minRotation, Math.min(maxRotation, newRotation))
-
-				// Apply the rotation immediately during drag using unified function
-				updateRotation(newRotation, "drag")
-			},
-			[enableDrag, direction, dragSensitivity, updateRotation]
-		)
-
-		const handleDragEnd = useCallback(() => {
-			if (!isDragging.current) return
-
-			isDragging.current = false
-
-			const currentValue = rotationMotionValue.get()
-
-			// Calculate the nearest quarter rotation (90-degree increment)
-			const quarterRotations = Math.round(currentValue / 90)
-			const snappedRotation = quarterRotations * 90
-
-			// Calculate how many steps we've moved from the drag start position
-			const rotationDifference = snappedRotation - startRotation.current
-			const steps = Math.round(rotationDifference / 90)
-
-			if (steps !== 0) {
-				// Prevent conflicting operations
-				if (pendingIndexChange.current !== null) {
-					// If there's already a pending change, just snap to position
-					animate(rotationMotionValue, snappedRotation, {
-						...snapTransition,
-						onComplete: () => {
-							updateRotation(snappedRotation, "manual")
-							if (continuousRotation) {
-								setTimeout(() => {
-									if (!isDragging.current && !isRotating.current) {
-										startContinuousRotation()
-									}
-								}, 100)
-							}
-						},
-					})
-					return
-				}
-
-				isRotating.current = true
-
-				// Calculate new item index based on steps and direction
-				// Account for direction-specific rotation mapping
-				let indexSteps = steps
-
-				// For "top" and "left" directions, positive rotation goes backward
-				if (direction === "top" || direction === "left") {
-					indexSteps = -steps
-				}
-
-				// Use modular arithmetic for more robust index calculation
-				const totalSteps = Math.abs(indexSteps)
-				let newItemIndex = currentItemIndex
-
-				if (indexSteps > 0) {
-					newItemIndex = (currentItemIndex + totalSteps) % items.length
-				} else {
-					newItemIndex = (currentItemIndex - totalSteps + items.length) % items.length
-				}
-
-				// Ensure the new index is valid
-				newItemIndex = Math.max(0, Math.min(items.length - 1, newItemIndex))
-
-				pendingIndexChange.current = newItemIndex
-
-				// Animate to the snapped position using unified rotation
-				animate(rotationMotionValue, snappedRotation, {
-					...snapTransition,
+		const turnTo = useCallback(
+			(deg: number, options: ValueAnimationTransition = transition) => {
+				const step = stepOf(deg)
+				targetStepRef.current = step
+				// animate() on the same MotionValue stops the previous animation and inherits its
+				// velocity, so rapid retargeting stays smooth
+				animationRef.current = animate(rotation, deg, {
+					...(prefersReducedMotion ? { duration: 0 } : options),
 					onComplete: () => {
-						handleAnimationComplete(steps > 0 ? "next" : "prev")
-						updateRotation(snappedRotation, "manual")
-
-						// Restart continuous rotation after drag ends if enabled
-						if (continuousRotation) {
-							// Use a small delay and ensure we restart from clean state
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
+						if (targetStepRef.current === step) targetStepRef.current = null
 					},
 				})
-			} else {
-				// Snap back to nearest quarter rotation
-				animate(rotationMotionValue, snappedRotation, {
-					...snapTransition,
-					onComplete: () => {
-						updateRotation(snappedRotation, "manual")
+			},
+			[rotation, stepOf, transition, prefersReducedMotion]
+		)
 
-						// Restart continuous rotation after drag ends if enabled
-						if (continuousRotation) {
-							// Use a small delay and ensure we restart from clean state
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			}
-		}, [
-			direction,
-			rotationMotionValue,
-			updateRotation,
-			currentItemIndex,
-			items.length,
-			snapTransition,
-			handleAnimationComplete,
-			continuousRotation,
-			startContinuousRotation,
-		])
+		const turnToStep = useCallback(
+			(step: number, options?: ValueAnimationTransition) => turnTo(angleOf(step), options),
+			[turnTo, angleOf]
+		)
 
-		// Set up global event listeners for drag
-		useEffect(() => {
-			if (enableDrag) {
-				window.addEventListener("mousemove", handleDragMove)
-				window.addEventListener("mouseup", handleDragEnd)
-				window.addEventListener("touchmove", handleDragMove)
-				window.addEventListener("touchend", handleDragEnd)
-
-				return () => {
-					window.removeEventListener("mousemove", handleDragMove)
-					window.removeEventListener("mouseup", handleDragEnd)
-					window.removeEventListener("touchmove", handleDragMove)
-					window.removeEventListener("touchend", handleDragEnd)
-				}
-			}
-		}, [enableDrag, handleDragMove, handleDragEnd])
-
-		// Set up scroll wheel event listener
-		useEffect(() => {
-			const containerElement = document.getElementById(`carousel-${items[0]?.id || "default"}`)
-			if (enableScrollControl && containerElement) {
-				containerElement.addEventListener("wheel", handleWheel, { passive: false })
-
-				return () => {
-					containerElement.removeEventListener("wheel", handleWheel)
-				}
-			}
-		}, [enableScrollControl, handleWheel, items])
-
-		// Set up page scroll event listener
-		useEffect(() => {
-			if (enablePageScrollControl) {
-				// Store reference to carousel element
-				const containerElement = document.getElementById(`carousel-${items[0]?.id || "default"}`)
-				carouselElementRef.current = containerElement
-
-				window.addEventListener("scroll", handlePageScroll, { passive: true })
-
-				// Delay initial trigger to allow initial rotation offset to be applied
-				const timer = setTimeout(() => {
-					if (initialRotationOffset === 0) {
-						// Only trigger on initial load if no rotation offset is set
-						handlePageScroll()
-					}
-				}, 150)
-
-				return () => {
-					clearTimeout(timer)
-					window.removeEventListener("scroll", handlePageScroll)
-				}
-			}
-		}, [enablePageScrollControl, handlePageScroll, items, initialRotationOffset])
+		const stopTurning = useCallback(() => {
+			animationRef.current?.stop()
+			animationRef.current = null
+			targetStepRef.current = null
+			rotation.stop()
+		}, [rotation])
 
 		const next = useCallback(() => {
-			if (items.length === 0 || isRotating.current) return
-
-			// Stop continuous rotation during manual navigation
-			if (continuousRotation) {
-				stopContinuousRotation()
-			}
-
-			isRotating.current = true
-			const newIndex = (currentItemIndex + 1) % items.length
-			pendingIndexChange.current = newIndex
-
-			if (direction === "top") {
-				animate(rotationMotionValue, currentRotation + 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("next")
-						updateRotation(currentRotation + 90, "manual")
-
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "bottom") {
-				animate(rotationMotionValue, currentRotation - 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("next")
-						updateRotation(currentRotation - 90, "manual")
-
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "left") {
-				animate(rotationMotionValue, currentRotation - 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("next")
-						updateRotation(currentRotation - 90, "manual")
-
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "right") {
-				animate(rotationMotionValue, currentRotation + 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("next")
-						updateRotation(currentRotation + 90, "manual")
-
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			}
-		}, [
-			items.length,
-			direction,
-			_transition,
-			currentRotation,
-			continuousRotation,
-			stopContinuousRotation,
-			startContinuousRotation,
-			handleAnimationComplete,
-		])
+			if (!n) return
+			turnToStep(restingStep() + 1)
+		}, [n, restingStep, turnToStep])
 
 		const prev = useCallback(() => {
-			if (items.length === 0 || isRotating.current) return
+			if (!n) return
+			turnToStep(restingStep() - 1)
+		}, [n, restingStep, turnToStep])
 
-			// Stop continuous rotation during manual navigation
-			if (continuousRotation) {
-				stopContinuousRotation()
-			}
+		const goTo = useCallback(
+			(index: number) => {
+				if (!n) return
+				const target = mod(Math.round(index), n)
+				const m = modelRef.current
+				const from = restingStep()
 
-			isRotating.current = true
-			const newIndex = currentItemIndex === 0 ? items.length - 1 : currentItemIndex - 1
-			pendingIndexChange.current = newIndex
+				// already there, or an adjacent face already holds it
+				for (const k of [from, from + 1, from - 1]) {
+					if (contentAt(m, k) === target) return turnToStep(k)
+				}
 
-			if (direction === "top") {
-				animate(rotationMotionValue, currentRotation - 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("prev")
-						updateRotation(currentRotation - 90, "manual")
+				// Swapping a face's photo is always a single 90° turn, so item-space distance doesn't
+				// matter — what matters is that the incoming face isn't already on screen:
+				// - mid-turn: keep travelling (reversing would land on the face in view)
+				// - at rest: turn toward the side hidden by the tilt (+6°) and resting pose
+				let s: 1 | -1
+				if (from !== m.step) {
+					s = from > m.step ? 1 : -1
+				} else {
+					const position = (dirSign * (rotation.get() + TILT_DEG)) / 90
+					s = position - m.step > 0 ? -1 : 1
+				}
+				const k = from + s
 
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "bottom") {
-				animate(rotationMotionValue, currentRotation + 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("prev")
-						updateRotation(currentRotation + 90, "manual")
+				// freeze everything that might be on screen (around both the visual step and
+				// the step we were heading to), then re-base so face k shows the target
+				const overrides = new Map(m.overrides)
+				for (const kk of new Set([...windowOf(m), from - 1, from, from + 1])) {
+					if (kk !== k) overrides.set(kk, contentAt(m, kk))
+				}
+				overrides.delete(k)
+				overrides.delete(k + s)
+				commit({ ...m, base: mod(target - k, n), overrides })
+				turnToStep(k)
+			},
+			[n, restingStep, contentAt, turnToStep, commit, dirSign, rotation]
+		)
 
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "left") {
-				animate(rotationMotionValue, currentRotation + 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("prev")
-						updateRotation(currentRotation + 90, "manual")
+		const getSnapshot = useCallback(
+			(): BoxCarouselSnapshot => ({
+				rotation: targetStepRef.current != null ? angleOf(targetStepRef.current) : rotation.get(),
+				index: contentAt(modelRef.current, restingStep()),
+			}),
+			[angleOf, rotation, contentAt, restingStep]
+		)
 
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			} else if (direction === "right") {
-				animate(rotationMotionValue, currentRotation - 90, {
-					..._transition,
-					onComplete: () => {
-						handleAnimationComplete("prev")
-						updateRotation(currentRotation - 90, "manual")
-
-						// Restart continuous rotation after manual navigation if enabled
-						if (continuousRotation) {
-							setTimeout(() => {
-								if (!isDragging.current && !isRotating.current) {
-									startContinuousRotation()
-								}
-							}, 100)
-						}
-					},
-				})
-			}
-		}, [
-			items.length,
-			direction,
-			_transition,
-			currentRotation,
-			continuousRotation,
-			stopContinuousRotation,
-			startContinuousRotation,
-			handleAnimationComplete,
-		])
+		const restore = useCallback(
+			(snapshot: BoxCarouselSnapshot) => {
+				if (contentAt(modelRef.current, stepOf(snapshot.rotation)) === snapshot.index) {
+					turnTo(snapshot.rotation)
+				} else {
+					goTo(snapshot.index)
+				}
+			},
+			[contentAt, stepOf, turnTo, goTo]
+		)
 
 		useImperativeHandle(
 			ref,
 			() => ({
 				next,
 				prev,
-				getCurrentItemIndex: () => currentItemIndex,
+				goTo,
+				getCurrentItemIndex: () => contentAt(modelRef.current, modelRef.current.step),
+				getSnapshot,
+				restore,
 			}),
-			[next, prev, currentItemIndex]
+			[next, prev, goTo, contentAt, getSnapshot, restore]
 		)
+
+		// --- Interaction state ---------------------------------------------------------------
+
+		const [isHovered, setIsHovered] = useState(false)
+		const [isDragging, setIsDragging] = useState(false)
+		const [isFocusVisible, setIsFocusVisible] = useState(false)
+		const interacting = isHovered || isDragging || isFocusVisible
+
+		const onInteractingChangeRef = useRef(onInteractingChange)
+		onInteractingChangeRef.current = onInteractingChange
+		const firstInteractRef = useRef(true)
+		useEffect(() => {
+			if (firstInteractRef.current) {
+				firstInteractRef.current = false
+				return
+			}
+			onInteractingChangeRef.current?.(interacting)
+		}, [interacting])
+
+		// --- Drag (pointer events; vertical page panning stays native on touch) --------------
+
+		const dragRef = useRef<{ pointerId: number; x: number; y: number; start: number } | null>(null)
+
+		const handlePointerDown = useCallback(
+			(e: React.PointerEvent<HTMLDivElement>) => {
+				if (!enableDrag || !n || e.button !== 0) return
+				stopTurning()
+				dragRef.current = {
+					pointerId: e.pointerId,
+					x: e.clientX,
+					y: e.clientY,
+					start: rotation.get(),
+				}
+				e.currentTarget.setPointerCapture(e.pointerId)
+				setIsDragging(true)
+			},
+			[enableDrag, n, stopTurning, rotation]
+		)
+
+		const handlePointerMove = useCallback(
+			(e: React.PointerEvent<HTMLDivElement>) => {
+				const drag = dragRef.current
+				if (!drag || drag.pointerId !== e.pointerId) return
+				const delta = isVertical ? e.clientY - drag.y : e.clientX - drag.x
+				const sign = direction === "top" || direction === "right" ? 1 : -1
+				rotation.set(drag.start + (sign * delta * dragSensitivity) / 2)
+			},
+			[isVertical, direction, rotation, dragSensitivity]
+		)
+
+		const handlePointerUp = useCallback(
+			(e: React.PointerEvent<HTMLDivElement>) => {
+				const drag = dragRef.current
+				if (!drag || drag.pointerId !== e.pointerId) return
+				dragRef.current = null
+				setIsDragging(false)
+				// project a little with the release velocity, then settle on a face
+				const projected = rotation.get() + rotation.getVelocity() * 0.12
+				const startStep = stepOf(drag.start)
+				const step = Math.max(startStep - 2, Math.min(startStep + 2, stepOf(projected)))
+				turnToStep(step, snapTransition)
+			},
+			[rotation, stepOf, turnToStep, snapTransition]
+		)
+
+		// --- Detent: wheel / page-scroll turns come to rest on a face ----------------------------
+		// Scroll-driven rotation is continuous while input flows; once it stops, the cube springs
+		// to the nearest face like a detent, so it never rests half-turned between two photos.
+
+		const settleTimerRef = useRef<number | null>(null)
+		const scheduleSettle = useCallback(() => {
+			if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current)
+			settleTimerRef.current = window.setTimeout(() => {
+				settleTimerRef.current = null
+				if (dragRef.current || targetStepRef.current != null) return
+				turnToStep(stepOf(rotation.get()), snapTransition)
+			}, 180)
+		}, [rotation, stepOf, turnToStep, snapTransition])
+		useEffect(
+			() => () => {
+				if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current)
+			},
+			[]
+		)
+
+		// --- Wheel over the cube --------------------------------------------------------------
+
+		const containerRef = useRef<HTMLDivElement | null>(null)
+
+		useEffect(() => {
+			const el = containerRef.current
+			if (!enableScrollControl || !el) return
+			const onWheel = (e: WheelEvent) => {
+				// Never trap the reader: a vertical wheel over the cube scrolls the page (page-scroll
+				// control turns the cube anyway). Sideways swipes / shift+wheel turn it directly, and
+				// so does a vertical wheel the page can't use (already at the top/bottom).
+				const sideways = e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)
+				const doc = document.documentElement
+				const atEdge =
+					(e.deltaY > 0 && window.scrollY + window.innerHeight >= doc.scrollHeight - 1) ||
+					(e.deltaY < 0 && window.scrollY <= 0)
+				if (!sideways && !(enablePageScrollControl ? atEdge : true)) return
+				e.preventDefault()
+				stopTurning()
+				const delta = sideways ? e.deltaX || e.deltaY : e.deltaY
+				rotation.set(rotation.get() + delta * scrollSensitivity * 0.5 * spinSign)
+				scheduleSettle()
+			}
+			el.addEventListener("wheel", onWheel, { passive: false })
+			return () => el.removeEventListener("wheel", onWheel)
+		}, [
+			enableScrollControl,
+			enablePageScrollControl,
+			scrollSensitivity,
+			rotation,
+			spinSign,
+			stopTurning,
+			scheduleSettle,
+		])
+
+		// --- Page scroll ----------------------------------------------------------------------
+
+		useEffect(() => {
+			if (!enablePageScrollControl) return
+			let lastY = window.scrollY
+			const onScroll = () => {
+				const y = window.scrollY
+				const delta = y - lastY
+				lastY = y
+				const el = containerRef.current
+				if (!el || Math.abs(delta) < 1 || dragRef.current) return
+				const rect = el.getBoundingClientRect()
+				if (rect.top - scrollOffset > window.innerHeight || rect.bottom < 0) return
+				// the reader took over: drop any programmatic turn
+				if (targetStepRef.current != null) stopTurning()
+				rotation.set(rotation.get() + delta * pageScrollSensitivity * 0.1 * spinSign)
+				scheduleSettle()
+			}
+			window.addEventListener("scroll", onScroll, { passive: true })
+			return () => window.removeEventListener("scroll", onScroll)
+		}, [
+			enablePageScrollControl,
+			scrollOffset,
+			pageScrollSensitivity,
+			rotation,
+			spinSign,
+			stopTurning,
+			scheduleSettle,
+		])
+
+		// --- Continuous rotation --------------------------------------------------------------
+
+		const continuousEnabled =
+			continuousRotation && !enableScrollControl && !enablePageScrollControl && n > 0
+
+		useAnimationFrame((_, delta) => {
+			if (!continuousEnabled || prefersReducedMotion) return
+			if ((pauseOnHover && isHovered) || (pauseOnDrag && isDragging) || isFocusVisible) return
+			if (targetStepRef.current != null) return
+			const current = rotation.get()
+			const inQuarter = mod(current, 90)
+			const distanceFromBoundary = Math.min(inQuarter, 90 - inQuarter)
+			const curve = 1 + (turnSpeedMultiplier - 1) * (1 - distanceFromBoundary / 45)
+			rotation.set(current + spinSign * continuousSpeed * curve * (Math.min(delta, 64) / 1000))
+		})
+
+		// --- Auto play ------------------------------------------------------------------------
+
+		useEffect(() => {
+			if (!autoPlay || continuousRotation || enableScrollControl || enablePageScrollControl || !n)
+				return
+			if (interacting) return
+			const interval = setInterval(next, autoPlayInterval)
+			return () => clearInterval(interval)
+		}, [
+			autoPlay,
+			continuousRotation,
+			enableScrollControl,
+			enablePageScrollControl,
+			n,
+			next,
+			autoPlayInterval,
+			interacting,
+		])
+
+		// --- Keyboard -------------------------------------------------------------------------
+
+		const handleKeyDown = useCallback(
+			(e: React.KeyboardEvent) => {
+				const back = isVertical ? "ArrowUp" : "ArrowLeft"
+				const fwd = isVertical ? "ArrowDown" : "ArrowRight"
+				if (e.key === back) {
+					e.preventDefault()
+					prev()
+				} else if (e.key === fwd) {
+					e.preventDefault()
+					next()
+				}
+			},
+			[isVertical, next, prev]
+		)
+
+		// --- Rendering ------------------------------------------------------------------------
 
 		const depth = useMemo(
 			() => (direction === "top" || direction === "bottom" ? height : width),
 			[direction, width, height]
 		)
+		const depthMotion = useMotionValue(depth)
+		useEffect(() => depthMotion.set(depth), [depth, depthMotion])
 
-		// Create a motion value for scale
-		const scaleMotionValue = useMotionValue(1)
-		const scale = useSpring(scaleMotionValue, { stiffness: 300, damping: 30 })
-
-		// Update scale based on hover state
+		const scaleTarget = useMotionValue(1)
+		const scale = useSpring(scaleTarget, dragSpring)
 		useEffect(() => {
-			scaleMotionValue.set(isHovered ? hoverScale : 1)
-		}, [isHovered, hoverScale, scaleMotionValue])
+			scaleTarget.set(isHovered && !prefersReducedMotion ? hoverScale : 1)
+		}, [isHovered, hoverScale, scaleTarget, prefersReducedMotion])
 
-		const transform = useTransform(rotationMotionValue, (rotation) => {
-			const isVertical = direction === "top" || direction === "bottom"
-			const x = isVertical ? rotation : 0
-			const y = isVertical ? 0 : rotation
-			return `translateZ(-${depth / 2 - 12}px) rotateX(${x + 6}deg) rotateY(${y + 6}deg)`
+		const transform = useTransform([rotation, depthMotion], ([deg, d]: number[]) => {
+			const x = isVertical ? deg : 0
+			const y = isVertical ? 0 : deg
+			return `translateZ(-${d / 2 - 12}px) rotateX(${x + TILT_DEG}deg) rotateY(${y + TILT_DEG}deg)`
 		})
-
-		const containerTransform = useTransform(scale, (s) => `scale(${s})`)
 
 		// Determine face transforms based on the desired rotation axis
 		const faceTransforms = (() => {
 			switch (direction) {
-				case "left":
-					return [
-						// left, front, right, back (rotation around Y-axis)
-						`rotateY(-90deg) translateZ(${width / 2}px)`,
-						`rotateY(0deg) translateZ(${depth / 2}px)`,
-						`rotateY(90deg) translateZ(${width / 2}px)`,
-						`rotateY(180deg) translateZ(${depth / 2}px)`,
-					]
 				case "top":
 					return [
-						// top, front, bottom, back (rotation around X-axis)
 						`rotateX(90deg) translateZ(${height / 2}px)`,
 						`rotateY(0deg) translateZ(${depth / 2}px)`,
 						`rotateX(-90deg) translateZ(${height / 2}px)`,
@@ -1218,7 +833,6 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					]
 				case "right":
 					return [
-						// right, front, left, back (rotation around Y-axis)
 						`rotateY(90deg) translateZ(${width / 2}px)`,
 						`rotateY(0deg) translateZ(${depth / 2}px)`,
 						`rotateY(-90deg) translateZ(${width / 2}px)`,
@@ -1226,15 +840,14 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					]
 				case "bottom":
 					return [
-						// bottom, front, top, back (rotation around X-axis)
 						`rotateX(-90deg) translateZ(${height / 2}px)`,
 						`rotateY(0deg) translateZ(${depth / 2}px)`,
 						`rotateX(90deg) translateZ(${height / 2}px)`,
 						`rotateY(180deg) translateZ(${depth / 2}px) rotateZ(180deg)`,
 					]
+				case "left":
 				default:
 					return [
-						// left, front, right, back (rotation around Y-axis)
 						`rotateY(-90deg) translateZ(${width / 2}px)`,
 						`rotateY(0deg) translateZ(${depth / 2}px)`,
 						`rotateY(90deg) translateZ(${width / 2}px)`,
@@ -1243,189 +856,71 @@ const BoxCarousel = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			}
 		})()
 
-		// Continuous rotation management (disabled when any scroll control is enabled)
-		useEffect(() => {
-			if (
-				continuousRotation &&
-				!enableScrollControl &&
-				!enablePageScrollControl &&
-				items.length > 0
-			) {
-				// Add a small delay to ensure initial rotation offset is applied first
-				const timer = setTimeout(() => {
-					startContinuousRotation()
-				}, 100)
+		// Which item each physical face shows
+		const faceItems = useMemo(() => {
+			const out: (number | undefined)[] = [undefined, undefined, undefined, undefined]
+			if (!n) return out
+			for (const k of windowOf(model)) out[mod(k + 1, 4)] = contentAt(model, k)
+			return out
+		}, [model, n, contentAt])
 
-				return () => {
-					clearTimeout(timer)
-					stopContinuousRotation()
-				}
-			}
-		}, [
-			continuousRotation,
-			enableScrollControl,
-			enablePageScrollControl,
-			items.length,
-			startContinuousRotation,
-			stopContinuousRotation,
-		])
-
-		// Pause/resume continuous rotation based on hover state
-		useEffect(() => {
-			if (!continuousRotation) return
-
-			if (pauseOnHover && isHovered) {
-				stopContinuousRotation()
-			} else if (!isDragging.current && !isRotating.current) {
-				startContinuousRotation()
-			}
-		}, [
-			continuousRotation,
-			pauseOnHover,
-			isHovered,
-			startContinuousRotation,
-			stopContinuousRotation,
-		])
-
-		// Auto play functionality (disabled when continuous rotation or any scroll control is enabled)
-		useEffect(() => {
-			if (
-				autoPlay &&
-				!continuousRotation &&
-				!enableScrollControl &&
-				!enablePageScrollControl &&
-				items.length > 0
-			) {
-				const interval = setInterval(next, autoPlayInterval)
-				return () => clearInterval(interval)
-			}
-		}, [
-			autoPlay,
-			continuousRotation,
-			enableScrollControl,
-			enablePageScrollControl,
-			items.length,
-			next,
-			autoPlayInterval,
-		])
-
-		// Cleanup continuous rotation on unmount
-		useEffect(() => {
-			return () => {
-				if (continuousAnimationRef.current) {
-					continuousAnimationRef.current.stop()
-				}
-			}
-		}, [])
-
-		const handleKeyDown = useCallback(
-			(e: React.KeyboardEvent) => {
-				if (isRotating.current) return
-
-				switch (e.key) {
-					case "ArrowLeft":
-						e.preventDefault()
-						if (direction === "left" || direction === "right") {
-							prev()
-						}
-						break
-					case "ArrowRight":
-						e.preventDefault()
-						if (direction === "left" || direction === "right") {
-							next()
-						}
-						break
-					case "ArrowUp":
-						e.preventDefault()
-						if (direction === "top" || direction === "bottom") {
-							prev()
-						}
-						break
-					case "ArrowDown":
-						e.preventDefault()
-						if (direction === "top" || direction === "bottom") {
-							next()
-						}
-						break
-					default:
-						break
-				}
-			},
-			[direction, next, prev, items.length]
-		)
+		const faceColors = ["#ff9999", "#99ff99", "#9999ff", "#ffff99"]
 
 		return (
 			<motion.div
-				id={`carousel-${items[0]?.id || "default"}`}
+				{...props}
+				ref={containerRef}
 				className={cn(
-					"relative focus:outline-0",
+					"relative focus:outline-0 select-none",
 					enableDrag && "cursor-grab active:cursor-grabbing",
+					isVertical ? "touch-pan-x" : "touch-pan-y",
 					className
 				)}
 				style={{
 					width,
 					height,
 					perspective: `${perspective}px`,
-					transform: containerTransform,
+					scale,
 				}}
 				onKeyDown={handleKeyDown}
-				onMouseEnter={() => setIsHovered(true)}
-				onMouseLeave={() => setIsHovered(false)}
+				onPointerEnter={(e) => e.pointerType === "mouse" && setIsHovered(true)}
+				onPointerLeave={(e) => e.pointerType === "mouse" && setIsHovered(false)}
+				onPointerDown={handlePointerDown}
+				onPointerMove={handlePointerMove}
+				onPointerUp={handlePointerUp}
+				onPointerCancel={handlePointerUp}
+				onFocus={(e) => {
+					if (e.target === e.currentTarget && e.currentTarget.matches(":focus-visible"))
+						setIsFocusVisible(true)
+				}}
+				onBlur={(e) => e.target === e.currentTarget && setIsFocusVisible(false)}
 				tabIndex={0}
-				aria-label={`3D carousel with ${items.length} items`}
-				aria-describedby="carousel-instructions"
-				aria-live="polite"
-				aria-atomic="true"
-				onMouseDown={handleDragStart}
-				onTouchStart={handleDragStart}
-				{...props}
+				role="group"
+				aria-roledescription="carousel"
+				aria-label={`3D photo cube with ${n} photos. Use arrow keys to turn.`}
 			>
-				<div className="sr-only" aria-live="polite">
-					Showing item {currentItemIndex + 1} of {items.length}:{" "}
-					{items[currentItemIndex]?.alt || `Item ${currentItemIndex + 1}`}
+				<div className="sr-only" aria-live="polite" aria-atomic="true">
+					Showing photo {currentItemIndex + 1} of {n}:{" "}
+					{items[currentItemIndex]?.alt || `Photo ${currentItemIndex + 1}`}
 				</div>
 
 				<motion.div
-					className="relative w-full h-full [transform-style:preserve-3d] rotate-x-45"
-					style={{
-						transform: transform,
-					}}
+					className="relative w-full h-full [transform-style:preserve-3d]"
+					style={{ transform }}
 				>
-					{/* First face */}
-					<CubeFace
-						transform={faceTransforms[0]}
-						style={debug ? { width, height, backgroundColor: "#ff9999" } : { width, height }}
-						debug={debug}
-					>
-						<MediaRenderer item={items[prevIndex]} debug={debug} />
-					</CubeFace>
-
-					{/* Second face */}
-					<CubeFace
-						transform={faceTransforms[1]}
-						style={debug ? { width, height, backgroundColor: "#99ff99" } : { width, height }}
-						debug={debug}
-					>
-						<MediaRenderer item={items[currentIndex]} debug={debug} />
-					</CubeFace>
-
-					{/* Third face */}
-					<CubeFace
-						transform={faceTransforms[2]}
-						style={debug ? { width, height, backgroundColor: "#9999ff" } : { width, height }}
-						debug={debug}
-					>
-						<MediaRenderer item={items[nextIndex]} debug={debug} />
-					</CubeFace>
-
-					{/* Fourth face */}
-					<CubeFace
-						transform={faceTransforms[3]}
-						style={debug ? { width, height, backgroundColor: "#ffff99" } : { width, height }}
-						debug={debug}
-					>
-						<MediaRenderer item={items[afterNextIndex]} debug={debug} />
-					</CubeFace>
+					{faceTransforms.map((faceTransform, i) => (
+						<CubeFace
+							key={i}
+							transform={faceTransform}
+							style={debug ? { width, height, backgroundColor: faceColors[i] } : { width, height }}
+							debug={debug}
+						>
+							<MediaRenderer
+								item={faceItems[i] != null ? items[faceItems[i]!] : undefined}
+								debug={debug}
+							/>
+						</CubeFace>
+					))}
 				</motion.div>
 			</motion.div>
 		)
