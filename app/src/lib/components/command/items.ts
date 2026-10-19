@@ -8,6 +8,7 @@ import type { Category } from "@/lib/types/category"
 import type { FacetKey, FilterState } from "@/lib/filters"
 import { descriptorRegex, extractDescriptors } from "@/lib/descriptors"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
+import { originSearchText } from "@/lib/origins"
 import { NOTE_STAGES } from "@/lib/types/session"
 import { fuzzyFields, fuzzyMatch } from "./fuzzy"
 import type { RecentEntry } from "./recents"
@@ -72,7 +73,7 @@ export function buildIndex(
 				...(s.style ?? []).flatMap((st) => [st.title, st.category?.title]),
 				...(s.tags ?? []).map((t) => t?.title),
 				...(s.cultivar ?? []).map((c) => c.title),
-				...(s.origin ?? []).flatMap((o) => [o?.location, o?.municipality, o?.country]),
+				...(s.origin ?? []).flatMap((o) => originSearchText(o).reverse()),
 			]
 				.filter(Boolean)
 				.join(" · "),

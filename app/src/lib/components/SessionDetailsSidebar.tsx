@@ -52,7 +52,7 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 
 							{(session.style ||
 								session.production_year ||
-								session.season ||
+								session.harvest ||
 								session.elevation ||
 								session.aging_conditions) && <PartitionedDivider />}
 							{session.style && session.style.length > 0 && (
@@ -73,9 +73,9 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 									<span>{session.production_year}</span>
 								</DetailListEntry>
 							)}
-							{session.season && (
+							{(session.season_note || session.harvest?.season) && (
 								<DetailListEntry label="season">
-									<span>{session.season}</span>
+									<span>{session.season_note || session.harvest?.season}</span>
 								</DetailListEntry>
 							)}
 							{session.elevation && (

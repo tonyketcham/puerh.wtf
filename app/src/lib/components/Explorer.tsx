@@ -23,6 +23,13 @@ import {
 	type FilterState,
 } from "@/lib/filters"
 import { sessionMatchesDescriptor } from "@/lib/descriptors"
+import {
+	LEGACY_ORIGIN_SLUGS,
+	canonicalOriginKey,
+	originChain,
+	originKeys,
+	originSearchText,
+} from "@/lib/origins"
 import { descriptorAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
 import YearRuler from "@/lib/components/explorer/YearRuler"
 import FilterTokens, { type FilterToken } from "@/lib/components/explorer/FilterTokens"
@@ -75,6 +82,13 @@ function normalize(text?: string | null) {
 	return (text || "").toLowerCase()
 }
 
+/** Lowercased text plus its diacritic-free spelling, so "yiwu" finds Yìwǔ and "da ye" Dà Yè Zhòng. */
+function searchForms(text: string) {
+	const lower = normalize(text)
+	const bare = lower.normalize("NFD").replace(/\p{M}/gu, "")
+	return bare === lower ? [lower] : [lower, bare]
+}
+
 const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
 
@@ -104,8 +118,10 @@ function passesFilters(
 		if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
 	}
 	if (facets.origins.length) {
-		const originSlugs = (s.origin || []).flatMap((o) => [o?._slug || "", o?.id || ""])
-		if (!facets.origins.some((slug) => originSlugs.includes(slug))) return false
+		// slug or id of the origin or any ancestor (so a Yiwu filter keeps its villages); legacy
+		// long slugs from old shared URLs map to the current ones
+		const keys = (s.origin || []).flatMap(originKeys)
+		if (!facets.origins.some((value) => keys.includes(canonicalOriginKey(value)))) return false
 	}
 
 	if (!query) return true
@@ -116,11 +132,12 @@ function passesFilters(
 		...(s.vendor || []).map((v) => v.title),
 		...(s.cultivar || []).map((c) => c.title),
 		...(s.tags || []).map((t) => t?.title || ""),
-		...(s.origin || []).flatMap((o) => [o?.location, o?.municipality, o?.country, o?._slug]),
+		...(s.origin || []).flatMap((o) => [...originSearchText(o), o?._slug]),
+		s.origin_note || "",
 		...(s.style || []).flatMap((st) => [st.title, st.category?.title]),
 	]
 		.filter(Boolean)
-		.map((t) => normalize(String(t)))
+		.flatMap((t) => searchForms(String(t)))
 	if (haystack.some((t) => t.includes(query))) return true
 	// flavors: the command bar writes ?q=<descriptor> when a flavor is picked, so q also finds
 	// sessions whose tasting notes mention it (plural-tolerant, word-bounded)
@@ -197,14 +214,18 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
 		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
 		for (const s of sessions) {
-			for (const o of s.origin || []) {
-				if (!o) continue
-				const label = o.location || o.municipality || o.country || o._slug
-				if (o._slug) map.origins.set(o._slug, { label })
-				if (o.id) map.origins.set(o.id, { label })
+			// label every node of the chain, so a filter on a parent (e.g. ?origins=yunnan) reads nicely
+			for (const o of (s.origin || []).flatMap(originChain)) {
+				const label = { label: o.title || o._slug }
+				map.origins.set(o._slug, label)
+				map.origins.set(o.id, label)
 			}
 			for (const c of s.cultivar || []) map.cultivars.set(c._slug, { label: c.title })
 			for (const t of s.tags || []) if (t?._slug) map.tags.set(t._slug, { label: t.title })
+		}
+		for (const [legacy, slug] of Object.entries(LEGACY_ORIGIN_SLUGS)) {
+			const label = map.origins.get(slug)
+			if (label) map.origins.set(legacy, label)
 		}
 		return map
 	}, [categories, vendors, sessions])

@@ -1,4 +1,5 @@
 import type { Category } from "@/lib/types/category"
+import type { OriginNote, OriginRef } from "@/lib/types/origin"
 import type { Content } from "@/lib/types/content"
 import type {
 	Session as GqlSession,
@@ -36,15 +37,9 @@ export type SessionPreview = BaseSession & {
 		| null
 	cultivar?: Cultivar[]
 	tags?: { _slug: string; title: string }[] | null
-	origin?:
-		| {
-				_slug: string
-				id: string
-				country?: string | null
-				location?: string | null
-				municipality?: string | null
-		  }[]
-		| null
+	origin?: OriginRef[] | null
+	/** why there's no origin (blends, undisclosed sourcing) */
+	origin_note?: OriginNote | null
 }
 
 /** A photo attached to a session. `image` is a site-root path like /images/uploads/x.jpeg (or a legacy https URL). */
@@ -87,8 +82,18 @@ export type ExplorerSession = SessionPreviewWithFeatureImage & {
 
 export type Cultivar = Pick<NonNullObject<NonNullable<GqlVarietal>>, "id" | "_slug" | "title">
 
+/** Harvest timing. `season` is the normalized season; `season_note` on the session keeps the raw text. */
+export type SessionHarvest = {
+	season?: "spring" | "summer" | "autumn" | "winter" | null
+	/** 1–12 */
+	month?: number | null
+	years?: number[] | null
+}
+
 export type SessionFull = SessionPreviewWithFeatureImage & {
-	season: GqlSession["season"]
+	harvest: SessionHarvest | null
+	season_note: GqlSession["season_note"]
+	/** meters */
 	elevation: GqlSession["elevation"]
 	aging_conditions: GqlSession["aging_conditions"]
 	rating: NonNullable<GqlSession["rating"]>
@@ -108,7 +113,6 @@ export type SessionFull = SessionPreviewWithFeatureImage & {
 		| null
 	cultivar: Cultivar[]
 	picking: GqlSession["picking"]
-	genre: GqlSession["genre"]
 	notes: SessionNotes
 	flavor_axes: SessionFlavorAxes
 	brewing: SessionBrewing | null

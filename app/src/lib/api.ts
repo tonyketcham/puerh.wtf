@@ -7,6 +7,7 @@ import {
 } from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
+import type { Origin } from "./types/origin"
 
 const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
 	headers: {},
@@ -24,6 +25,17 @@ const NOTES_FIELDS = `
 	empty_cup
 	cha_qi
 `
+
+/**
+ * An origin plus its parent chain. Flatbread resolves the Origin → Origin self-ref one level per
+ * selection, so nest it as deep as the tree goes (village → … → country is 6 nodes).
+ */
+const ORIGIN_DEPTH = 6
+const ORIGIN_NODE_FIELDS = `_slug id title hanzi pinyin kind`
+const ORIGIN_FIELDS = Array.from({ length: ORIGIN_DEPTH - 1 }).reduce<string>(
+	(inner) => `${ORIGIN_NODE_FIELDS} parent { ${inner} }`,
+	ORIGIN_NODE_FIELDS
+)
 
 const BREWING_FIELDS = `
 	temperature
@@ -127,12 +139,9 @@ export async function getExplorerSessions(options?: {
 					title
 				}
 				origin {
-					_slug
-					id
-					country
-					location
-					municipality
+					${ORIGIN_FIELDS}
 				}
+				origin_note
 				rating
 				notes {
 					${NOTES_FIELDS}
@@ -224,13 +233,17 @@ export async function getSession(slug: string): Promise<SessionFull> {
 				date
 				production_year
 				excerpt
-				season
+				harvest {
+					season
+					month
+					years
+				}
+				season_note
 				elevation
 				aging_conditions
 				rating
 				purchase_link
 				picking
-				genre
 				style {
 					id
 					title
@@ -270,12 +283,9 @@ export async function getSession(slug: string): Promise<SessionFull> {
 					title
 				}
 				origin {
-					_slug
-					id
-					country
-					location
-					municipality
+					${ORIGIN_FIELDS}
 				}
+				origin_note
 				images {
 					alt
 					image
@@ -289,6 +299,30 @@ export async function getSession(slug: string): Promise<SessionFull> {
 
 	const { Session } = await flatbread.request(query, { id: sessionId })
 	return Session
+}
+
+export async function getOrigins(): Promise<Origin[]> {
+	const query = gql`
+		query AllOrigins {
+			allOrigins(sortBy: "_slug") {
+				${ORIGIN_FIELDS}
+				groups
+				description
+				geo {
+					lat
+					lon
+					precision
+					radius_km
+					elevation_m
+					confidence
+					source
+				}
+			}
+		}
+	`
+
+	const { allOrigins }: { allOrigins: Origin[] } = await flatbread.request(query)
+	return allOrigins
 }
 
 export type VendorDetail = {

@@ -28,6 +28,7 @@ export type Author = {
   _filename?: Maybe<Scalars['String']['output']>;
   _path?: Maybe<Scalars['String']['output']>;
   _slug?: Maybe<Scalars['String']['output']>;
+  excerpt?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   image?: Maybe<Scalars['String']['output']>;
   links?: Maybe<Author_Links>;
@@ -109,11 +110,27 @@ export type Origin = {
   _filename?: Maybe<Scalars['String']['output']>;
   _path?: Maybe<Scalars['String']['output']>;
   _slug?: Maybe<Scalars['String']['output']>;
-  country?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  geo?: Maybe<Origin_Geo>;
+  groups?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  hanzi?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
-  location?: Maybe<Scalars['String']['output']>;
-  municipality?: Maybe<Scalars['String']['output']>;
+  kind?: Maybe<Scalars['String']['output']>;
+  /** The Origin referenced by this Origin */
+  parent?: Maybe<Origin>;
+  pinyin?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type Origin_Geo = {
+  __typename?: 'Origin_Geo';
+  confidence?: Maybe<Scalars['String']['output']>;
+  elevation_m?: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
+  lat?: Maybe<Scalars['Float']['output']>;
+  lon?: Maybe<Scalars['Float']['output']>;
+  precision?: Maybe<Scalars['String']['output']>;
+  radius_km?: Maybe<Scalars['Float']['output']>;
+  source?: Maybe<Scalars['String']['output']>;
 };
 
 export type Origin__Content = {
@@ -303,17 +320,18 @@ export type Session = {
   elevation?: Maybe<Scalars['Float']['output']>;
   excerpt?: Maybe<Scalars['String']['output']>;
   flavor_axes?: Maybe<Session_Flavor_Axes>;
-  genre?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  harvest?: Maybe<Session_Harvest>;
   id?: Maybe<Scalars['String']['output']>;
   images?: Maybe<Array<Maybe<Session_Images>>>;
   notes?: Maybe<Session_Notes>;
   /** All Origins that are referenced by this Session */
   origin?: Maybe<Array<Maybe<Origin>>>;
+  origin_note?: Maybe<Scalars['String']['output']>;
   picking?: Maybe<Scalars['String']['output']>;
   production_year?: Maybe<Scalars['Float']['output']>;
   purchase_link?: Maybe<Scalars['String']['output']>;
   rating?: Maybe<Scalars['Float']['output']>;
-  season?: Maybe<Scalars['String']['output']>;
+  season_note?: Maybe<Scalars['String']['output']>;
   /** All Styles that are referenced by this Session */
   style?: Maybe<Array<Maybe<Style>>>;
   /** All Tagses that are referenced by this Session */
@@ -456,6 +474,13 @@ export type Session_Flavor_Axes_Wood = {
   start?: Maybe<Scalars['Float']['output']>;
 };
 
+export type Session_Harvest = {
+  __typename?: 'Session_Harvest';
+  month?: Maybe<Scalars['Float']['output']>;
+  season?: Maybe<Scalars['String']['output']>;
+  years?: Maybe<Array<Maybe<Scalars['Float']['output']>>>;
+};
+
 export type Session_Images = {
   __typename?: 'Session_Images';
   alt?: Maybe<Scalars['String']['output']>;
@@ -506,7 +531,6 @@ export type Style = {
   category?: Maybe<Category>;
   color?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
-  genre_id?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
 };
@@ -575,9 +599,19 @@ export type Varietal = {
   _path?: Maybe<Scalars['String']['output']>;
   _slug?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  hanzi?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
-  styles?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  /** All Styles that are referenced by this Varietal */
+  styles?: Maybe<Array<Maybe<Style>>>;
   title?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type VarietalStylesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Order>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Varietal__Content = {
