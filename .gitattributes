@@ -1,0 +1,3 @@
+# Generated geo artifacts must be byte-identical on every OS (plan §4.3.1)
+app/public/maps/** -text
+app/src/generated/*.json text eol=lf
