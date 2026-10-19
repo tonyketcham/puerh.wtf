@@ -1,4 +1,5 @@
-import { gql, GraphQLClient } from "graphql-request"
+import { gql } from "graphql-request"
+import * as flatbread from "./flatbread"
 import {
 	FLAVOR_AXES,
 	type ExplorerSession,
@@ -8,10 +9,6 @@ import {
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
 import type { Origin, OriginRef } from "./types/origin"
-
-const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
-	headers: {},
-})
 
 // Shared GraphQL selection sets (interpolated into the gql strings below)
 const FLAVOR_AXES_FIELDS = FLAVOR_AXES.map((axis) => `${axis} { start finish }`).join("\n")

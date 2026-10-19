@@ -10,15 +10,12 @@
  * per request with React's cache().
  */
 import { cache } from "react"
-import { gql, GraphQLClient } from "graphql-request"
+import { gql } from "graphql-request"
+import * as flatbread from "@/lib/flatbread"
 import { getExplorerSessions } from "@/lib/api"
 import type { PageKind } from "@/lib/peek"
 import { buildRelationIndex, type RelationIndex } from "@/lib/relations"
 import type { OriginGeo, OriginKind } from "@/lib/types/origin"
-
-const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
-	headers: {},
-})
 
 // ---------------------------------------------------------------------------
 // Types

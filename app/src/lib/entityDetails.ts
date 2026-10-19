@@ -7,12 +7,9 @@
  * handed to the EntityPeek host, so opening a peek never fetches. Entries without anything to
  * add are dropped and descriptions are clipped to what the card shows, to keep the payload small.
  */
-import { gql, GraphQLClient } from "graphql-request"
+import { gql } from "graphql-request"
+import * as flatbread from "@/lib/flatbread"
 import type { OriginKind } from "@/lib/types/origin"
-
-const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
-	headers: {},
-})
 
 export type OriginPeekDetail = {
 	description?: string
