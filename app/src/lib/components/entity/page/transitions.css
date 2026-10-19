@@ -1,6 +1,7 @@
 /*
-  Route transitions for entity pages (plan §3.2 Motion), driven by React <ViewTransition>
-  (see viewTransition.ts). Plain CSS: view-transition pseudo-elements are global.
+  Route transitions for entity pages (plan §3.2 Motion), driven by
+  document.startViewTransition (see viewTransition.ts: React <ViewTransition> never fires on App
+  Router navigations). Plain CSS: view-transition pseudo-elements are global.
 */
 
 /* the clicked chip / crumb / peek header grows into the Rock 3D title */
@@ -15,9 +16,8 @@
 }
 
 /*
-  Everything else rides the root snapshot's default cross-fade. (No unnamed <ViewTransition>
-  around the page body: a Suspense boundary revealing inside one, like the URL-reading filter
-  chips on a static export, would start a transition on first load.)
+  Everything else rides the root snapshot's default cross-fade. (Hard loads don't
+  transition: only useMorphClick starts one.)
 */
 
 /* reduced motion: no morphs or lifts, an opacity cross-fade only */

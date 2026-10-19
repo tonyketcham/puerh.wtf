@@ -16,8 +16,6 @@ export default (phase) => {
 			FLATBREAD_URL: process.env.FLATBREAD_URL || "http://localhost:5057/graphql",
 		},
 		experimental: {
-			// React <ViewTransition> route morphs on entity pages (plan §3.2); cross-fades elsewhere
-			viewTransition: true,
 			// Only use Jotai SWC plugins when NOT using Turbopack (due to a compatibility issue)
 			...(isDev &&
 				!isUsingTurbopack && {

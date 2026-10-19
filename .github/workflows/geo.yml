@@ -1,8 +1,8 @@
 name: Geo
 
-# Origin map pipeline guards (docs/relational-plan.md §4.3.1). Neither job touches the network
-# beyond installing deps: geo:check hashes inputs against the committed manifest, and geo:test
-# runs the real pipeline on a 4-tile fixture and compares it byte for byte on every OS.
+# Origin map pipeline determinism (docs/relational-plan.md §4.3.1): geo:test runs the real
+# pipeline on a 4-tile fixture and compares it byte for byte on every OS, with no network beyond
+# installing deps. (geo:check, the cheap manifest guard, runs in build.yml's app-build job.)
 
 on:
   pull_request:
@@ -13,18 +13,6 @@ on:
       - main
 
 jobs:
-  geo-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter puerh.wtf geo:check
-
   geo-test:
     strategy:
       fail-fast: false

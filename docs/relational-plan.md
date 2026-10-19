@@ -282,7 +282,7 @@ The page lives in the center editor column; the Explorer and status bar persist.
   - **Top descriptors** for the entity: descriptor frequency across its sessions, so you can click "camphor" to find references inside Yiwu.
 - **Status bar:** `^ origin · 10 refs · 22.07°N 101.42°E · ±6 km · precision: mountain-area`.
 - **Motion:**
-  - Route change: use React 19 `<ViewTransition>` (Next 16 `experimental.viewTransition`) to morph the clicked chip or peek header into the page title, and the peek inset into the hero map.
+  - Route change: use React 19 `<ViewTransition>` (Next 16 `experimental.viewTransition`) to morph the clicked chip or peek header into the page title, and the peek inset into the hero map. *(Built on `document.startViewTransition` instead; see §7.)*
   - Fallback: cross-fade.
   - Session cards enter staggered (reuse `enterIndex` from `SessionCard`).
   - Scroll-linked: the hero map tilts very slightly via `useScroll` → `rotateX 0→6°`, and contours fade toward index contours only.
@@ -452,7 +452,7 @@ The pipeline has to run the same on Windows (main dev), macOS (other devices), a
 | `/origins` base frame (locator + Yunnan + context lines) | ≤ 150 KB |
 | Six-mountains LOD (lazy on zoom) | ≤ 250 KB |
 | Ridgelines hero | ≤ 60 KB |
-| CJK subset font | ≤ 15 KB |
+| CJK subset font | ≤ 16 KB (planned 15; see §7) |
 | Runtime JS added | ~0 beyond components (motion already present; no d3-geo/maplibre at runtime) |
 
 Rejected options:
@@ -477,7 +477,7 @@ Rejected options:
 2. Camera: a locator (East Asia coast) → Yunnan frame. Spring-animated `viewBox` (motion value → `attr`).
 3. Rings pop in by vintage year order, so the oldest tea appears first. The YearRuler filter dims rings outside the selected years.
 4. Hover a ring: EntityPeek. Hover an Explorer row: its ring pulses and a hairline leader draws from the map edge.
-5. Click a cluster: zoom to the six-mountains frame and lazy-load the LOD (cross-fade 250 ms). The breadcrumb updates and the URL becomes `/origins/yiwu/` (shallow, no full navigation).
+5. Click a cluster: zoom to the six-mountains frame and lazy-load the LOD (cross-fade 250 ms). The breadcrumb updates and the URL becomes `/origins/yiwu/` (shallow, no full navigation). *(Built as `/origins/?at=yiwu`; see §7.)*
 6. Keyboard: ←/→ cycles origins by longitude, Enter opens, Esc zooms out, `f` toggles "filter Explorer to visible".
 7. Layer toggles (status bar, IDE-style): `contours · ridges · rivers · storage · supply lines`.
 
@@ -608,6 +608,20 @@ Still open (facts only the owner has; they don't block any phase):
 - D14: the vendor for Mori-machi Dark (Liquid Proust vs Den's Tea)
 - D15: Moon Bear White's production year (2020 or 2021)
 - A village-level point for Suan Zao Shu (township or vendor map)
+
+## 7. Implementation notes (divergences from the plan)
+
+Recorded 2026-10-19 while closing the completeness review. Each one is deliberate, and none changes a decision in §6.
+
+| Plan | Built | Why |
+|---|---|---|
+| §3.2: route morphs with React 19 `<ViewTransition>` and `experimental.viewTransition` | `useMorphClick` drives `document.startViewTransition` by hand (`entity/page/viewTransition.ts`). The experimental flag is off. | Under the Next 16 App Router, a `<Link>` navigation commits outside any transition React considers, so `<ViewTransition>` never fired on the static export. A Suspense reveal on first load did start one, which meant a whole-page cross-fade on every hard load. Nothing uses React's component, so the flag is dropped. |
+| §4.5 step 5: zooming to a cluster shallow-routes to `/origins/yiwu/` | `replaceState` to `/origins/?at=yiwu` | Under static export, `/origins/yiwu/` is a separate prerendered page (the origin's entity page), so a reload would land on a different page. The map reads `?at=` on load to restore the focus, and the query keeps filter params intact. |
+| §4.4: CJK subset font ≤ 15 KB | 15.5 KB, with the budget raised to 16 KB (`scripts/geo/params.mjs`) | Taiwanese and Japanese origins keep their native forms (台灣 嘉義 朝宮 滋賀 静岡). These are five glyphs the simplified set doesn't share, about 1 KB together. Simplifying them would misname the places. |
+| §4.3.1: `geo:check` in `build.yml` | As planned: a step in `build.yml`'s app-build job. The cross-OS `geo-test` matrix has its own `geo.yml` workflow. | The matrix runs on three OSes; the build job runs only on Ubuntu. |
+| §4.6: `geo.elevation_m` is optional | Filled in for 32 tea origins (the puer mountains and villages, plus the oolong, green and white tea places) | Peeks, heroes and insets showed "unrecorded" for nearly every origin. The ranges are typical garden elevations, consistent with the sessions' recorded elevations where those are plausible. Counties, provinces and low-confidence placeholders (Weidong) stay unrecorded. |
+
+One addition outside the plan: the static build shares one Flatbread client (`lib/flatbread.ts`). It memoizes queries per worker, caps the requests in flight and retries connection errors. Without it, the 21 prerender workers each asked for every collection on each of about 445 pages. That overwhelmed the single Flatbread server, which refused connections (ECONNREFUSED).
 
 ## Sources
 
