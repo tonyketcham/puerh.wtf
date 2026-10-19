@@ -144,6 +144,9 @@ importers:
       graphql-request:
         specifier: 4.3.0
         version: 4.3.0(graphql@16.5.0)
+      gray-matter:
+        specifier: 4.0.3
+        version: 4.0.3
       hast-util-parse-selector:
         specifier: 3.1.0
         version: 3.1.0
@@ -4760,10 +4763,6 @@ packages:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
     hasBin: true
 
-  js-yaml@4.1.0:
-    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
-    hasBin: true
-
   js-yaml@4.1.1:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
@@ -8752,7 +8751,7 @@ snapshots:
   '@flatbread/transformer-yaml@1.0.0-alpha.8':
     dependencies:
       '@sindresorhus/slugify': 2.2.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
 
   '@flatbread/utils@1.0.0-alpha.2':
     dependencies:
@@ -9239,7 +9238,7 @@ snapshots:
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       jose: 5.10.0
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lodash: 4.17.21
       scuid: 1.1.0
       tslib: 2.4.0
@@ -11164,7 +11163,7 @@ snapshots:
   cosmiconfig@8.3.6(typescript@6.0.3):
     dependencies:
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       parse-json: 5.2.0
       path-type: 4.0.0
     optionalDependencies:
@@ -13085,10 +13084,6 @@ snapshots:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
-
-  js-yaml@4.1.0:
-    dependencies:
-      argparse: 2.0.1
 
   js-yaml@4.1.1:
     dependencies:

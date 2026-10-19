@@ -46,6 +46,7 @@
 		"eslint-config-prettier": "8.5.0",
 		"flatbread": "1.0.0-alpha.22",
 		"graphql-request": "4.3.0",
+		"gray-matter": "4.0.3",
 		"hast-util-parse-selector": "3.1.0",
 		"hast-util-select": "5.0.2",
 		"mapshaper": "0.6.113",

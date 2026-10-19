@@ -7,7 +7,7 @@ import {
 } from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
-import type { Origin } from "./types/origin"
+import type { Origin, OriginRef } from "./types/origin"
 
 const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
 	headers: {},
@@ -29,6 +29,8 @@ const NOTES_FIELDS = `
 /**
  * An origin plus its parent chain. Flatbread resolves the Origin → Origin self-ref one level per
  * selection, so nest it as deep as the tree goes (village → … → country is 6 nodes).
+ * The deepest chains today (Banpo Laozhai, Weidong) are exactly 6; getOrigins() throws if the
+ * content grows deeper so truncation can't go unnoticed.
  */
 const ORIGIN_DEPTH = 6
 const ORIGIN_NODE_FIELDS = `_slug id title hanzi pinyin kind`
@@ -322,7 +324,29 @@ export async function getOrigins(): Promise<Origin[]> {
 	`
 
 	const { allOrigins }: { allOrigins: Origin[] } = await flatbread.request(query)
+	assertOriginDepth(allOrigins)
 	return allOrigins
+}
+
+/**
+ * Every origin is listed with at least its own parent, so if the last node of any selected chain
+ * still has a parent in the full list, the tree outgrew ORIGIN_DEPTH and chains are being cut short.
+ */
+function assertOriginDepth(origins: Origin[]) {
+	const parentOf = new Map(origins.map((origin) => [origin.id, origin.parent?.id]))
+	for (const origin of origins) {
+		let node: OriginRef | null | undefined = origin
+		let depth = 1
+		while (node?.parent) {
+			node = node.parent
+			depth++
+		}
+		if (depth === ORIGIN_DEPTH && node && parentOf.get(node.id)) {
+			throw new Error(
+				`Origin "${origin._slug}" is deeper than ORIGIN_DEPTH (${ORIGIN_DEPTH}); raise it in lib/api.ts`
+			)
+		}
+	}
 }
 
 export type VendorDetail = {

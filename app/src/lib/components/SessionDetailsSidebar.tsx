@@ -52,7 +52,8 @@ export default function SessionDetailsSidebar({ session }: SessionDetailsSidebar
 
 							{(session.style ||
 								session.production_year ||
-								session.harvest ||
+								session.harvest?.season ||
+								session.season_note ||
 								session.elevation ||
 								session.aging_conditions) && <PartitionedDivider />}
 							{session.style && session.style.length > 0 && (

@@ -593,6 +593,7 @@ collections:
       - label: 'Name'
         name: 'title'
         widget: 'string'
+        hint: 'Short romanized name without suffixes (Jingmai, not Jingmai Shan). It becomes the file slug.'
 
       - label: 'Hanzi / Kanji'
         name: 'hanzi'
@@ -637,7 +638,7 @@ collections:
             widget: 'select'
             hint: 'What the point actually means'
             options:
-              ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'unknown']
+              ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'forest', 'unknown']
           - { label: 'Radius (km)', name: 'radius_km', widget: 'number', value_type: 'float' }
           - label: 'Elevation range (m)'
             name: 'elevation_m'
