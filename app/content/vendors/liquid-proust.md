@@ -8,5 +8,5 @@ links:
   instagram: https://www.instagram.com/liquidproust/
 location: Columbus
 municipality: Ohio
-country: USA
+country: United States
 ---
