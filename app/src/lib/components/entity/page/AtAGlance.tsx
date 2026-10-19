@@ -107,7 +107,7 @@ export default function AtAGlance({
 				/>
 			</dl>
 
-			<div className="grid items-center gap-x-8 gap-y-6 md:grid-cols-[minmax(0,1fr)_minmax(200px,260px)]">
+			<div className="grid grid-cols-1 items-center gap-x-8 gap-y-6 md:grid-cols-[minmax(0,1fr)_minmax(200px,260px)]">
 				<div className="min-w-0 space-y-6">
 					<VintageStrip model={model} index={index} />
 

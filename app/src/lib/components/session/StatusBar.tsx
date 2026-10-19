@@ -87,7 +87,7 @@ export default function StatusBar() {
 						exit={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
 						transition={{ type: "spring", stiffness: 420, damping: 34 }}
 					>
-						<div className="flex items-stretch min-w-0">
+						<div className="flex items-stretch min-w-0 overflow-hidden">
 							{/* liquor block: the debugger-mode corner of an IDE, tinted with this tea */}
 							<Segment
 								as="button"
@@ -148,18 +148,22 @@ export default function StatusBar() {
 
 						<div className="flex items-stretch shrink-0">
 							{age != null && (
-								<Segment title={`Vintage ${session.production_year}`}>
+								<Segment title={`Vintage ${session.production_year}`} className="hidden md:flex">
 									aged {formatAge(age)}
 								</Segment>
 							)}
-							{date && <Segment title="Session date">{date}</Segment>}
+							{date && (
+								<Segment title="Session date" className="hidden md:flex">
+									{date}
+								</Segment>
+							)}
 							<PhaseSegment />
 							<LiquorSegment hex={liquor.hex} measured={liquor.measured} />
 							<Segment
 								as="button"
 								title="Command bar"
 								onClick={() => openCommandBar({})}
-								className="pr-3 text-white/35"
+								className="hidden md:flex pr-3 text-white/35"
 							>
 								<kbd className="font-fira-code">{isMac ? "⌘K" : "Ctrl K"}</kbd>
 							</Segment>
@@ -233,7 +237,7 @@ function PhaseSegment() {
 			aria-valuemax={100}
 			aria-valuenow={Math.round(phase * 100)}
 			title={`Flavor phase ${Math.round(phase * 100)}% · driven by ${source}`}
-			className="relative flex items-center gap-1.5 px-2.5 whitespace-nowrap transition-colors duration-150 hover:bg-white/[0.03] hover:text-white/75"
+			className="relative hidden md:flex items-center gap-1.5 px-2.5 whitespace-nowrap transition-colors duration-150 hover:bg-white/[0.03] hover:text-white/75"
 		>
 			<span className="text-white/40">start</span>
 			<span className="flex" aria-hidden>

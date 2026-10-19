@@ -51,7 +51,7 @@ export default function VesselIndex({ vessels }: { vessels: EntityListItem[] }) 
 				title="Teaware"
 				summary={`// ${vessels.length} vessels · ${used} in the log · ${index.sessions.length} sessions poured`}
 			/>
-			<ol className="grid gap-4 sm:grid-cols-2" data-recording-key="vessel-index">
+			<ol className="grid grid-cols-1 gap-4 sm:grid-cols-2" data-recording-key="vessel-index">
 				{cards.map(({ v, model, facts, rotation }, i) => {
 					const spec = [
 						v.vessel?.kind,

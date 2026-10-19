@@ -28,8 +28,10 @@ export default function LexiconShell({ children }: { children: ReactNode }) {
 	return (
 		// [data-statusbar-layout] turns on --statusbar-h (see app.css)
 		<div className="flex-1 bg-background text-ink" data-statusbar-layout data-lexicon-shell>
-			<div className="grid grid-cols-12 gap-8 p-8">
-				<div className={cn("min-w-0", slug ? "col-span-8" : "col-span-12")}>{children}</div>
+			<div className="grid grid-cols-12 gap-x-8 gap-y-10 lg:gap-8 lg:p-8">
+				<div className={cn("min-w-0", slug ? "col-span-12 lg:col-span-8" : "col-span-12")}>
+					{children}
+				</div>
 
 				{slug && (
 					<SessionPropertiesPanel>

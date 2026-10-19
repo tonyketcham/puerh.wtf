@@ -47,6 +47,19 @@
 }
 
 /*
+  Below lg the IDE frame folds into one column: the Explorer rail steps aside (the command bar
+  and the compact site header carry navigation) and the Properties panel joins the page flow
+  under the editor, so neither side reserves width. Matches Tailwind's lg (64rem).
+*/
+@media (width < 64rem) {
+	:root,
+	:root:has([data-properties-panel]) {
+		--explorer-w: 0px;
+		--rightpanel-w: 0px;
+	}
+}
+
+/*
   Rock 3D's space glyph advances a full 1em (text faces sit near 0.25em), it ships no kerning
   pairs, and its glyphs carry ~0.1–0.2em of side bearing. Left alone, word gaps run 4–5x the
   letter gaps and short words (Hou Gu, Cha, Pu) read as loose letters. In the components layer

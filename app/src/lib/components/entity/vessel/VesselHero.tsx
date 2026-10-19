@@ -47,7 +47,7 @@ export default function VesselHero({
 	return (
 		// a container query: the editor column is narrow beside the Explorer and Properties
 		<div className="@container" data-recording-key="vessel-hero">
-			<div className="grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+			<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] @2xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
 				<VesselPhoto
 					src={data.image}
 					kind={spec?.kind}

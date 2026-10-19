@@ -61,7 +61,7 @@ export default function OriginIndex({
 				summary={`// ${origins.length} places · ${tasted} with sessions · ${placedSessions} of ${index.sessions.length} sessions placed`}
 			/>
 
-			<div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
+			<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
 				<div className="lg:sticky lg:top-[calc(var(--commandbar-h)+0.5rem)]">
 					{/* the map reads the Explorer filters from the URL */}
 					<Suspense fallback={<div className={MAP_BOX} />}>

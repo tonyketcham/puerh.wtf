@@ -53,7 +53,10 @@ export default function VendorIndex({
 				title="Vendors"
 				summary={`// ${vendors.length} vendors · ${tasted} tasted · by sessions`}
 			/>
-			<ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-recording-key="vendor-index">
+			<ul
+				className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+				data-recording-key="vendor-index"
+			>
 				{cards.map(({ v, stats, mix, accent }, i) => {
 					const total = mix.reduce((n, m) => n + m.count, 0)
 					return (
@@ -153,7 +156,7 @@ export default function VendorIndex({
 									</span>
 									<span className="flex-1" />
 									{stats.avgRating != null && (
-										<span className="tabular-nums">
+										<span className="tabular-nums whitespace-nowrap shrink-0">
 											<span className="text-white/30">avg</span>{" "}
 											{formatRating(Math.round(stats.avgRating * 10) / 10)}
 										</span>

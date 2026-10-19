@@ -337,7 +337,8 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	return (
 		<MotionConfig reducedMotion="user">
 			<div
-				className="fixed top-0 left-0 bottom-[var(--statusbar-h)] z-20 flex flex-col w-[var(--explorer-w)] p-8 space-y-10 pointer-events-none font-fira-code"
+				// below lg the rail steps aside (app.css zeroes --explorer-w) and the layout shows a compact header
+				className="fixed top-0 left-0 bottom-[var(--statusbar-h)] z-20 hidden lg:flex flex-col w-[var(--explorer-w)] p-8 space-y-10 pointer-events-none font-fira-code"
 				data-recording-key={recordingKey}
 			>
 				<SiteHeader />

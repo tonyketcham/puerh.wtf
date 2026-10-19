@@ -173,7 +173,10 @@ export default function SessionTitle({ title, slug }: SessionTitleProps) {
 	const stacked: CSSProperties = { gridArea: "1 / 1", padding: BLEED, margin: `-${BLEED}` }
 
 	return (
-		<h1 className="grid font-rock-3d text-8xl text-shadow-2xl" data-session-title>
+		<h1
+			className="grid font-rock-3d text-6xl sm:text-7xl lg:text-8xl text-shadow-2xl"
+			data-session-title
+		>
 			<motion.span
 				ref={ref}
 				className="block"

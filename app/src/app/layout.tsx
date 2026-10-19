@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import localFont from "next/font/local"
 import "../app.css"
 import Explorer from "../lib/components/Explorer"
+import SiteHeader from "../lib/components/SiteHeader"
 import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
 import { StoreProvider } from "@/lib/store/StoreProvider"
 import { Suspense } from "react"
@@ -49,9 +50,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 						<Suspense>
 							<Explorer sessions={sessions} vendors={vendors} categories={categories} />
 						</Suspense>
-						<div className="flex flex-col w-full ml-[var(--explorer-w)]">
+						<div className="flex flex-col w-full min-w-0 ml-[var(--explorer-w)]">
+							{/* below lg the Explorer rail is hidden, so the masthead rides above the page */}
+							<SiteHeader compact className="pt-[calc(var(--commandbar-h)+0.5rem)] lg:hidden" />
 							{/* top: room for the command bar; bottom: room for the status bar (0 off session pages) */}
-							<main className="w-full p-8 pt-[calc(var(--commandbar-h)+2rem)] pb-[calc(var(--statusbar-h)+2rem)]">
+							<main className="w-full min-w-0 px-4 pt-4 lg:p-8 lg:pt-[calc(var(--commandbar-h)+2rem)] pb-[calc(var(--statusbar-h)+2rem)] lg:pb-[calc(var(--statusbar-h)+2rem)]">
 								{children}
 							</main>
 						</div>

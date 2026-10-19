@@ -251,7 +251,7 @@ function VendorHero({
 	points: DotMapPoint[]
 }) {
 	return (
-		<div className="grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
 			<div className="flex items-center gap-4 p-5">
 				<Logo src={data.image} title={data.title} />
 				<div className="min-w-0 space-y-1.5 text-xs">
@@ -366,7 +366,7 @@ function ColorFieldHero({
 		).length
 	}, [points, model.sessions])
 	return (
-		<div className="grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 			<div className="relative">
 				<motion.div
 					aria-hidden
@@ -458,7 +458,7 @@ function CultivarHero({
 }) {
 	const size = leafSize(data.title)
 	return (
-		<div className="grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+		<div className="grid grid-cols-1 overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 			<div className="flex gap-5 px-6 py-5">
 				<div className="flex flex-col items-center gap-2 shrink-0">
 					{data.hanzi ? (

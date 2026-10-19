@@ -93,7 +93,7 @@ export default function LexiconStatusBar({ slug }: { slug: string | null }) {
 					exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
 					transition={{ type: "spring", stiffness: 420, damping: 34 }}
 				>
-					<div className="flex items-stretch min-w-0">
+					<div className="flex items-stretch min-w-0 overflow-hidden">
 						<div
 							className="flex items-center gap-1.5 px-3 font-medium transition-colors duration-500"
 							style={{
@@ -115,7 +115,7 @@ export default function LexiconStatusBar({ slug }: { slug: string | null }) {
 					</div>
 					<div className="flex items-stretch shrink-0">
 						{right.map((part, i) => (
-							<div key={i} className="flex items-center px-2.5">
+							<div key={i} className="hidden md:flex items-center px-2.5">
 								{part}
 							</div>
 						))}
@@ -136,7 +136,7 @@ export default function LexiconStatusBar({ slug }: { slug: string | null }) {
 							type="button"
 							title="Command bar"
 							onClick={() => openCommandBar({})}
-							className="flex items-center px-2.5 pr-3 text-white/35 outline-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:bg-white/[0.08]"
+							className="hidden md:flex items-center px-2.5 pr-3 text-white/35 outline-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:bg-white/[0.08]"
 						>
 							<kbd className="font-fira-code">{isMac ? "⌘K" : "Ctrl K"}</kbd>
 						</button>

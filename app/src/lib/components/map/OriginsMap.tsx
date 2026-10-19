@@ -1154,7 +1154,7 @@ function MapChrome({
 		<>
 			{/* hero caption, while the ridges stand */}
 			<motion.div
-				className="absolute left-4 top-3.5 pointer-events-none text-[10.5px] leading-relaxed text-white/45"
+				className="absolute left-4 right-24 top-3.5 pointer-events-none text-[10.5px] leading-relaxed text-white/45"
 				style={{ opacity: heroOpacity }}
 				aria-hidden
 			>

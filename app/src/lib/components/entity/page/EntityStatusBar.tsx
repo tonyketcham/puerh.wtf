@@ -150,7 +150,7 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 					exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
 					transition={{ type: "spring", stiffness: 420, damping: 34 }}
 				>
-					<div className="flex items-stretch min-w-0">
+					<div className="flex items-stretch min-w-0 overflow-hidden">
 						<div
 							className="flex items-center gap-1.5 px-3 font-medium transition-colors duration-500"
 							style={{
@@ -161,7 +161,13 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 							<span aria-hidden>{ENTITY_META[kind].glyph}</span>
 							{slug ? ENTITY_META[kind].label : PLURAL[kind]}
 						</div>
-						<div className="flex items-center min-w-0 gap-0 px-2.5 overflow-hidden whitespace-nowrap">
+						<div
+							className={cn(
+								"flex items-center min-w-0 gap-0 px-2.5 overflow-hidden whitespace-nowrap",
+								// narrow screens give the map layer toggles the room
+								kind === "origin" && !slug && "hidden md:flex"
+							)}
+						>
 							{left.map((part, i) => (
 								<span key={i} className="flex items-center">
 									{i > 0 && <span className="px-1.5 text-white/20">·</span>}
@@ -176,7 +182,7 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 					</div>
 					<div className="flex items-stretch shrink-0">
 						{right.map((part, i) => (
-							<div key={i} className="flex items-center px-2.5">
+							<div key={i} className="hidden md:flex items-center px-2.5">
 								{part}
 							</div>
 						))}
@@ -197,7 +203,7 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 							type="button"
 							title="Command bar"
 							onClick={() => openCommandBar({})}
-							className="flex items-center px-2.5 pr-3 text-white/35 outline-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:bg-white/[0.08]"
+							className="hidden md:flex items-center px-2.5 pr-3 text-white/35 outline-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:bg-white/[0.08]"
 						>
 							<kbd className="font-fira-code">{isMac ? "⌘K" : "Ctrl K"}</kbd>
 						</button>

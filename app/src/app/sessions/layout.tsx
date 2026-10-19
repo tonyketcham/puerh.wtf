@@ -7,8 +7,8 @@ export default async function SessionLayout({ children }: PropsWithChildren) {
 	return (
 		// [data-statusbar-layout] turns on --statusbar-h (see app.css)
 		<div className="flex-1 bg-background text-ink" data-statusbar-layout>
-			<div className="grid grid-cols-12 gap-8 p-8">
-				<div className="col-span-8">
+			<div className="grid grid-cols-12 gap-x-8 gap-y-10 lg:gap-8 lg:p-8">
+				<div className="min-w-0 col-span-12 lg:col-span-8">
 					{/* persists across sessions, so shared crumbs hold still while the tail changes */}
 					<SessionBreadcrumb className="mb-4" recordingKey="session-breadcrumb" />
 					<div className="space-y-8">{children}</div>
