@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { memo, useState, type DragEvent } from "react"
-import { motion } from "motion/react"
+import { AnimatePresence, motion } from "motion/react"
 import type { TreeNode } from "../../types/tree"
 import ColoredFileIcon from "./ColoredFileIcon"
 import { useFileTreeContext } from "./FileTreeContext"
@@ -11,6 +11,7 @@ import { setSessionDragPreview } from "./dragPreview"
 import { getLiquorColor, liquorTextRgb, rgbCss } from "@/lib/liquor"
 import { setSessionDragData } from "@/lib/dnd"
 import { cn } from "@/lib/utils/cn"
+import { formatRating } from "@/lib/sessionSort"
 
 interface FileProps {
 	node: TreeNode
@@ -24,7 +25,8 @@ const stripSlash = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p)
 
 function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 	const pathname = usePathname()
-	const { referenceMatches } = useFileTreeContext()
+	const { referenceMatches, order } = useFileTreeContext()
+	const showRating = order === "rating"
 	const [dragging, setDragging] = useState(false)
 
 	const hasHref = !!hrefFunction
@@ -93,6 +95,20 @@ function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 				)}
 				<span className={isCurrentPage ? "text-white" : ""}>{` ${node.title}`}</span>
 			</span>
+			<AnimatePresence initial={false}>
+				{showRating && isSession && typeof node.rating === "number" && (
+					<motion.span
+						key="rating"
+						className="mt-px text-[11px] leading-5 tabular-nums text-white/40 group-hover:text-white/70"
+						initial={{ opacity: 0, x: 6 }}
+						animate={{ opacity: 1, x: 0 }}
+						exit={{ opacity: 0, x: 6 }}
+						transition={{ type: "spring", stiffness: 520, damping: 38 }}
+					>
+						{formatRating(node.rating)}
+					</motion.span>
+				)}
+			</AnimatePresence>
 			{/* always in the flow so a dot appearing never narrows the title and rewraps the row */}
 			{isSession && (
 				<span

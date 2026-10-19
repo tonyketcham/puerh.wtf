@@ -1,8 +1,9 @@
 "use client"
 
-import { useId, useState } from "react"
+import { useId, useState, type ReactNode } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import File from "./File"
+import { useFileTreeContext } from "./FileTreeContext"
 import type { TreeNode } from "../../types/tree"
 import { buildLink } from "../../utils/BuildLinkToGivenCollectionNode"
 
@@ -51,6 +52,8 @@ interface FolderProps {
 	nodes: TreeNode[]
 	/** unfiltered size; when larger than nodes.length the header shows "n / total" */
 	total?: number
+	/** header actions, right of the title (kept outside the toggle button) */
+	actions?: ReactNode
 	expanded?: boolean
 	indentationLevel?: number
 }
@@ -59,12 +62,14 @@ export default function Folder({
 	title,
 	nodes,
 	total,
+	actions,
 	expanded: initialExpanded = true,
 	indentationLevel = 0,
 }: FolderProps) {
 	const [expanded, setExpanded] = useState(initialExpanded)
 	const reduce = useReducedMotion()
 	const listId = useId()
+	const { order } = useFileTreeContext()
 	const filtered = total !== undefined && total !== nodes.length
 
 	// rows collapse/expand in height so siblings glide instead of jumping
@@ -80,39 +85,42 @@ export default function Folder({
 				// clip only while resizing, so a lifted (dragging) row isn't cut off
 				animate: { opacity: 1, height: "auto", transitionEnd: { overflow: "visible" } },
 				exit: { opacity: 0, height: 0, overflow: "hidden" },
-				transition: { height: ROW_SPRING, opacity: { duration: 0.18 } },
+				transition: { height: ROW_SPRING, layout: ROW_SPRING, opacity: { duration: 0.18 } },
 		  }
 
 	return (
 		<div className="px-2 py-1.5">
-			<button
-				type="button"
-				onClick={() => setExpanded((v) => !v)}
-				aria-expanded={expanded}
-				aria-controls={listId}
-				className="flex w-full items-center px-2 space-x-2 text-left rounded-sm cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/25"
-				style={{ paddingLeft: `${indentationLevel * 1.25 + 0.25}rem` }}
-			>
-				<ExpandCollapseIcon expanded={expanded} />
-				<FolderIcon />
-				<span className="flex-1 text-sm leading-4 text-white/60 group-hover:text-white">
-					{title}
-				</span>
-				<AnimatePresence initial={false}>
-					{filtered && (
-						<motion.span
-							key="count"
-							className="text-[10px] tabular-nums text-white/40"
-							initial={{ opacity: 0, x: 4 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 4 }}
-						>
-							{nodes.length}
-							<span className="text-white/25"> / {total}</span>
-						</motion.span>
-					)}
-				</AnimatePresence>
-			</button>
+			<div className="flex items-center gap-1">
+				<button
+					type="button"
+					onClick={() => setExpanded((v) => !v)}
+					aria-expanded={expanded}
+					aria-controls={listId}
+					className="flex flex-1 min-w-0 items-center px-2 space-x-2 text-left rounded-sm cursor-pointer group outline-none focus-visible:ring-1 focus-visible:ring-white/25"
+					style={{ paddingLeft: `${indentationLevel * 1.25 + 0.25}rem` }}
+				>
+					<ExpandCollapseIcon expanded={expanded} />
+					<FolderIcon />
+					<span className="flex-1 text-sm leading-4 text-white/60 group-hover:text-white">
+						{title}
+					</span>
+					<AnimatePresence initial={false}>
+						{filtered && (
+							<motion.span
+								key="count"
+								className="text-[10px] tabular-nums text-white/40"
+								initial={{ opacity: 0, x: 4 }}
+								animate={{ opacity: 1, x: 0 }}
+								exit={{ opacity: 0, x: 4 }}
+							>
+								{nodes.length}
+								<span className="text-white/25"> / {total}</span>
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</button>
+				{actions}
+			</div>
 			<AnimatePresence initial={false}>
 				{expanded && (
 					<motion.ul
@@ -130,7 +138,7 @@ export default function Folder({
 						<li aria-hidden="true" className="h-1" />
 						<AnimatePresence initial={false}>
 							{nodes.map((node) => (
-								<motion.li key={node.id} {...rowMotion}>
+								<motion.li key={node.id} layout="position" layoutDependency={order} {...rowMotion}>
 									{node?.children ? (
 										<Folder
 											title={node.title}

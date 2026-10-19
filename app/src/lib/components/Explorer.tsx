@@ -30,7 +30,9 @@ import {
 	originKeys,
 	originSearchText,
 } from "@/lib/origins"
-import { descriptorAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
+import { descriptorAtom, explorerSortAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
+import { sortSessions } from "@/lib/sessionSort"
+import SessionSortToggle from "@/lib/components/explorer/SessionSortToggle"
 import YearRuler from "@/lib/components/explorer/YearRuler"
 import FilterTokens, { type FilterToken } from "@/lib/components/explorer/FilterTokens"
 import DescriptorReferences from "@/lib/components/explorer/DescriptorReferences"
@@ -162,6 +164,7 @@ const getServerModKey = () => "Ctrl"
 export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
 	const { q, setQ, facets, setFacets } = useUrlSync()
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
+	const [sort, setSort] = useAtom(explorerSortAtom)
 	const openCommandBar = useSetAtom(openCommandBarAtom)
 	const modKey = useSyncExternalStore(subscribeNoop, getModKey, getServerModKey)
 
@@ -179,6 +182,11 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				? sessions.filter((s) => passesFilters(s, facets, query, { ignoreYears: true }))
 				: filteredSessions,
 		[sessions, facets, query, filteredSessions]
+	)
+	// display order (sessions arrive newest first, so date needs no sort)
+	const sortedSessions = useMemo(
+		() => (sort === "date" ? filteredSessions : sortSessions(filteredSessions, sort)),
+		[filteredSessions, sort]
 	)
 
 	// Vendors/categories lists are narrowed by the free-text query only
@@ -198,9 +206,9 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		const all = new Set(
 			sessions.filter((s) => sessionMatchesDescriptor(s, descriptorTerm)).map((s) => s._slug)
 		)
-		const visible = filteredSessions.filter((s) => all.has(s._slug)).map((s) => s._slug)
+		const visible = sortedSessions.filter((s) => all.has(s._slug)).map((s) => s._slug)
 		return { total: all.size, visible }
-	}, [descriptorTerm, sessions, filteredSessions])
+	}, [descriptorTerm, sessions, sortedSessions])
 
 	// Active filter tokens (labels resolved from the data, so command-bar filters read nicely)
 	const labels = useMemo(() => {
@@ -333,12 +341,20 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 						/>
 						<FileTree
 							referenceSlugs={references?.visible ?? null}
+							order={sort}
 							data={[
 								{
 									id: "sessions",
 									title: "Sessions",
-									children: filteredSessions,
+									children: sortedSessions,
 									total: filtered ? sessions.length : undefined,
+									actions: (
+										<SessionSortToggle
+											value={sort}
+											onChange={setSort}
+											recordingKey="explorer-session-sort"
+										/>
+									),
 								},
 								{
 									id: "vendors",

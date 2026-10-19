@@ -24,6 +24,7 @@ export type SessionPreview = BaseSession & {
 	excerpt: NonNullable<GqlSession["excerpt"]>
 	style: {
 		id: string
+		_slug: string
 		title: string
 		color: string
 		category: Category
@@ -36,11 +37,14 @@ export type SessionPreview = BaseSession & {
 		  }[]
 		| null
 	cultivar?: Cultivar[]
-	tags?: { _slug: string; title: string }[] | null
+	tags?: SessionTag[] | null
 	origin?: OriginRef[] | null
 	/** why there's no origin (blends, undisclosed sourcing) */
 	origin_note?: OriginNote | null
 }
+
+/** A tag: a colored mood chip. Tags act as Explorer filters (?tags=), not pages. */
+export type SessionTag = { _slug: string; title: string; color?: string | null }
 
 /** A photo attached to a session. `image` is a site-root path like /images/uploads/x.jpeg (or a legacy https URL). */
 export type SessionImage = {

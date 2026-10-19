@@ -117,6 +117,7 @@ export async function getExplorerSessions(options?: {
 				excerpt
 				style {
 					id
+					_slug
 					title
 					color
 					category {
@@ -139,6 +140,7 @@ export async function getExplorerSessions(options?: {
 				tags {
 					_slug
 					title
+					color
 				}
 				origin {
 					${ORIGIN_FIELDS}
@@ -248,6 +250,7 @@ export async function getSession(slug: string): Promise<SessionFull> {
 				picking
 				style {
 					id
+					_slug
 					title
 					color
 					category {
@@ -283,6 +286,7 @@ export async function getSession(slug: string): Promise<SessionFull> {
 				tags {
 					_slug
 					title
+					color
 				}
 				origin {
 					${ORIGIN_FIELDS}

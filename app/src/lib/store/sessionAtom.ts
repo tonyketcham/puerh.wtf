@@ -15,6 +15,8 @@ import type {
 	SessionNotes,
 } from "@/lib/types/session"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
+import { buildRelationIndex } from "@/lib/relations"
+import { isSessionSort, type SessionSort } from "@/lib/sessionSort"
 
 // ---------------------------------------------------------------------------
 // Current session
@@ -77,7 +79,8 @@ export type FlavorPhaseSource = "scroll" | "scrub" | "steep" | "auto"
 export const flavorPhaseMotion: MotionValue<number> = motionValue(0)
 
 const PHASE_STEP = 0.02
-const quantizePhase = (v: number) => Math.round(Math.min(1, Math.max(0, v)) / PHASE_STEP) * PHASE_STEP
+const quantizePhase = (v: number) =>
+	Math.round(Math.min(1, Math.max(0, v)) / PHASE_STEP) * PHASE_STEP
 
 const flavorPhaseMirrorAtom = atom(0)
 flavorPhaseMirrorAtom.onMount = (setMirror) => {
@@ -163,11 +166,33 @@ export const explorerSessionsBySlugAtom = atom(
 	(get) => new Map(get(explorerSessionsAtom).map((s) => [s._slug, s] as const))
 )
 
+/** Relation index over every session (entities, roll-ups, co-occurrence; see lib/relations). */
+export const relationIndexAtom = atom((get) => buildRelationIndex(get(explorerSessionsAtom)))
+
 /** The ExplorerSession for compareSlugAtom (null if unset/unknown). */
-export const compareSessionAtom = atom(
-	(get) => {
-		const slug = get(compareSlugAtom)
-		return slug ? get(explorerSessionsBySlugAtom).get(slug) ?? null : null
+export const compareSessionAtom = atom((get) => {
+	const slug = get(compareSlugAtom)
+	return slug ? get(explorerSessionsBySlugAtom).get(slug) ?? null : null
+})
+
+const EXPLORER_SORT_KEY = "puerh:explorer-sort"
+const explorerSortBaseAtom = atom<SessionSort>("date")
+explorerSortBaseAtom.onMount = (set) => {
+	// per-viewer convenience: storage may be blocked (private windows, previews); date is fine
+	try {
+		const saved = window.localStorage.getItem(EXPLORER_SORT_KEY)
+		if (isSessionSort(saved)) set(saved)
+	} catch {}
+}
+
+/** Session order in the Explorer (remembered per browser). */
+export const explorerSortAtom = atom(
+	(get) => get(explorerSortBaseAtom),
+	(_get, set, next: SessionSort) => {
+		set(explorerSortBaseAtom, next)
+		try {
+			window.localStorage.setItem(EXPLORER_SORT_KEY, next)
+		} catch {}
 	}
 )
 

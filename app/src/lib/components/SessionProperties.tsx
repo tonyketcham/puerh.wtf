@@ -1,15 +1,10 @@
 "use client"
 
-import DetailsListItem from "@/lib/components/DetailsListItem"
-import type { Cultivar } from "@/lib/types/session"
 import "simplebar-react/dist/simplebar.min.css"
-import PanelSection from "./containers/PanelSection"
 import Panel from "./containers/Panel"
 import type { PropsWithChildren } from "react"
-import { useAtomValue } from "jotai"
-import { sessionAtom } from "@/lib/store/sessionAtom"
-import Chip from "@/lib/components/Chip"
 import FlavorProfilePanel from "@/lib/components/properties/FlavorProfilePanel"
+import ProvenancePanels from "@/lib/components/properties/ProvenancePanels"
 import NotesPanel from "@/lib/components/properties/NotesPanel"
 
 /**
@@ -32,35 +27,10 @@ export default function SessionProperties() {
 		<>
 			<FlavorProfilePanel />
 
-			<PanelSection title="Metadata">
-				<ul className="space-y-4">
-					<MetaData />
-				</ul>
-			</PanelSection>
+			{/* Provenance / Source / Record (plan §3.4) */}
+			<ProvenancePanels />
 
 			<NotesPanel />
-		</>
-	)
-}
-
-function MetaData() {
-	const session = useAtomValue(sessionAtom)
-	return (
-		<>
-			{session?.production_year && (
-				<DetailsListItem icon={null} title="Production Year" value={session.production_year} />
-			)}
-			{session?.cultivar && <Cultivars values={session.cultivar} />}
-		</>
-	)
-}
-
-function Cultivars({ values }: { values: Cultivar[] }) {
-	return (
-		<>
-			{values.map((value) => (
-				<Chip key={value.id}>{value.title}</Chip>
-			))}
 		</>
 	)
 }
