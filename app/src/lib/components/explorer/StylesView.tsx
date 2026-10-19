@@ -10,7 +10,7 @@ import type { Category } from "@/lib/types/category"
 import type { ExplorerSession } from "@/lib/types/session"
 import EntityRow from "./EntityRow"
 import { CupStrip } from "./marks"
-import ViewHeader from "./ViewHeader"
+import ViewHeader, { IndexLink } from "./ViewHeader"
 import { styleGroupsClosedAtom } from "./state"
 import { countBy, stripSlash, type EntityViewProps } from "./views"
 
@@ -123,7 +123,9 @@ export default function StylesView({
 
 	return (
 		<div data-explorer-view="styles">
-			<ViewHeader label="Styles" count={styleCount} noun={styleCount === 1 ? "style" : "styles"} />
+			<ViewHeader label="Styles" count={styleCount} noun={styleCount === 1 ? "style" : "styles"}>
+				<IndexLink href="/styles/" pathname={pathname} recordingKey="explorer-styles-index" />
+			</ViewHeader>
 			<ul aria-label="Styles by category">
 				<AnimatePresence initial={false}>
 					{rows.map((row, i) => (

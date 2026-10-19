@@ -409,6 +409,7 @@ export default function Palette({
 						setDescriptor(null)
 						onClose()
 					} else if (command.id === "home") navigate("/")
+					else if (command.href) navigate(command.href)
 					return
 				}
 			}
@@ -746,7 +747,7 @@ const ENTITY_HINT: Record<ScopeKind, string> = {
 function EmptyResults({ query, mode }: { query: string; mode: Mode }) {
 	const q = query.trim()
 	let hint: React.ReactNode
-	if (mode.kind === "commands") hint = "Try brew, compare, random, clear or home."
+	if (mode.kind === "commands") hint = "Try brew, compare, random, home, or an index like lexicon."
 	else if (mode.kind === "arg") hint = "Try a vintage like 2018, a vendor, or part of the name."
 	else if (mode.kind === "scope" && mode.scope === "descriptors")
 		hint = "Flavors come from tasting notes. Try apricot, camphor, or petrichor."

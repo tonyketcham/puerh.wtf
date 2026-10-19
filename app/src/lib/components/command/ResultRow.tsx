@@ -3,14 +3,20 @@
 import { memo, type PointerEvent } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import {
+	BookA,
 	Check,
 	ChevronRight,
+	Coffee,
 	CornerDownLeft,
 	Dices,
 	FunnelX,
 	GitCompareArrows,
 	House,
+	Layers,
+	Mountain,
 	Sparkles,
+	Sprout,
+	Store,
 	Timer,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -31,6 +37,12 @@ const COMMAND_ICON: Record<CommandId, typeof Timer> = {
 	random: Dices,
 	clear: FunnelX,
 	home: House,
+	origins: Mountain,
+	vendors: Store,
+	styles: Layers,
+	cultivars: Sprout,
+	teaware: Coffee,
+	lexicon: BookA,
 }
 
 type RowProps = {

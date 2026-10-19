@@ -7,7 +7,7 @@ import { entityHref } from "@/lib/entities"
 import type { Vendor } from "@/lib/types/vendor"
 import EntityRow from "./EntityRow"
 import { MixBar, type MixSegment } from "./marks"
-import ViewHeader from "./ViewHeader"
+import ViewHeader, { IndexLink } from "./ViewHeader"
 import { countBy, stripSlash, type EntityViewProps } from "./views"
 
 const ROW_SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.7 } as const
@@ -68,7 +68,9 @@ export default function VendorsView({
 				label="Vendors"
 				count={rows.length}
 				noun={rows.length === 1 ? "vendor" : "vendors"}
-			/>
+			>
+				<IndexLink href="/vendors/" pathname={pathname} recordingKey="explorer-vendors-index" />
+			</ViewHeader>
 			<ul aria-label="Vendors">
 				<AnimatePresence initial={false}>
 					{rows.map(({ vendor, count, total, mix }, i) => (

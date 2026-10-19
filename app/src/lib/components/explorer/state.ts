@@ -8,7 +8,7 @@
 import { atom } from "jotai"
 import type { EntityKind } from "@/lib/entities"
 
-export const EXPLORER_VIEWS = ["sessions", "origins", "vendors", "styles"] as const
+export const EXPLORER_VIEWS = ["sessions", "origins", "vendors", "styles", "lexicon"] as const
 export type ExplorerView = typeof EXPLORER_VIEWS[number]
 
 const isExplorerView = (v: unknown): v is ExplorerView =>
@@ -41,6 +41,9 @@ export const originTreeOpenAtom = atom<ReadonlyMap<string, boolean>>(new Map())
 
 /** Styles view: categories closed by hand (open by default). */
 export const styleGroupsClosedAtom = atom<ReadonlySet<string>>(new Set<string>())
+
+/** Lexicon view: flavor groups opened by hand (closed by default: thirteen rows to scan). */
+export const lexiconGroupsOpenAtom = atom<ReadonlySet<string>>(new Set<string>())
 
 export type ExplorerHover = { kind: EntityKind; slug: string }
 

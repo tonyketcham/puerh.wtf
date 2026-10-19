@@ -314,7 +314,55 @@ export function parsePrefix(query: string): { scope: ScopeKind; rest: string } |
 // Items + groups
 // ---------------------------------------------------------------------------
 
-export type CommandId = "brew" | "compare" | "random" | "clear" | "home"
+export type CommandId = "brew" | "compare" | "random" | "clear" | "home" | IndexId
+
+/** The index pages a command opens (plan §2.3): the Explorer's views at full size. */
+export type IndexId = "origins" | "vendors" | "styles" | "cultivars" | "teaware" | "lexicon"
+
+export const INDEX_COMMANDS: readonly (CommandDef & { id: IndexId; href: string })[] = [
+	{
+		id: "origins",
+		label: "Origins map",
+		hint: "every place, on the contour map",
+		aliases: "origins map places terroir mountains villages where ^",
+		href: "/origins/",
+	},
+	{
+		id: "vendors",
+		label: "Vendors",
+		hint: "who sold what",
+		aliases: "vendors shops sellers merchants index @",
+		href: "/vendors/",
+	},
+	{
+		id: "styles",
+		label: "Styles",
+		hint: "categories and the styles beneath",
+		aliases: "styles categories sheng shou oolong black index ~",
+		href: "/styles/",
+	},
+	{
+		id: "cultivars",
+		label: "Cultivars",
+		hint: "the plants behind the leaf",
+		aliases: "cultivars varietals plants da ye zhong index %",
+		href: "/cultivars/",
+	},
+	{
+		id: "teaware",
+		label: "Teaware",
+		hint: "gaiwans, pots and cups",
+		aliases: "teaware vessels gaiwan teapot pot cups clay index",
+		href: "/teaware/",
+	},
+	{
+		id: "lexicon",
+		label: "Lexicon",
+		hint: "every flavor word, by axis",
+		aliases: "lexicon flavors words descriptors glossary vocabulary notes index",
+		href: "/lexicon/",
+	},
+]
 export type ArgCommand = "brew" | "compare"
 
 export type Mode =
@@ -370,6 +418,8 @@ export type CommandDef = {
 	aliases: string
 	/** opens a second-step tea picker */
 	arg?: ArgCommand
+	/** goes to a page */
+	href?: string
 }
 
 export type SearchContext = {
@@ -410,11 +460,13 @@ export function commandDefs(ctx: SearchContext): CommandDef[] {
 			label: "Go home",
 			hint: "all sessions",
 			aliases: "home index start back sessions",
-		}
+		},
+		// the indexes go last: the empty bar suggests only the first few commands
+		...INDEX_COMMANDS
 	)
 	// a no-op row is noise: only offer "clear" when there is something to clear
 	if (ctx.activeFilterCount || ctx.descriptor) {
-		defs.splice(defs.length - 1, 0, {
+		defs.splice(defs.length - 1 - INDEX_COMMANDS.length, 0, {
 			id: "clear",
 			label: "Clear filters",
 			hint: [
@@ -674,7 +726,7 @@ export function search(
 	const q = query.trim()
 	switch (mode.kind) {
 		case "commands":
-			return group("commands", commandItems(ctx, q))
+			return group("commands", commandItems(ctx, q, 12))
 		case "arg": {
 			const filter =
 				mode.command === "compare"

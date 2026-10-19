@@ -2,7 +2,7 @@
 
 import { useRef, type KeyboardEvent } from "react"
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
-import { Files, Layers, Mountain, Store, type LucideIcon } from "lucide-react"
+import { BookA, Files, Layers, Mountain, Store, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { EXPLORER_VIEWS, type ExplorerView } from "./state"
 
@@ -13,15 +13,16 @@ const VIEW_META: Record<ExplorerView, { label: string; icon: LucideIcon; glyph?:
 	origins: { label: "Origins", icon: Mountain, glyph: "^" },
 	vendors: { label: "Vendors", icon: Store, glyph: "@" },
 	styles: { label: "Styles", icon: Layers, glyph: "~" },
+	lexicon: { label: "Lexicon", icon: BookA },
 }
 
 export const explorerTabId = (view: ExplorerView) => `explorer-tab-${view}`
 export const EXPLORER_PANEL_ID = "explorer-view-panel"
 
 /**
- * The Explorer's activity rail (plan §2.1): switch between Sessions, Origins, Vendors and
- * Styles. Icons only, except the open view, whose name slides out beside its icon while a
- * shared pill glides under it. A tablist: ←/→ (and Home/End) move and select.
+ * The Explorer's activity rail (plan §2.1): switch between Sessions, Origins, Vendors,
+ * Styles and the flavor Lexicon. Icons only, except the open view, whose name slides out
+ * beside its icon while a shared pill glides under it. A tablist: ←/→ (and Home/End) move and select.
  */
 export default function ActivityRail({
 	value,
@@ -60,7 +61,7 @@ export default function ActivityRail({
 			<div
 				role="tablist"
 				aria-label="Explorer views"
-				className="flex items-center gap-0.5 min-w-0"
+				className="flex items-center gap-px min-w-0"
 				data-recording-key={recordingKey}
 			>
 				{EXPLORER_VIEWS.map((view) => {
@@ -87,7 +88,7 @@ export default function ActivityRail({
 							onKeyDown={onKeyDown}
 							data-view={view}
 							className={cn(
-								"relative flex items-center h-7 px-[7px] gap-1.5 rounded-md shrink-0",
+								"relative flex items-center h-7 px-1.5 gap-1.5 rounded-md shrink-0",
 								"outline-none focus-visible:ring-1 focus-visible:ring-white/40",
 								"transition-colors duration-150",
 								active ? "text-white/90" : "text-white/40 hover:text-white/75"

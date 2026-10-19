@@ -18,6 +18,7 @@ export default function LexiconWord({
 	className,
 	style,
 	onHover,
+	dataAttributes,
 	recordingKey,
 }: {
 	entry: LexiconEntry
@@ -26,6 +27,8 @@ export default function LexiconWord({
 	style?: CSSProperties
 	/** pointer or focus arrives (true) / leaves (false) */
 	onHover?: (on: boolean) => void
+	/** extra data-* attributes for the link (the Explorer's keyboard walk, the peek placement) */
+	dataAttributes?: Record<`data-${string}`, string>
 	recordingKey?: string
 }) {
 	const target = useMemo(() => ({ kind: "descriptor" as const, key: entry.term }), [entry.term])
@@ -43,6 +46,7 @@ export default function LexiconWord({
 			onFocus={chain(handlers.onFocus, () => onHover?.(true))}
 			onBlur={chain(handlers.onBlur, () => onHover?.(false))}
 			onClick={chain(handlers.onClick, morph)}
+			{...dataAttributes}
 			data-word={entry.slug}
 			data-peek-state={status ?? undefined}
 			data-recording-key={recordingKey}

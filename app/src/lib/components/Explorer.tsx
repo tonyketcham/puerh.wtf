@@ -40,6 +40,7 @@ import ActivityRail, {
 import OriginsView from "@/lib/components/explorer/OriginsView"
 import VendorsView from "@/lib/components/explorer/VendorsView"
 import StylesView from "@/lib/components/explorer/StylesView"
+import LexiconView from "@/lib/components/explorer/LexiconView"
 import {
 	EXPLORER_VIEWS,
 	explorerHoverAtom,
@@ -110,6 +111,7 @@ const VIEW_FACET: Record<ExplorerView, FacetKey | null> = {
 	origins: "origins",
 	vendors: "vendors",
 	styles: "styles",
+	lexicon: null,
 }
 
 const VIEW_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
@@ -122,9 +124,10 @@ const getServerModKey = () => "Ctrl"
 
 /**
  * The left sidebar: site header plus the Explorer panel. An activity rail switches the panel
- * between Sessions (the file tree) and the entity views, Origins (a tree), Vendors and Styles
- * (plan §2.5). The vintage ruler and the filter tokens sit above every view: filters narrow
- * the entity views' counts too, each view ignoring its own facet.
+ * between Sessions (the file tree) and the entity views, Origins (a tree), Vendors, Styles
+ * and the flavor Lexicon (plan §2.1, §2.5). The vintage ruler and the filter tokens sit
+ * above every view: filters narrow the entity views' counts too, each view ignoring its own
+ * facet.
  */
 export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
 	const { q, setQ, facets, setFacets, urlState, pathname } = useUrlSync()
@@ -298,6 +301,15 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		[view, setView, setHover]
 	)
 
+	// a lexicon word's "find all references": pin it and show the sessions that list it
+	const findReferences = useCallback(
+		(term: string) => {
+			setDescriptor({ term, pinned: true })
+			changeView("sessions")
+		},
+		[setDescriptor, changeView]
+	)
+
 	const viewProps = {
 		index,
 		pool: viewPool,
@@ -335,7 +347,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 					<div className="relative">
 						{/* header: the activity rail (a tablist) and search */}
 						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
-							<div className="flex items-center gap-2 py-2.5 pl-2.5 pr-4 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
+							<div className="flex items-center gap-2 py-2.5 pl-2 pr-2.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
 								<h2 className="sr-only">Explorer</h2>
 								<div className="flex-1 min-w-0">
 									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
@@ -421,6 +433,9 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 												{view === "origins" && <OriginsView {...viewProps} />}
 												{view === "vendors" && <VendorsView {...viewProps} vendors={vendors} />}
 												{view === "styles" && <StylesView {...viewProps} categories={categories} />}
+												{view === "lexicon" && (
+													<LexiconView {...viewProps} onFindReferences={findReferences} />
+												)}
 											</div>
 										)}
 									</motion.div>
