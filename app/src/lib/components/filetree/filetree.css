@@ -31,21 +31,21 @@
 
 .ft-seg {
 	position: absolute;
+	/* over the branches: where a branch leaves the rail, a lit route runs across it unbroken */
+	z-index: 1;
 	left: calc(var(--rail-x) - 0.5px);
 	width: 1px;
 	pointer-events: none;
 	background-color: var(--seg-rest);
 	background-size: 1px var(--rail-dash);
-	transition:
-		background-color 220ms ease,
-		filter 220ms ease;
+	transition: background-color 220ms ease, filter 220ms ease;
 }
 /* above the branch (reaching up through the gap under the folder for the first row) */
 .ft-seg-top {
 	top: 0;
 	height: calc(50% - 6px);
 }
-.ft-row:first-child .ft-seg-top {
+.ft-row:nth-child(1 of .ft-row:not([data-visible="false"])) .ft-seg-top {
 	top: calc(var(--rail-reach) * -1);
 	height: calc(50% - 6px + var(--rail-reach));
 }
@@ -54,7 +54,7 @@
 	top: calc(50% - 6px);
 	bottom: 0;
 }
-.ft-row:last-child .ft-seg-bottom {
+.ft-row:nth-last-child(1 of .ft-row:not([data-visible="false"])) .ft-seg-bottom {
 	display: none;
 }
 
@@ -67,12 +67,10 @@
 	overflow: visible;
 	pointer-events: none;
 	color: var(--seg-rest);
-	transition:
-		color 220ms ease,
-		filter 220ms ease;
+	transition: color 220ms ease, filter 220ms ease;
 }
 /* ── the current page's route: lit, still ── */
-.ft-row:has(~ .ft-row [aria-current="page"]) .ft-seg,
+.ft-row:has(~ .ft-row:not([data-visible="false"]) [aria-current="page"]) .ft-seg,
 .ft-row:has([aria-current="page"]) .ft-seg-top {
 	background-color: var(--seg-route);
 }
