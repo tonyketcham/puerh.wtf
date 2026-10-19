@@ -32,6 +32,11 @@ Run the app test suite:
 pnpm test
 ```
 
+Playwright needs its browser once per machine: `npx playwright install chromium` (from `app/`).
+Tests reuse a dev server already on :3000, which may be another checkout's. Set `PW_PORT` to
+start this checkout's own server on that port instead (`PW_PORT=3200 pnpm test`; in PowerShell,
+`$env:PW_PORT=3200; pnpm test`). Flatbread then runs on `PW_PORT + 2000`, or `PW_FLATBREAD_PORT`.
+
 ## Rough Stack
 
 - Next.js, React, and TypeScript for the main site in `app/`
