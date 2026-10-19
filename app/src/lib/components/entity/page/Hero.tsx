@@ -1,11 +1,12 @@
 "use client"
 
-import { Suspense, useMemo, useState, type CSSProperties, type ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { Suspense, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react"
 import Hatch from "@/lib/components/entity/Hatch"
 import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
 import OriginsMap from "@/lib/components/map/OriginsMap"
 import type { MapPoint } from "@/lib/components/map/points"
+import { entityKeys } from "@/lib/relations"
 import { cn } from "@/lib/utils/cn"
 import type { EntityPageData } from "./data"
 import DotMap, { type DotMapPoint } from "./DotMap"
@@ -48,7 +49,7 @@ export default function Hero({
 			return <VendorHero data={data} model={model} points={points} />
 		case "style":
 		case "category":
-			return <ColorFieldHero data={data} model={model} lead={lead} />
+			return <ColorFieldHero data={data} model={model} lead={lead} points={points} />
 		case "cultivar":
 			return <CultivarHero data={data} lead={lead} points={points} model={model} />
 		case "vessel":
@@ -61,6 +62,35 @@ export default function Hero({
 // ---------------------------------------------------------------------------
 
 const ELEV_MAX = 2600
+
+/** Scroll-linked relief (plan §3.2 Motion): how far the map leans back, and what the plain
+ * contours fade to, once the hero has scrolled away. */
+const TILT_DEG = 6
+const MINOR_FLOOR = 0.15
+
+/**
+ * As the hero scrolls up out of view the map leans back very slightly (rotateX 0 → 6°) and
+ * its plain contours fade toward the index lines, as a printed map read at an angle. Springs
+ * on the scroll position, so a flick settles instead of snapping. Reduced motion: flat and
+ * fully drawn.
+ */
+function useHeroRelief() {
+	const ref = useRef<HTMLDivElement>(null)
+	const reduce = useReducedMotion() ?? false
+	const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.3", "end start"] })
+	const progress = useSpring(scrollYProgress, { stiffness: 220, damping: 40, mass: 0.6 })
+	const rotateX = useTransform(progress, [0, 1], [0, TILT_DEG])
+	const minor = useTransform(progress, [0, 0.8], [1, MINOR_FLOOR])
+	const style = reduce
+		? undefined
+		: ({
+				rotateX,
+				transformPerspective: 900,
+				transformOrigin: "50% 100%",
+				"--minor-contours": minor,
+		  } as unknown as CSSProperties)
+	return [ref, style, !reduce] as const
+}
 
 function OriginHero({
 	data,
@@ -75,6 +105,7 @@ function OriginHero({
 	const placed = !!geo && data.originKind !== "unknown"
 	const rings = model.stats.liquor.slice(0, 14)
 	const inset = placed && hasInset([{ slug: data.slug }])
+	const [reliefRef, reliefStyle, reliefFade] = useHeroRelief()
 	// a node too coarse for an inset (a county, a province, a country): frame its points
 	const fit = useMemo(
 		() => (inset || !placed ? [] : framePoints(mapPoints, data.slug)),
@@ -96,7 +127,12 @@ function OriginHero({
 			className="relative grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1fr)_220px]"
 		>
 			{/* the zoomed contour map (plan §3.2, §4.5); a Properties or peek inset grows into it */}
-			<div className="relative h-64">
+			<motion.div
+				ref={reliefRef}
+				className="relative h-64"
+				style={reliefStyle}
+				data-contour-fade={reliefFade ? "" : undefined}
+			>
 				{inset ? (
 					<InsetMap
 						origins={[{ slug: data.slug, title: data.title, hanzi: data.hanzi }]}
@@ -132,7 +168,7 @@ function OriginHero({
 				<p className="absolute left-3 top-2.5 px-1 py-0.5 rounded-[3px] bg-[#121012]/80 text-[10.5px] text-white/45 map-label pointer-events-none">
 					{comment}
 				</p>
-			</div>
+			</motion.div>
 
 			<dl className="flex flex-col justify-center gap-3 px-5 py-4 border-t sm:border-t-0 sm:border-l border-white/[0.06] text-xs">
 				{placed && (
@@ -311,50 +347,94 @@ function ColorFieldHero({
 	data,
 	model,
 	lead,
+	points,
 }: {
 	data: EntityPageData
 	model: EntityModel
 	lead?: ReactNode
+	/** the group's origins, each in its sessions' blended liquor */
+	points: DotMapPoint[]
 }) {
 	const reduce = useReducedMotion() ?? false
 	const color = data.color || model.node?.color || model.accent
 	const category = data.kind === "style" ? data.ancestors[0] : null
+	// sessions with no surveyed origin among the dots (blends, undisclosed gardens)
+	const unplaced = useMemo(() => {
+		const slugs = new Set(points.map((p) => p.slug))
+		return model.sessions.filter(
+			(s) => !entityKeys(s, "origin", { rollup: false }).some((k) => slugs.has(k))
+		).length
+	}, [points, model.sessions])
 	return (
-		<div className="relative overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07]">
-			<motion.div
-				aria-hidden
-				className="absolute inset-0 origin-left"
-				style={{
-					background: `linear-gradient(100deg, color-mix(in oklab, ${color} 30%, transparent), color-mix(in oklab, ${color} 7%, transparent) 55%, transparent 85%)`,
-				}}
-				initial={reduce ? { opacity: 0 } : { scaleX: 0, opacity: 0.4 }}
-				animate={reduce ? { opacity: 1 } : { scaleX: 1, opacity: 1 }}
-				transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
-			/>
-			<span
-				aria-hidden
-				className="absolute inset-y-0 left-0 w-[3px]"
-				style={{ backgroundColor: color }}
-			/>
-			<div className="relative px-6 py-5 space-y-3">
-				<p className="flex items-center gap-2 text-[10.5px] text-white/50">
-					<span aria-hidden className="size-2 rounded-[2px]" style={{ backgroundColor: color }} />
-					{category ? (
-						<>
-							{category.title.toLowerCase()}{" "}
-							<span className="text-white/30">· {color.toLowerCase()}</span>
-						</>
+		<div className="grid overflow-hidden rounded-lg ring-1 ring-inset ring-white/[0.07] sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+			<div className="relative">
+				<motion.div
+					aria-hidden
+					className="absolute inset-0 origin-left"
+					style={{
+						background: `linear-gradient(100deg, color-mix(in oklab, ${color} 30%, transparent), color-mix(in oklab, ${color} 7%, transparent) 55%, transparent 85%)`,
+					}}
+					initial={reduce ? { opacity: 0 } : { scaleX: 0, opacity: 0.4 }}
+					animate={reduce ? { opacity: 1 } : { scaleX: 1, opacity: 1 }}
+					transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+				/>
+				<span
+					aria-hidden
+					className="absolute inset-y-0 left-0 w-[3px]"
+					style={{ backgroundColor: color }}
+				/>
+				<div className="relative px-6 py-5 space-y-3">
+					<p className="flex items-center gap-2 text-[10.5px] text-white/50">
+						<span aria-hidden className="size-2 rounded-[2px]" style={{ backgroundColor: color }} />
+						{category ? (
+							<>
+								{category.title.toLowerCase()}{" "}
+								<span className="text-white/30">· {color.toLowerCase()}</span>
+							</>
+						) : (
+							<>
+								{data.children.length} {data.children.length === 1 ? "style" : "styles"}
+								<span className="text-white/30">· {color.toLowerCase()}</span>
+							</>
+						)}
+					</p>
+					{lead ? (
+						<div className="text-[15px] leading-relaxed max-w-prose text-white/80">{lead}</div>
 					) : (
-						<>
-							{data.children.length} {data.children.length === 1 ? "style" : "styles"}
-							<span className="text-white/30">· {color.toLowerCase()}</span>
-						</>
+						<p className="text-sm text-white/40">{"// no description yet"}</p>
 					)}
-				</p>
-				{lead ? (
-					<div className="text-[15px] leading-relaxed max-w-prose text-white/80">{lead}</div>
+				</div>
+			</div>
+			{/* where the group grows (plan §2.4): only its own rings */}
+			<div className="relative border-t sm:border-t-0 sm:border-l border-white/[0.06] min-h-52">
+				{points.length ? (
+					<>
+						<div className="absolute inset-x-0 flex items-center top-7 bottom-6">
+							<DotMap
+								points={points}
+								width={300}
+								height={170}
+								labels={3}
+								accent={model.accentText}
+								recordingKey={`${data.kind}-origins-map`}
+							/>
+						</div>
+						<p className="absolute left-4 top-3 text-[10.5px] text-white/40 pointer-events-none">
+							{`// grown · ${points.length} ${points.length === 1 ? "place" : "places"}`}
+						</p>
+						{unplaced > 0 && (
+							<p className="absolute left-4 bottom-2.5 text-[10.5px] text-white/25 pointer-events-none">
+								{`// + ${unplaced} unplaced: blends, undisclosed`}
+							</p>
+						)}
+					</>
 				) : (
-					<p className="text-sm text-white/40">{"// no description yet"}</p>
+					<>
+						<Hatch className="absolute inset-0 w-full h-full" spacing={7} />
+						<p className="absolute left-4 top-3 text-[10.5px] text-white/45">
+							{model.sessions.length ? "// blends · no surveyed gardens" : "// not yet tasted"}
+						</p>
+					</>
 				)}
 			</div>
 		</div>

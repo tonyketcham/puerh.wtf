@@ -59,6 +59,12 @@
 	object-fit: cover;
 }
 
+/* Origin hero (plan §3.2): scrolling away fades the plain contours toward the index lines.
+   --minor-contours (1 → ~0.15) is driven from the scroll position (Hero.tsx). */
+[data-contour-fade] [data-contour="minor"] {
+	opacity: var(--minor-contours, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.map-parallax {
 		transition: none;

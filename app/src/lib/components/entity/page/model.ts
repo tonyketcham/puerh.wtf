@@ -140,6 +140,11 @@ const toLinear = (c: number) => {
 const toSrgb = (l: number) =>
 	255 * (l <= 0.0031308 ? 12.92 * l : 1.055 * Math.max(0, l) ** (1 / 2.4) - 0.055)
 
+/** A liquor lifted until it reads on the #121012 ground (a dark shou would vanish otherwise). */
+export function liftedColor(hex: string, minLuminance = 0.32): string {
+	return toHex(liftLiquor(hexToRgb(hex) ?? [217, 164, 65], minLuminance))
+}
+
 /** Mean of several colors in linear light (what mixing the liquors would look like). */
 export function blendColors(colors: readonly string[]): string {
 	const rgbs = colors.map(hexToRgb).filter((c): c is RGB => !!c)

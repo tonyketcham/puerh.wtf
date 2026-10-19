@@ -13,6 +13,8 @@
  * - ContextLines: coast, rivers, lakes and dashed province lines. No national borders.
  *
  * Every stroke is `vector-effect: non-scaling-stroke`, so widths are pixels at any zoom.
+ * Strokes of the plain (non-index) contours sit under data-contour="minor", so a container
+ * can fade the map toward its index lines (the origin hero does as it scrolls away; map.css).
  */
 import { memo, useRef, type CSSProperties } from "react"
 import type { Band, MapContext } from "./geo"
@@ -101,7 +103,7 @@ export const ContourLines = memo(function ContourLines({
 		: []
 	return (
 		<g>
-			<g>{plain.map(line)}</g>
+			<g data-contour="minor">{plain.map(line)}</g>
 			<g className={indexClassName}>{index.map(line)}</g>
 			{lit.map(([b, h]) => (
 				<DrawPath
@@ -148,38 +150,44 @@ export const TanakaBands = memo(function TanakaBands({
 			{bands.map((b, i) => {
 				const h = highlight?.(b.elev) ?? null
 				const delay = (draw?.delay ?? 0) + i * step
+				// a plain band's strokes can fade; never its fill, which hides the lines beneath
+				const minor = b.index || h ? undefined : "minor"
 				return (
 					<g key={b.elev}>
-						<path
-							d={b.d}
-							className="map-tanaka-dark"
-							fill="none"
-							stroke="#000"
-							strokeOpacity={(b.index ? 0.8 : 0.6) * alpha}
-							strokeWidth={b.index ? 1.4 : 1.1}
-							vectorEffect={NS}
-						/>
-						<path
-							d={b.d}
-							className="map-tanaka-light"
-							fill="none"
-							stroke={h?.color ?? CREAM}
-							strokeOpacity={(h ? 0.5 : b.index ? 0.3 : 0.15) * alpha}
-							strokeWidth={b.index ? 1.1 : 0.85}
-							vectorEffect={NS}
-						/>
+						<g data-contour={minor}>
+							<path
+								d={b.d}
+								className="map-tanaka-dark"
+								fill="none"
+								stroke="#000"
+								strokeOpacity={(b.index ? 0.8 : 0.6) * alpha}
+								strokeWidth={b.index ? 1.4 : 1.1}
+								vectorEffect={NS}
+							/>
+							<path
+								d={b.d}
+								className="map-tanaka-light"
+								fill="none"
+								stroke={h?.color ?? CREAM}
+								strokeOpacity={(h ? 0.5 : b.index ? 0.3 : 0.15) * alpha}
+								strokeWidth={b.index ? 1.1 : 0.85}
+								vectorEffect={NS}
+							/>
+						</g>
 						<path d={b.d} fill={ground} fillRule="evenodd" stroke="none" />
-						<DrawPath
-							d={b.d}
-							drawKey={draw?.key}
-							play={draw?.play ?? !!draw}
-							reduce={draw?.reduce}
-							delay={delay}
-							duration={draw?.duration ?? 420}
-							stroke={h?.color ?? CREAM}
-							strokeOpacity={(h ? h.opacity ?? 0.95 : b.index ? 0.26 : 0.1) * alpha}
-							strokeWidth={h ? h.width ?? 1.2 : b.index ? 0.8 : 0.5}
-						/>
+						<g data-contour={minor}>
+							<DrawPath
+								d={b.d}
+								drawKey={draw?.key}
+								play={draw?.play ?? !!draw}
+								reduce={draw?.reduce}
+								delay={delay}
+								duration={draw?.duration ?? 420}
+								stroke={h?.color ?? CREAM}
+								strokeOpacity={(h ? h.opacity ?? 0.95 : b.index ? 0.26 : 0.1) * alpha}
+								strokeWidth={h ? h.width ?? 1.2 : b.index ? 0.8 : 0.5}
+							/>
+						</g>
 					</g>
 				)
 			})}
