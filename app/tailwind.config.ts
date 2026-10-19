@@ -14,6 +14,8 @@ const config = {
 				"ink-muted": "rgba(255,255,255,0.8)",
 				"border-muted": "rgba(255,255,255,0.05)",
 				brand: "#edc446",
+				// the wrappers' print red: registration marks, the hero's hanzi
+				crimson: "#d8452f",
 				"bai-cha": {
 					50: "#fefefe",
 					100: "#fdfdfd",
@@ -40,6 +42,13 @@ const config = {
 			},
 			dropShadow: {
 				split: "0px 4px 0px rgba(255, 255, 255, 0.25)",
+			},
+			keyframes: {
+				// the home page teaware drawing: its turn running out, as a hairline under its tab
+				"teaware-dwell": { from: { width: "0" }, to: { width: "100%" } },
+			},
+			animation: {
+				"teaware-dwell": "teaware-dwell var(--dwell) linear forwards",
 			},
 		},
 	},
