@@ -10,7 +10,9 @@ cultivar:
   - 3bb9ab60-9225-4a97-8f7b-f4b5cc7633e8
 origin:
   - af8954b3-fbf4-445d-830e-fe31a287646e
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2020
 picking: Young leaves
 elevation: 1245

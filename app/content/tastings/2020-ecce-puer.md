@@ -62,6 +62,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 15
   infusion_increment: 10
+origin_note: blend
 ---
 
 The cake has a wonderfully light compression that you can pick large leaves apart from individually, just using your hands and minimal force.

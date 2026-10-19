@@ -10,7 +10,10 @@ cultivar:
   - e784f1e1-4399-43a0-a9fe-767bec4fc3a2
 origin:
   - 27bab493-b309-4b5b-a912-c92a584af28d
-season: June
+harvest:
+  season: summer
+  month: 6
+season_note: June
 production_year: 2019
 picking: Young leaves
 elevation: 400

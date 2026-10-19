@@ -7,7 +7,6 @@ style:
   - 18f824ae-afc2-47d5-9255-27c345fbe0c1
 origin:
   - 983b2971-0260-4437-a5bf-8e8e80a9483a
-season: ''
 production_year: 2013
 picking: a mix of tips and large, mature leaves; Da Bai (large white leaves)
 aging_conditions: dry/natural conditions in Fujian from 2013-2018, Guangzhou til 2020

@@ -12,7 +12,9 @@ cultivar:
 origin:
   - aa7fe22e-c86f-4318-ba17-55361a79eb30
   - 008ec9cc-0c87-4e83-a1fc-8d9cd22a1ba3
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2020
 picking: Bud & up to 3 leaves
 elevation: 1500
@@ -72,8 +74,6 @@ brewing:
   vessel: Jianshui Zitao Teapot
   first_infusion_duration: 20
   infusion_increment: 25
-genre:
-  - 0ce2be99-ac41-40e5-b68d-92609daaf809
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
   - eb1d0494-6f02-48bc-8c34-936dda1a1549

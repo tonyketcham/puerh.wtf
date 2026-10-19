@@ -3,7 +3,7 @@ id: 268aaac0-d138-4ef3-967e-3907655f0d0d
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 title: River Song
-genre:
+style:
   - d881f184-5372-406a-a47f-421cbacf58bf
 production_year: 1998
 picking: Bud & up to 3 leaves
@@ -65,6 +65,7 @@ brewing:
   vessel: Jianshui Zitao Teapot
   first_infusion_duration: 5
   infusion_increment: 5
+origin_note: undisclosed
 ---
 
 ## Infusion log

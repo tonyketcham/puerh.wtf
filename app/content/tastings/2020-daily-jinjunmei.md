@@ -9,7 +9,6 @@ cultivar:
   - 5762bc4f-df2c-41b9-9848-7fb8652d8d96
 origin:
   - 0c420030-b53f-4f7c-8841-5c34dfcd3085
-season: ''
 production_year: 2020
 picking: Buds
 vendor:

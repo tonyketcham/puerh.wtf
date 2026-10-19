@@ -65,6 +65,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 10
+origin_note: blend
 ---
 
 The identifiable baked goods in the nose of the leaf are neat. There's a solid banana aspect but on the other side backed up against it you get this pancakey syrupiness, which goes with the name.

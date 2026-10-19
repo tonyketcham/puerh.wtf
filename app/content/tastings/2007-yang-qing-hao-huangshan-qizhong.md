@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 085425bb-508a-49af-94b8-22a0fff12985
-season: Early Spring
+harvest:
+  season: spring
+season_note: Early Spring
 production_year: 2007
 aging_conditions: "13 years wet in Yang's Taiwanese storage"
 vendor:

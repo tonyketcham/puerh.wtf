@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - db44b2c0-1481-477c-af92-b554e56c5d26
-season: Early Spring
+harvest:
+  season: spring
+season_note: Early Spring
 production_year: 2020
 picking: Bud + up to 2 leaves
 vendor:

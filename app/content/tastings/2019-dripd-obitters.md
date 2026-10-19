@@ -64,6 +64,7 @@ brewing:
   vessel: Jianshui Zitao Xishi Clay Pot
   first_infusion_duration: 7
   infusion_increment: 5
+origin_note: blend
 ---
 
 Yea this is a funky smellin one.

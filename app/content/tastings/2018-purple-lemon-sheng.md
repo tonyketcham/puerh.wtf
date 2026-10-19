@@ -72,6 +72,7 @@ images:
   - image: /images/uploads/img_6794.jpeg
     alt: tea liquor in a cup
 tea_name: 2018 Purple Lemon Sheng
+origin_note: undisclosed
 ---
 ### Infusions
 

@@ -69,6 +69,7 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 15
+origin_note: blend
 ---
 Visually, this stuff looks frozen in time out here lookin like some 2017 sheng. But the smell of the dry leaf in the heated gaiwan is a bit more of that woody aged smell. I'm noticing a super sweet varnish type of deal with a caramel toffee thing too, then a bit of drier/'cleaner' aged notes like wood and my classic museum description. There are a ton of buds in this with black gunmetal-colored leaves.
 

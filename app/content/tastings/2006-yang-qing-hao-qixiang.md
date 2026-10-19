@@ -14,7 +14,9 @@ origin:
   - e9a17dc5-6d6c-433a-9570-5f4c5f7a6236
   - 756d197f-6e4a-42bb-ad12-6cde329e1939
   - 8f94266b-da17-4f30-8a46-d6b4b4dffbd3
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2006
 aging_conditions: 2 years US, ~12 years Taiwan
 vendor:

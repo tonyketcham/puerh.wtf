@@ -7,7 +7,9 @@ style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Autumn
+harvest:
+  season: autumn
+season_note: Autumn
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
@@ -76,6 +78,7 @@ images:
     alt: bing hole shot
   - image: /images/uploads/eb116509-555b-4aaf-ab61-4c0bdbf79860.jpeg
     alt: wet leaf in the gaiwan
+origin_note: blend
 ---
 ### Synopsis
 

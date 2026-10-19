@@ -76,6 +76,7 @@ images:
     alt: liquor in the beaker
   - image: /images/uploads/b1a2c04e-4acc-4369-bc49-c20969e5e7c5-min.jpg
     alt: liquor in the cup
+origin_note: undisclosed
 ---
 The smell of the warm dry leaf takes on a familiar heavily roasted oolong aroma, reminiscent of nearly burnt, crusty bread. No rinse. I'm feelin spicy.
 

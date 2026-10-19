@@ -9,7 +9,10 @@ cultivar:
   - 06e8d630-3549-441a-bee9-e3c3c74fcf1f
 origin:
   - cc42ad0c-ef8e-4056-8ae4-ec9bb77ce98d
-season: early April
+harvest:
+  season: spring
+  month: 4
+season_note: early April
 production_year: 2020
 picking: tippy young growth without the fuzz
 elevation: 300

@@ -9,7 +9,9 @@ cultivar:
   - 155823a5-e457-426e-aa93-020dca00f42e
 origin:
   - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2021
 picking: Bud up to 2 or 3 leaves
 vendor:

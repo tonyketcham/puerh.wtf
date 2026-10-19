@@ -9,7 +9,10 @@ cultivar:
   - be108267-b99b-42f1-9d2a-3c7db0ac469a
 origin:
   - 8a775018-7fc0-4175-bd8b-1818425901ef
-season: mid-April
+harvest:
+  season: spring
+  month: 4
+season_note: mid-April
 production_year: 2020
 picking: large bud & 2 leaves
 elevation: 300

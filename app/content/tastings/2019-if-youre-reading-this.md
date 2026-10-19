@@ -62,6 +62,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 20
   infusion_increment: 10
+origin_note: blend
 ---
 
 ### Infusions

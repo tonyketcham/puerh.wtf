@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - ff781a76-c57d-472a-9f3f-98c4f36b527b
-season: Autumn
+harvest:
+  season: autumn
+season_note: Autumn
 production_year: 2016
 elevation: 1400
 vendor:

@@ -9,7 +9,11 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 88d4ea3a-b772-4472-bd44-566c55bb608e
-season: 2018 & 2019
+harvest:
+  years:
+    - 2018
+    - 2019
+season_note: 2018 & 2019
 production_year: 2020
 aging_conditions: dry storage
 vendor:

@@ -9,7 +9,10 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 0b66380d-30b5-46a0-bead-826b261eef6f
-season: Spring (April)
+harvest:
+  season: spring
+  month: 4
+season_note: Spring (April)
 production_year: 2020
 elevation: 1800
 vendor:

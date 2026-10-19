@@ -61,6 +61,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 25
   infusion_increment: 15
+origin_note: blend
 ---
 
 This is specifically for the 2020 Hot Brandy Minis - they may open up differently than the cake version since I'm just gonna throw the ball in and hit it with water.

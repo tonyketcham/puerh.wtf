@@ -75,6 +75,7 @@ images:
     alt: tea liquor in the beaker early in the session
   - image: /images/uploads/img_1116.jpeg
     alt: dark red tea liquor in the cup, deep into the session
+origin_note: blend
 ---
 This material is 6 years aged prior to the pressing in 2011.
 

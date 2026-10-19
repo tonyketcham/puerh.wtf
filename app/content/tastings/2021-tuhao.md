@@ -7,7 +7,9 @@ style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
@@ -75,6 +77,7 @@ images:
       and gunmetal greys
   - image: /images/uploads/img_9321.jpeg
     alt: backside of the pressed cake (leaf) with the binghole
+origin_note: blend
 ---
 ### Infusions
 

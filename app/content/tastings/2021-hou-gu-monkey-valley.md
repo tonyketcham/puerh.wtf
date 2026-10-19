@@ -8,7 +8,9 @@ style:
 cultivar: []
 origin:
   - f62cd431-7994-4e07-b68b-64e068b058bf
-season: Early Spring
+harvest:
+  season: spring
+season_note: Early Spring
 production_year: 2021
 picking: Young bud up to 2 young leaves
 aging_conditions: 6 months in a fridge in my basement

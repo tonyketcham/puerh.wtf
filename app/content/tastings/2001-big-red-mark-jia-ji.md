@@ -67,6 +67,7 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 10
+origin_note: blend
 ---
 The first time I had this many months back, I really wasn't a fan because I tried it hot off the mail. It tasted straight up like cigarette ash. Now I've let it rest for a real long time lookin for an opportunity to give it another spin. Trying Arby's Truth Serum water recipe seemed like the best time for another go at it. 
 

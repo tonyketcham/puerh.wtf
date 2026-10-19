@@ -76,6 +76,7 @@ images:
     alt: Sexy brew
   - image: https://res.cloudinary.com/pu-erh/image/upload/c_scale,h_1031/v1611170610/tea/2021/Camphor%20Lao%20Cha%20Tou/F2FF2E91-4176-49A6-9A1C-30BE842F6080_reuttu.jpg
     alt: Wetty leaf
+origin_note: undisclosed
 ---
 
 The smell in the bag is particularly spicy and camphor-y; uniquely different from all the other teas I've tried so far.

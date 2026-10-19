@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 008ec9cc-0c87-4e83-a1fc-8d9cd22a1ba3
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2007
 aging_conditions: Menghai for 7.5 years, Guangzhou for 7 years
 vendor:

@@ -76,6 +76,7 @@ images:
     alt: pu soup
   - image: /images/uploads/9d615e7f-d170-4360-a4dd-d0a8197ae5e4-min.jpg
     alt: pu ready for flushing
+origin_note: blend
 ---
 This tea seems to be an interesting find by [LP](https://puerh.wtf/vendor/liquid-proust), coming from a Taiwanese producer and distributor called [GABA Tea (May Zest Tea Co., Ltd)](https://www.facebook.com/mzt.gaba)
 

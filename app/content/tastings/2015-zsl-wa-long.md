@@ -7,7 +7,9 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2015
 elevation: 1100
 vendor:
@@ -79,6 +81,7 @@ images:
     alt: Wet leaf
   - image: https://res.cloudinary.com/pu-erh/image/upload/v1612896143/tea/2021/2015%20ZSL%20Wa%20Long/70A854C7-78E3-4527-BCCA-6EBB922B55B0_isfkql.jpg
     alt: Tea in cup
+origin_note: undisclosed
 ---
 
 The pickings are very fuzzy and have a mix of real young and more established young material. Came across a decent sprinkle of golden buds in there too.

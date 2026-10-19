@@ -73,6 +73,7 @@ images:
     alt: Tea juice in the cup
   - image: /images/uploads/da4c40c2-6f83-4d63-b678-e7f249c182fb-min.jpg
     alt: big bag
+origin_note: blend
 ---
 
 This material is 6 years aged prior to the pressing in 2011.

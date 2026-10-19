@@ -9,7 +9,9 @@ cultivar:
   - 550a87de-9e6c-4457-9f82-b5eab6f4b36e
 origin:
   - a6060fae-eee1-4d8d-920d-3eeae937db1a
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2020
 picking: Bud + up to 4 leaves
 elevation: 2125

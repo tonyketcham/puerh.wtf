@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - a6060fae-eee1-4d8d-920d-3eeae937db1a
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2014
 elevation: 1900
 vendor:

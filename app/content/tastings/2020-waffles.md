@@ -64,6 +64,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 10
+origin_note: blend
 ---
 
 The liquor's definitely cloudier on this compared to the 2018 version. Got a different set of dry/wet leaf notes that weren't better or worse - just different. The wet leaf was much more savory than the 2018 when hot, and then went into a fruity sweetness when it cooled down.
