@@ -97,11 +97,18 @@ export default function TextMorph({
 					<motion.span
 						key={glyph.key}
 						aria-hidden
-						className="absolute top-0 left-0"
+						className={cn(
+							"absolute top-0 left-0",
+							// the glide is a CSS transition on `translate` (separate from motion's
+							// `transform`): motion doesn't animate bare `ch` offsets, so a shared letter
+							// stayed at its old index
+							!reduce && "transition-[translate] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+						)}
+						style={{ translate: `${j}ch 0` }}
 						// a micro-interaction: barely-there lift, mostly a crossfade; exiting letters
 						// keep their last spot (they're absolutely placed, so nothing reflows)
-						initial={{ opacity: 0, y: 1.5, x: `${j}ch` }}
-						animate={{ opacity: 1, y: 0, x: `${j}ch` }}
+						initial={{ opacity: 0, y: 1.5 }}
+						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -1.5, transition: reduce ? INSTANT : { duration: 0.12 } }}
 						transition={reduce ? INSTANT : GLIDE}
 					>
