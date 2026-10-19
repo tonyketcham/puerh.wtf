@@ -38,6 +38,8 @@ import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils/cn"
 import type { PeekController } from "./controller"
 import { dominantAxes, featuredSessions, type PeekModel } from "./model"
+import { PEEK_CARD_ID } from "./usePeekTrigger"
+import { useMorphClick } from "../page/viewTransition"
 
 /** Content ease from the plan's motion tokens (§3). */
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -135,7 +137,7 @@ export default function PeekCard({ model, state, index, details, peek, engaged }
 
 			{/* 易武  Yiwu                     ⌐ 2000–2020 */}
 			<motion.div variants={row} className="flex items-end min-w-0 gap-3 -mt-1">
-				<h2 className="flex items-baseline min-w-0 gap-2">
+				<h2 className="flex items-baseline min-w-0 gap-2" data-peek-title>
 					{hanzi && (
 						<span lang="zh" className="text-lg leading-none shrink-0 text-white/45">
 							{hanzi}
@@ -767,6 +769,9 @@ function Sessions({ model, peek, row }: { model: PeekModel; peek: PeekController
 	)
 }
 
+const cardTitle = (el: HTMLElement) =>
+	el.closest(`#${PEEK_CARD_ID}`)?.querySelector("[data-peek-title]")
+
 /** [Open yiwu.origin ↵]  [Filter ⇧↵]  [Compare] */
 function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController; row: Variants }) {
 	const { target } = model
@@ -777,6 +782,13 @@ function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController;
 	const openCommandBar = useSetAtom(openCommandBarAtom)
 	const href = peekHref(target)
 	const filter = peekFilter(target, model.title)
+	// Open morphs the card's name (not the button) into the page title
+	const openMorph = useMorphClick(
+		isPageKind(target.kind) ? target.kind : "origin",
+		target.key,
+		isPageKind(target.kind) ? href : null,
+		cardTitle
+	)
 	const filtered = filter ? filter.active(readFilters(params)) : false
 	const candidates = model.sessions.filter((s) => s._slug !== current)
 
@@ -802,6 +814,8 @@ function Actions({ model, peek, row }: { model: PeekModel; peek: PeekController;
 					prefetch={peekRouteReady(target) ? undefined : false}
 					className={actionClass("primary")}
 					title={`Open ${peekFileName(target)}`}
+					// the card's name grows into the page title (route view transition)
+					onClick={openMorph}
 				>
 					<span className="min-w-0 truncate">
 						Open <span className="text-white/55">{peekFileName(target)}</span>

@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation"
 import { useMemo, type CSSProperties, type ReactNode } from "react"
 import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
 import { readFilters, replaceFilters, toggleFacet, type FacetKey } from "@/lib/filters"
-import { isPageKind } from "@/lib/peek"
+import { isPageKind, type PageKind } from "@/lib/peek"
 import { usePeekTrigger } from "@/lib/components/entity/peek/usePeekTrigger"
+import { useMorphClick } from "@/lib/components/entity/page/viewTransition"
 import { cn } from "@/lib/utils/cn"
 
 export type EntityRefVariant = "chip" | "crumb"
@@ -42,9 +43,9 @@ const FILTER_FACET: Partial<Record<EntityKind, FacetKey>> = { tag: "tags", year:
 /**
  * A reference to an entity, IDE "symbol" style: kind glyph + label (+ count).
  *
- * - Page kinds (origin, vendor, style, category, cultivar) link to their page (§2.3; pages for
- *   origins, styles and cultivars arrive in Phase 3, so those links don't prefetch yet) and
- *   peek it first (EntityPeek, §3.1): Peek Definition before Go to Definition.
+ * - Page kinds (origin, vendor, style, category, cultivar) link to their page (§2.3) and peek
+ *   it first (EntityPeek, §3.1): Peek Definition before Go to Definition. Following the link
+ *   morphs the ref into the page's title (a route view transition, see page/viewTransition).
  * - Filter kinds (tag, vintage) are toggle buttons for the Explorer's ?tags= / ?years= filter,
  *   pressed while that filter is on. Rendered under a Suspense boundary (they read the URL).
  */
@@ -67,9 +68,15 @@ function PageRef({
 	const peekable = peek && isPageKind(kind)
 	const target = useMemo(() => (peekable ? { kind, key: slug } : null), [peekable, kind, slug])
 	const { handlers, status } = usePeekTrigger<HTMLAnchorElement>(target)
+	const morph = useMorphClick(kind as PageKind, slug, isPageKind(kind) ? href : null)
 	return (
 		<Link
 			{...handlers}
+			onClick={(e) => {
+				handlers.onClick(e)
+				// Go to Definition: the ref grows into the page's title (route view transition)
+				morph(e)
+			}}
 			href={href}
 			prefetch={meta.routeReady ? undefined : false}
 			// the peek says all of this and more; a native tooltip would only cover it

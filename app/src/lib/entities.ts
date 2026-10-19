@@ -31,11 +31,11 @@ type EntityKindMeta = {
 }
 
 export const ENTITY_META: Record<EntityKind, EntityKindMeta> = {
-	origin: { glyph: "^", label: "origin", route: "origins", routeReady: false },
+	origin: { glyph: "^", label: "origin", route: "origins", routeReady: true },
 	vendor: { glyph: "@", label: "vendor", route: "vendors", routeReady: true },
-	style: { glyph: "~", label: "style", route: "styles", routeReady: false },
+	style: { glyph: "~", label: "style", route: "styles", routeReady: true },
 	category: { glyph: "~", label: "category", route: "categories", routeReady: true },
-	cultivar: { glyph: "%", label: "cultivar", route: "cultivars", routeReady: false },
+	cultivar: { glyph: "%", label: "cultivar", route: "cultivars", routeReady: true },
 	tag: { glyph: "#", label: "tag", route: null, routeReady: false },
 	year: { glyph: ":", label: "vintage", route: null, routeReady: false },
 }
