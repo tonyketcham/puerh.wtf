@@ -1,11 +1,12 @@
 /**
- * The four drawn pieces of teaware, reconstructed from the log's own session photos.
+ * The drawn pieces of teaware, reconstructed from the log's own session photos.
  *
  * Evidence record
  * | piece              | evidence                                                    | how it's used                         |
  * | ------------------ | ----------------------------------------------------------- | ------------------------------------- |
  * | Cat Gaiwan         | top view (3c1f3c14…), side view on the 1988 Wuyi desk shot  | flare, rim lip, inset lid and ring    |
- * |                    | (1988-wuyi_4), volume_ml 100                                | knob traced; scaled to hold 100 ml    |
+ * |                    | (1988-wuyi_4), volume_ml 100; the owner's side photo of     | knob; scaled to hold 100 ml. The      |
+ * |                    | its painting (see PHOTO)                                    | painting is traced in the photo's px  |
  * | Hongni Shuiping    | top view (5ddb9bd2…), volume_ml 90                          | round body, wide mouth, straight      |
  * |                    |                                                             | tapered spout, ear handle; side       |
  * |                    |                                                             | profile estimated; scaled to 90 ml    |
@@ -32,7 +33,9 @@ import {
 	ridge,
 	sampleProfile,
 	sheet,
+	sideRadius,
 	topHeight,
+	wrap,
 	drape,
 	tube,
 	type Callout,
@@ -43,6 +46,8 @@ import {
 	type Vec3,
 	type VesselModel,
 } from "./geometry"
+import { DEFAULT_PITCH as P, DEFAULT_YAW as Y } from "./render"
+import type { Shot } from "./sequence"
 
 export type DrawingId = "cat-gaiwan" | "hongni-shuiping" | "thousand-lines" | "cups" | "cnnp-7542"
 
@@ -60,8 +65,10 @@ export interface DrawingSpec {
 	pitch?: number
 	/** caption for a piece with no vessel page */
 	info?: { title: string; hanzi: string | null; facts: string[] }
-	/** where the drawing's evidence came from, for the caption */
-	source: string
+	/** a line about the piece itself, for one the log has no sessions for */
+	note?: string
+	/** its turntable: the views it moves through, the first one drawn on */
+	shots: Shot[]
 	build: () => VesselModel
 }
 
@@ -125,6 +132,24 @@ const onRing = (r: number, z: number, deg: number): Vec3 => {
 
 /* ------------------------------------------------------------ cat gaiwan */
 
+/*
+ * The owner's side photo of the cat gaiwan (1500 × 2000 px) is the reference for its painting,
+ * traced in the photo's pixels. Each stroke is unrolled off the photographed wall (undoing the
+ * curve's foreshortening about the bowl's axis) and laid onto the model's wall, scaled down so
+ * the scene sits within the bowl's belly.
+ */
+const PHOTO = {
+	/** the photographed wall's radius at the painting, px */
+	wallR: 480,
+	/** the bowl's axis in the photo: x at the rim (y 695) and at the foot (y 1750) */
+	axis: { rimY: 695, rimX: 757, footY: 1750, footX: 820 },
+	/** the painting's middle, px, and where it lands on the model's wall (z, raw units) */
+	centreY: 1074,
+	centreZ: 31,
+	/** px per raw unit: the painting spans ~27 units of the wall's height */
+	k: 26,
+}
+
 function catGaiwan(): VesselModel {
 	const bowl = profile([
 		[0, 1.6],
@@ -164,20 +189,259 @@ function catGaiwan(): VesselModel {
 		[0, 57],
 	])
 	const parts = [lathe("bowl", bowl), lathe("lid", lid)]
+
+	// the painting, unrolled off the photo and laid on the wall, centred on the default view's front
+	const side = sideRadius(bowl, 5, 50)
+	const { axis, wallR, centreY, centreZ, k } = PHOTO
+	const toWall = ([x, y]: [number, number]): [number, number] => {
+		const ax = axis.rimX + ((y - axis.rimY) * (axis.footX - axis.rimX)) / (axis.footY - axis.rimY)
+		const d = Math.max(-0.999, Math.min(0.999, (x - ax) / wallR))
+		return [(wallR * Math.asin(d)) / k, centreZ + (centreY - y) / k]
+	}
+	const at = (-66 * Math.PI) / 180
+	const decals = PAINTING.flatMap(({ color, strokes }) =>
+		wrap(
+			strokes.map((s) => s.map(toWall)),
+			side,
+			{ at, lift: 0.25 }
+		).map((pts) => ({ part: "bowl", color, pts }))
+	)
+	const pin = (x: number, y: number) => wrap([[toWall([x, y]), toWall([x, y])]], side, { at })[0][0]
+
 	return finish(parts, {
 		cavity: bowl,
 		brim: 50.6,
 		ml: 100,
 		lift: { lid: 30 },
 		bodyParts: ["bowl"],
+		decals,
 		callouts: [
 			{ label: "盖 lid", at: onRing(27, 51, -60), part: "lid", side: "left" },
 			{ label: "ring knob", at: onRing(11.8, 60, 30), part: "lid", side: "right" },
-			{ label: "碗 bowl", at: onRing(43.2, 38, 25), part: "bowl", side: "right" },
+			{ label: "mischievous cat", at: pin(928, 812), part: "bowl", side: "right" },
+			{ label: "unsuspecting victim", at: pin(640, 1290), part: "bowl", side: "left" },
 			{ label: "foot ring", at: onRing(22.4, 2.5, -40), part: "bowl", side: "left" },
 		],
 	})
 }
+
+/** the painting's inks, lifted for the dark ground */
+const INK = {
+	iron: "#c99366",
+	leaf: "#8fc4a0",
+	nose: "#e9a08c",
+}
+
+type Px = [number, number]
+
+const ellipse = (cx: number, cy: number, rx: number, ry: number, n = 22): Px[] =>
+	Array.from({ length: n + 1 }, (_, k) => {
+		const a = (k / n) * Math.PI * 2
+		return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]
+	})
+
+/** A thin pointed leaf from its base to its tip, `w` px wide at the middle. */
+const blade = ([bx, by]: Px, [tx, ty]: Px, w: number): Px[] => {
+	const len = Math.hypot(tx - bx, ty - by)
+	const [ux, uy] = [(tx - bx) / len, (ty - by) / len]
+	const [nx, ny] = [-uy, ux]
+	const n = 8
+	const half = (sign: number) =>
+		Array.from({ length: n + 1 }, (_, k) => {
+			const t = k / n
+			const off = sign * (w / 2) * Math.sin(Math.PI * t) ** 0.8
+			return [bx + ux * len * t + nx * off, by + uy * len * t + ny * off] as Px
+		})
+	return [...half(1), ...half(-1).reverse()]
+}
+
+/**
+ * The cat gaiwan's painting, traced in px from the owner's photo: a tabby has hauled its chin up
+ * onto a table and stares down past the edge at a potted succulent in a footed planter.
+ */
+const PAINTING: { color: string; strokes: Px[][] }[] = [
+	{
+		color: INK.iron,
+		strokes: [
+			// the table: its far edge, and its left side running down toward the eye
+			[
+				[400, 1150],
+				[483, 985],
+				[1222, 990],
+			],
+			// head, from the table up over both ears and back down
+			[
+				[748, 978],
+				[738, 930],
+				[728, 860],
+				[716, 790],
+				[708, 742],
+				[742, 760],
+				[770, 782],
+				[820, 768],
+				[870, 762],
+				[920, 766],
+				[958, 772],
+				[985, 745],
+				[1009, 724],
+				[1013, 770],
+				[1018, 818],
+				[1030, 880],
+				[1040, 940],
+				[1040, 985],
+			],
+			// eyes, and pupils turned down toward the plant
+			ellipse(800, 852, 32, 27),
+			ellipse(928, 846, 32, 27),
+			ellipse(792, 858, 14, 15, 14),
+			ellipse(920, 852, 14, 15, 14),
+			// mouth and chin
+			[
+				[858, 898],
+				[858, 912],
+			],
+			[
+				[832, 916],
+				[845, 923],
+				[858, 912],
+				[871, 923],
+				[884, 916],
+			],
+			[
+				[838, 952],
+				[858, 960],
+				[878, 952],
+			],
+			// whiskers
+			[
+				[768, 892],
+				[712, 878],
+			],
+			[
+				[766, 905],
+				[706, 906],
+			],
+			[
+				[768, 916],
+				[714, 936],
+			],
+			[
+				[950, 890],
+				[1034, 866],
+			],
+			[
+				[952, 903],
+				[1046, 904],
+			],
+			[
+				[950, 914],
+				[1040, 940],
+			],
+			// tabby marks on the brow and over the ears
+			[
+				[834, 786],
+				[839, 824],
+			],
+			[
+				[866, 780],
+				[866, 818],
+			],
+			[
+				[898, 786],
+				[893, 824],
+			],
+			[
+				[760, 812],
+				[778, 832],
+			],
+			[
+				[986, 806],
+				[968, 828],
+			],
+			// the planter: rim band, tapering body on two little feet, its brush marks
+			[
+				[548, 1150],
+				[772, 1150],
+				[772, 1182],
+				[552, 1185],
+				[548, 1150],
+			],
+			[
+				[555, 1185],
+				[590, 1410],
+				[785, 1395],
+				[770, 1182],
+			],
+			[
+				[592, 1410],
+				[594, 1424],
+				[610, 1422],
+				[608, 1408],
+			],
+			[
+				[764, 1397],
+				[766, 1410],
+				[783, 1408],
+				[781, 1395],
+			],
+			...[
+				[590, 1220],
+				[612, 1300],
+				[640, 1210],
+				[662, 1330],
+				[690, 1225],
+				[712, 1300],
+				[742, 1215],
+				[752, 1320],
+				[620, 1360],
+				[700, 1365],
+				[600, 1250],
+				[730, 1265],
+			].map(([x, y]) => [
+				[x, y],
+				[x + 2, y + 30],
+			] as Px[]),
+		],
+	},
+	{
+		color: INK.leaf,
+		strokes: [
+			// a mound of moss over the soil
+			[
+				[560, 1150],
+				[574, 1128],
+				[610, 1116],
+				[665, 1110],
+				[722, 1118],
+				[756, 1132],
+				[766, 1150],
+			],
+			// and the succulent's spikes fanning out of it
+			blade([622, 1122], [542, 1133], 12),
+			blade([630, 1118], [568, 1090], 12),
+			blade([640, 1116], [600, 1076], 12),
+			blade([650, 1114], [628, 1064], 12),
+			blade([660, 1114], [660, 1068], 12),
+			blade([670, 1114], [690, 1064], 12),
+			blade([680, 1115], [714, 1072], 12),
+			blade([692, 1117], [742, 1080], 12),
+			blade([702, 1120], [758, 1106], 12),
+		],
+	},
+	{
+		color: INK.nose,
+		strokes: [
+			[
+				[838, 876],
+				[878, 876],
+				[870, 890],
+				[858, 898],
+				[846, 890],
+				[838, 876],
+			],
+		],
+	},
+]
 
 /* ------------------------------------------------------- hongni shuiping */
 
@@ -540,6 +804,51 @@ function cnnp7542(): VesselModel {
 	})
 }
 
+/* --------------------------------------------------------------- turntables */
+
+/**
+ * A lidded pot's run: three-quarter, then a side elevation (spout, mouth and handle in profile),
+ * the lid lifts, the camera rises to look in, tips over into plan, and the lid seats again.
+ */
+const LIDDED: Shot[] = [
+	{ yaw: Y, pitch: P, explode: 0, hold: 1500 },
+	{ yaw: 0, pitch: 0.05, explode: 0, hold: 1300, move: 850 },
+	{ yaw: 0, pitch: 0.05, explode: 1, hold: 1000, move: 650 },
+	{ yaw: 0.9, pitch: 0.68, explode: 1, hold: 1400, move: 950 },
+	{ yaw: 1.7, pitch: 1.08, explode: 1, hold: 1100, move: 850 },
+	{ yaw: 2.5, pitch: P, explode: 0, hold: 1300, move: 950 },
+]
+
+/** the gaiwan holds its painting to the eye: the cat, straight on, before the lid comes off */
+const GAIWAN: Shot[] = [
+	{ yaw: Y, pitch: P, explode: 0, hold: 1500 },
+	{ yaw: Y, pitch: 0.06, explode: 0, hold: 1700, move: 850 },
+	{ yaw: Y, pitch: 0.06, explode: 1, hold: 1000, move: 650 },
+	{ yaw: Y + 1, pitch: 0.7, explode: 1, hold: 1400, move: 950 },
+	{ yaw: Y + 1.9, pitch: 1.08, explode: 1, hold: 1100, move: 850 },
+	{ yaw: Y + 2.8, pitch: P, explode: 0, hold: 1300, move: 950 },
+]
+
+/** the cups: in elevation side by side, then down into them */
+const CUPS: Shot[] = [
+	{ yaw: Y, pitch: P, explode: 0, hold: 1500 },
+	{ yaw: 0, pitch: 0.04, explode: 0, hold: 1300, move: 850 },
+	{ yaw: 0.6, pitch: 1.05, explode: 0, hold: 1400, move: 950 },
+	{ yaw: 1.5, pitch: 0.5, explode: 0, hold: 1300, move: 950 },
+]
+
+/**
+ * The cake: the wrapper's print read square-on from above, its dome and rim in elevation, then the
+ * wrapper lifts to show the neifei pressed into the face.
+ */
+const CAKE: Shot[] = [
+	{ yaw: Y, pitch: 0.72, explode: 0, hold: 1500 },
+	{ yaw: 0, pitch: 1.12, explode: 0, hold: 1600, move: 900 },
+	{ yaw: 0.25, pitch: 0.04, explode: 0, hold: 1200, move: 900 },
+	{ yaw: Y, pitch: 0.62, explode: 1, hold: 1600, move: 1000 },
+	{ yaw: Y + 1.2, pitch: 0.72, explode: 0, hold: 1200, move: 950 },
+]
+
 /* ---------------------------------------------------------------- registry */
 
 export const DRAWINGS: DrawingSpec[] = [
@@ -549,7 +858,7 @@ export const DRAWINGS: DrawingSpec[] = [
 		short: "cat gaiwan",
 		accent: "#e9dcc2",
 		action: "lift the lid",
-		source: "from session photos, sized by volume",
+		shots: GAIWAN,
 		build: catGaiwan,
 	},
 	{
@@ -558,7 +867,7 @@ export const DRAWINGS: DrawingSpec[] = [
 		short: "shuiping",
 		accent: "#e07a52",
 		action: "lift the lid",
-		source: "from session photos, sized by volume",
+		shots: LIDDED,
 		build: hongniShuiping,
 	},
 	{
@@ -567,7 +876,7 @@ export const DRAWINGS: DrawingSpec[] = [
 		short: "thousand lines",
 		accent: "#c98f6d",
 		action: "lift the lid",
-		source: "from session photos, sized by volume",
+		shots: LIDDED,
 		build: thousandLines,
 	},
 	{
@@ -577,7 +886,8 @@ export const DRAWINGS: DrawingSpec[] = [
 		accent: "#dcc8a0",
 		action: null,
 		info: { title: "Tea cups", hanzi: "品茗杯", facts: ["glazed stoneware"] },
-		source: "from session photos",
+		note: "where every steep ends up",
+		shots: CUPS,
 		build: cups,
 	},
 	{
@@ -588,7 +898,8 @@ export const DRAWINGS: DrawingSpec[] = [
 		action: "lift the wrapper",
 		pitch: 0.72,
 		info: { title: "CNNP 7542", hanzi: "雲南七子餅茶", facts: ["sheng bing", "357 g", "Ø≈200 mm"] },
-		source: "from wrapper photos; a 357 g bing's size",
+		note: "75: a 1975 recipe · 4: its leaf grade · 2: Menghai",
+		shots: CAKE,
 		build: cnnp7542,
 	},
 ]

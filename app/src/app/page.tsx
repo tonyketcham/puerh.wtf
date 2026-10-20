@@ -15,6 +15,15 @@ export default async function HomePage() {
 	])
 	// One clock for the whole list, so every card's tape ages against the same "now".
 	const now = new Date()
+	// how often each vessel was brewed in, and when last
+	const use = new Map<string, { n: number; last: string }>()
+	for (const s of all)
+		for (const v of s.vessel ?? []) {
+			const u = use.get(v._slug) ?? { n: 0, last: "" }
+			u.n++
+			if (s.date > u.last) u.last = s.date
+			use.set(v._slug, u)
+		}
 	const drawn: DrawnVessel[] = vessels.map((v) => ({
 		slug: v.slug,
 		title: v.title,
@@ -22,6 +31,8 @@ export default async function HomePage() {
 		kind: v.vessel?.kind ?? null,
 		material: v.vessel?.material ?? null,
 		volume_ml: v.vessel?.volume_ml ?? null,
+		sessions: use.get(v.slug)?.n ?? 0,
+		lastBrewed: use.get(v.slug)?.last.slice(0, 10).replace(/-/g, ".") || null,
 	}))
 
 	const dates = all.map((s) => s.date).filter(Boolean).sort()

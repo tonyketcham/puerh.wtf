@@ -450,6 +450,50 @@ export function drape(
 	})
 }
 
+/**
+ * Wraps 2D print (mm, x along the surface, y = height z) around a body of revolution, as a
+ * painter's brush follows a bowl: x becomes arc length at that height, starting from azimuth
+ * `at` and running counter-clockwise (to the right, seen from outside).
+ */
+export function wrap(
+	strokes: [number, number][][],
+	radius: (z: number) => number,
+	{ at = 0, lift = 0.3, step = 0.8 } = {}
+): Vec3[][] {
+	const point = (x: number, z: number): Vec3 => {
+		const r = radius(z)
+		const a = at + x / r
+		return [(r + lift) * Math.cos(a), (r + lift) * Math.sin(a), z]
+	}
+	return strokes.map((stroke) => {
+		const out: Vec3[] = []
+		for (let k = 0; k < stroke.length - 1; k++) {
+			const [ax, ay] = stroke[k]
+			const [bx, by] = stroke[k + 1]
+			const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / step))
+			for (let t = 0; t < n; t++) out.push(point(ax + ((bx - ax) * t) / n, ay + ((by - ay) * t) / n))
+		}
+		const [lx, ly] = stroke[stroke.length - 1]
+		out.push(point(lx, ly))
+		return out
+	})
+}
+
+/** Outer radius of a lathe profile at height z (its outer wall between `zFrom` and `zTo`). */
+export function sideRadius(samples: ProfileSample[], zFrom: number, zTo: number) {
+	const wall = samples.filter((s) => !s.inner && s.z >= zFrom && s.z <= zTo).sort((a, b) => a.z - b.z)
+	return (z: number) => {
+		if (z <= wall[0].z) return wall[0].r
+		for (let i = 1; i < wall.length; i++)
+			if (wall[i].z >= z) {
+				const a = wall[i - 1]
+				const b = wall[i]
+				return a.r + ((b.r - a.r) * (z - a.z)) / Math.max(1e-9, b.z - a.z)
+			}
+		return wall[wall.length - 1].r
+	}
+}
+
 /** Height of a lathe profile's upper surface at radius r (its samples above `zAbove`). */
 export function topHeight(samples: ProfileSample[], zAbove: number) {
 	const top = samples.filter((s) => s.z > zAbove).sort((a, b) => a.r - b.r)

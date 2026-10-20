@@ -43,13 +43,6 @@ const config = {
 			dropShadow: {
 				split: "0px 4px 0px rgba(255, 255, 255, 0.25)",
 			},
-			keyframes: {
-				// the home page teaware drawing: its turn running out, as a hairline under its tab
-				"teaware-dwell": { from: { width: "0" }, to: { width: "100%" } },
-			},
-			animation: {
-				"teaware-dwell": "teaware-dwell var(--dwell) linear forwards",
-			},
 		},
 	},
 	plugins: [require("./tailwindPlugins/wordSpacingPlugin.cjs")],

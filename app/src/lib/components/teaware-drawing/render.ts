@@ -61,6 +61,10 @@ export class Renderer {
 	private model: VesselModel | null = null
 	private scale = 1
 	private zMid = 0
+	/** the stage left for the drawing once the label lanes are taken */
+	private avail = { w: 1, h: 1 }
+	/** each part's top when seated, and how far it lifts */
+	private tops: { top: number; lift: number }[] = []
 	private zLo = 0
 	private zSpan = 1
 	private lanes = true
@@ -109,30 +113,42 @@ export class Renderer {
 		this.fit()
 	}
 
-	/** Fits the model at the default pitch, lids lifted, any yaw: one scale per vessel. */
+	/** Measures the model and the stage; the scale itself follows the pose (see frame). */
 	private fit() {
 		const m = this.model
 		if (!m || !this.w) return
 		let zMin = Infinity
 		let zMax = -Infinity
-		for (const p of m.parts) {
+		this.tops = m.parts.map((p) => {
 			const lift = m.lift[p.id] ?? 0
+			let top = -Infinity
 			for (let k = 2; k < p.pos.length; k += 3) {
 				zMin = Math.min(zMin, p.pos[k])
-				zMax = Math.max(zMax, p.pos[k] + lift)
+				top = Math.max(top, p.pos[k])
 			}
-		}
+			zMax = Math.max(zMax, top + lift)
+			return { top, lift }
+		})
 		this.zLo = zMin
 		this.zSpan = zMax - zMin || 1
 		this.lanes = this.w >= 440
 		const padX = this.lanes ? LANE + LANE_GAP : 16
-		const availW = this.w - padX * 2
-		const availH = this.h - 36
-		const sp = Math.sin(m.pitch ?? DEFAULT_PITCH)
-		const cp = Math.cos(m.pitch ?? DEFAULT_PITCH)
-		const tall = (zMax - zMin) * cp + 2 * m.radius * sp
-		this.scale = Math.max(0.1, Math.min(availW / (2 * m.radius), availH / tall))
-		this.zMid = (zMin + zMax) / 2
+		this.avail = { w: this.w - padX * 2, h: this.h - 36 }
+		this.frame({ yaw: 0, pitch: m.pitch ?? DEFAULT_PITCH, explode: 0, reveal: 1, alpha: 1 })
+	}
+
+	/**
+	 * Fits the drawing to the stage for this pose: a plan view or a lifted lid needs more height,
+	 * so the scale (and the centre) move with the camera, smoothly, as it does.
+	 */
+	private frame(v: ViewState) {
+		const m = this.model
+		if (!m) return
+		let zMax = -Infinity
+		for (const t of this.tops) zMax = Math.max(zMax, t.top + t.lift * v.explode)
+		const tall = (zMax - this.zLo) * Math.cos(v.pitch) + 2 * m.radius * Math.sin(v.pitch)
+		this.scale = Math.max(0.1, Math.min(this.avail.w / (2 * m.radius), this.avail.h / tall))
+		this.zMid = (this.zLo + zMax) / 2
 	}
 
 	private project(p: Vec3, v: ViewState, lift: number): [number, number, number] {
@@ -143,7 +159,11 @@ export class Renderer {
 		const x1 = p[0] * cy - p[1] * sy
 		const y1 = p[0] * sy + p[1] * cy
 		const z1 = p[2] + lift - this.zMid
-		return [this.w / 2 + this.scale * x1, this.h / 2 - this.scale * (y1 * sp + z1 * cp), y1 * cp - z1 * sp]
+		return [
+			this.w / 2 + this.scale * x1,
+			this.h / 2 - this.scale * (y1 * sp + z1 * cp),
+			y1 * cp - z1 * sp,
+		]
 	}
 
 	/** Inks one frame; returns true while labels are still easing into place. */
@@ -153,6 +173,7 @@ export class Renderer {
 		ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0)
 		ctx.clearRect(0, 0, this.w, this.h)
 		if (!m || v.alpha <= 0) return false
+		this.frame(v)
 
 		const cy = Math.cos(v.yaw)
 		const sy = Math.sin(v.yaw)
@@ -197,13 +218,7 @@ export class Renderer {
 			hidden: [] as number[],
 		}
 		const reveal = v.reveal
-		const push = (
-			bucket: number[],
-			ax: number,
-			ay: number,
-			bx: number,
-			by: number
-		) => {
+		const push = (bucket: number[], ax: number, ay: number, bx: number, by: number) => {
 			bucket.push(ax, ay, bx, by)
 		}
 		const visible = (x: number, y: number, d: number) => this.visible(x, y, d, tol)
@@ -220,10 +235,12 @@ export class Renderer {
 				const my = (pr.y[a] + pr.y[b]) / 2
 				const md = (pr.d[a] + pr.d[b]) / 2
 				if (visible(mx, my, md)) push(paths[role], pr.x[a], pr.y[a], pr.x[b], pr.y[b])
-				else if (role === "feature" && part.axis) push(paths.hidden, pr.x[a], pr.y[a], pr.x[b], pr.y[b])
+				else if (role === "feature" && part.axis)
+					push(paths.hidden, pr.x[a], pr.y[a], pr.x[b], pr.y[b])
 			}
 			for (const ring of part.rings)
-				for (let j = 0; j < cols; j++) seg(idx(ring.i, j), idx(ring.i, j + 1), ring.feature ? "feature" : "wire")
+				for (let j = 0; j < cols; j++)
+					seg(idx(ring.i, j), idx(ring.i, j + 1), ring.feature ? "feature" : "wire")
 			const columns = [
 				...part.meridians.map((j) => [j, "wire"] as const),
 				...(part.featureMeridians ?? []).map((j) => [j, "feature"] as const),
@@ -302,7 +319,9 @@ export class Renderer {
 			for (const p of decal.pts) {
 				const q = this.project(p, v, lift)
 				const zn = (p[2] + lift - this.zLo) / this.zSpan
-				const mid = prev && this.visible((prev[0] + q[0]) / 2, (prev[1] + q[1]) / 2, (prev[2] + q[2]) / 2, tol)
+				const mid =
+					prev &&
+					this.visible((prev[0] + q[0]) / 2, (prev[1] + q[1]) / 2, (prev[2] + q[2]) / 2, tol)
 				if (prev && mid && zn <= v.reveal) segs.push(prev[0], prev[1], q[0], q[1])
 				prev = q
 			}
@@ -315,18 +334,19 @@ export class Renderer {
 		const h = this.h
 		const px = Math.floor(x)
 		const py = Math.floor(y)
-		let far = -Infinity
+		const threshold = d - tol
 		for (let dy = -1; dy <= 1; dy++) {
 			const yy = py + dy
 			if (yy < 0 || yy >= h) return true
 			for (let dx = -1; dx <= 1; dx++) {
 				const xx = px + dx
 				if (xx < 0 || xx >= w) return true
-				const z = this.zbuf[yy * w + xx]
-				if (z > far) far = z
+				// The test is existential: one sample behind this point is enough. Most
+				// visible lines can stop here instead of reading all nine neighbours.
+				if (this.zbuf[yy * w + xx] >= threshold) return true
 			}
 		}
-		return d <= far + tol
+		return false
 	}
 
 	private raster(part: Part, pr: Projected) {
@@ -365,16 +385,34 @@ export class Renderer {
 		const cd = pr.d[c]
 		const inv = 1 / area
 		const zb = this.zbuf
+		// Barycentric coordinates and depth are affine across the triangle. Compute
+		// their x steps once, rather than repeating the cross products per pixel.
+		const step0 = (by - cy) * inv
+		const step1 = (cy - ay) * inv
+		const step2 = -step0 - step1
+		const stepZ = step0 * (ad - cd) + step1 * (bd - cd)
 		for (let y = y0; y <= y1; y++) {
 			const py = y + 0.5
-			for (let x = x0; x <= x1; x++) {
-				const px = x + 0.5
-				const w0 = ((bx - px) * (cy - py) - (by - py) * (cx - px)) * inv
-				const w1 = ((cx - px) * (ay - py) - (cy - py) * (ax - px)) * inv
-				const w2 = 1 - w0 - w1
-				if (w0 < -1e-4 || w1 < -1e-4 || w2 < -1e-4) continue
-				const z = w0 * ad + w1 * bd + w2 * cd
-				const k = y * w + x
+			const px = x0 + 0.5
+			let w0 = ((bx - px) * (cy - py) - (by - py) * (cx - px)) * inv
+			let w1 = ((cx - px) * (ay - py) - (cy - py) * (ax - px)) * inv
+			const w2 = 1 - w0 - w1
+			// Clip the scanline to the three half-planes before visiting pixels. A
+			// nearly edge-on quad has a large bounding box but only a thin inked span.
+			let first = 0
+			let last = x1 - x0
+			if (step0 > 0) first = Math.max(first, Math.ceil((-1e-4 - w0) / step0))
+			else if (step0 < 0) last = Math.min(last, Math.floor((-1e-4 - w0) / step0))
+			else if (w0 < -1e-4) continue
+			if (step1 > 0) first = Math.max(first, Math.ceil((-1e-4 - w1) / step1))
+			else if (step1 < 0) last = Math.min(last, Math.floor((-1e-4 - w1) / step1))
+			else if (w1 < -1e-4) continue
+			if (step2 > 0) first = Math.max(first, Math.ceil((-1e-4 - w2) / step2))
+			else if (step2 < 0) last = Math.min(last, Math.floor((-1e-4 - w2) / step2))
+			else if (w2 < -1e-4) continue
+			let z = w0 * ad + w1 * bd + w2 * cd + first * stepZ
+			let k = y * w + x0 + first
+			for (let x = first; x <= last; x++, k++, z += stepZ) {
 				if (z < zb[k]) zb[k] = z
 			}
 		}
@@ -414,7 +452,12 @@ export class Renderer {
 	 * anchor's height. When the vessel turns an anchor across the axis, its label fades out and
 	 * comes back in the other lane, so no leader ever has to cross the drawing.
 	 */
-	private callouts(v: ViewState, cream: (a: number) => string, tol: number, smooth: boolean): boolean {
+	private callouts(
+		v: ViewState,
+		cream: (a: number) => string,
+		tol: number,
+		smooth: boolean
+	): boolean {
 		const m = this.model!
 		const ctx = this.ctx
 		const reveal = Math.min(1, Math.max(0, (v.reveal - 0.85) / 0.25))
@@ -498,11 +541,19 @@ export class Renderer {
 	}
 }
 
-function stroke(ctx: CanvasRenderingContext2D, segs: number[], color: string, width: number, dash: number[] = []) {
+function stroke(
+	ctx: CanvasRenderingContext2D,
+	segs: number[],
+	color: string,
+	width: number,
+	dash: number[] = []
+) {
 	if (!segs.length) return
 	ctx.beginPath()
-	let lx = NaN
-	let ly = NaN
+	// Infinity, not NaN: a NaN comparison is always false, which once left every batch's first
+	// segment without its moveTo, and so undrawn
+	let lx = Infinity
+	let ly = Infinity
 	for (let i = 0; i < segs.length; i += 4) {
 		const ax = segs[i]
 		const ay = segs[i + 1]
