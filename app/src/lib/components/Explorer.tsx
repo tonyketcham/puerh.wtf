@@ -419,9 +419,10 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 					backdropClassName="bg-[rgba(45,40,45,0.35)] max-xl:bg-[#171617]"
 				>
 					<div className="relative">
-						{/* header: the activity rail (a tablist) and search */}
+						{/* header: the activity rail (a tablist) and search, concentric with the panel: its 15px
+						    inner radius less this 6px inset gives the tabs their 9px radius */}
 						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
-							<div className="flex items-center gap-2 py-2.5 pl-2 pr-2.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
+							<div className="flex items-center gap-1.5 p-1.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
 								<h2 className="sr-only">Explorer</h2>
 								<div className="flex-1 min-w-0">
 									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
@@ -431,7 +432,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 									type="button"
 									onClick={closeDrawer}
 									aria-label="Close Explorer"
-									className="grid w-7 h-7 rounded-md outline-none shrink-0 place-items-center text-white/45 hover:text-white hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-white/50 xl:hidden"
+									className="grid w-7 h-7 rounded-[9px] outline-none shrink-0 place-items-center text-white/45 hover:text-white hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-white/50 xl:hidden"
 								>
 									<X size={14} strokeWidth={1.75} aria-hidden />
 								</button>

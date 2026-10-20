@@ -88,7 +88,7 @@ export default function ActivityRail({
 							onKeyDown={onKeyDown}
 							data-view={view}
 							className={cn(
-								"relative flex items-center h-7 px-1.5 gap-1.5 rounded-md shrink-0",
+								"relative flex items-center h-7 px-1.5 gap-1.5 rounded-[9px] shrink-0",
 								"outline-none focus-visible:ring-1 focus-visible:ring-white/40",
 								"transition-colors duration-150",
 								active ? "text-white/90" : "text-white/40 hover:text-white/75"
@@ -99,7 +99,7 @@ export default function ActivityRail({
 									layoutId="explorer-rail-pill"
 									aria-hidden
 									transition={transition}
-									className="absolute inset-0 rounded-md bg-white/[0.07] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]"
+									className="absolute inset-0 rounded-[9px] bg-white/[0.07] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]"
 								>
 									<span className="absolute left-2 right-2 -bottom-px h-px rounded-full bg-brand/70 shadow-[0_0_6px_rgb(237_196_70/0.6)]" />
 								</motion.span>
