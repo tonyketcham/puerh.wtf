@@ -112,8 +112,8 @@ export default function ActivityRail({
 									<motion.span
 										key="label"
 										layout="position"
-										initial={reduce ? { opacity: 0 } : { opacity: 0, x: -4, filter: "blur(2px)" }}
-										animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+										initial={reduce ? { opacity: 0 } : { opacity: 0, x: -4 }}
+										animate={{ opacity: 1, x: 0 }}
 										exit={{ opacity: 0, transition: { duration: 0.08 } }}
 										transition={
 											reduce ? { duration: 0.12 } : { ...SPRING, opacity: { duration: 0.18 } }

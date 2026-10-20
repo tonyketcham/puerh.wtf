@@ -80,6 +80,10 @@ export default function SessionsList({
 					y: { ...SPRING, delay: arrive ? delay : 0 },
 				}}
 				data-session-slug={s._slug}
+				// each card on its own layer: its tape textures (SVG turbulence and shadow filters)
+				// rasterize ahead of the scroll, in small pieces, instead of in one 100–300 ms task the
+				// moment the list scrolls into view (measured: plan §7)
+				style={{ willChange: "transform" }}
 			>
 				{cards[s._slug]}
 			</motion.div>

@@ -1,7 +1,9 @@
 "use client"
 
-import { useCallback, useMemo, type KeyboardEvent } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import VirtualList, { type VirtualListNavigation } from "./VirtualList"
+
+import { memo, useCallback, useMemo, type KeyboardEvent } from "react"
+import { motion } from "motion/react"
 import { useAtom } from "jotai"
 import { ListTree } from "lucide-react"
 import LexiconWord from "@/app/lexicon/_components/LexiconWord"
@@ -19,8 +21,6 @@ import { lexiconGroupsOpenAtom } from "./state"
 import ViewHeader, { IndexLink } from "./ViewHeader"
 import { stripSlash, type EntityViewProps } from "./views"
 
-const ROW_SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.7 } as const
-
 type Word = { entry: LexiconEntry; count: number; color: string }
 type Row =
 	| { kind: "group"; group: LexiconGroup; words: number; listings: number; open: boolean }
@@ -36,14 +36,13 @@ type Row =
  * row (the peek owns that key). ⇧F12, as in an IDE, or the tree icon pins it as the
  * Explorer's "find all references" and switches to Sessions to show them.
  */
-export default function LexiconView({
+function LexiconView({
 	index,
 	pool,
 	narrowed,
 	pathname,
 	onFindReferences,
 }: EntityViewProps & { onFindReferences: (term: string) => void }) {
-	const reduce = useReducedMotion()
 	const [openGroups, setOpenGroups] = useAtom(lexiconGroupsOpenAtom)
 	const lexicon = lexiconOf(index.sessions)
 
@@ -93,7 +92,7 @@ export default function LexiconView({
 	)
 
 	// ↑/↓ walk every row, → / ← open and close a group (← on a word steps out to its group)
-	const onKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
+	const onKeyDown = (e: KeyboardEvent<HTMLUListElement>, navigation: VirtualListNavigation) => {
 		if (e.altKey || e.ctrlKey || e.metaKey) return
 		const el = e.target as HTMLElement
 		const all = [...e.currentTarget.querySelectorAll<HTMLElement>("[data-lexicon-row]")]
@@ -128,14 +127,19 @@ export default function LexiconView({
 				if (isGroup && group && !openGroups.has(group)) {
 					e.preventDefault()
 					toggle(group, true)
-				} else if (isGroup) focus(all[i + 1])
+				} else if (isGroup) {
+					if (navigation.focusNext(el)) e.preventDefault()
+					else focus(all[i + 1])
+				}
 				return
 			case "ArrowLeft":
 				if (isGroup && group && openGroups.has(group)) {
 					e.preventDefault()
 					toggle(group, false)
-				} else if (!isGroup)
-					focus(all.find((r) => r.dataset.lexiconRow === "group" && r.dataset.group === group))
+				} else if (!isGroup) {
+					if (navigation.focusKey(`group:${group}`)) e.preventDefault()
+					else focus(all.find((r) => r.dataset.lexiconRow === "group" && r.dataset.group === group))
+				}
 				return
 		}
 	}
@@ -145,49 +149,37 @@ export default function LexiconView({
 			<ViewHeader label="Lexicon" count={wordCount} noun={wordCount === 1 ? "word" : "words"}>
 				<IndexLink href="/lexicon/" pathname={pathname} recordingKey="explorer-lexicon-index" />
 			</ViewHeader>
-			<ul aria-label="Flavor words by group" onKeyDown={onKeyDown}>
-				<AnimatePresence initial={false}>
-					{rows.map((row, i) => (
-						<motion.li
-							key={row.kind === "group" ? `group:${row.group}` : `word:${row.word.entry.slug}`}
-							layout={reduce ? false : "position"}
-							initial={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
-							animate={reduce ? { opacity: 1 } : { opacity: 1, height: "auto" }}
-							exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
-							transition={{
-								height: ROW_SPRING,
-								layout: ROW_SPRING,
-								// a group's words spill out top to bottom
-								opacity: {
-									duration: 0.16,
-									delay: row.kind === "word" && !reduce ? Math.min(row.order, 14) * 0.014 : 0,
-								},
-							}}
-							className={row.kind === "group" && i > 0 ? "pt-px" : undefined}
-						>
-							{row.kind === "group" ? (
-								<GroupRow
-									group={row.group}
-									words={row.words}
-									listings={row.listings}
-									open={row.open}
-									onToggle={toggle}
-								/>
-							) : (
-								<WordRow
-									word={row.word}
-									narrowed={narrowed}
-									current={pathname === stripSlash(lexiconHref(row.word.entry.slug))}
-									onFindReferences={onFindReferences}
-								/>
-							)}
-						</motion.li>
-					))}
-				</AnimatePresence>
-				{rows.length === 0 && (
-					<li className="px-2 py-1.5 text-xs text-white/35">no words in these sessions</li>
+			<VirtualList
+				items={rows}
+				getKey={(row) =>
+					row.kind === "group" ? `group:${row.group}` : `word:${row.word.entry.slug}`
+				}
+				rowHeight={(row) => (row.kind === "group" && row !== rows[0] ? 29 : 28)}
+				label="Flavor words by group"
+				rowClassName={(row) => (row.kind === "group" && row !== rows[0] ? "pt-px" : undefined)}
+				onKeyDown={onKeyDown}
+				renderRow={(row) => (
+					<>
+						{row.kind === "group" ? (
+							<GroupRow
+								group={row.group}
+								words={row.words}
+								listings={row.listings}
+								open={row.open}
+								onToggle={toggle}
+							/>
+						) : (
+							<WordRow
+								word={row.word}
+								narrowed={narrowed}
+								current={pathname === stripSlash(lexiconHref(row.word.entry.slug))}
+								onFindReferences={onFindReferences}
+							/>
+						)}
+					</>
 				)}
-			</ul>
+			/>
+			{rows.length === 0 && <p className="px-2 py-1.5 text-xs text-white/35">nothing matches</p>}
 		</div>
 	)
 }
@@ -345,3 +337,5 @@ function WordRow({
 		</div>
 	)
 }
+
+export default memo(LexiconView)

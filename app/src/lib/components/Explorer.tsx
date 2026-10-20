@@ -6,11 +6,10 @@ import type { ExplorerSession } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { Search as SearchIcon } from "lucide-react"
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react"
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
 import {
 	EMPTY_FACETS,
@@ -27,7 +26,7 @@ import { sessionMatchesDescriptor } from "@/lib/descriptors"
 import { LEGACY_ORIGIN_SLUGS, originChain } from "@/lib/origins"
 import { buildRelationIndex, sessionsOf } from "@/lib/relations"
 import type { PageKind } from "@/lib/peek"
-import { descriptorAtom, explorerSortAtom, openCommandBarAtom } from "@/lib/store/sessionAtom"
+import { descriptorAtom, explorerSortAtom } from "@/lib/store/sessionAtom"
 import { sortSessions } from "@/lib/sessionSort"
 import SessionSortToggle from "@/lib/components/explorer/SessionSortToggle"
 import YearRuler from "@/lib/components/explorer/YearRuler"
@@ -158,12 +157,6 @@ function useDrawer(pathname: string | null) {
 	return { drawerOpen, closeDrawer, drawerRef }
 }
 
-// ⌘ on Apple platforms, Ctrl elsewhere. Server snapshot is "Ctrl" so hydration matches.
-const subscribeNoop = () => () => {}
-const getModKey = () =>
-	/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent) ? "⌘" : "Ctrl"
-const getServerModKey = () => "Ctrl"
-
 /**
  * The left sidebar: site header plus the Explorer panel. An activity rail switches the panel
  * between Sessions (the file tree) and the entity views, Origins (a tree), Vendors, Styles
@@ -177,26 +170,36 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	const [sort, setSort] = useAtom(explorerSortAtom)
 	const [view, setView] = useAtom(explorerViewAtom)
 	const [hover, setHover] = useAtom(explorerHoverAtom)
-	const openCommandBar = useSetAtom(openCommandBarAtom)
-	const modKey = useSyncExternalStore(subscribeNoop, getModKey, getServerModKey)
 	const reduce = useReducedMotion()
 	const { drawerOpen, closeDrawer, drawerRef } = useDrawer(pathname)
 
 	const query = q.toLowerCase().trim()
 	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
 
-	// Filtering
-	const filteredSessions = useMemo(
-		() => sessions.filter((s) => matchesFilters(s, facets, query)),
-		[sessions, facets, query]
-	)
-	// Everything but the year facet: the ruler's density, so it stays informative mid-selection
+	// Reuse the non-year pool while scrubbing: relation/query matching does not change
+	// with either handle. Only membership in the selected year set needs recomputing.
+	const { styles, origins, vendors: vendorFilters, cultivars, tags, vessels } = facets
+	const otherFacetsJson = JSON.stringify({
+		styles,
+		origins,
+		vendors: vendorFilters,
+		cultivars,
+		tags,
+		vessels,
+		years: EMPTY_FACETS.years,
+	})
+	const otherFacets = useMemo<FacetState>(() => JSON.parse(otherFacetsJson), [otherFacetsJson])
 	const sessionsExceptYears = useMemo(
+		() => sessions.filter((s) => matchesFilters(s, otherFacets, query)),
+		[sessions, otherFacets, query]
+	)
+	const selectedYearSet = useMemo(() => new Set(facets.years), [facets.years])
+	const filteredSessions = useMemo(
 		() =>
-			facets.years.length
-				? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: ["years"] }))
-				: filteredSessions,
-		[sessions, facets, query, filteredSessions]
+			selectedYearSet.size
+				? sessionsExceptYears.filter((s) => selectedYearSet.has(yearOf(s)))
+				: sessionsExceptYears,
+		[sessionsExceptYears, selectedYearSet]
 	)
 	// The open entity view counts sessions passing every filter but its own
 	const viewFacet = VIEW_FACET[view]
@@ -208,9 +211,28 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		[viewFacet, sessions, facets, query, filteredSessions]
 	)
 	// display order (sessions arrive newest first, so date needs no sort)
-	const sortedSessions = useMemo(
-		() => (sort === "date" ? filteredSessions : sortSessions(filteredSessions, sort)),
-		[filteredSessions, sort]
+	const orderedSessions = useMemo(
+		() => (sort === "date" ? sessions : sortSessions(sessions, sort)),
+		[sessions, sort]
+	)
+	const sortedSessions = useMemo(() => {
+		if (sort === "date") return filteredSessions
+		const kept = new Set(filteredSessions.map((s) => s.id))
+		return orderedSessions.filter((s) => kept.has(s.id))
+	}, [filteredSessions, orderedSessions, sort])
+	const sessionTreeData = useMemo(
+		() => [
+			{
+				id: "sessions",
+				title: "Sessions",
+				children: sortedSessions,
+				total: hasAnyFilter(urlState) ? sessions.length : undefined,
+				actions: (
+					<SessionSortToggle value={sort} onChange={setSort} recordingKey="explorer-session-sort" />
+				),
+			},
+		],
+		[sortedSessions, urlState, sessions.length, sort, setSort]
 	)
 
 	// Descriptor "find references"
@@ -303,11 +325,12 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			if (last && contiguous) last.push(y)
 			else runs.push([y])
 		}
-		for (const run of runs) {
+		for (const [i, run] of runs.entries()) {
 			const label = run.length === 1 ? String(run[0]) : `${run[0]}–${run[run.length - 1]}`
 			const remove = new Set(run.map(String))
 			out.push({
-				id: `years:${run[0]}`,
+				// Dragging changes this range's endpoints, not the identity of the filter.
+				id: `years:${i}`,
 				kind: FACET_KIND.years,
 				label,
 				onRemove: () =>
@@ -362,21 +385,6 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		onToggleFilter,
 	}
 
-	const searchButton = (
-		<button
-			type="button"
-			onClick={() => openCommandBar({ query: q, scope: "sessions" })}
-			aria-label="Search sessions"
-			aria-keyshortcuts="Meta+K Control+K"
-			className="flex items-center h-7 gap-1.5 px-2 shrink-0 text-white/55 border rounded-md border-heicha-500 bg-white/[0.02] hover:text-white hover:border-white/15 hover:bg-white/[0.05] transition-colors outline-none focus-visible:ring-1 focus-visible:ring-white/40"
-		>
-			<SearchIcon size={13} strokeWidth={2.25} />
-			<kbd className="font-fira-code text-[10px] leading-none text-white/40 tracking-tight">
-				{modKey === "⌘" ? "⌘K" : "Ctrl K"}
-			</kbd>
-		</button>
-	)
-
 	return (
 		<MotionConfig reducedMotion="user">
 			{/* below xl: the scrim behind the drawer (a click on the page puts it away) */}
@@ -419,15 +427,14 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 					backdropClassName="bg-[rgba(45,40,45,0.35)] max-xl:bg-[#171617]"
 				>
 					<div className="relative">
-						{/* header: the activity rail (a tablist) and search, concentric with the panel: its 15px
-						    inner radius less this 6px inset gives the tabs their 9px radius */}
+						{/* header: the activity rail (a tablist), concentric with the panel: its 15px inner radius
+						    less this 6px inset gives the tabs their 9px radius */}
 						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
 							<div className="flex items-center gap-1.5 p-1.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
 								<h2 className="sr-only">Explorer</h2>
 								<div className="flex-1 min-w-0">
 									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
 								</div>
-								{searchButton}
 								<button
 									type="button"
 									onClick={closeDrawer}
@@ -467,11 +474,9 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 										key={view}
 										custom={direction}
 										variants={{
-											enter: (d: number) =>
-												reduce ? { opacity: 0 } : { opacity: 0, x: d * 14, filter: "blur(2px)" },
-											center: { opacity: 1, x: 0, filter: "blur(0px)" },
-											exit: (d: number) =>
-												reduce ? { opacity: 0 } : { opacity: 0, x: d * -14, filter: "blur(2px)" },
+											enter: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * 14 }),
+											center: { opacity: 1, x: 0 },
+											exit: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * -14 }),
 										}}
 										initial="enter"
 										animate="center"
@@ -485,7 +490,6 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 												: {
 														...VIEW_SPRING,
 														opacity: { duration: 0.16 },
-														filter: { duration: 0.16 },
 												  }
 										}
 									>
@@ -493,21 +497,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 											<FileTree
 												referenceSlugs={references?.visible ?? null}
 												order={sort}
-												data={[
-													{
-														id: "sessions",
-														title: "Sessions",
-														children: sortedSessions,
-														total: filtered ? sessions.length : undefined,
-														actions: (
-															<SessionSortToggle
-																value={sort}
-																onChange={setSort}
-																recordingKey="explorer-session-sort"
-															/>
-														),
-													},
-												]}
+												data={sessionTreeData}
 											/>
 										)}
 										{/* entity rows run a little wider than the padding: names need the room */}

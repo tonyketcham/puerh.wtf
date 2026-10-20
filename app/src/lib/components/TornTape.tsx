@@ -366,7 +366,7 @@ export function TapedCard({ tape, enterIndex, className, style, children }: Tape
 	return (
 		<MotionConfig reducedMotion="user">
 			<motion.div
-				className="w-full"
+				className="w-full h-full"
 				initial={enter ? { opacity: 0, y: 18 } : false}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{
@@ -391,7 +391,7 @@ export function TapedCard({ tape, enterIndex, className, style, children }: Tape
 					{/* Liquor glow: the top border picks up the color of the brewed tea */}
 					<motion.span
 						aria-hidden="true"
-						className="pointer-events-none absolute -inset-px z-[1] rounded-2xl border border-[rgb(var(--liquor-text-rgb,var(--liquor-rgb))/0.55)]"
+						className="pointer-events-none absolute -inset-px z-[1] rounded-xl border border-[rgb(var(--liquor-text-rgb,var(--liquor-rgb))/0.55)]"
 						style={{
 							maskImage: "linear-gradient(to bottom, #000, transparent 45%)",
 							WebkitMaskImage: "linear-gradient(to bottom, #000, transparent 45%)",

@@ -1,11 +1,8 @@
 "use client"
 
-import { useId, useState, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import File from "./File"
 import type { TreeNode } from "../../types/tree"
-import { buildLink } from "../../utils/BuildLinkToGivenCollectionNode"
-import { cn } from "@/lib/utils/cn"
 import "./filetree.css"
 
 export const FolderIcon = () => (
@@ -44,7 +41,6 @@ const ExpandCollapseIcon = ({ expanded }: { expanded: boolean }) => (
 	</motion.svg>
 )
 
-const ROW_SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.7 } as const
 const COUNT_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 
 interface FolderProps {
@@ -54,7 +50,8 @@ interface FolderProps {
 	total?: number
 	/** header actions, right of the title (kept outside the toggle button) */
 	actions?: ReactNode
-	expanded?: boolean
+	expanded: boolean
+	onToggle: () => void
 	indentationLevel?: number
 }
 
@@ -63,38 +60,20 @@ export default function Folder({
 	nodes,
 	total,
 	actions,
-	expanded: initialExpanded = true,
+	expanded,
+	onToggle,
 	indentationLevel = 0,
 }: FolderProps) {
-	const [expanded, setExpanded] = useState(initialExpanded)
 	const reduce = useReducedMotion()
-	const listId = useId()
 	const filtered = total !== undefined && total !== nodes.length
 
-	// Filtered rows leave the flow once; siblings glide with layout transforms.
-	// Animating each row's height forced layout and scrollbar measurement every frame.
-	const rowMotion = reduce
-		? {
-				initial: { opacity: 0 },
-				animate: { opacity: 1 },
-				exit: { opacity: 0 },
-				transition: { duration: 0.12 },
-		  }
-		: {
-				initial: { opacity: 0, y: 4 },
-				animate: { opacity: 1, y: 0 },
-				exit: { opacity: 0, y: -4 },
-				transition: { y: ROW_SPRING, layout: ROW_SPRING, opacity: { duration: 0.18 } },
-		  }
-
 	return (
-		<div className="py-1">
+		<div className="pt-1">
 			<div className="flex items-center gap-1 pr-1">
 				<button
 					type="button"
-					onClick={() => setExpanded((v) => !v)}
+					onClick={onToggle}
 					aria-expanded={expanded}
-					aria-controls={listId}
 					className="flex items-center flex-1 h-8 min-w-0 gap-2 pr-2 text-left transition-colors rounded-lg outline-none cursor-pointer group hover:bg-white/[0.03] focus-visible:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22)]"
 					// the chevron sits on the rail column (filetree.css --rail-x)
 					style={{ paddingLeft: 7 + indentationLevel * 12 }}
@@ -124,59 +103,6 @@ export default function Folder({
 				</button>
 				{actions}
 			</div>
-			<AnimatePresence initial={false}>
-				{expanded && (
-					<motion.ul
-						id={listId}
-						key="list"
-						className="relative ft-list"
-						initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0, overflow: "hidden" }}
-						animate={
-							reduce
-								? { opacity: 1 }
-								: { height: "auto", opacity: 1, transitionEnd: { overflow: "visible" } }
-						}
-						exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0, overflow: "hidden" }}
-						transition={{ height: ROW_SPRING, opacity: { duration: 0.16 } }}
-					>
-						<AnimatePresence initial={false} mode="popLayout">
-							{nodes.map((node) => (
-								<motion.li
-									key={node.id}
-									// the data line's rows (filetree.css): siblings, so a hovered row can light
-									// the route above it
-									className={cn(!node?.children && "ft-row")}
-									layout="position"
-									layoutDependency={nodes}
-									{...rowMotion}
-								>
-									{node?.children ? (
-										<Folder
-											title={node.title}
-											nodes={node.children ?? []}
-											indentationLevel={indentationLevel + 1}
-										/>
-									) : (
-										<File
-											node={node}
-											hrefFunction={buildLink}
-											indentationLevel={indentationLevel + 1}
-										/>
-									)}
-								</motion.li>
-							))}
-						</AnimatePresence>
-						{nodes.length === 0 && (
-							<li
-								className="py-2 text-[11px] text-white/35"
-								style={{ paddingLeft: 26 + indentationLevel * 12 }}
-							>
-								{"// nothing matches"}
-							</li>
-						)}
-					</motion.ul>
-				)}
-			</AnimatePresence>
 		</div>
 	)
 }

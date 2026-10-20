@@ -139,7 +139,7 @@ export function usePeekTrigger<T extends HTMLElement = HTMLElement>(
 		},
 		onPointerLeave(e) {
 			if (!targetRef.current || e.pointerType !== "mouse") return
-			peek.leave(e.currentTarget)
+			peek.leave(e.currentTarget, { x: e.clientX, y: e.clientY })
 		},
 
 		onPointerDown(e) {

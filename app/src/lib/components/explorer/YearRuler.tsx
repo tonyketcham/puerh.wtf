@@ -2,11 +2,13 @@
 
 import {
 	useCallback,
+	memo,
 	useEffect,
 	useId,
 	useMemo,
 	useRef,
 	useState,
+	startTransition,
 	type KeyboardEvent,
 	type MouseEvent,
 	type PointerEvent,
@@ -15,12 +17,14 @@ import {
 	AnimatePresence,
 	motion,
 	useMotionValue,
+	useTransform,
 	useReducedMotion,
 	animate,
 	type Transition,
 } from "motion/react"
 import type { ExplorerSession } from "@/lib/types/session"
 import { cn } from "@/lib/utils/cn"
+import TextMorph from "@/lib/components/session/TextMorph"
 
 export interface YearRulerProps {
 	/** all sessions (unfiltered) — the ruler's domain */
@@ -46,7 +50,7 @@ type Handle = "lo" | "hi"
 type Gesture =
 	| { kind: "pending"; pointerId: number; startX: number; startYear: number }
 	| { kind: "brush"; pointerId: number; startYear: number }
-	| { kind: "handle"; pointerId: number; which: Handle; fixed: number }
+	| { kind: "handle"; pointerId: number; which: Handle; fixed: number; grabOffset: number }
 
 const TICK_MAX_H = 20
 const TICK_MIN_H = 4
@@ -98,6 +102,14 @@ export default function YearRuler({
 	const gestureRef = useRef<Gesture | null>(null)
 	const lastWriteRef = useRef<string | null>(null)
 	const clickYearRef = useRef<number | null>(null)
+	const trackRectRef = useRef<DOMRect | null>(null)
+	const pointerFrameRef = useRef<number | null>(null)
+	const pendingPointerRef = useRef<{
+		clientX: number
+		pointerId: number
+		pointerType: string
+	} | null>(null)
+	const previewKeyRef = useRef<string | null>(null)
 	const readoutId = useId()
 
 	const { vintages, counts, maxCount, minY, maxY } = useMemo(() => {
@@ -133,6 +145,7 @@ export default function YearRuler({
 	const [draft, setDraft] = useState<number[] | null>(null)
 	const [hoverYear, setHoverYear] = useState<number | null>(null)
 	const [activeHandle, setActiveHandle] = useState<Handle | null>(null)
+	const [dragging, setDragging] = useState(false)
 
 	const selected = draft ?? committed
 	const selectedSet = useMemo(() => new Set(selected), [selected])
@@ -144,12 +157,35 @@ export default function YearRuler({
 	// ----- geometry ---------------------------------------------------------
 	const span = maxY - minY + 1
 	const pct = useCallback((y: number) => ((y - minY + 0.5) / span) * 100, [minY, span])
+	const loPosition = useMotionValue(pct(lo - BAND_PAD))
+	const hiPosition = useMotionValue(pct(hi + BAND_PAD))
+	const loTranslate = useTransform(loPosition, (p) => `${p}%`)
+	const hiTranslate = useTransform(hiPosition, (p) => `${p}%`)
+	const bandWidth = useTransform(
+		[loPosition, hiPosition],
+		([l, h]) => `${Math.max(0, Number(h) - Number(l))}%`
+	)
+
+	// During the gesture the pointer owns the geometry. Only release, keyboard and
+	// external URL changes spring to exact vintages; filtering never pulls the handle back.
+	useEffect(() => {
+		if (gestureRef.current) return
+		const transition = reduce ? { duration: 0 } : HANDLE_SPRING
+		const lower = animate(loPosition, pct(lo - BAND_PAD), transition)
+		const upper = animate(hiPosition, pct(hi + BAND_PAD), transition)
+		return () => {
+			lower.stop()
+			upper.stop()
+		}
+	}, [lo, hi, pct, reduce, dragging, loPosition, hiPosition])
 
 	const yearAtClientX = useCallback(
-		(clientX: number) => {
-			const rect = trackRef.current?.getBoundingClientRect()
+		(clientX: number, clamp = true) => {
+			const rect = trackRectRef.current ?? trackRef.current?.getBoundingClientRect()
 			if (!rect || rect.width === 0) return minY
-			const frac = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+			if (gestureRef.current) trackRectRef.current = rect
+			const raw = (clientX - rect.left) / rect.width
+			const frac = clamp ? Math.min(1, Math.max(0, raw)) : raw
 			return minY - 0.5 + frac * span
 		},
 		[minY, span]
@@ -200,8 +236,12 @@ export default function YearRuler({
 
 	const preview = useCallback(
 		(list: number[]) => {
-			setDraft((prev) => (prev && prev.join(",") === list.join(",") ? prev : list))
-			commit(list)
+			const key = list.join(",")
+			if (previewKeyRef.current === key) return
+			previewKeyRef.current = key
+			setDraft(list)
+			// The ruler is urgent input; filtering the rest of the page may yield to it.
+			startTransition(() => commit(list))
 		},
 		[commit]
 	)
@@ -228,7 +268,10 @@ export default function YearRuler({
 	const endGesture = () => {
 		const written = lastWriteRef.current
 		gestureRef.current = null
+		trackRectRef.current = null
+		previewKeyRef.current = null
 		setActiveHandle(null)
+		setDragging(false)
 		// the URL holds the normalized selection ("" = all), so compare normalized keys
 		if (written === null || written === committedKey) {
 			setDraft(null)
@@ -247,6 +290,7 @@ export default function YearRuler({
 	const onTrackPointerDown = (e: PointerEvent<HTMLDivElement>) => {
 		if (e.button !== 0 || vintages.length === 0) return
 		e.currentTarget.setPointerCapture(e.pointerId)
+		trackRectRef.current = trackRef.current?.getBoundingClientRect() ?? null
 		lastWriteRef.current = committedKey
 		settleKeyRef.current = null
 		gestureRef.current = {
@@ -261,6 +305,9 @@ export default function YearRuler({
 		if (e.button !== 0) return
 		e.stopPropagation()
 		e.currentTarget.setPointerCapture(e.pointerId)
+		trackRectRef.current = trackRef.current?.getBoundingClientRect() ?? null
+		loPosition.stop()
+		hiPosition.stop()
 		lastWriteRef.current = committedKey
 		settleKeyRef.current = null
 		gestureRef.current = {
@@ -268,12 +315,16 @@ export default function YearRuler({
 			pointerId: e.pointerId,
 			which,
 			fixed: which === "lo" ? hi : lo,
+			grabOffset:
+				yearAtClientX(e.clientX, false) -
+				(minY - 0.5 + ((which === "lo" ? loPosition.get() : hiPosition.get()) / 100) * span),
 		}
 		setActiveHandle(which)
+		setDragging(true)
 		setHoverYear(null)
 	}
 
-	const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+	const movePointer = (e: { clientX: number; pointerId: number; pointerType: string }) => {
 		const g = gestureRef.current
 		const y = yearAtClientX(e.clientX)
 
@@ -291,15 +342,18 @@ export default function YearRuler({
 			if (Math.abs(e.clientX - g.startX) < DRAG_THRESHOLD_PX) return
 			gestureRef.current = { kind: "brush", pointerId: g.pointerId, startYear: g.startYear }
 			setHoverYear(null)
+			setDragging(true)
 			ghostOpacity.set(1)
 		}
 
 		const cur = gestureRef.current!
 		if (cur.kind === "brush") {
 			setGhost(cur.startYear, y)
+			loPosition.set(pct(Math.min(cur.startYear, y) - BAND_PAD))
+			hiPosition.set(pct(Math.max(cur.startYear, y) + BAND_PAD))
 			preview(vintagesBetween(Math.round(cur.startYear), Math.round(y)))
 		} else if (cur.kind === "handle") {
-			const v = nearestVintage(y)
+			const v = nearestVintage(y - cur.grabOffset + (cur.which === "lo" ? BAND_PAD : -BAND_PAD))
 			const next =
 				cur.which === "lo"
 					? vintagesBetween(Math.min(v, cur.fixed), cur.fixed)
@@ -308,9 +362,57 @@ export default function YearRuler({
 		}
 	}
 
-	const onPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+	// Hardware can send several moves per display frame. Only the latest sample matters;
+	// release flushes it synchronously so a quick drag never loses its final vintage.
+	const flushPointer = () => {
+		if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current)
+		pointerFrameRef.current = null
+		const pending = pendingPointerRef.current
+		pendingPointerRef.current = null
+		if (pending) movePointer(pending)
+	}
+	const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
 		const g = gestureRef.current
-		if (!g || g.pointerId !== e.pointerId) return
+		if (g?.pointerId === e.pointerId && g.kind === "handle") {
+			const raw =
+				yearAtClientX(e.clientX, false) - g.grabOffset + (g.which === "lo" ? BAND_PAD : -BAND_PAD)
+			const min = g.which === "lo" ? minY : g.fixed
+			const max = g.which === "lo" ? g.fixed : maxY
+			const bound = Math.min(max, Math.max(min, raw))
+			const distance = raw - bound
+			// Resistance approaches a small overhang, including when the handles meet.
+			const limit = (g.which === "lo" ? raw > max : raw < min) ? BAND_PAD * 0.75 : span * 0.05
+			const elastic = bound + (distance * 0.3) / (1 + (Math.abs(distance) * 0.3) / limit)
+			;(g.which === "lo" ? loPosition : hiPosition).set(
+				pct(elastic + (g.which === "lo" ? -BAND_PAD : BAND_PAD))
+			)
+		}
+		pendingPointerRef.current = {
+			clientX: e.clientX,
+			pointerId: e.pointerId,
+			pointerType: e.pointerType,
+		}
+		if (pointerFrameRef.current === null) {
+			pointerFrameRef.current = requestAnimationFrame(flushPointer)
+		}
+	}
+	useEffect(() => {
+		const invalidateTrack = () => {
+			trackRectRef.current = null
+		}
+		window.addEventListener("resize", invalidateTrack)
+		window.addEventListener("scroll", invalidateTrack, true)
+		return () => {
+			if (pointerFrameRef.current !== null) cancelAnimationFrame(pointerFrameRef.current)
+			window.removeEventListener("resize", invalidateTrack)
+			window.removeEventListener("scroll", invalidateTrack, true)
+		}
+	}, [])
+
+	const onPointerUp = (e: PointerEvent<HTMLDivElement>) => {
+		if (!gestureRef.current || gestureRef.current.pointerId !== e.pointerId) return
+		flushPointer()
+		const g = gestureRef.current!
 		// a press that never moved is a click on the nearest tick; resolved in onClick (needs e.detail)
 		clickYearRef.current = g.kind === "pending" ? nearestVintage(g.startYear) : null
 		endGesture()
@@ -402,33 +504,27 @@ export default function YearRuler({
 	for (let y = minY; y <= maxY; y++) graduations.push(y)
 
 	const t = (spring: Transition): Transition => (reduce ? { duration: 0 } : spring)
-	const handleEdge = (which: Handle) => pct(which === "lo" ? lo - BAND_PAD : hi + BAND_PAD)
 
 	return (
 		<div className="mb-3 select-none" data-year-ruler>
 			{/* header: label + live readout */}
 			<div className="flex items-baseline justify-between h-4 mb-1 text-[10px] leading-4">
 				<span className="tracking-[0.14em] uppercase text-white/35">Vintage</span>
-				<span
+				<motion.span
 					id={readoutId}
 					className="relative flex items-baseline gap-1.5 tabular-nums"
 					aria-live="polite"
+					initial={reduce ? false : { opacity: 0, filter: "blur(2px)" }}
+					animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
+					transition={{ duration: reduce ? 0 : 0.16 }}
 				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={label}
-							className={cn(hasSelection || hoverYear !== null ? "text-white/85" : "text-white/45")}
-							initial={reduce ? { opacity: 0 } : { opacity: 0, y: 5, filter: "blur(2px)" }}
-							animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-							exit={reduce ? { opacity: 0 } : { opacity: 0, y: -5, filter: "blur(2px)" }}
-							transition={{ duration: 0.16 }}
-						>
-							{label}
-						</motion.span>
-					</AnimatePresence>
+					<TextMorph
+						text={label}
+						className={hasSelection || hoverYear !== null ? "text-white/85" : "text-white/45"}
+					/>
 					<span className="text-white/30">·</span>
 					<span className="text-white/45">{count}</span>
-				</span>
+				</motion.span>
 			</div>
 
 			{/* track */}
@@ -441,8 +537,22 @@ export default function YearRuler({
 				onPointerDown={onTrackPointerDown}
 				onPointerMove={onPointerMove}
 				onPointerUp={onPointerUp}
-				onPointerCancel={() => gestureRef.current && endGesture()}
-				onPointerLeave={() => setHoverYear(null)}
+				onPointerCancel={(e) => {
+					if (gestureRef.current?.pointerId !== e.pointerId) return
+					flushPointer()
+					endGesture()
+				}}
+				onLostPointerCapture={(e) => {
+					if (gestureRef.current?.pointerId !== e.pointerId) return
+					flushPointer()
+					endGesture()
+				}}
+				onPointerLeave={() => {
+					if (!gestureRef.current) {
+						pendingPointerRef.current = null
+						setHoverYear(null)
+					}
+				}}
 				onClick={onTrackClick}
 			>
 				{/* baseline */}
@@ -464,8 +574,8 @@ export default function YearRuler({
 
 				{/* selected runs */}
 				<AnimatePresence initial={false}>
-					{hasSelection &&
-						runs.map(([a, b], i) => {
+					{(hasSelection || dragging) &&
+						(dragging ? [[lo, hi]] : runs).map(([a, b], i) => {
 							const left = `${pct(a - BAND_PAD)}%`
 							const width = `${pct(b + BAND_PAD) - pct(a - BAND_PAD)}%`
 							return (
@@ -473,12 +583,16 @@ export default function YearRuler({
 									key={`run-${i}`}
 									aria-hidden="true"
 									className="absolute inset-y-0 rounded-[3px] pointer-events-none"
+									layout={!reduce && runs.length > 1 && !dragging}
 									style={{
+										left: dragging || runs.length === 1 ? loTranslate : left,
+										width: dragging || runs.length === 1 ? bandWidth : width,
+										borderRadius: 3,
 										background: `linear-gradient(to top, ${liquorA(0.22)}, ${liquorA(0.06)})`,
 										boxShadow: `inset 0 0 0 1px ${liquorA(0.32)}`,
 									}}
-									initial={{ opacity: 0, left, width }}
-									animate={{ opacity: 1, left, width }}
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
 									exit={{ opacity: 0, transition: { duration: 0.15 } }}
 									transition={t(SPRING)}
 								/>
@@ -495,57 +609,28 @@ export default function YearRuler({
 					/>
 				)}
 
-				{/* ticks */}
+				{/* Only ticks whose fill, highlight or bead changed need to update. */}
 				{vintages.map((v) => {
 					const total = counts.get(v) ?? 0
-					const kept = filteredCounts.get(v) ?? 0
-					const h = TICK_MIN_H + Math.sqrt(total / maxCount) * (TICK_MAX_H - TICK_MIN_H)
-					const isSel = selectedSet.has(v)
 					return (
-						<div
+						<VintageTick
 							key={v}
-							aria-hidden="true"
-							className="absolute bottom-0 w-[3px] -translate-x-1/2 pointer-events-none"
-							style={{ left: `${pct(v)}%`, height: h }}
-						>
-							<div className="absolute inset-0 rounded-t-[1px] bg-white/[0.08]" />
-							<motion.div
-								className={cn(
-									"absolute inset-0 origin-bottom rounded-t-[1px] transition-colors duration-200",
-									hoverYear === v
-										? "bg-white"
-										: hasSelection
-										? isSel
-											? "bg-[var(--liquor-text,#edc446)]"
-											: "bg-white/25"
-										: "bg-white/60"
-								)}
-								initial={false}
-								animate={{ scaleY: total ? kept / total : 0 }}
-								transition={t(SPRING)}
-							/>
-							<AnimatePresence>
-								{previewYears?.has(v) && (
-									<motion.span
-										key="bead"
-										className="absolute left-1/2 size-[5px] -ml-[2.5px] rounded-full"
-										style={{
-											bottom: h + 3,
-											background: LIQUOR,
-											boxShadow: `0 0 6px ${liquorA(0.7)}`,
-										}}
-										initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.4 }}
-										animate={{ opacity: 1, y: 0, scale: 1 }}
-										exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.1 } }}
-										transition={
-											reduce
-												? { duration: 0.1 }
-												: { type: "spring", stiffness: 640, damping: 26, delay: (v - minY) * 0.006 }
-										}
-									/>
-								)}
-							</AnimatePresence>
-						</div>
+							position={pct(v)}
+							height={TICK_MIN_H + Math.sqrt(total / maxCount) * (TICK_MAX_H - TICK_MIN_H)}
+							fill={total ? (filteredCounts.get(v) ?? 0) / total : 0}
+							tone={
+								hoverYear === v
+									? "hover"
+									: hasSelection
+									? selectedSet.has(v)
+										? "selected"
+										: "dim"
+									: "all"
+							}
+							preview={previewYears?.has(v) ?? false}
+							delay={(v - minY) * 0.006}
+							reduce={!!reduce}
+						/>
 					)
 				})}
 
@@ -556,38 +641,41 @@ export default function YearRuler({
 					return (
 						<motion.div
 							key={which}
-							role="slider"
-							tabIndex={0}
-							aria-label={which === "lo" ? "Earliest vintage" : "Latest vintage"}
-							aria-valuemin={vintages[0]}
-							aria-valuemax={vintages[vintages.length - 1]}
-							aria-valuenow={value}
-							aria-valuetext={hasSelection ? String(value) : `${value} (all vintages)`}
-							aria-orientation="horizontal"
-							className="absolute -top-0.5 -bottom-0.5 z-10 flex justify-center w-3 -translate-x-1/2 outline-none cursor-ew-resize touch-none group/handle"
+							className="absolute -top-0.5 -bottom-0.5 left-0 z-10 w-full pointer-events-none"
 							initial={false}
-							animate={{ left: `${handleEdge(which)}%` }}
-							transition={t(HANDLE_SPRING)}
-							onPointerDown={onHandlePointerDown(which)}
-							onKeyDown={onHandleKeyDown(which)}
+							style={{ x: which === "lo" ? loTranslate : hiTranslate }}
 						>
-							<motion.span
-								className={cn(
-									"block h-full w-[3px] rounded-full",
-									"ring-offset-1 ring-offset-[#171617] group-focus-visible/handle:ring-2 group-focus-visible/handle:ring-white/50",
-									!hasSelection &&
-										!active &&
-										"opacity-30 group-hover/ruler:opacity-60 group-focus-visible/handle:opacity-100"
-								)}
-								style={{
-									background: LIQUOR,
-									boxShadow: `0 0 0 1px rgba(0,0,0,0.5), 0 0 8px ${liquorA(active ? 0.7 : 0.35)}`,
-								}}
-								initial={false}
-								animate={{ scaleY: active ? 1.15 : 1, scaleX: active ? 1.35 : 1 }}
-								whileHover={reduce ? undefined : { scaleX: 1.35 }}
-								transition={t(HANDLE_SPRING)}
-							/>
+							<div
+								role="slider"
+								tabIndex={0}
+								aria-label={which === "lo" ? "Earliest vintage" : "Latest vintage"}
+								aria-valuemin={vintages[0]}
+								aria-valuemax={vintages[vintages.length - 1]}
+								aria-valuenow={value}
+								aria-valuetext={hasSelection ? String(value) : `${value} (all vintages)`}
+								aria-orientation="horizontal"
+								className="absolute inset-y-0 left-0 flex justify-center w-3 -translate-x-1/2 outline-none cursor-ew-resize touch-none pointer-events-auto group/handle"
+								onPointerDown={onHandlePointerDown(which)}
+								onKeyDown={onHandleKeyDown(which)}
+							>
+								<motion.span
+									className={cn(
+										"block h-full w-[3px] rounded-full",
+										"ring-offset-1 ring-offset-[#171617] group-focus-visible/handle:ring-2 group-focus-visible/handle:ring-white/50",
+										!hasSelection &&
+											!active &&
+											"opacity-30 group-hover/ruler:opacity-60 group-focus-visible/handle:opacity-100"
+									)}
+									style={{
+										background: LIQUOR,
+										boxShadow: `0 0 0 1px rgba(0,0,0,0.5), 0 0 8px ${liquorA(active ? 0.7 : 0.35)}`,
+									}}
+									initial={false}
+									animate={{ scaleY: active ? 1.15 : 1, scaleX: active ? 1.35 : 1 }}
+									whileHover={reduce ? undefined : { scaleX: 1.35 }}
+									transition={t(HANDLE_SPRING)}
+								/>
+							</div>
 						</motion.div>
 					)
 				})}
@@ -622,3 +710,62 @@ export default function YearRuler({
 		</div>
 	)
 }
+
+/** Density is independent of the selected range: don't restart every tick's Motion tree on a drag. */
+const VintageTick = memo(function VintageTick({
+	position,
+	height,
+	fill,
+	tone,
+	preview,
+	delay,
+	reduce,
+}: {
+	position: number
+	height: number
+	fill: number
+	tone: "hover" | "selected" | "dim" | "all"
+	preview: boolean
+	delay: number
+	reduce: boolean
+}) {
+	return (
+		<div
+			aria-hidden="true"
+			className="absolute bottom-0 w-[3px] -translate-x-1/2 pointer-events-none"
+			style={{ left: position + "%", height }}
+		>
+			<div className="absolute inset-0 rounded-t-[1px] bg-white/[0.08]" />
+			<motion.div
+				className={cn(
+					"absolute inset-0 origin-bottom rounded-t-[1px] transition-colors duration-200",
+					tone === "hover"
+						? "bg-white"
+						: tone === "selected"
+						? "bg-[var(--liquor-text,#edc446)]"
+						: tone === "dim"
+						? "bg-white/25"
+						: "bg-white/60"
+				)}
+				initial={false}
+				animate={{ scaleY: fill }}
+				transition={reduce ? { duration: 0 } : SPRING}
+			/>
+			<AnimatePresence>
+				{preview && (
+					<motion.span
+						key="bead"
+						className="absolute left-1/2 size-[5px] -ml-[2.5px] rounded-full"
+						style={{ bottom: height + 3, background: LIQUOR, boxShadow: "0 0 6px " + liquorA(0.7) }}
+						initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4, scale: 0.4 }}
+						animate={{ opacity: 1, y: 0, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.4, transition: { duration: 0.1 } }}
+						transition={
+							reduce ? { duration: 0.1 } : { type: "spring", stiffness: 640, damping: 26, delay }
+						}
+					/>
+				)}
+			</AnimatePresence>
+		</div>
+	)
+})

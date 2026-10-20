@@ -27,16 +27,49 @@ import { PEEK_CARD_ID, PEEK_SUMMARY_ID } from "./usePeekTrigger"
 const CARD_W = 320
 /** before the first content lands, assume a typical card so flip() picks the right side */
 const ESTIMATED_H = 340
+/** clear air between a docked card and its panel's border */
+const DOCK_GAP = 8
+/** viewport margin every placement keeps */
+const EDGE = 12
 /** UI chrome spring (plan §3) */
 const SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
+
+/**
+ * A trigger inside a panel docks the card beside that panel, out over the canvas, rather
+ * than dropping it over the panel's own rows: left of a right-hand panel (Properties), right of
+ * a left-hand one (Explorer). A trigger may name its side with data-peek-placement; otherwise
+ * the panel's half of the viewport decides. Null when there is no panel or no room beside it
+ * (the folded one-column layout), and the card hangs off the trigger instead.
+ */
+function dockSide(anchor: HTMLElement): { panel: HTMLElement; side: "left" | "right" } | null {
+	const el = anchor.closest<HTMLElement>("[data-overlay-panel]")
+	if (!el) return null
+	const panel = el.getBoundingClientRect()
+	const vw = document.documentElement.clientWidth
+	const hint = anchor.closest<HTMLElement>("[data-peek-placement]")?.dataset.peekPlacement
+	const preferred: "left" | "right" = hint?.startsWith("right")
+		? "right"
+		: hint?.startsWith("left")
+		? "left"
+		: panel.left + panel.width / 2 > vw / 2
+		? "left"
+		: "right"
+	const fits = (side: "left" | "right") =>
+		side === "left"
+			? panel.left - DOCK_GAP - CARD_W >= EDGE
+			: panel.right + DOCK_GAP + CARD_W <= vw - EDGE
+	if (fits(preferred)) return { panel: el, side: preferred }
+	const other = preferred === "left" ? "right" : "left"
+	return fits(other) ? { panel: el, side: other } : null
+}
 
 type Shown = {
 	state: PeekState
 	x: number
 	y: number
 	placement: Placement
-	/** px from the card's left edge to the anchor, so it grows out of its trigger */
-	originX: number
+	/** the card's transform-origin, at its trigger (or the panel edge it docks to) */
+	origin: string
 	/** the trigger scrolled out of view (a pinned card waits, hidden) */
 	hidden: boolean
 	/** the peek closed: the card exits where it stood, and the next one waits for its position */
@@ -46,8 +79,8 @@ type Shown = {
 /**
  * The one EntityPeek card (plan §3.1), mounted once in the root layout.
  *
- * Floating UI places it against whichever trigger peekAtom names (below, flipping above near
- * the viewport edge). Content and position switch in the same render, and the card carries a
+ * Floating UI places it against whichever trigger peekAtom names: docked beside the trigger's
+ * panel (see dockSide), else below it, flipping above near the viewport edge. Content and position switch in the same render, and the card carries a
  * shared layoutId keyed to the peek's token, so moving to an adjacent trigger morphs this one
  * card (position and size) instead of closing and reopening; scroll-follow updates keep the
  * token and just move. Entering, it springs out of its anchor (scale 0.96 → 1, 4 px).
@@ -82,31 +115,65 @@ export default function EntityPeekHost({
 		const update = () => {
 			const anchor = state.anchor
 			if (!anchor.isConnected) return // the trigger's reanchor() takes it from here
-			computePosition(anchor, floating, {
-				strategy: "fixed",
-				placement: "bottom-start",
-				middleware: [
-					offset(8),
-					flip({ padding: 12, fallbackPlacements: ["top-start", "bottom-end", "top-end"] }),
-					shift({ padding: 12 }),
-					size({
-						padding: 12,
-						apply({ availableHeight, elements }) {
-							elements.floating.style.setProperty(
-								"--peek-max-h",
-								`${Math.max(180, Math.floor(availableHeight))}px`
-							)
+			const dock = dockSide(anchor)
+			const maxHeight = size({
+				padding: EDGE,
+				apply({ availableHeight, elements }) {
+					elements.floating.style.setProperty(
+						"--peek-max-h",
+						`${Math.max(180, Math.floor(availableHeight))}px`
+					)
+				},
+			})
+			// docked: the reference spans the panel across and the trigger down, so the card
+			// sits off the panel's edge level with its trigger (and hide() still tracks the trigger)
+			const reference = dock
+				? {
+						contextElement: anchor,
+						getBoundingClientRect() {
+							const r = anchor.getBoundingClientRect()
+							const { left, right } = dock.panel.getBoundingClientRect()
+							return {
+								x: left,
+								y: r.top,
+								left,
+								right,
+								top: r.top,
+								bottom: r.bottom,
+								width: right - left,
+								height: r.height,
+							}
 						},
-					}),
-					hide({ strategy: "referenceHidden" }),
-				],
+				  }
+				: anchor
+			computePosition(reference, floating, {
+				strategy: "fixed",
+				placement: dock ? `${dock.side}-start` : "bottom-start",
+				middleware: dock
+					? [
+							// lift it a touch so the title, not the card's top edge, lines up with the trigger
+							offset({ mainAxis: DOCK_GAP, crossAxis: -12 }),
+							shift({ padding: EDGE }),
+							maxHeight,
+							hide({ strategy: "referenceHidden" }),
+					  ]
+					: [
+							offset(8),
+							flip({ padding: EDGE, fallbackPlacements: ["top-start", "bottom-end", "top-end"] }),
+							shift({ padding: EDGE }),
+							maxHeight,
+							hide({ strategy: "referenceHidden" }),
+					  ],
 			}).then(({ x, y, placement, middlewareData }) => {
 				if (!live) return
 				const rect = anchor.getBoundingClientRect()
-				const originX = Math.min(
-					CARD_W - 12,
-					Math.max(12, rect.left + Math.min(rect.width / 2, 28) - x)
-				)
+				const side = placement.split("-")[0]
+				const origin =
+					side === "left" || side === "right"
+						? `${side === "left" ? CARD_W : 0}px ${Math.max(0, rect.top + rect.height / 2 - y)}px`
+						: `${Math.min(CARD_W - 12, Math.max(12, rect.left + Math.min(rect.width / 2, 28) - x))}px ${
+								side === "bottom" ? "0px" : "100%"
+						  }`
 				const hidden = !!middlewareData.hide?.referenceHidden
 				setShown((prev) =>
 					prev &&
@@ -121,7 +188,7 @@ export default function EntityPeekHost({
 								x,
 								y,
 								placement,
-								originX: prev?.state === state ? prev.originX : originX,
+								origin: prev?.state === state ? prev.origin : origin,
 								hidden,
 						  }
 				)
@@ -199,7 +266,10 @@ export default function EntityPeekHost({
 	const target = shown?.state.target
 	const model = useMemo(() => (target ? buildPeekModel(index, target) : null), [index, target])
 
-	const below = !shown || shown.placement.startsWith("bottom")
+	// enter from the side it grew out of: down from a trigger above, out from a docked panel edge
+	const side = shown?.placement.split("-")[0] ?? "bottom"
+	const enterFrom =
+		side === "left" ? { x: 4 } : side === "right" ? { x: -4 } : { y: side === "bottom" ? -4 : 4 }
 	const visible = open && !shown!.hidden
 	const pinned = !!shown?.state.pinned
 
@@ -236,8 +306,8 @@ export default function EntityPeekHost({
 							data-pinned={pinned || undefined}
 							layoutId="entity-peek"
 							layoutDependency={shown!.state.token}
-							initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: below ? -4 : 4 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
+							initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, ...enterFrom }}
+							animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
 							exit={
 								reduce
 									? { opacity: 0, transition: { duration: 0.12 } }
@@ -250,7 +320,7 @@ export default function EntityPeekHost({
 							}}
 							style={{
 								borderRadius: 8,
-								transformOrigin: `${shown!.originX}px ${below ? "0px" : "100%"}`,
+								transformOrigin: shown!.origin,
 							}}
 							onPointerEnter={(e) => {
 								if (e.pointerType !== "mouse") return

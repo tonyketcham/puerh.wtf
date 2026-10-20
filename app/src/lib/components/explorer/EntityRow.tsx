@@ -10,6 +10,7 @@ import type { PageKind } from "@/lib/peek"
 import { chain, usePeekTrigger } from "@/lib/components/entity/peek/usePeekTrigger"
 import { cn } from "@/lib/utils"
 import { explorerHoverAtom } from "./state"
+import { useVirtualListNavigation } from "./VirtualList"
 
 /** Indent per tree level, in px (the guides sit on these columns). */
 export const INDENT_PX = 12
@@ -86,6 +87,7 @@ function EntityRowImpl({
 	recordingKey,
 }: EntityRowProps) {
 	const store = useStore()
+	const navigation = useVirtualListNavigation()
 	const setHover = useSetAtom(explorerHoverAtom)
 	const target = useMemo(() => ({ kind, key: slug }), [kind, slug])
 	const { handlers, status } = usePeekTrigger<HTMLAnchorElement>(target)
@@ -130,13 +132,19 @@ function EntityRowImpl({
 					if (expandable && !open) {
 						e.preventDefault()
 						onOpenChange?.(slug, true)
-					} else if (expandable) focus(rows[i + 1])
+					} else if (expandable) {
+						if (navigation?.focusNext(el)) e.preventDefault()
+						else focus(rows[i + 1])
+					}
 					return
 				case "ArrowLeft":
 					if (expandable && open) {
 						e.preventDefault()
 						onOpenChange?.(slug, false)
-					} else if (parentSlug) focus(rows.find((r) => r.dataset.slug === parentSlug))
+					} else if (parentSlug) {
+						if (navigation?.focusKey(parentSlug)) e.preventDefault()
+						else focus(rows.find((r) => r.dataset.slug === parentSlug))
+					}
 					return
 			}
 		}

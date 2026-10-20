@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import VirtualList from "./VirtualList"
+
+import { memo, useMemo } from "react"
 import { isEntityFiltered } from "@/lib/filters"
 import { entityHref } from "@/lib/entities"
 import type { Vendor } from "@/lib/types/vendor"
@@ -10,13 +11,11 @@ import { MixBar, type MixSegment } from "./marks"
 import ViewHeader, { IndexLink } from "./ViewHeader"
 import { countBy, stripSlash, type EntityViewProps } from "./views"
 
-const ROW_SPRING = { type: "spring", stiffness: 420, damping: 38, mass: 0.7 } as const
-
 /**
  * Vendors by how many sessions they supplied, each with the category mix of its teas.
  * Vendors with no tasted tea stay at the bottom, dimmed, while nothing is filtered.
  */
-export default function VendorsView({
+function VendorsView({
 	vendors,
 	pool,
 	filters,
@@ -25,7 +24,6 @@ export default function VendorsView({
 	onToggleFilter,
 	index,
 }: EntityViewProps & { vendors: Vendor[] }) {
-	const reduce = useReducedMotion()
 	const counts = useMemo(() => countBy(pool, "vendor"), [pool])
 
 	const rows = useMemo(() => {
@@ -71,46 +69,41 @@ export default function VendorsView({
 			>
 				<IndexLink href="/vendors/" pathname={pathname} recordingKey="explorer-vendors-index" />
 			</ViewHeader>
-			<ul aria-label="Vendors">
-				<AnimatePresence initial={false}>
-					{rows.map(({ vendor, count, total, mix }, i) => (
-						<motion.li
-							key={vendor._slug}
-							layout={reduce ? false : "position"}
-							initial={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
-							animate={reduce ? { opacity: 1 } : { opacity: 1, height: "auto" }}
-							exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
-							transition={{ height: ROW_SPRING, layout: ROW_SPRING, opacity: { duration: 0.16 } }}
-						>
-							<EntityRow
-								kind="vendor"
-								slug={vendor._slug}
-								title={vendor.title}
-								count={count}
-								total={total}
-								flat
-								mark={
-									<span
-										aria-hidden
-										className="grid size-4 shrink-0 place-items-center text-[12px] leading-none text-white/35"
-									>
-										@
-									</span>
-								}
-								trailing={<MixBar segments={mix} index={i} />}
-								filtered={isEntityFiltered(filters, "vendor", vendor._slug)}
-								onToggleFilter={onToggleFilter}
-								current={pathname === stripSlash(entityHref("vendor", vendor._slug) ?? "")}
-								muted={count === 0}
-								recordingKey={`explorer-vendor-${vendor._slug}`}
-							/>
-						</motion.li>
-					))}
-				</AnimatePresence>
-				{rows.length === 0 && (
-					<li className="px-2 py-1.5 text-xs text-white/35">nothing matches</li>
+			<VirtualList
+				items={rows}
+				getKey={(row) => row.vendor._slug}
+				rowHeight={28}
+				label="Vendors"
+				renderRow={({ vendor, count, total, mix }, i) => (
+					<>
+						<EntityRow
+							kind="vendor"
+							slug={vendor._slug}
+							title={vendor.title}
+							count={count}
+							total={total}
+							flat
+							mark={
+								<span
+									aria-hidden
+									className="grid size-4 shrink-0 place-items-center text-[12px] leading-none text-white/35"
+								>
+									@
+								</span>
+							}
+							trailing={<MixBar segments={mix} index={i} />}
+							filtered={isEntityFiltered(filters, "vendor", vendor._slug)}
+							onToggleFilter={onToggleFilter}
+							current={pathname === stripSlash(entityHref("vendor", vendor._slug) ?? "")}
+							muted={count === 0}
+							recordingKey={`explorer-vendor-${vendor._slug}`}
+						/>
+					</>
 				)}
-			</ul>
+			/>
+			{rows.length === 0 && <p className="px-2 py-1.5 text-xs text-white/35">nothing matches</p>}
 		</div>
 	)
 }
+
+export default memo(VendorsView)
