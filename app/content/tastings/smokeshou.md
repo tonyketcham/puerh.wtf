@@ -11,7 +11,7 @@ cultivar:
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/products/2021-smokeshou-mini
+purchase_link: 'https://white2tea.com/products/2021-smokeshou-mini'
 excerpt: smore shou
 date: 2022-02-18T21:34:04.574Z
 flavor_axes:
@@ -46,12 +46,12 @@ flavor_axes:
     start: 3
     finish: 0
 notes:
-  dry_leaf_nose: pine smoke, leather, tobacco, petrichor
-  wet_leaf_nose: campfire, charcoal, damp earth, pine
-  cha_qi: relaxing, grounding, and maximally chillaxing
+  dry_leaf_nose: 'pine smoke, leather, tobacco, petrichor'
+  wet_leaf_nose: 'campfire, charcoal, damp earth, pine'
+  cha_qi: 'relaxing, grounding, and maximally chillaxing'
   empty_cup: campfire smores
-  taste: smores, scotch, pine smoke, and a good time
-  mouthfeel: thickness is this thing's sickness, smooth as hell
+  taste: 'smores, scotch, pine smoke, and a good time'
+  mouthfeel: 'thickness is this thing''s sickness, smooth as hell'
   finish: chocolate chunks and granola
 tags:
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
@@ -67,6 +67,8 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
 ---
 ### Synopsis
 
