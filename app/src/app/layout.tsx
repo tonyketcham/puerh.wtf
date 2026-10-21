@@ -10,6 +10,7 @@ import { Suspense } from "react"
 import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
 import CommandBar from "@/lib/components/command/CommandBar"
 import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
+import ScrollReset from "@/lib/components/ScrollReset"
 import { getEntityDetails } from "@/lib/entityDetails"
 
 const inter = Inter({
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 		<html lang="en">
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<StoreProvider>
+					<ScrollReset />
 					<HydrateExplorerSessions sessions={sessions} />
 					<div className="relative flex flex-row">
 						<Suspense>

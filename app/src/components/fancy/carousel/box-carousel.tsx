@@ -631,6 +631,8 @@ const DEFAULT_SNAP_TRANSITION: ValueAnimationTransition = {
 	stiffness: 200,
 }
 const DEFAULT_DRAG_SPRING: SpringConfig = { stiffness: 300, damping: 30 }
+/** How the cube chases wheel / page-scroll input: critically damped, ~50ms behind the scroll */
+const SCROLL_FOLLOW: ValueAnimationTransition = { type: "spring", stiffness: 400, damping: 40 }
 const FACE_COLORS = ["#ff9999", "#99ff99", "#9999ff", "#ffff99"]
 
 /**
@@ -792,10 +794,14 @@ const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			[turnTo, angleOf]
 		)
 
+		/** Where wheel / page-scroll input is steering the cube (null when it isn't) */
+		const scrollTargetRef = useRef<number | null>(null)
+
 		const stopTurning = useCallback(() => {
 			animationRef.current?.stop()
 			animationRef.current = null
 			targetStepRef.current = null
+			scrollTargetRef.current = null
 			rotation.stop()
 		}, [rotation])
 
@@ -948,12 +954,23 @@ const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 		// Scroll-driven rotation is continuous while input flows; once it stops, the cube springs
 		// to the nearest face like a detent, so it never rests half-turned between two photos.
 
+		// A finger resting on the screen mid-swipe sends no scroll events, but the swipe isn't over:
+		// the detent waits for the finger to lift, so the cube never snaps and then jumps away.
+		const touchingRef = useRef(false)
+		const settlePendingRef = useRef(false)
+
 		const settleTimerRef = useRef<number | null>(null)
 		const scheduleSettle = useCallback(() => {
 			if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current)
 			settleTimerRef.current = window.setTimeout(() => {
 				settleTimerRef.current = null
+				if (touchingRef.current) {
+					settlePendingRef.current = true
+					return
+				}
+				settlePendingRef.current = false
 				if (dragRef.current || targetStepRef.current != null) return
+				scrollTargetRef.current = null
 				turnToStep(stepOf(rotation.get()), snapTransition)
 			}, 180)
 		}, [rotation, stepOf, turnToStep, snapTransition])
@@ -962,6 +979,22 @@ const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 				if (settleTimerRef.current != null) window.clearTimeout(settleTimerRef.current)
 			},
 			[]
+		)
+
+		// Scroll input arrives in uneven steps (and off the compositor's beat on a phone), so it
+		// moves a target the cube springs after, rather than the cube itself: the turn stays
+		// continuous between events, and a retarget inherits the spring's velocity.
+		const nudge = useCallback(
+			(deg: number) => {
+				// the reader took over: drop any programmatic turn
+				if (targetStepRef.current != null) stopTurning()
+				const to = (scrollTargetRef.current ?? rotation.get()) + deg
+				scrollTargetRef.current = to
+				if (prefersReducedMotion) rotation.set(to)
+				else animationRef.current = animate(rotation, to, SCROLL_FOLLOW)
+				scheduleSettle()
+			},
+			[rotation, stopTurning, scheduleSettle, prefersReducedMotion]
 		)
 
 		// --- Wheel over the cube --------------------------------------------------------------
@@ -982,22 +1015,12 @@ const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 					(e.deltaY < 0 && window.scrollY <= 0)
 				if (!sideways && !(enablePageScrollControl ? atEdge : true)) return
 				e.preventDefault()
-				stopTurning()
 				const delta = sideways ? e.deltaX || e.deltaY : e.deltaY
-				rotation.set(rotation.get() + delta * scrollSensitivity * 0.5 * spinSign)
-				scheduleSettle()
+				nudge(delta * scrollSensitivity * 0.5 * spinSign)
 			}
 			el.addEventListener("wheel", onWheel, { passive: false })
 			return () => el.removeEventListener("wheel", onWheel)
-		}, [
-			enableScrollControl,
-			enablePageScrollControl,
-			scrollSensitivity,
-			rotation,
-			spinSign,
-			stopTurning,
-			scheduleSettle,
-		])
+		}, [enableScrollControl, enablePageScrollControl, scrollSensitivity, spinSign, nudge])
 
 		// --- Page scroll ----------------------------------------------------------------------
 
@@ -1020,30 +1043,41 @@ const BoxCarouselImpl = forwardRef<BoxCarouselRef, BoxCarouselProps>(
 			io.observe(el)
 
 			let lastY = window.scrollY
+			let lastH = window.innerHeight
 			const onScroll = () => {
 				const y = window.scrollY
+				const h = window.innerHeight
 				const delta = y - lastY
 				lastY = y
+				// a phone's toolbar showing or hiding resizes the viewport, and the page's reflow
+				// can shift scrollY with it: that jump is layout, not the reader scrolling
+				if (h !== lastH) {
+					lastH = h
+					return
+				}
 				if (!visible || Math.abs(delta) < 1 || dragRef.current) return
-				// the reader took over: drop any programmatic turn
-				if (targetStepRef.current != null) stopTurning()
-				rotation.set(rotation.get() + delta * pageScrollSensitivity * 0.1 * spinSign)
-				scheduleSettle()
+				nudge(delta * pageScrollSensitivity * 0.1 * spinSign)
+			}
+			const onTouchStart = () => {
+				touchingRef.current = true
+			}
+			const onTouchEnd = (e: TouchEvent) => {
+				if (e.touches.length) return
+				touchingRef.current = false
+				if (settlePendingRef.current) scheduleSettle()
 			}
 			window.addEventListener("scroll", onScroll, { passive: true })
+			window.addEventListener("touchstart", onTouchStart, { passive: true })
+			window.addEventListener("touchend", onTouchEnd, { passive: true })
+			window.addEventListener("touchcancel", onTouchEnd, { passive: true })
 			return () => {
 				window.removeEventListener("scroll", onScroll)
+				window.removeEventListener("touchstart", onTouchStart)
+				window.removeEventListener("touchend", onTouchEnd)
+				window.removeEventListener("touchcancel", onTouchEnd)
 				io.disconnect()
 			}
-		}, [
-			enablePageScrollControl,
-			scrollOffset,
-			pageScrollSensitivity,
-			rotation,
-			spinSign,
-			stopTurning,
-			scheduleSettle,
-		])
+		}, [enablePageScrollControl, scrollOffset, pageScrollSensitivity, spinSign, nudge, scheduleSettle])
 
 		// --- Continuous rotation --------------------------------------------------------------
 
