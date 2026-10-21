@@ -11,49 +11,51 @@ cultivar:
 production_year: 2013
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: in progress
+excerpt: 'Heavy-bodied sheng with wild blueberry, malt, and cooling aromatics'
 date: 2021-03-24T18:45:11.622Z
 flavor_axes:
   cream:
     start: 5
-    finish: 0
+    finish: null
   umami:
     start: 5
-    finish: 0
+    finish: null
   stone:
     start: 5
-    finish: 0
+    finish: null
   spices:
     start: 6
-    finish: 0
+    finish: null
   earth:
     start: 4
-    finish: 0
+    finish: null
   nuts_roast:
     start: 6
-    finish: 0
+    finish: null
   wood:
     start: 2
-    finish: 0
+    finish: null
   vegetal:
     start: 3
-    finish: 0
+    finish: null
   floral:
     start: 6
-    finish: 0
+    finish: null
   fruits:
     start: 6
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: old books, millet, toasted barley, raisin, wild honey, cornmeal,
-    blueberry, dark chocolate
-  wet_leaf_nose: tree resin, cascara, wet autumn leaves, raisin, blueberries, milk
-    chocolate, barley flour, rhubarb, lily
+  dry_leaf_nose: >-
+    old books, millet, toasted barley, raisin, wild honey, cornmeal, blueberry,
+    dark chocolate
+  wet_leaf_nose: >-
+    tree resin, cascara, wet autumn leaves, raisin, blueberries, milk chocolate,
+    barley flour, rhubarb, lily
   mouthfeel: heavy thickness
-  empty_cup: caramel & granola, mineral springs
-  taste: in progress
-  finish: in progress
-  cha_qi: in progress
+  empty_cup: 'caramel & granola, mineral springs'
+  taste: null
+  finish: null
+  cha_qi: null
 tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
@@ -66,6 +68,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 12
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 The pressing of this cake was done in 2013 but is believed to contain Banzhang-area 2003 material blended with a bit of newer material.
 
