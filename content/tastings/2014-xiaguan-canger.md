@@ -7,6 +7,9 @@ style:
   - dd6b3158-e788-4564-bee5-78778637c230
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
+# Origin attributed by Yunnan Craft's 2014 Canger listing; exact production match unconfirmed.
+origin:
+  - ee1c40b7-2ab5-40ce-b891-343884c5b832
 production_year: 2014
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
