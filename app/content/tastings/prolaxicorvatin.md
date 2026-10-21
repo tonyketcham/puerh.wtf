@@ -11,50 +11,51 @@ origin:
   - db44b2c0-1481-477c-af92-b554e56c5d26
 production_year: 2016
 aging_conditions: 5 years dry/natural in Guangzhou
-purchase_link: https://white2tea.com/products/2016-prolaxicorvatin
-excerpt: in progress
+purchase_link: 'https://white2tea.com/products/2016-prolaxicorvatin'
+excerpt: 'Chocolate milk, resinous wood, concord grape florals, and banana bread'
 date: 2021-07-21T17:50:03.016Z
 flavor_axes:
   cream:
     start: 6
-    finish: 0
+    finish: null
   umami:
     start: 5
-    finish: 0
+    finish: null
   stone:
     start: 7
-    finish: 0
+    finish: null
   spices:
     start: 6
-    finish: 0
+    finish: null
   earth:
     start: 3
-    finish: 0
+    finish: null
   nuts_roast:
     start: 5
-    finish: 0
+    finish: null
   wood:
     start: 6
-    finish: 0
+    finish: null
   vegetal:
     start: 3
-    finish: 0
+    finish: null
   floral:
     start: 6
-    finish: 0
+    finish: null
   fruits:
     start: 7
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: chocolate milk, toasted rice hulls, arbor stuff, brown sugar
-  wet_leaf_nose: carolina bbq sauce, concord grape, fall leaves, chocolate covered
+  dry_leaf_nose: 'chocolate milk, toasted rice hulls, arbor stuff, brown sugar'
+  wet_leaf_nose: >-
+    carolina bbq sauce, concord grape, fall leaves, chocolate covered
     blueberries, flowers, resinous wood
-  mouthfeel: light thickness, puckering astringency
-  empty_cup: peanut brittle, hard sugar
-  finish: "banana bread, concord grape flowers, "
-  taste: "chocolate milk, dark resinous wood, rock candy, "
-  cha_qi: in progress
-rating: 50
+  mouthfeel: 'light thickness, puckering astringency'
+  empty_cup: 'peanut brittle, hard sugar'
+  finish: 'banana bread, concord grape flowers, '
+  taste: 'chocolate milk, dark resinous wood, rock candy, '
+  cha_qi: null
+rating: -1
 brewing:
   temperature: 205
   material_amount: 5.75
@@ -62,6 +63,15 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+storage:
+  - place: guangzhou
+    from: 2016
+    to: 2021
+    approx: true
+vendor:
+  - 81d86379-bf51-47ed-8d2f-6997e057ced7
 ---
 ### Infusions
 
