@@ -7,7 +7,7 @@ import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react"
 import { useAtom } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
@@ -15,13 +15,11 @@ import {
 	EMPTY_FACETS,
 	hasAnyFilter,
 	matchesFilters,
-	readFilters,
-	replaceFilters,
 	toggleEntityFilter,
 	type FacetKey,
 	type FacetState,
-	type FilterState,
 } from "@/lib/filters"
+import { filtersAtom, replaceFilters } from "@/lib/store/filterState"
 import { sessionMatchesDescriptor } from "@/lib/descriptors"
 import { LEGACY_ORIGIN_SLUGS, originChain } from "@/lib/origins"
 import { buildRelationIndex, sessionsOf } from "@/lib/relations"
@@ -51,6 +49,7 @@ import {
 import { stripSlash } from "@/lib/components/explorer/views"
 import { EXPLORER_DRAWER_ID } from "@/lib/components/explorer/ExplorerToggle"
 import { useMediaQuery } from "@/lib/utils/useMediaQuery"
+import { useFocusTrap } from "@/lib/utils/useFocusTrap"
 import { cn } from "@/lib/utils/cn"
 import { X } from "lucide-react"
 
@@ -61,40 +60,27 @@ export interface ExplorerProps {
 	recordingKey?: string
 }
 
-/**
- * URL search params are the source of truth for filters (shared with the command bar).
- * - Reacts to any external URL change (command bar, back/forward).
- * - Writes via history.replaceState (no server round-trip, no scroll).
- * - Plain <Link> navigations drop the query string; filters are carried over to the new pathname
- *   (to clear them, replace on the same pathname, e.g. replaceFilters({ q: "", facets: EMPTY_FACETS })).
- */
-function useUrlSync() {
+/** All filter controls read and update the same atom; URL persistence lives at the root. */
+function useFilters() {
 	const pathname = usePathname()
-	const searchParams = useSearchParams()
-	const urlState = useMemo(() => readFilters(searchParams), [searchParams])
+	const [filters, setFilters] = useAtom(filtersAtom)
 
-	// Carry filters across navigations that dropped them
-	const lastRef = useRef<{ pathname: string; state: FilterState }>({ pathname, state: urlState })
-	useEffect(() => {
-		const last = lastRef.current
-		if (last.pathname !== pathname && !hasAnyFilter(urlState) && hasAnyFilter(last.state)) {
-			replaceFilters(last.state)
-			lastRef.current = { pathname, state: last.state }
-			return
-		}
-		lastRef.current = { pathname, state: urlState }
-	}, [pathname, urlState])
+	const setFacets = useCallback(
+		(next: FacetState | ((current: FacetState) => FacetState)) => {
+			setFilters((current) => ({
+				...current,
+				facets: typeof next === "function" ? next(current.facets) : next,
+			}))
+		},
+		[setFilters]
+	)
 
-	const setFacets = useCallback((next: FacetState | ((current: FacetState) => FacetState)) => {
-		replaceFilters((current) => ({
-			...current,
-			facets: typeof next === "function" ? next(current.facets) : next,
-		}))
-	}, [])
+	const setQ = useCallback(
+		(q: string) => setFilters((current) => ({ ...current, q })),
+		[setFilters]
+	)
 
-	const setQ = useCallback((q: string) => replaceFilters((current) => ({ ...current, q })), [])
-
-	return { q: urlState.q, setQ, facets: urlState.facets, setFacets, urlState, pathname }
+	return { q: filters.q, setQ, facets: filters.facets, setFacets, filters, pathname }
 }
 
 const yearOf = (s: ExplorerSession) =>
@@ -131,12 +117,15 @@ function useDrawer(pathname: string | null) {
 	const drawer = !useMediaQuery(EXPLORER_DOCK_QUERY)
 	const drawerRef = useRef<HTMLDivElement>(null)
 	const closeDrawer = useCallback(() => setOpen(false), [setOpen])
+	const previousPath = useRef(pathname)
 
 	useEffect(() => {
-		setOpen(false)
+		if (previousPath.current !== pathname) setOpen(false)
+		previousPath.current = pathname
 	}, [pathname, setOpen])
 
 	const drawerOpen = drawer && open
+	useFocusTrap(drawerRef, drawerOpen)
 	useEffect(() => {
 		if (!drawerOpen) return
 		const root = document.documentElement
@@ -165,7 +154,7 @@ function useDrawer(pathname: string | null) {
  * facet.
  */
 export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
-	const { q, setQ, facets, setFacets, urlState, pathname } = useUrlSync()
+	const { q, setQ, facets, setFacets, filters, pathname } = useFilters()
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
 	const [sort, setSort] = useAtom(explorerSortAtom)
 	const [view, setView] = useAtom(explorerViewAtom)
@@ -226,13 +215,13 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				id: "sessions",
 				title: "Sessions",
 				children: sortedSessions,
-				total: hasAnyFilter(urlState) ? sessions.length : undefined,
+				total: hasAnyFilter(filters) ? sessions.length : undefined,
 				actions: (
 					<SessionSortToggle value={sort} onChange={setSort} recordingKey="explorer-session-sort" />
 				),
 			},
 		],
-		[sortedSessions, urlState, sessions.length, sort, setSort]
+		[sortedSessions, filters, sessions.length, sort, setSort]
 	)
 
 	// Descriptor "find references"
@@ -379,7 +368,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	const viewProps = {
 		index,
 		pool: viewPool,
-		filters: urlState,
+		filters,
 		narrowed: filtered,
 		pathname: stripSlash(pathname ?? ""),
 		onToggleFilter,
@@ -422,15 +411,12 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				<SiteHeader className="max-xl:hidden" />
 
 				{/* The actual sidebar panel. Make this interactive. */}
-				<Panel
-					className="flex-1 contain-size"
-					backdropClassName="bg-[rgba(45,40,45,0.35)] max-xl:bg-[#171617]"
-				>
+				<Panel className="flex-1 contain-size">
 					<div className="relative">
 						{/* header: the activity rail (a tablist), concentric with the panel: its 15px inner radius
 						    less this 6px inset gives the tabs their 9px radius */}
-						<div className="sticky top-0 z-10 p-0 border-b border-heicha-500">
-							<div className="flex items-center gap-1.5 p-1.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
+						<div className="sticky top-0 z-10 p-0 surface-strip">
+							<div className="flex items-center gap-1.5 p-1.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg surface-grain">
 								<h2 className="sr-only">Explorer</h2>
 								<div className="flex-1 min-w-0">
 									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />

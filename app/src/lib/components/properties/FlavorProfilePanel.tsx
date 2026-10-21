@@ -219,7 +219,7 @@ export default function FlavorProfilePanel() {
 			onDrop={onDrop}
 		>
 			<PanelSection
-				title="Flavor Profile"
+				title="Session Details"
 				hasBottomBorder
 				hasPadding={false}
 				rightSlot={
@@ -264,7 +264,7 @@ export default function FlavorProfilePanel() {
 											: { opacity: 0, y: -4, scale: 0.97, filter: "blur(3px)" }
 									}
 									transition={reduce ? { duration: 0.12 } : POP}
-									className="pointer-events-auto inline-flex max-w-full items-center gap-1.5 h-6 pl-2 pr-0.5 rounded-full border border-white/10 bg-[#121012]/85 backdrop-blur-md text-[11px] text-white/85 shadow-lg shadow-black/40"
+									className="pointer-events-auto inline-flex max-w-full items-center gap-1.5 h-6 pl-2 pr-0.5 rounded-full bg-[var(--surface-face)]/90 backdrop-blur-md shadow-key text-[11px] text-white/85"
 									data-compare-chip
 								>
 									<span aria-hidden className="relative flex items-center">
@@ -354,7 +354,7 @@ export default function FlavorProfilePanel() {
 									}
 									initial={reduce ? false : { scale: 0.9, opacity: 0, y: 4 }}
 									transition={reduce ? { duration: 0 } : POP}
-									className="inline-flex items-center gap-2 h-7 pl-1.5 pr-3 rounded-full border bg-[#121012]/85 backdrop-blur-md text-[11px] text-white shadow-lg shadow-black/50"
+									className="inline-flex items-center gap-2 h-7 pl-1.5 pr-3 rounded-full border bg-[var(--surface-face)]/90 backdrop-blur-md text-[11px] text-white shadow-key"
 									style={{
 										borderColor: over ? withAlpha(accent, 70) : "rgba(255,255,255,0.12)",
 									}}
@@ -386,7 +386,7 @@ export default function FlavorProfilePanel() {
 								transition={{ duration: reduce ? 0 : 0.36, ease: "easeOut" }}
 								className="absolute inset-x-0 bottom-2 flex justify-center pointer-events-none"
 							>
-								<span className="rounded-full border border-white/10 bg-[#121012]/85 px-2.5 py-1 text-[10px] text-white/70">
+								<span className="rounded-full bg-[var(--surface-face)]/90 shadow-key px-2.5 py-1 text-[10px] text-white/70">
 									that’s this tea — drop another
 								</span>
 							</motion.div>

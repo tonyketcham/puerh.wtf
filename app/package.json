@@ -15,7 +15,6 @@
 		"geo:test": "node scripts/geo/test.mjs",
 		"dev": "flatbread start -- next dev --turbopack --inspect",
 		"dev:no-turbopack": "flatbread start -- next dev --inspect",
-		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skiping pnpm install",
 		"build": "./scripts/build-with-exit-code.sh flatbread start -X npx -- next build",
 		"start": "next start",
 		"test": "playwright test",

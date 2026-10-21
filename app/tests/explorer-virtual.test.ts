@@ -23,6 +23,7 @@ test("10,000 sessions keep a bounded DOM and keyboard navigation reaches unmount
 	await page.keyboard.press("ArrowDown")
 	await expect(first).toBeFocused()
 	await page.keyboard.press("Home")
+	await expect(fixture.getByRole("button", { name: /Fixture sessions/ })).toBeFocused()
 	await page.keyboard.press("Enter")
 	await expect(list).toHaveAttribute("data-virtual-total", "1")
 	await page.keyboard.press("Enter")

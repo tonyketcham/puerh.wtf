@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { Suspense, useMemo, useState, type CSSProperties, type ReactNode } from "react"
 import { useAtom, useSetAtom } from "jotai"
-import { useSearchParams } from "next/navigation"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ChevronRight, Crosshair, Filter } from "lucide-react"
 import EntityRef from "@/lib/components/entity/EntityRef"
@@ -13,11 +12,13 @@ import DotMap, { type DotMapPoint } from "@/lib/components/entity/page/DotMap"
 import EntityTitle from "@/lib/components/entity/page/EntityTitle"
 import { liquorStops } from "@/lib/components/entity/page/model"
 import Section from "@/lib/components/entity/page/Section"
+import RelatedGroup, { type RelatedGroupData } from "@/lib/components/entity/page/RelatedGroup"
 import SessionsList from "@/lib/components/entity/page/SessionsList"
 import { useMorphClick } from "@/lib/components/entity/page/viewTransition"
 import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
 import { ENTITY_META, type EntityKind } from "@/lib/entities"
-import { readFilters, replaceFilters } from "@/lib/filters"
+import { replaceFilters } from "@/lib/store/filterState"
+import { useFilterActive } from "@/lib/store/useFilterActive"
 import {
 	LEXICON_GROUP_META,
 	lexiconCompanions,
@@ -181,11 +182,10 @@ function Crumbs({ entry, model }: { entry: LexiconEntry; model: WordModel }) {
 
 /** The editor tab, `‘ honey.descriptor`, with find references and the Explorer filter. */
 function FileTab({ entry, model }: { entry: LexiconEntry; model: WordModel }) {
-	const params = useSearchParams()
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
 	const target = { kind: "descriptor" as const, key: entry.term }
-	const filter = peekFilter(target, entry.term)
-	const filtered = filter ? filter.active(readFilters(params)) : false
+	const filter = peekFilter(target)
+	const filtered = useFilterActive(target)
 	const pinned = !!descriptor?.pinned && entry.spellings.includes(descriptor.term)
 	return (
 		<div className="flex items-center gap-1.5 shrink-0">
@@ -561,24 +561,6 @@ function Snippet({ text, index, length }: { text: string; index: number; length:
 // Related: what it's said with, where, in what, from whom
 // ---------------------------------------------------------------------------
 
-type RelRow = {
-	key: string
-	count: number
-	render: ReactNode
-	color?: string | null
-}
-
-type RelGroup = {
-	key: string
-	label: string
-	glyph: string
-	rows: RelRow[]
-	total: number
-	hint?: string
-}
-
-const COLLAPSED = 6
-
 function WordRelated({
 	model,
 	entry,
@@ -591,7 +573,7 @@ function WordRelated({
 	lexicon: Lexicon
 }) {
 	const groups = useMemo(() => {
-		const out: RelGroup[] = []
+		const out: RelatedGroupData[] = []
 		const company = lexiconCompanions(lexicon, entry, 12)
 		if (company.length)
 			out.push({
@@ -653,92 +635,6 @@ function WordRelated({
 			{groups.map((g, i) => (
 				<RelatedGroup key={g.key} group={g} order={i} accent={model.accentText} />
 			))}
-		</div>
-	)
-}
-
-function RelatedGroup({
-	group,
-	order,
-	accent,
-}: {
-	group: RelGroup
-	order: number
-	accent: string
-}) {
-	const reduce = useReducedMotion() ?? false
-	const [open, setOpen] = useState(false)
-	const shown = open ? group.rows : group.rows.slice(0, COLLAPSED)
-	const more = group.rows.length - COLLAPSED
-
-	return (
-		<div className="min-w-0 space-y-2" data-related={group.key}>
-			<h3 className="flex items-center gap-2 text-[11px] text-white/40">
-				<span aria-hidden className="text-white/25">
-					{group.glyph}
-				</span>
-				<span className="tracking-[0.1em] uppercase">{group.label}</span>
-				<span className="tabular-nums text-white/25">{group.rows.length}</span>
-				{group.hint && <span className="text-white/25 normal-case">· {group.hint}</span>}
-			</h3>
-			<motion.ul layout={reduce ? false : "size"} transition={SPRING} className="space-y-1">
-				<AnimatePresence initial={false}>
-					{shown.map((row, i) => (
-						<motion.li
-							key={row.key}
-							layout={reduce ? false : "position"}
-							className="grid grid-cols-[minmax(0,auto)_minmax(2rem,1fr)_auto] items-center gap-3"
-							initial={reduce ? { opacity: 0 } : { opacity: 0, y: 4 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, transition: { duration: 0.12 } }}
-							transition={{
-								duration: 0.35,
-								ease: EASE,
-								delay: reduce
-									? 0
-									: i < COLLAPSED
-									? order * 0.05 + i * 0.03
-									: (i - COLLAPSED) * 0.025,
-							}}
-						>
-							{row.render}
-							<span
-								aria-hidden
-								className="relative h-1 rounded-full bg-white/[0.04] overflow-hidden"
-							>
-								<motion.span
-									className="absolute inset-y-0 left-0 origin-left rounded-full"
-									style={{
-										width: `${Math.max(4, (row.count / Math.max(1, group.total)) * 100)}%`,
-										backgroundColor: row.color || accent,
-										opacity: 0.8,
-									}}
-									initial={reduce ? { opacity: 0 } : { scaleX: 0 }}
-									animate={reduce ? { opacity: 0.8 } : { scaleX: 1 }}
-									transition={
-										reduce
-											? { duration: 0.2 }
-											: { ...SPRING, delay: 0.15 + order * 0.05 + i * 0.03 }
-									}
-								/>
-							</span>
-							<span className="text-[11px] tabular-nums text-white/35 min-w-[3ch] text-right">
-								{row.count}
-							</span>
-						</motion.li>
-					))}
-				</AnimatePresence>
-			</motion.ul>
-			{more > 0 && (
-				<button
-					type="button"
-					onClick={() => setOpen((o) => !o)}
-					aria-expanded={open}
-					className="h-6 px-1 -ml-1 text-[10px] rounded-[4px] outline-none text-white/35 hover:text-white focus-visible:ring-1 focus-visible:ring-white/40"
-				>
-					{open ? "show fewer" : `+${more} more`}
-				</button>
-			)}
 		</div>
 	)
 }

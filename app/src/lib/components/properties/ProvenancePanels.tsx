@@ -587,7 +587,7 @@ function Refs({ children, className }: { children: ReactNode; className?: string
 	return <span className={cn("flex flex-wrap items-center gap-1", className)}>{children}</span>
 }
 
-/** Filter chips read the URL (useSearchParams), which needs a Suspense boundary in a static export. */
+/** Filter chips share the live Jotai state with the Explorer. */
 function FilterRefs({ children }: { children: ReactNode }) {
 	return <Suspense fallback={null}>{children}</Suspense>
 }

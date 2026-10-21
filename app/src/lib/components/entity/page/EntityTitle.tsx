@@ -3,6 +3,7 @@
 import { useLayoutEffect, useMemo, type CSSProperties } from "react"
 import { motion, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils/cn"
+import { stripMarks } from "@/lib/utils/stripMarks"
 import { TITLE_CLASS, titleMounted, titleTransitionName, type MorphKind } from "./viewTransition"
 
 /** Masks and clips stop at the border box, but Rock 3D and its hard shadow paint past it. */
@@ -99,12 +100,4 @@ export default function EntityTitle({
 			)}
 		</h1>
 	)
-}
-
-/** "Dà Yè Zhòng" → "Da Ye Zhong" */
-export function stripMarks(text: string): string {
-	return text
-		.normalize("NFD")
-		.replace(/\p{M}+/gu, "")
-		.normalize("NFC")
 }

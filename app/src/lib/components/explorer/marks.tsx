@@ -204,7 +204,7 @@ export function CupStrip({ colors, index = 0 }: { colors: readonly string[]; ind
 			{cups.map((color, i) => (
 				<motion.span
 					key={i}
-					className="block size-[7px] rounded-full ring-1 ring-[#171617]"
+					className="block size-[7px] rounded-full ring-1 ring-[#151315]"
 					style={{ background: color }}
 					initial={reduce ? { opacity: 0 } : { scale: 0, opacity: 0 }}
 					animate={reduce ? { opacity: 1 } : { scale: 1, opacity: 1 }}

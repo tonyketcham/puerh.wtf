@@ -9,7 +9,7 @@ import RadarChart, { type RadarCompare } from "@/lib/components/dataviz/radar/Ra
 import { withAlpha } from "@/lib/components/dataviz/radar/geometry"
 import EntityRef from "@/lib/components/entity/EntityRef"
 import { NoteStageIcon } from "@/lib/components/icons/TeaIcons"
-import { replaceFilters, currentFilters } from "@/lib/filters"
+import { replaceFilters, currentFilters } from "@/lib/store/filterState"
 import { NOTE_STAGE_META } from "@/lib/noteStages"
 import { peekFilter, type PageKind } from "@/lib/peek"
 import {
@@ -170,7 +170,7 @@ function Descriptors({ model, row }: { model: EntityModel; row: Variants }) {
 	const max = words[0].count
 	const filter = peekFilter(
 		{ kind: model.kind, key: model.node?.slug ?? model.slug },
-		model.node?.title ?? model.slug
+		model.node?.id
 	)
 
 	// find references inside this entity: its Explorer filter on, the word pinned

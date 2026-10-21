@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, startTransition, useEffect, useState } from "react"
+import { memo, startTransition, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useAtomValue } from "jotai"
 import { hoveredNoteStageAtom } from "@/lib/store/sessionAtom"
@@ -14,6 +14,16 @@ const INSTANT = { duration: 0 } as const
 /** stage icon (size-3) and the flex gaps (gap-1.5) the caption is laid out with, in px */
 const ICON_PX = 12
 const GAP_PX = 6
+/** the caption box (w-36), and Fira Code's 0.6em advance at text-[11px], in px */
+const BOX_PX = 144
+const CH_PX = 6.6
+/** an overflowing label waits this long under the pointer, reads at about 9 characters a second,
+ *  and snaps home quickly once the pointer leaves */
+const READ_DELAY_MS = 1000
+const READ_PX_PER_S = 60
+const RETURN_S = 0.6
+/** the soft edge an overflowing label fades out through */
+const FEATHER = "14px"
 
 // ---------------------------------------------------------------------------
 // Caption store: the cube reports its face here, and only the caption subscribes, so a face
@@ -71,6 +81,10 @@ interface CubeCaptionProps {
  * Every part is absolutely placed from the label's length (the caption is monospace), so
  * re-centering is a transform animation, never a layout animation: nothing here measures layout
  * or reflows the page while it scrolls.
+ *
+ * A label too long for the box (a photo's alt text) left-anchors instead, so it reads from its
+ * first word, fades out through a feathered edge before "n/N" (pinned right), and after a beat
+ * under the pointer scrolls along to its end; leaving scrolls it back.
  */
 function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 	const reduce = useReducedMotion() ?? false
@@ -89,6 +103,21 @@ function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 		[stages]
 	)
 
+	// an overflowing label reads to its end after a beat under the pointer
+	const [reading, setReading] = useState(false)
+	const [edge, setEdge] = useState<"start" | "moving" | "end">("start")
+	const readTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+	const stopReading = () => {
+		clearTimeout(readTimer.current)
+		setReading(false)
+	}
+	useEffect(() => {
+		clearTimeout(readTimer.current)
+		setReading(false)
+		setEdge("start")
+	}, [index])
+	useEffect(() => () => clearTimeout(readTimer.current), [])
+
 	const hoveredStage = useAtomValue(hoveredNoteStageAtom)
 	const count = stages.length
 	const stage = stages[index] ?? null
@@ -100,10 +129,33 @@ function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 	const digits = String(count).length
 	const iconPx = stage ? ICON_PX + GAP_PX : 0
 	const labelCh = [...caption].length
-	const half = { px: (iconPx + GAP_PX) / 2, ch: (labelCh + 2 * digits + 1) / 2 }
+	const digitsCh = 2 * digits + 1
+	const half = { px: (iconPx + GAP_PX) / 2, ch: (labelCh + digitsCh) / 2 }
+	/** how far the whole line runs past the box: > 0 means the label has to give way */
+	const overflowPx = iconPx + GAP_PX + (labelCh + digitsCh) * CH_PX - BOX_PX
+	const overflows = overflowPx > 0
 	/** the icon + label group; the icon rides along with it, the label sits after the icon */
-	const groupX = offset(-half.px, -half.ch)
-	const digitsX = offset(iconPx + GAP_PX - half.px, labelCh - half.ch)
+	const groupX = overflows ? offset(-BOX_PX / 2, 0) : offset(-half.px, -half.ch)
+	const digitsX = overflows
+		? offset(BOX_PX / 2, -digitsCh)
+		: offset(iconPx + GAP_PX - half.px, labelCh - half.ch)
+	/** the label's window: what's left of the box after the icon and "n/N" */
+	const windowWidth = offset(BOX_PX - iconPx - GAP_PX, -digitsCh)
+	const readX =
+		reading && overflows ? offset(BOX_PX - iconPx - GAP_PX, -(labelCh + digitsCh)) : offset(0, 0)
+	const readMove = reduce
+		? INSTANT
+		: {
+				duration: reading ? Math.max(0.5, overflowPx / READ_PX_PER_S) : RETURN_S,
+				ease: "easeInOut" as const,
+		  }
+	const feather = !overflows
+		? undefined
+		: edge === "start"
+		? `linear-gradient(to right, black calc(100% - ${FEATHER}), transparent)`
+		: edge === "end"
+		? `linear-gradient(to right, transparent, black ${FEATHER})`
+		: `linear-gradient(to right, transparent, black ${FEATHER}, black calc(100% - ${FEATHER}), transparent)`
 
 	const move = reduce ? INSTANT : CAPTION_SPRING
 	const part = "absolute inset-y-0 left-0 flex items-center whitespace-nowrap"
@@ -133,6 +185,19 @@ function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 		<div
 			className="relative h-7 overflow-hidden w-36 font-fira-code text-[11px] [contain:layout_paint]"
 			aria-hidden
+			onPointerEnter={() => {
+				if (!overflows) return
+				clearTimeout(readTimer.current)
+				readTimer.current = setTimeout(() => {
+					setReading(true)
+					setEdge("moving")
+				}, READ_DELAY_MS)
+			}}
+			onPointerLeave={() => {
+				if (!reading) return clearTimeout(readTimer.current)
+				stopReading()
+				setEdge("moving")
+			}}
 		>
 			{/* the parts hang off the box's center line */}
 			<div className="absolute inset-y-0 left-1/2">
@@ -147,11 +212,24 @@ function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 					</AnimatePresence>
 
 					<motion.span className={part} initial={false} animate={{ x: iconPx }} transition={move}>
-						<TextMorph
-							text={caption}
-							className="transition-colors duration-300"
-							style={{ color }}
-						/>
+						<span
+							className="flex items-center h-full overflow-hidden"
+							style={{ maxWidth: windowWidth, maskImage: feather, WebkitMaskImage: feather }}
+						>
+							<motion.span
+								className="flex items-center"
+								initial={false}
+								animate={{ x: readX }}
+								transition={readMove}
+								onAnimationComplete={() => overflows && setEdge(reading ? "end" : "start")}
+							>
+								<TextMorph
+									text={caption}
+									className="transition-colors duration-300"
+									style={{ color }}
+								/>
+							</motion.span>
+						</span>
 					</motion.span>
 				</motion.span>
 

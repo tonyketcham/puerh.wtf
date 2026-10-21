@@ -1,14 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useState, type ReactNode } from "react"
-import { useAtomValue, useSetAtom } from "jotai"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import StatusBarFrame from "@/lib/components/containers/StatusBarFrame"
+import { useMemo, type ReactNode } from "react"
+import { useAtomValue } from "jotai"
 import { ENTITY_META } from "@/lib/entities"
-import { liquorInk, type RGB } from "@/lib/liquor"
 import type { PageKind } from "@/lib/peek"
-import { formatRating } from "@/lib/sessionSort"
-import { openCommandBarAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
-import { cn } from "@/lib/utils/cn"
+import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import MapLayerToggles from "@/lib/components/map/MapLayerToggles"
 import { buildEntityModel } from "./model"
 import { entityPageAtom, useHydrated } from "./state"
@@ -34,8 +31,6 @@ const PLURAL: Record<PageKind, string> = {
 export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: string | null }) {
 	const index = useAtomValue(relationIndexAtom)
 	const page = useAtomValue(entityPageAtom)
-	const openCommandBar = useSetAtom(openCommandBarAtom)
-	const reduce = useReducedMotion() ?? false
 	const hydrated = useHydrated()
 	const data = hydrated && slug && page?.kind === kind && page.slug === slug ? page.data : null
 	const model = useMemo(
@@ -49,13 +44,7 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 		[index, kind, slug, data]
 	)
 
-	const [isMac, setIsMac] = useState(true)
-	useEffect(() => {
-		setIsMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent))
-	}, [])
-
 	const left: ReactNode[] = []
-	const right: ReactNode[] = []
 	if (model) {
 		const { stats } = model
 		left.push(
@@ -101,22 +90,6 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 					{data.hanzi}
 				</span>
 			)
-
-		if (stats.years)
-			right.push(
-				<span key="years" className="tabular-nums" title="Vintages">
-					{stats.years[0] === stats.years[1]
-						? stats.years[0]
-						: `${stats.years[0]}–${stats.years[1]}`}
-				</span>
-			)
-		if (stats.avgRating != null)
-			right.push(
-				<span key="avg" className="tabular-nums" title="Average rating">
-					<span className="text-white/35">avg</span>{" "}
-					{formatRating(Math.round(stats.avgRating * 10) / 10)}
-				</span>
-			)
 	} else {
 		const nodes = index.nodes[kind]
 		const tasted = kind === "category" ? index.nodes.style.size : nodes.size
@@ -128,95 +101,22 @@ export default function EntityStatusBar({ kind, slug }: { kind: PageKind; slug: 
 		left.push(<span key="sessions">{index.sessions.length} sessions</span>)
 	}
 
-	const accent = model?.accent ?? null
-	const ink = accent ? liquorInk(hexRgb(accent)) : "#121012"
-
 	return (
-		<footer
-			className={cn(
-				"fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-between h-[var(--statusbar-h)]",
-				"border-t border-white/[0.07] bg-[#161416] font-fira-code text-[11px] leading-none text-white/55",
-				"overflow-hidden"
-			)}
-			aria-label={`${ENTITY_META[kind].label} status`}
-			data-recording-key="entity-status-bar"
-		>
-			<AnimatePresence initial={false} mode="popLayout">
-				<motion.div
-					key={slug ?? "index"}
-					className="flex items-stretch justify-between flex-1 min-w-0"
-					initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
-					animate={{ opacity: 1, y: 0 }}
-					exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-					transition={{ type: "spring", stiffness: 420, damping: 34 }}
-				>
-					<div className="flex items-stretch min-w-0 overflow-hidden">
-						<div
-							className="flex items-center gap-1.5 px-3 font-medium transition-colors duration-500"
-							style={{
-								backgroundColor: accent ?? "rgb(255 255 255 / 0.08)",
-								color: accent ? ink : "rgb(255 255 255 / 0.7)",
-							}}
-						>
-							<span aria-hidden>{ENTITY_META[kind].glyph}</span>
-							{slug ? ENTITY_META[kind].label : PLURAL[kind]}
-						</div>
-						<div
-							className={cn(
-								"flex items-center min-w-0 gap-0 px-2.5 overflow-hidden whitespace-nowrap",
-								// narrow screens give the map layer toggles the room
-								kind === "origin" && !slug && "hidden md:flex"
-							)}
-						>
-							{left.map((part, i) => (
-								<span key={i} className="flex items-center">
-									{i > 0 && <span className="px-1.5 text-white/20">·</span>}
-									{part}
-								</span>
-							))}
-						</div>
-						{/* the origin map's layers (plan §4.5), on /origins */}
-						{kind === "origin" && !slug && (
-							<MapLayerToggles className="pl-2.5 border-l border-white/[0.07]" />
-						)}
-					</div>
-					<div className="flex items-stretch shrink-0">
-						{right.map((part, i) => (
-							<div key={i} className="hidden md:flex items-center px-2.5">
-								{part}
-							</div>
-						))}
-						{accent && (
-							<div
-								className="flex items-center gap-1.5 px-2.5"
-								title="Blended liquor of its sessions"
-							>
-								<span
-									aria-hidden
-									className="size-2.5 rounded-[3px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]"
-									style={{ backgroundColor: accent }}
-								/>
-								<span className="uppercase">{accent}</span>
-							</div>
-						)}
-						<button
-							type="button"
-							title="Command bar"
-							onClick={() => openCommandBar({})}
-							className="hidden md:flex items-center px-2.5 pr-3 text-white/35 outline-none hover:bg-white/[0.06] hover:text-white/85 focus-visible:bg-white/[0.08]"
-						>
-							<kbd className="font-fira-code">{isMac ? "⌘K" : "Ctrl K"}</kbd>
-						</button>
-					</div>
-				</motion.div>
-			</AnimatePresence>
-		</footer>
+		<StatusBarFrame
+			pageKey={slug ?? "index"}
+			label={ENTITY_META[kind].label + " status"}
+			recordingKey="entity-status-bar"
+			glyph={ENTITY_META[kind].glyph}
+			name={slug ? ENTITY_META[kind].label : PLURAL[kind]}
+			accent={model?.accent ?? null}
+			stats={model?.stats}
+			left={left}
+			leftClassName={kind === "origin" && !slug ? "hidden md:flex" : undefined}
+			afterLeft={
+				kind === "origin" && !slug ? (
+					<MapLayerToggles className="pl-2.5 border-l border-white/[0.07]" />
+				) : undefined
+			}
+		/>
 	)
-}
-
-function hexRgb(hex: string): RGB {
-	const h = hex.replace("#", "")
-	const full = h.length === 3 ? h.replace(/./g, (c) => c + c) : h
-	const n = parseInt(full.slice(0, 6), 16)
-	return Number.isFinite(n) ? [(n >> 16) & 255, (n >> 8) & 255, n & 255] : [217, 164, 65]
 }

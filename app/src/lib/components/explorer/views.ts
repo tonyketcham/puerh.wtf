@@ -12,7 +12,7 @@ export type EntityViewProps = {
 	index: RelationIndex
 	/** sessions passing every filter except this view's own facet */
 	pool: readonly ExplorerSession[]
-	/** the URL filters, for each row's filtered state */
+	/** the shared live filters, for each row's filtered state */
 	filters: FilterState
 	/** whether any filter or query is narrowing the sessions */
 	narrowed: boolean

@@ -22,7 +22,7 @@ interface FilterTokensProps {
 const TOKEN_SPRING = { type: "spring", stiffness: 520, damping: 36, mass: 0.7 } as const
 
 /**
- * Active filters as small removable tokens (shared URL filter state, so anything set from the
+ * Active filters as small removable tokens (shared Jotai filter state, so anything set from the
  * command bar shows up here). Tokens pop in/out and the rest reflow with layout springs.
  */
 export default function FilterTokens({ tokens, onClearAll }: FilterTokensProps) {

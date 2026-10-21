@@ -10,17 +10,17 @@ import {
 	useReducedMotion,
 	type Transition,
 } from "motion/react"
-import { useSearchParams } from "next/navigation"
 import { Search as SearchIcon } from "lucide-react"
 import { commandBarAtom, explorerSessionsAtom } from "@/lib/store/sessionAtom"
-import { countActiveFilters, readFilters } from "@/lib/filters"
+import { activeFilterCountAtom } from "@/lib/store/filterState"
 import type { ExplorerSession } from "@/lib/types/session"
 import type { Vendor } from "@/lib/types/vendor"
 import type { Category } from "@/lib/types/category"
 import type { EntityDetails } from "@/lib/entityDetails"
 import { buildIndex } from "./items"
 import Palette, { ICON_LAYOUT_ID, MORPH_SPRING, SURFACE_LAYOUT_ID } from "./Palette"
-import { Kbd, usePlatform } from "./parts"
+import { Kbd } from "./parts"
+import { usePlatform } from "@/lib/utils/usePlatform"
 
 export interface CommandBarProps {
 	sessions: ExplorerSession[]
@@ -51,7 +51,7 @@ function isEditable(target: EventTarget | null) {
  * quick-open prefixes (@ # ^ ~ % :) scope it to one kind.
  *
  * State: commandBarAtom (open/query/scope; anyone may open it via openCommandBarAtom).
- * Filters: URL search params via replaceFilters (shared with the Explorer).
+ * Filters: the shared Jotai filter state (also used by the Explorer).
  */
 export default function CommandBar({ sessions, vendors, categories, details }: CommandBarProps) {
 	const [state, setState] = useAtom(commandBarAtom)
@@ -60,12 +60,7 @@ export default function CommandBar({ sessions, vendors, categories, details }: C
 	const source = hydrated.length ? hydrated : sessions
 	const reduceMotion = !!useReducedMotion()
 	const platform = usePlatform()
-	const searchParams = useSearchParams()
-
-	const filterCount = useMemo(() => {
-		const f = readFilters(searchParams)
-		return countActiveFilters(f)
-	}, [searchParams])
+	const filterCount = useAtomValue(activeFilterCountAtom)
 
 	// Build the index when the browser is idle, so the first open is instant.
 	const [armed, setArmed] = useState(false)
@@ -186,7 +181,7 @@ export default function CommandBar({ sessions, vendors, categories, details }: C
 						}
 						onClick={() => setState({ open: true, query: "", scope: "all" })}
 						style={{ borderRadius: 10 }}
-						className="group relative flex items-center gap-2.5 h-9 pl-3 pr-1.5 w-[min(30rem,100%)] pointer-events-auto border border-white/[0.08] bg-[#1a171a]/75 backdrop-blur-xl text-white/45 font-fira-code text-[12px] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_10px_30px_-14px_rgba(0,0,0,0.8)] transition-[border-color,color,background-color] duration-200 hover:border-white/[0.16] hover:text-white/75 hover:bg-[#1d1a1d]/85 focus-visible:outline-none focus-visible:border-[#edc446]/50 focus-visible:text-white/80"
+						className="group relative flex items-center gap-2.5 h-9 pl-3 pr-1.5 w-[min(30rem,100%)] pointer-events-auto surface-card text-white/45 font-fira-code text-[12px] transition-[color,filter] duration-200 hover:text-white/75 hover:brightness-125 outline-none focus-visible:outline-1 focus-visible:outline-[#edc446]/50 focus-visible:text-white/80"
 					>
 						<motion.span
 							layoutId={ICON_LAYOUT_ID}
@@ -280,7 +275,7 @@ function DialogSurface({
 			aria-label="Search and commands"
 			inert={!isPresent || undefined}
 			style={{ borderRadius: 14 }}
-			className="relative w-full max-w-[640px] overflow-hidden border pointer-events-auto border-white/[0.1] bg-[#191619] font-fira-code shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_30px_80px_-20px_rgba(0,0,0,0.85),0_0_0_1px_rgba(0,0,0,0.4)]"
+			className="relative w-full max-w-[640px] overflow-hidden pointer-events-auto surface-card font-fira-code"
 		>
 			<motion.div
 				layout="position"

@@ -1,12 +1,12 @@
 /**
- * URL search params are the shared filter state for the Explorer and the command bar:
+ * Pure matching and URL serialization for the shared Explorer/command-bar filters:
  *   ?q=<text>&styles=a,b&origins=…&years=2018,2019&vendors=…&cultivars=…&tags=…&vessels=…
  * (styles = category or style slugs: a category is the top of the style tree, so `sheng` keeps
  * every Sheng style and `blended-sheng` only that one; origins = origin slug/id, rolling up the
  * tree; years = production years as integers.)
  *
- * Write with `replaceFilters()` (history.replaceState, which Next's router observes, so
- * useSearchParams() updates without a server round-trip). The Explorer reacts to any change.
+ * Live state belongs to store/filterState. FilterUrlSync seeds it once on a fresh load
+ * and lazily writes snapshots to the URL; URL edits do not drive the running app.
  */
 import type { EntityKind } from "@/lib/entities"
 import { sessionMatchesDescriptor } from "@/lib/descriptors"
@@ -88,29 +88,6 @@ export function buildFilterSearch(base: string | URLSearchParams, state: FilterS
 	}
 	const s = params.toString()
 	return s ? `?${s}` : ""
-}
-
-/** Current filters from window.location (client only). */
-export function currentFilters(): FilterState {
-	if (typeof window === "undefined") return { q: "", facets: { ...EMPTY_FACETS } }
-	return readFilters(new URLSearchParams(window.location.search))
-}
-
-/**
- * Replace the URL's filter params on the current pathname without navigation/scroll.
- * Accepts a full state or an updater of the current state.
- */
-export function replaceFilters(next: FilterState | ((current: FilterState) => FilterState)) {
-	if (typeof window === "undefined") return
-	const current = currentFilters()
-	const state = typeof next === "function" ? next(current) : next
-	const search = buildFilterSearch(window.location.search, state)
-	const url = `${window.location.pathname}${search}${window.location.hash}`
-	if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
-		// pass null state: Next patches replaceState and only syncs its router (useSearchParams)
-		// for calls that don't carry its own internal state object
-		window.history.replaceState(null, "", url)
-	}
 }
 
 /** Toggle one value in a facet list. */

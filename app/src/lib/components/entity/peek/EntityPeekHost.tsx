@@ -344,7 +344,7 @@ export default function EntityPeekHost({
 									if (peek.filter(shown!.state.target)) e.preventDefault()
 								}
 							}}
-							className="relative overflow-x-hidden overflow-y-auto max-h-[var(--peek-max-h,80vh)] overscroll-contain font-fira-code text-white bg-[#121012] ring-1 ring-inset ring-[#fff2ca]/10 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.95),0_2px_8px_-2px_rgba(0,0,0,0.6)]"
+							className="relative overflow-x-hidden overflow-y-auto max-h-[var(--peek-max-h,80vh)] overscroll-contain font-fira-code text-white surface-card"
 						>
 							{/* the trigger's aria-describedby: one line, not the whole dialog */}
 							<span id={PEEK_SUMMARY_ID} hidden>

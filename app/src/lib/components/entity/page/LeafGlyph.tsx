@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils/cn"
-import { stripMarks } from "./EntityTitle"
+import { stripMarks } from "@/lib/utils/stripMarks"
 
 export type LeafSize = "small" | "medium" | "large"
 

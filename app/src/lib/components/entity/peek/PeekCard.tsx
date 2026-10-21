@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 import { useMemo, useState, type ReactNode } from "react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -14,7 +13,7 @@ import type { EntityDetails, OriginPeekDetail, VesselPeekDetail } from "@/lib/en
 import { brewFacts, brewProfile, timeDomain } from "@/lib/components/entity/vessel/brew"
 import UseStrip from "@/lib/components/entity/vessel/UseStrip"
 import VesselPhoto from "@/lib/components/entity/vessel/VesselPhoto"
-import { readFilters } from "@/lib/filters"
+import { useFilterActive } from "@/lib/store/useFilterActive"
 import { lexiconHref, lexiconPageOf } from "@/lib/lexicon"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
 import { entityHref } from "@/lib/entities"
@@ -42,6 +41,7 @@ import type { PeekState } from "@/lib/store/peekAtom"
 import type { ExplorerSession, NoteStage } from "@/lib/types/session"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils/cn"
+import { stripMarks } from "@/lib/utils/stripMarks"
 import type { PeekController } from "./controller"
 import { dominantAxes, featuredSessions, type PeekModel } from "./model"
 import { PEEK_CARD_ID } from "./usePeekTrigger"
@@ -695,7 +695,7 @@ function VesselBody({ model, index, detail, row, accent }: BodyProps) {
 						<div
 							key={f.k}
 							title={f.title}
-							className="px-2 py-1.5 rounded-[4px] bg-white/[0.03] ring-1 ring-inset ring-white/[0.05]"
+							className="px-2 py-1.5 rounded-[4px] bg-black/20 shadow-well"
 						>
 							<dt className="text-[9px] uppercase tracking-[0.12em] text-white/30">{f.k}</dt>
 							<dd className="text-[11px] tabular-nums text-white/75">{f.v}</dd>
@@ -725,7 +725,7 @@ function Centroid({ model, engaged, row }: { model: PeekModel; engaged: boolean;
 	return (
 		<motion.div
 			variants={row}
-			className="flex items-center gap-3 py-2 pl-1 pr-2 rounded-md bg-white/[0.02] ring-1 ring-inset ring-white/[0.05]"
+			className="flex items-center gap-3 py-2 pl-1 pr-2 rounded-md bg-black/20 shadow-well"
 		>
 			<span className="text-[#fff2ca]/70" title={engaged ? "finish" : "start"}>
 				<FlavorGlyph axes={stats.centroid} color={color} active={engaged} size={52} />
@@ -809,9 +809,9 @@ function Sessions({ model, peek, row }: { model: PeekModel; peek: PeekController
 						type="button"
 						onClick={() => peek.filter(model.target)}
 						className="h-6 px-1 text-[10px] rounded-[4px] outline-none text-white/35 hover:text-white focus-visible:ring-1 focus-visible:ring-white/40 disabled:hover:text-white/35"
-						disabled={!peekFilter(model.target, model.title)}
+						disabled={!peekFilter(model.target, model.node?.id)}
 					>
-						+{more} more{peekFilter(model.target, model.title) ? " · show in Explorer" : ""}
+						+{more} more{peekFilter(model.target, model.node?.id) ? " · show in Explorer" : ""}
 					</button>
 				</li>
 			)}
@@ -835,7 +835,6 @@ function Actions({
 	index: RelationIndex
 }) {
 	const { target } = model
-	const params = useSearchParams()
 	const current = useAtomValue(sessionSlugAtom)
 	const setCompare = useSetAtom(compareSlugAtom)
 	const setDescriptor = useSetAtom(descriptorAtom)
@@ -847,7 +846,7 @@ function Actions({
 	)
 	const href = word ? lexiconHref(word.slug) : peekHref(target)
 	const fileName = word ? `${word.slug}.${PEEK_META.descriptor.label}` : peekFileName(target)
-	const filter = peekFilter(target, model.title)
+	const filter = peekFilter(target, model.node?.id)
 	// Open morphs the card's name (not the button) into the page title
 	const openMorph = useMorphClick(
 		word ? "descriptor" : isPageKind(target.kind) ? target.kind : "origin",
@@ -855,7 +854,7 @@ function Actions({
 		word || isPageKind(target.kind) ? href : null,
 		cardTitle
 	)
-	const filtered = filter ? filter.active(readFilters(params)) : false
+	const filtered = useFilterActive(target, model.node?.id)
 	const candidates = model.sessions.filter((s) => s._slug !== current)
 
 	const compare = () => {
@@ -941,7 +940,7 @@ function Actions({
 function actionClass(variant: "primary" | "plain" = "plain") {
 	return cn(
 		"inline-flex items-center min-w-0 h-7 gap-1.5 px-2 text-[11px] rounded-[5px] outline-none whitespace-nowrap",
-		"ring-1 ring-inset transition-[color,background-color,box-shadow] duration-150",
+		"ring-1 ring-inset shadow-key active:shadow-well transition-[color,background-color,box-shadow] duration-150",
 		"focus-visible:ring-white/50 disabled:opacity-35 disabled:pointer-events-none",
 		variant === "primary"
 			? "flex-1 justify-between text-white ring-[#fff2ca]/15 bg-[#fff2ca]/[0.06] hover:bg-[#fff2ca]/[0.1] hover:ring-[#fff2ca]/25"
@@ -951,7 +950,7 @@ function actionClass(variant: "primary" | "plain" = "plain") {
 
 function Kbd({ children }: { children: ReactNode }) {
 	return (
-		<kbd className="font-fira-code text-[9px] leading-none px-1 py-0.5 rounded-[3px] text-white/40 bg-white/[0.05]">
+		<kbd className="font-fira-code text-[9px] leading-none px-1 py-0.5 rounded-[3px] text-white/40 bg-white/[0.05] shadow-key">
 			{children}
 		</kbd>
 	)
@@ -1026,7 +1025,7 @@ function Chip({
 			type="button"
 			onClick={onClick}
 			title={title}
-			className="inline-flex items-center h-5 max-w-full gap-1 px-1.5 text-[10px] rounded-[4px] outline-none text-white/70 ring-1 ring-inset ring-white/[0.08] bg-white/[0.02] transition-colors hover:text-white hover:ring-white/20 hover:bg-white/[0.06] focus-visible:ring-white/50"
+			className="inline-flex items-center h-5 max-w-full gap-1 px-1.5 text-[10px] rounded-[4px] outline-none text-white/70 ring-1 ring-inset ring-white/[0.06] bg-white/[0.025] shadow-key-soft transition-colors hover:text-white hover:ring-white/20 hover:bg-white/[0.06] focus-visible:ring-white/50"
 		>
 			{glyph && (
 				<span aria-hidden className="text-white/35" style={color ? { color } : undefined}>
@@ -1166,14 +1165,6 @@ function formatLatLon(lat: number, lon: number): string {
 	const ns = lat >= 0 ? "N" : "S"
 	const ew = lon >= 0 ? "E" : "W"
 	return `${Math.abs(lat).toFixed(2)}°${ns} ${Math.abs(lon).toFixed(2)}°${ew}`
-}
-
-/** "Dà Yè Zhòng" → "Da Ye Zhong" (for faces without combining marks). */
-function stripMarks(text: string): string {
-	return text
-		.normalize("NFD")
-		.replace(/\p{M}+/gu, "")
-		.normalize("NFC")
 }
 
 function hostOf(url: string): string | null {

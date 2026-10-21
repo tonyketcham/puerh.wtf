@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import {
 	memo,
 	useCallback,
@@ -28,7 +28,8 @@ import { usePeekTrigger } from "@/lib/components/entity/peek/usePeekTrigger"
 import { isPlainClick, navigateWithMorph } from "@/lib/components/entity/page/viewTransition"
 import { explorerHoverAtom } from "@/lib/components/explorer/state"
 import { entityHref } from "@/lib/entities"
-import { matchesFilters, readFilters, replaceFilters } from "@/lib/filters"
+import { matchesFilters } from "@/lib/filters"
+import { filtersAtom, replaceFilters } from "@/lib/store/filterState"
 import { sessionColor, sessionsOf, type RelationIndex } from "@/lib/relations"
 import { commandBarAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import type { ExplorerSession } from "@/lib/types/session"
@@ -115,8 +116,7 @@ export default function OriginsMap({
 	const index = useAtomValue(relationIndexAtom)
 	const layers = useAtomValue(mapLayersAtom)
 	const hover = useAtomValue(explorerHoverAtom)
-	const params = useSearchParams()
-	const { facets, q } = useMemo(() => readFilters(params), [params])
+	const { facets, q } = useAtomValue(filtersAtom)
 	const query = q.toLowerCase().trim()
 	const interactive = mode === "index"
 
@@ -695,10 +695,10 @@ export default function OriginsMap({
 				className="absolute inset-0 overflow-hidden pointer-events-none"
 				style={{ opacity: overlayOpacity }}
 			>
+				{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
 				{/* a pan moves this box, not each pin */}
 				<div ref={mover} className="absolute inset-0">
 					{layers.storage && <StorageLabels nodes={storage.nodes} />}
-					{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
 					{revealed &&
 						markers.map((m) => (
 							<OriginMarker
@@ -1192,7 +1192,7 @@ function MapChrome({
 					<button
 						type="button"
 						onClick={onToggleViewFilter}
-						className="h-6 px-2 mr-1 text-[10px] rounded-[4px] bg-[#121012]/85 ring-1 ring-inset ring-[#edc446]/40 text-[#edc446] outline-none hover:ring-[#edc446]/80 focus-visible:ring-[#edc446]"
+						className="h-6 px-2 mr-1 text-[10px] rounded-[4px] bg-[var(--surface-face)]/90 shadow-key ring-1 ring-inset ring-[#edc446]/40 text-[#edc446] outline-none hover:ring-[#edc446]/80 focus-visible:ring-[#edc446]"
 						title="Explorer filtered to the origins in view (f)"
 					>
 						filtered to view · f
@@ -1227,7 +1227,7 @@ function ChromeButton({
 			aria-label={label}
 			title={label}
 			onClick={onClick}
-			className="grid size-6 place-items-center rounded-[4px] bg-[#121012]/85 ring-1 ring-inset ring-white/[0.1] text-white/55 outline-none transition-colors hover:text-white hover:ring-white/30 focus-visible:ring-white/60"
+			className="grid size-6 place-items-center rounded-[4px] bg-[var(--surface-face)]/90 shadow-key ring-1 ring-inset ring-white/[0.06] text-white/55 outline-none transition-colors hover:text-white hover:ring-white/30 focus-visible:ring-white/60"
 		>
 			{children}
 		</button>

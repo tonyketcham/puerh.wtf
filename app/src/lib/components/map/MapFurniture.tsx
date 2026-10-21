@@ -13,7 +13,7 @@
  * ticks are pinned to it (camera.ts), and the bar, readout and rectangle are written straight to
  * the DOM. React only hears about it when the graticule's step or extent changes.
  */
-import { memo, useCallback, useEffect, useRef, useState, type RefObject } from "react"
+import { memo, useEffect, useRef, useState, type RefObject } from "react"
 import { motion, type MotionValue } from "motion/react"
 import { cn } from "@/lib/utils"
 import type { Camera, PinWrite, ViewTick } from "./camera"
@@ -134,18 +134,6 @@ export function GraticuleTicks({
 	// ticks only, not the whole map around them
 	const grid = useGraticule(camera)
 	const ref = useRef<HTMLDivElement | null>(null)
-	// the box the ticks are in: a pan moves it, not each tick
-	const mover = useCallback(
-		(el: HTMLDivElement | null) => {
-			ref.current = el
-			const off = camera.mover(el)
-			return () => {
-				off?.()
-				ref.current = null
-			}
-		},
-		[camera]
-	)
 	useEffect(() => {
 		const el = ref.current
 		if (!el || !grid) return
@@ -189,11 +177,11 @@ export function GraticuleTicks({
 	if (!grid) return null
 	return (
 		<div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none">
-			<div ref={mover} className="absolute inset-0">
+			<div ref={ref} className="absolute inset-0">
 				{grid.lons.map((lon) => (
 					<span
 						key={`x${lon}`}
-						ref={(el) => (el ? camera.pin(el, SHARED.forward(lon, 25)[0], 0, lonTick) : undefined)}
+						ref={(el) => (el ? camera.pin(el, SHARED.forward(lon, 25)[0], 0, lonTick, true) : undefined)}
 						data-axis="lon"
 						data-v={lon}
 						className="map-tick"
@@ -205,7 +193,7 @@ export function GraticuleTicks({
 				{grid.lats.map((lat) => (
 					<span
 						key={`y${lat}`}
-						ref={(el) => (el ? camera.pin(el, 0, SHARED.forward(102, lat)[1], latTick) : undefined)}
+						ref={(el) => (el ? camera.pin(el, 0, SHARED.forward(102, lat)[1], latTick, true) : undefined)}
 						data-axis="lat"
 						data-v={lat}
 						className="map-tick"

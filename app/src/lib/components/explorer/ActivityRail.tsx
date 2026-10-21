@@ -99,7 +99,7 @@ export default function ActivityRail({
 									layoutId="explorer-rail-pill"
 									aria-hidden
 									transition={transition}
-									className="absolute inset-0 rounded-[9px] bg-white/[0.07] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.07)]"
+									className="absolute inset-0 rounded-[9px] bg-white/[0.07] shadow-key"
 								>
 									<span className="absolute left-2 right-2 -bottom-px h-px rounded-full bg-brand/70 shadow-[0_0_6px_rgb(237_196_70/0.6)]" />
 								</motion.span>

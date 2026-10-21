@@ -218,17 +218,18 @@ export default function PhaseScrubber({
 			whileHover="hover"
 			whileTap="press"
 			className={cn(
-				"group/scrub relative grid shrink-0 grid-cols-2 h-[22px] rounded-[7px] border border-white/10 bg-black/35",
+				// a well sunk into the header strip; the thumb is the lit key riding in it
+				"group/scrub relative grid shrink-0 grid-cols-2 h-[22px] rounded-[10px] border border-black/45 bg-black/40 shadow-well",
 				"text-[10px] leading-none select-none touch-none cursor-grab outline-none",
-				"transition-colors duration-150 hover:border-white/20 data-[dragging=true]:cursor-grabbing",
-				"focus-visible:ring-1 focus-visible:ring-white/40 focus-visible:ring-offset-1 focus-visible:ring-offset-[#171617]",
+				"transition-colors duration-150 hover:bg-black/30 data-[dragging=true]:cursor-grabbing",
+				"focus-visible:ring-1 focus-visible:ring-white/40 focus-visible:ring-offset-1 focus-visible:ring-offset-[#151315]",
 				className
 			)}
 			style={{ width: W }}
 		>
 			<motion.div
 				aria-hidden
-				className="absolute rounded-[5px] pointer-events-none"
+				className="absolute rounded-[7px] pointer-events-none"
 				variants={{
 					rest: { scaleY: 1, scaleX: 1 },
 					hover: { scaleY: 1, scaleX: 1 },
@@ -241,11 +242,15 @@ export default function PhaseScrubber({
 					left: PAD,
 					width: THUMB,
 					x: thumbX,
-					background: withAlpha(color, 22),
-					boxShadow: `inset 0 0 0 1px ${withAlpha(color, 60)}, 0 0 14px -3px ${withAlpha(
-						color,
-						55
-					)}`,
+					// a convex cap: lit along the top, shaded at the foot, glowing in the tea's color
+					background: `linear-gradient(to bottom, ${withAlpha(color, 32)}, ${withAlpha(color, 16)})`,
+					boxShadow: [
+						"inset 0 1px 0 rgb(255 248 230 / 0.24)",
+						"inset 0 -1px 0 rgb(0 0 0 / 0.28)",
+						`inset 0 0 0 1px ${withAlpha(color, 60)}`,
+						"0 1px 2px rgb(0 0 0 / 0.6)",
+						`0 0 14px -3px ${withAlpha(color, 55)}`,
+					].join(", "),
 				}}
 			/>
 			<motion.span

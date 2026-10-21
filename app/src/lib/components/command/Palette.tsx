@@ -12,17 +12,12 @@ import {
 } from "react"
 import { AnimatePresence, LayoutGroup, motion } from "motion/react"
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { ChevronRight, Search as SearchIcon, SquareTerminal } from "lucide-react"
 import { cn } from "@/lib/utils/cn"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
-import {
-	countActiveFilters,
-	EMPTY_FACETS,
-	readFilters,
-	replaceFilters,
-	toggleEntityFilter,
-} from "@/lib/filters"
+import { countActiveFilters, EMPTY_FACETS, toggleEntityFilter } from "@/lib/filters"
+import { filtersAtom, replaceFilters } from "@/lib/store/filterState"
 import {
 	compareSlugAtom,
 	descriptorAtom,
@@ -153,7 +148,6 @@ export default function Palette({
 	reduceMotion,
 }: PaletteProps) {
 	const router = useRouter()
-	const searchParams = useSearchParams()
 	const sessionSlug = useAtomValue(sessionSlugAtom)
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
 	const setCompareSlug = useSetAtom(compareSlugAtom)
@@ -173,7 +167,7 @@ export default function Palette({
 	const timers = useRef<number[]>([])
 	const pillGroup = useId()
 
-	const filters = useMemo(() => readFilters(searchParams), [searchParams])
+	const filters = useAtomValue(filtersAtom)
 	const ctx: SearchContext = useMemo(
 		() => ({
 			sessionSlug,
@@ -625,7 +619,7 @@ export default function Palette({
 									>
 										<div
 											id={`cmd-grp-${g.key}`}
-											className="sticky top-0 z-20 flex items-center justify-between px-5 h-7 text-[10px] uppercase tracking-[0.18em] text-white/35 bg-[#191619]"
+											className="sticky top-0 z-20 flex items-center justify-between px-5 h-7 text-[10px] uppercase tracking-[0.18em] text-white/35 bg-[var(--surface-face)]"
 										>
 											<span className="flex items-center gap-2">
 												{g.color && (

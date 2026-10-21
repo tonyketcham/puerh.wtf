@@ -16,6 +16,7 @@ import {
 import { formatSeconds, formatTemp, ratio } from "@/lib/steeps"
 import { vintageAgeYears } from "@/lib/age"
 import { cn } from "@/lib/utils/cn"
+import { usePlatform } from "@/lib/utils/usePlatform"
 import EntityRef from "@/lib/components/entity/EntityRef"
 import SlidingText from "./SlidingText"
 import { requestSteepAtom } from "./readingState"
@@ -41,10 +42,9 @@ export default function StatusBar() {
 
 	// vintage age depends on "now": compute after mount so SSR and hydration agree
 	const [now, setNow] = useState<Date | null>(null)
-	const [isMac, setIsMac] = useState(true)
+	const isMac = usePlatform() !== "other"
 	useEffect(() => {
 		setNow(new Date())
-		setIsMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent))
 	}, [])
 
 	const brewing = session?.brewing
@@ -72,7 +72,7 @@ export default function StatusBar() {
 		<footer
 			className={cn(
 				"fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-between h-[var(--statusbar-h)]",
-				"border-t border-white/[0.07] bg-[#161416] font-fira-code text-[11px] leading-none text-white/55",
+				"surface-bar font-fira-code text-[11px] leading-none text-white/55",
 				"overflow-hidden"
 			)}
 			aria-label="Session status"

@@ -34,7 +34,7 @@ export interface YearRulerProps {
 	 * vintage survive the other filters, so the ruler stays useful while a range is selected
 	 */
 	filteredSessions: ExplorerSession[]
-	/** currently selected production years (URL `years` facet, as strings) */
+	/** currently selected production years (shared filter state, as strings) */
 	activeYears: string[]
 	/** replace the `years` facet */
 	onYearsChange: (years: string[]) => void
@@ -48,8 +48,9 @@ export interface YearRulerProps {
 type Handle = "lo" | "hi"
 
 type Gesture =
-	| { kind: "pending"; pointerId: number; startX: number; startYear: number }
-	| { kind: "brush"; pointerId: number; startYear: number }
+	/** `base`: vintages a shift-brush adds to (empty for a plain brush, which replaces) */
+	| { kind: "pending"; pointerId: number; startX: number; startYear: number; base: number[] }
+	| { kind: "brush"; pointerId: number; startYear: number; base: number[] }
 	| { kind: "handle"; pointerId: number; which: Handle; fixed: number; grabOffset: number }
 
 const TICK_MAX_H = 20
@@ -85,10 +86,11 @@ function toRuns(selected: number[], vintages: number[]): [number, number][] {
  * Vintage (production_year) ruler above the Explorer tree.
  *
  * - One tick per vintage; height ~ √(sessions that year); fill = share surviving other filters.
- * - Drag across it to brush a range; click a tick to toggle a single vintage (shift-click
- *   extends); double-click clears. Handles snap to vintages with a spring.
+ * - Drag across it to brush a range (shift-drag adds another range); click a tick to toggle a
+ *   single vintage (shift-click fills in from the nearest selected vintage); double-click clears.
+ *   Handles snap to vintages with a spring.
  * - Handles are sliders: ←/→ step between vintages, PgUp/PgDn ×5, Home/End, Esc/Backspace clears.
- * - Writes only through onYearsChange (the URL `years` facet). Selecting every vintage = no filter.
+ * - Writes only through onYearsChange (the shared years facet). Selecting every vintage = no filter.
  */
 export default function YearRuler({
 	sessions,
@@ -141,16 +143,19 @@ export default function YearRuler({
 		[activeYears, counts]
 	)
 
-	// live selection while a gesture is in flight (URL catches up underneath)
+	// live selection while a gesture is in flight (the parent catches up underneath)
 	const [draft, setDraft] = useState<number[] | null>(null)
 	const [hoverYear, setHoverYear] = useState<number | null>(null)
 	const [activeHandle, setActiveHandle] = useState<Handle | null>(null)
 	const [dragging, setDragging] = useState(false)
+	// selection a shift-brush in flight is adding to (drawn as static runs beside the live band)
+	const [brushBase, setBrushBase] = useState<number[]>([])
 
 	const selected = draft ?? committed
 	const selectedSet = useMemo(() => new Set(selected), [selected])
 	const hasSelection = selected.length > 0 && selected.length < vintages.length
 	const runs = useMemo(() => toRuns(selected, vintages), [selected, vintages])
+	const baseRuns = useMemo(() => toRuns(brushBase, vintages), [brushBase, vintages])
 	const lo = selected.length ? selected[0] : minY
 	const hi = selected.length ? selected[selected.length - 1] : maxY
 
@@ -167,7 +172,7 @@ export default function YearRuler({
 	)
 
 	// During the gesture the pointer owns the geometry. Only release, keyboard and
-	// external URL changes spring to exact vintages; filtering never pulls the handle back.
+	// Committed filter changes spring to exact vintages; filtering never pulls the handle back.
 	useEffect(() => {
 		if (gestureRef.current) return
 		const transition = reduce ? { duration: 0 } : HANDLE_SPRING
@@ -216,7 +221,7 @@ export default function YearRuler({
 			const uniq = [...new Set(list)].sort((a, b) => a - b)
 			const next = uniq.length === 0 || uniq.length === vintages.length ? [] : uniq
 			const key = next.join(",")
-			// mid-gesture the URL may lag our writes, so dedupe against the last write instead
+			// Mid-gesture the parent render may lag our writes; dedupe against the last write.
 			const baseline = gestureRef.current ? lastWriteRef.current : committedKey
 			if (key === baseline) return
 			lastWriteRef.current = key
@@ -225,7 +230,7 @@ export default function YearRuler({
 		[onYearsChange, vintages.length, committedKey]
 	)
 
-	// After a gesture, hold the draft until the URL echoes the last write (no snap-back flicker)
+	// After a gesture, hold the draft until the parent echoes the last write (no snap-back flicker).
 	const settleKeyRef = useRef<string | null>(null)
 	useEffect(() => {
 		if (settleKeyRef.current !== null && settleKeyRef.current === committedKey) {
@@ -272,7 +277,8 @@ export default function YearRuler({
 		previewKeyRef.current = null
 		setActiveHandle(null)
 		setDragging(false)
-		// the URL holds the normalized selection ("" = all), so compare normalized keys
+		setBrushBase([])
+		// The atom holds the normalized selection ("" = all), so compare normalized keys.
 		if (written === null || written === committedKey) {
 			setDraft(null)
 		} else {
@@ -298,6 +304,7 @@ export default function YearRuler({
 			pointerId: e.pointerId,
 			startX: e.clientX,
 			startYear: yearAtClientX(e.clientX),
+			base: e.shiftKey && hasSelection ? committed : [],
 		}
 	}
 
@@ -340,7 +347,13 @@ export default function YearRuler({
 
 		if (g.kind === "pending") {
 			if (Math.abs(e.clientX - g.startX) < DRAG_THRESHOLD_PX) return
-			gestureRef.current = { kind: "brush", pointerId: g.pointerId, startYear: g.startYear }
+			gestureRef.current = {
+				kind: "brush",
+				pointerId: g.pointerId,
+				startYear: g.startYear,
+				base: g.base,
+			}
+			setBrushBase(g.base)
 			setHoverYear(null)
 			setDragging(true)
 			ghostOpacity.set(1)
@@ -351,7 +364,10 @@ export default function YearRuler({
 			setGhost(cur.startYear, y)
 			loPosition.set(pct(Math.min(cur.startYear, y) - BAND_PAD))
 			hiPosition.set(pct(Math.max(cur.startYear, y) + BAND_PAD))
-			preview(vintagesBetween(Math.round(cur.startYear), Math.round(y)))
+			const brushed = vintagesBetween(Math.round(cur.startYear), Math.round(y))
+			preview(
+				cur.base.length ? [...new Set([...cur.base, ...brushed])].sort((a, b) => a - b) : brushed
+			)
 		} else if (cur.kind === "handle") {
 			const v = nearestVintage(y - cur.grabOffset + (cur.which === "lo" ? BAND_PAD : -BAND_PAD))
 			const next =
@@ -426,9 +442,10 @@ export default function YearRuler({
 			clear() // double-click
 			return
 		}
-		if (e.shiftKey && committed.length) {
-			const anchor = year < committed[0] ? committed[committed.length - 1] : committed[0]
-			commit(vintagesBetween(anchor, year))
+		if (e.shiftKey && committed.length && !committed.includes(year)) {
+			// fill the gap to the nearest selected vintage, keeping every other range
+			const anchor = committed.reduce((a, b) => (Math.abs(b - year) < Math.abs(a - year) ? b : a))
+			commit([...committed, ...vintagesBetween(anchor, year)])
 			return
 		}
 		const base = committed.length ? committed : []
@@ -533,7 +550,7 @@ export default function YearRuler({
 				role="group"
 				aria-label="Filter by vintage"
 				aria-describedby={readoutId}
-				className="relative h-7 cursor-crosshair touch-pan-y group/ruler"
+				className="relative isolate h-7 cursor-crosshair touch-pan-y group/ruler"
 				onPointerDown={onTrackPointerDown}
 				onPointerMove={onPointerMove}
 				onPointerUp={onPointerUp}
@@ -575,7 +592,10 @@ export default function YearRuler({
 				{/* selected runs */}
 				<AnimatePresence initial={false}>
 					{(hasSelection || dragging) &&
-						(dragging ? [[lo, hi]] : runs).map(([a, b], i) => {
+						// mid-drag: the existing ranges a shift-brush adds to, then the live band
+						(dragging ? [...baseRuns, null] : runs).map((run, i) => {
+							const live = run === null || (!dragging && runs.length === 1)
+							const [a, b] = run ?? [lo, hi]
 							const left = `${pct(a - BAND_PAD)}%`
 							const width = `${pct(b + BAND_PAD) - pct(a - BAND_PAD)}%`
 							return (
@@ -585,8 +605,8 @@ export default function YearRuler({
 									className="absolute inset-y-0 rounded-[3px] pointer-events-none"
 									layout={!reduce && runs.length > 1 && !dragging}
 									style={{
-										left: dragging || runs.length === 1 ? loTranslate : left,
-										width: dragging || runs.length === 1 ? bandWidth : width,
+										left: live ? loTranslate : left,
+										width: live ? bandWidth : width,
 										borderRadius: 3,
 										background: `linear-gradient(to top, ${liquorA(0.22)}, ${liquorA(0.06)})`,
 										boxShadow: `inset 0 0 0 1px ${liquorA(0.32)}`,
@@ -661,7 +681,7 @@ export default function YearRuler({
 								<motion.span
 									className={cn(
 										"block h-full w-[3px] rounded-full",
-										"ring-offset-1 ring-offset-[#171617] group-focus-visible/handle:ring-2 group-focus-visible/handle:ring-white/50",
+										"ring-offset-1 ring-offset-[#151315] group-focus-visible/handle:ring-2 group-focus-visible/handle:ring-white/50",
 										!hasSelection &&
 											!active &&
 											"opacity-30 group-hover/ruler:opacity-60 group-focus-visible/handle:opacity-100"

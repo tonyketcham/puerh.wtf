@@ -242,7 +242,7 @@ export default function DescriptorHighlighter() {
 								// a hover preview can't be reached by the pointer anyway; only a pinned one is interactive
 								pinned ? "pointer-events-auto" : "pointer-events-none",
 								"flex items-center gap-1 pl-3 pr-1 h-8 max-w-full",
-								"border border-heicha-500 bg-[#1a181a]/90 backdrop-blur-xl shadow-[0_8px_30px_-10px_rgba(0,0,0,0.8)]",
+								"surface-card",
 								"font-fira-code text-[11px] text-white/60"
 							)}
 							data-descriptor-references

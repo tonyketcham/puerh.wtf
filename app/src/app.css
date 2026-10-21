@@ -116,8 +116,152 @@
 	}
 }
 
+/*
+  Embossed surfaces: the app's chrome reads as lightly machined plates, with controls as wells
+  sunk into them and keys raised off them. No drawn borders; every edge is a shadow stack
+  lit from above:
+
+    plate   a panel: dark outer hairline cuts it from the ground, two drops lift it, and (on
+            ::after, above its children) a 1px top bevel catches light while the bottom lip
+            falls into shade. Needs a positioned box that doesn't scroll itself.
+    card    the same plate in one box, for floating surfaces and scroll containers (the peek,
+            the palette, the cube nav) where a pseudo layer would scroll away: the bevel is
+            inset shadows, the grain is baked into its own background layers
+    bar     a plate docked to the viewport's bottom edge: bevel and groove on its top only
+    strip   a header milled across a plate: top bevel, then an engraved groove under it
+            (dark line, light line) that the content scrolls beneath
+    well    shadow-well (tailwind.config): a recess; shade pools under the top edge, the
+            bottom lip catches light. Active toggles sit in one.
+    key     shadow-key (tailwind.config): a raised cap; top bevel, dark foot, contact shadow.
+            Both are --tw-shadow, so they compose with ring-* states rather than replace them.
+
+  The grain is a macro photograph of bead-blasted casing, high-passed into an alpha tile
+  (public/textures/grain.webp): tooth above the mean is white, below it black, opacity by
+  deviation. A plain blend, so it reads at the same strength on any fill; its strength is the
+  layer's opacity, or, where it's baked into a background, a veil of the fill laid over it.
+*/
+:root {
+	--surface-face: #151315;
+	--grain: url("/textures/grain.webp") 0 0 / 256px 256px;
+}
+
+@layer components {
+	/*
+	  Type on a surface is printed on it, not floating over it: a warm ink in place of screen white
+	  (Tailwind's white utilities all read --color-white, so text-white/45, bg-white/5 and the
+	  rest re-ink with it) and a faint bleed that takes the vector edge off small sizes. On plates
+	  the tooth layer (see Panel) also breaks up the ink where the surface pokes through.
+	*/
+	.surface-ink,
+	.surface-plate,
+	.surface-card,
+	.surface-bar {
+		--color-white: #f6efe0;
+		text-shadow: 0 0 1px color-mix(in oklab, currentColor 22%, transparent);
+	}
+
+	.surface-plate {
+		box-shadow:
+			0 0 0 1px rgb(0 0 0 / 0.6),
+			0 1px 2px rgb(0 0 0 / 0.45),
+			0 18px 40px -18px rgb(0 0 0 / 0.85);
+	}
+	.surface-plate::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 30;
+		border-radius: inherit;
+		pointer-events: none;
+		box-shadow:
+			inset 0 1px 0 rgb(255 248 230 / 0.075),
+			inset 0 0 0 1px rgb(255 248 230 / 0.035),
+			inset 0 -1px 0 rgb(0 0 0 / 0.4);
+	}
+
+	/* the card's fill: a veil of the face over the grain tile (= the grain at 14%) over the face */
+	.surface-card,
+	.surface-bar {
+		background:
+			linear-gradient(rgb(21 19 21 / 0.86), rgb(21 19 21 / 0.86)),
+			var(--grain),
+			var(--surface-face);
+	}
+	.surface-card {
+		box-shadow:
+			inset 0 1px 0 rgb(255 248 230 / 0.075),
+			inset 0 0 0 1px rgb(255 248 230 / 0.035),
+			inset 0 -1px 0 rgb(0 0 0 / 0.4),
+			0 0 0 1px rgb(0 0 0 / 0.6),
+			0 2px 6px -2px rgb(0 0 0 / 0.6),
+			0 24px 60px -24px rgb(0 0 0 / 0.95);
+	}
+	.surface-bar {
+		box-shadow:
+			inset 0 1px 0 rgb(255 248 230 / 0.06),
+			0 -1px 0 rgb(0 0 0 / 0.6),
+			0 -8px 24px -12px rgb(0 0 0 / 0.7);
+	}
+
+	/*
+	  Grain sits on its own layer between a surface's fill and its contents, so each surface sets
+	  its strength with --grain-opacity: the plate's face carries it, header strips (lighter
+	  fills, where the same tooth reads louder) carry less.
+	*/
+	.surface-grain {
+		position: relative;
+		isolation: isolate;
+	}
+	.surface-grain::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: inherit;
+		pointer-events: none;
+		background: var(--grain);
+		opacity: var(--grain-opacity, 0.1);
+	}
+
+	/* the plate's face: grain, and a broad soft light falling from the top edge */
+	.surface-face {
+		--grain-opacity: 0.14;
+		background-color: var(--surface-face);
+		background-image: radial-gradient(140% 55% at 50% 0%, rgb(255 248 230 / 0.025), transparent 70%);
+	}
+
+	/* the surface's tooth over everything printed on it: dark pits only, so it eats into ink and
+	   leaves the dark face alone (same photograph as the grain, public/textures/tooth.webp) */
+	.surface-tooth {
+		position: absolute;
+		inset: 0;
+		z-index: 20;
+		border-radius: inherit;
+		pointer-events: none;
+		background: url("/textures/tooth.webp") 0 0 / 256px 256px;
+		opacity: 0.35;
+	}
+
+	/* header titles and property keys are stamped into the surface: shade above, a lit lip below */
+	:is(.surface-plate, .surface-card) :is(h2, dt) {
+		text-shadow:
+			0 -1px 0 rgb(0 0 0 / 0.55),
+			0 1px 0 rgb(255 248 230 / 0.06);
+	}
+
+	.surface-strip {
+		box-shadow:
+			inset 0 1px 0 rgb(255 248 230 / 0.05),
+			0 1px 0 rgb(0 0 0 / 0.55),
+			0 2px 0 rgb(255 248 230 / 0.035);
+	}
+}
+
+/* the ground under everything: the same grain, veiled down to a whisper (≈5%) */
 body {
 	@apply bg-background;
+	background-image: linear-gradient(rgb(18 16 18 / 0.95), rgb(18 16 18 / 0.95)), url("/textures/grain.webp");
+	background-size: auto, 256px 256px;
 	@apply transition-opacity duration-75 ease-in-out;
 	@apply font-fira-code text-white;
 }

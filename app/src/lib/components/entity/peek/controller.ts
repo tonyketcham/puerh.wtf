@@ -6,7 +6,7 @@ import { peekAtom, type PeekState, type PeekVia } from "@/lib/store/peekAtom"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import { getEntity } from "@/lib/relations"
 import { isPageKind, peekFilter, samePeek, type PeekTarget } from "@/lib/peek"
-import { replaceFilters } from "@/lib/filters"
+import { filtersAtom } from "@/lib/store/filterState"
 import { PEEK_CARD_ID } from "./usePeekTrigger"
 
 /** Hover intent before a closed card opens (plan §3.1). */
@@ -293,12 +293,10 @@ export function createPeekController(store: Store) {
 		/** ⇧↵: toggle the Explorer filter the target stands for. False when it has none. */
 		filter(target: PeekTarget): boolean {
 			const index = store.get(relationIndexAtom)
-			const title = isPageKind(target.kind)
-				? getEntity(index, target.kind, target.key)?.title ?? target.key
-				: target.key
-			const action = peekFilter(target, title)
+			const id = isPageKind(target.kind) ? getEntity(index, target.kind, target.key)?.id : null
+			const action = peekFilter(target, id)
 			if (!action) return false
-			replaceFilters(action.toggle)
+			store.set(filtersAtom, action.toggle)
 			return true
 		},
 	}

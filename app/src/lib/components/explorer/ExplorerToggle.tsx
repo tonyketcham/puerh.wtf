@@ -22,7 +22,7 @@ export default function ExplorerToggle({ className }: { className?: string }) {
 			onClick={() => setOpen(!open)}
 			className={cn(
 				"pointer-events-auto inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md font-fira-code text-xs",
-				"text-white/70 ring-1 ring-inset ring-white/[0.1] bg-white/[0.03] outline-none transition-colors",
+				"text-white/70 ring-1 ring-inset ring-white/[0.06] bg-[var(--surface-face)] shadow-key outline-none transition-colors",
 				"hover:text-white hover:bg-white/[0.06] focus-visible:ring-white/50",
 				className
 			)}

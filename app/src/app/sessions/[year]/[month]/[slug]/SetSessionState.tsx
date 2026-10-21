@@ -10,6 +10,7 @@ import { liquorVars } from "@/lib/liquor"
  * Syncs the page's session into the store. Runs as a layout effect, and is rendered first on
  * the page, so the per-page atom reset (triggered when the slug changes) happens before any
  * sibling component's effects measure/write steeps, runway, etc.
+ * Leaving the session clears that context before the next page's layout effects run.
  *
  * Also publishes the liquor CSS vars on <html> so fixed chrome outside the page subtree
  * (properties panel, status bar, command bar, ::selection) can use var(--liquor*).
@@ -19,6 +20,7 @@ function useSetSessionState({ session }: { session: SessionFull }) {
 
 	useLayoutEffect(() => {
 		setSessionData(session)
+		return () => setSessionData(null)
 	}, [session, setSessionData])
 
 	useLayoutEffect(() => {

@@ -6,7 +6,6 @@ import Explorer from "../lib/components/Explorer"
 import SiteHeader from "../lib/components/SiteHeader"
 import { getExplorerSessions, getVendors, getCategories } from "@/lib/api"
 import { StoreProvider } from "@/lib/store/StoreProvider"
-import { Suspense } from "react"
 import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
 import CommandBar from "@/lib/components/command/CommandBar"
 import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
@@ -49,9 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 					<ScrollReset />
 					<HydrateExplorerSessions sessions={sessions} />
 					<div className="relative flex flex-row">
-						<Suspense>
-							<Explorer sessions={sessions} vendors={vendors} categories={categories} />
-						</Suspense>
+						<Explorer sessions={sessions} vendors={vendors} categories={categories} />
 						<div className="flex flex-col w-full min-w-0 ml-[var(--explorer-w)]">
 							{/* below xl the Explorer is a drawer, so the masthead (with its toggle) rides above
 							    the page; it clears the fixed Properties panel like main does */}
@@ -67,18 +64,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 							</main>
 						</div>
 					</div>
-					<Suspense>
-						<CommandBar
-							sessions={sessions}
-							vendors={vendors}
-							categories={categories}
-							details={entityDetails}
-						/>
-					</Suspense>
-					{/* one EntityPeek card for every entity ref on the page (it reads filter params) */}
-					<Suspense>
-						<EntityPeekHost details={entityDetails} />
-					</Suspense>
+					<CommandBar
+						sessions={sessions}
+						vendors={vendors}
+						categories={categories}
+						details={entityDetails}
+					/>
+					{/* one EntityPeek card for every entity ref on the page */}
+					<EntityPeekHost details={entityDetails} />
 					<div className="fixed inset-0 z-50 pointer-events-none" id="portal-top-fixed" />
 				</StoreProvider>
 			</body>

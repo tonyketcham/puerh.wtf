@@ -103,7 +103,7 @@ function ResultRowImpl({
 					layoutId="commandbar-active-pill"
 					aria-hidden
 					transition={reduceMotion ? { duration: 0 } : PILL_SPRING}
-					className="absolute inset-0 rounded-lg bg-white/[0.065] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+					className="absolute inset-0 rounded-lg bg-white/[0.065] shadow-key"
 				>
 					<span className="absolute left-0 w-[2px] rounded-full top-2 bottom-2 bg-[var(--row-accent)] shadow-[0_0_8px_var(--row-accent)]" />
 				</motion.div>

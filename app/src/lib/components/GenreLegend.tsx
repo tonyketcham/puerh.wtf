@@ -40,7 +40,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 						portal
 						anchor={{ to: "top", gap: 8 }}
 						modal={false}
-						className="flex flex-col p-2 space-y-1 overflow-y-auto rounded-2xl w-max max-h-[60svh] border border-heicha-500 bg-heicha-700/90 backdrop-blur-md outline-hidden"
+						className="flex flex-col p-2 space-y-1 overflow-y-auto rounded-2xl w-max max-h-[60svh] surface-card outline-hidden"
 					>
 						{categories.map((category) => (
 							<ListboxOption

@@ -1,6 +1,6 @@
 "use client"
 
-import { useSyncExternalStore, type ReactNode } from "react"
+import type { ReactNode } from "react"
 import { cn } from "@/lib/utils/cn"
 import type { LiquorColor } from "@/lib/liquor"
 
@@ -51,7 +51,7 @@ export function Kbd({ children, className }: { children: ReactNode; className?: 
 	return (
 		<kbd
 			className={cn(
-				"inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 rounded-[5px] border border-white/10 bg-white/[0.04] font-fira-code text-[10px] leading-none text-white/55 shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]",
+				"inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 rounded-[5px] bg-white/[0.05] font-fira-code text-[10px] leading-none text-white/55 shadow-key",
 				className
 			)}
 		>
@@ -80,20 +80,5 @@ export function LiquorSwatch({ liquor, size = 14 }: { liquor: LiquorColor; size?
 				boxShadow: liquor.measured ? `0 0 10px -2px ${liquor.hex}99` : undefined,
 			}}
 		/>
-	)
-}
-
-const noopSubscribe = () => () => {}
-
-/** "mac" | "other" on the client, null during SSR/hydration (render a neutral placeholder). */
-export function usePlatform(): "mac" | "other" | null {
-	return useSyncExternalStore(
-		noopSubscribe,
-		() => {
-			const nav = navigator as Navigator & { userAgentData?: { platform?: string } }
-			const p = nav.userAgentData?.platform || navigator.platform || navigator.userAgent
-			return /mac|iphone|ipad|ipod/i.test(p) ? "mac" : "other"
-		},
-		() => null
 	)
 }

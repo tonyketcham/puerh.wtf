@@ -6,7 +6,7 @@
  * Pure module (no React): the trigger hook, the card and the Explorer can all use it.
  */
 import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
-import { toggleFacet, type FacetKey, type FilterState } from "@/lib/filters"
+import { isEntityFiltered, toggleEntityFilter, type FilterState } from "@/lib/filters"
 
 /** Entity kinds that have (or will have) a page. Tags and vintages are Explorer filters, not peeks. */
 export type PageKind = Exclude<EntityKind, "tag" | "year">
@@ -71,33 +71,23 @@ export const peekFileName = (target: PeekTarget) => `${target.key}.${PEEK_META[t
 // Filter (⇧↵)
 // ---------------------------------------------------------------------------
 
-/** Kinds that map onto an Explorer facet (styles = category slugs; origins roll up). */
-const PEEK_FACET: Partial<Record<PeekKind, FacetKey>> = {
-	origin: "origins",
-	vendor: "vendors",
-	category: "styles",
-	cultivar: "cultivars",
-	vessel: "vessels",
-}
-
 /**
- * The Explorer filter a target applies, as a toggle: facet kinds toggle their facet value;
- * styles (no facet of their own yet) and descriptors filter by text, which the Explorer
- * matches against style titles and tasting notes.
+ * Page kinds share the Explorer's facet toggles, including origin aliases and ids.
+ * A descriptor filters tasting notes through the free-text query.
  */
 export function peekFilter(
 	target: PeekTarget,
-	title: string
+	id?: string | null
 ): { active: (state: FilterState) => boolean; toggle: (state: FilterState) => FilterState } | null {
-	const facet = PEEK_FACET[target.kind]
-	if (facet) {
+	const { kind, key } = target
+	if (isPageKind(kind)) {
 		return {
-			active: (state) => state.facets[facet].includes(target.key),
-			toggle: (state) => toggleFacet(state, facet, target.key),
+			active: (state) => isEntityFiltered(state, kind, key, id),
+			toggle: (state) => toggleEntityFilter(state, kind, key, id),
 		}
 	}
-	if (target.kind === "style" || target.kind === "descriptor") {
-		const q = (target.kind === "style" ? title : target.key).toLowerCase()
+	if (kind === "descriptor") {
+		const q = key.toLowerCase()
 		return {
 			active: (state) => state.q.toLowerCase() === q,
 			toggle: (state) => ({ ...state, q: state.q.toLowerCase() === q ? "" : q }),

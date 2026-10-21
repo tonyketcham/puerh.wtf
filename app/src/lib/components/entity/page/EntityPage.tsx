@@ -3,11 +3,11 @@
 import Link from "next/link"
 import { Suspense, useMemo, type CSSProperties, type ReactNode } from "react"
 import { useAtomValue } from "jotai"
-import { useSearchParams } from "next/navigation"
 import { ChevronRight, Filter } from "lucide-react"
 import EntityRef from "@/lib/components/entity/EntityRef"
 import { ENTITY_META } from "@/lib/entities"
-import { readFilters, replaceFilters } from "@/lib/filters"
+import { replaceFilters } from "@/lib/store/filterState"
+import { useFilterActive } from "@/lib/store/useFilterActive"
 import { peekFileName, peekFilter, type PageKind } from "@/lib/peek"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import { cn } from "@/lib/utils/cn"
@@ -213,10 +213,9 @@ function Crumbs({ data, model }: { data: EntityPageData; model: EntityModel }) {
 
 /** The editor tab: `^ yiwu.origin`, plus the Explorer filter this page stands for. */
 function FileTab({ data, model }: { data: EntityPageData; model: EntityModel }) {
-	const params = useSearchParams()
 	const target = { kind: data.kind, key: data.slug }
-	const filter = peekFilter(target, data.title)
-	const active = filter ? filter.active(readFilters(params)) : false
+	const filter = peekFilter(target, data.id)
+	const active = useFilterActive(target, data.id)
 	return (
 		<div className="flex items-center gap-1.5 shrink-0">
 			<span

@@ -63,7 +63,7 @@ export default function OriginIndex({
 
 			<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(17rem,1fr)]">
 				<div className="lg:sticky lg:top-[calc(var(--commandbar-h)+0.5rem)]">
-					{/* the map reads the Explorer filters from the URL */}
+					{/* the map shares the Explorer's live filter atom */}
 					<Suspense fallback={<div className={MAP_BOX} />}>
 						<OriginsMap points={points} className={MAP_BOX} recordingKey="origins-map" />
 					</Suspense>
@@ -294,7 +294,7 @@ function UnplacedTray({ groups }: { groups: { label: string; sessions: ExplorerS
 									>
 										<Link
 											href={buildLink(s)}
-											className="inline-flex items-center h-6 gap-1.5 pl-1 pr-2 text-[11px] rounded-[4px] outline-none bg-[#121012]/85 ring-1 ring-inset ring-white/[0.08] text-white/70 transition-colors hover:text-white hover:ring-white/25 focus-visible:ring-white/50"
+											className="inline-flex items-center h-6 gap-1.5 pl-1 pr-2 text-[11px] rounded-[4px] outline-none bg-[var(--surface-face)]/90 shadow-key-soft ring-1 ring-inset ring-white/[0.06] text-white/70 transition-colors hover:text-white hover:ring-white/25 focus-visible:ring-white/50"
 										>
 											<span
 												aria-hidden

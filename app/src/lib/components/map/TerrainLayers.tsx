@@ -886,6 +886,8 @@ export function TerrainCanvas({
 		// the worker didn't start: draw here (nothing has been shown through it yet)
 		const off = onTerrainWorkerFail(() => {
 			worker.current = null
+			// These URLs were requested only in the workers. Let the page load them again.
+			loading.current.clear()
 			opts.current.fade = null
 			setFade(null)
 			if (last.current) update(last.current, true)

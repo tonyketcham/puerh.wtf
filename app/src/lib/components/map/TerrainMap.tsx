@@ -42,6 +42,8 @@ import { createPortal } from "react-dom"
 import { AnimatePresence, animate, motion, useReducedMotion, type MotionValue } from "motion/react"
 import { LocateFixed, Maximize2, Minus, Plus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useFocusTrap } from "@/lib/utils/useFocusTrap"
+import { usePlatform } from "@/lib/utils/usePlatform"
 import { MapCamera, setSvgView, useCamera, type Camera } from "./camera"
 import { ContourFadeContext } from "./contourFade"
 import { EASE, SHARED, type Box, type MapLabel, type Point } from "./geo"
@@ -159,10 +161,6 @@ function OwnCamera(props: TerrainMapProps) {
 	return <TerrainMapView {...props} controller={controller} />
 }
 
-const IS_MAC =
-	typeof navigator !== "undefined" &&
-	/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)
-
 function TerrainMapView({
 	variant,
 	controller,
@@ -196,6 +194,7 @@ function TerrainMapView({
 	dataAttrs,
 }: TerrainMapProps & { controller: TerrainController }) {
 	const { rootRef, svgRef, camera, touched } = controller
+	const isMac = usePlatform() === "mac"
 	const reduce = useReducedMotion() ?? false
 	const mode: GestureMode =
 		variant === "peek"
@@ -456,7 +455,7 @@ function TerrainMapView({
 
 	const hintText =
 		hint === "wheel"
-			? `${IS_MAC ? "⌘" : "Ctrl"} + scroll to zoom`
+			? `${isMac ? "⌘" : "Ctrl"} + scroll to zoom`
 			: hint === "touch"
 			? "Use two fingers to move the map"
 			: null
@@ -470,7 +469,7 @@ function TerrainMapView({
 			aria-label={
 				interactive
 					? `${label}. Drag to pan, ${
-							IS_MAC ? "⌘" : "Ctrl"
+							isMac ? "⌘" : "Ctrl"
 					  } + scroll or pinch to zoom; arrows pan, + and − zoom, 0 resets.`
 					: undefined
 			}
@@ -719,7 +718,7 @@ function MapButton({
 			title={label}
 			onClick={onClick}
 			className={cn(
-				"grid place-items-center rounded-[4px] bg-[#121012]/90 ring-1 ring-inset ring-white/[0.12] text-white/60 outline-none transition-colors hover:text-white hover:ring-white/35 focus-visible:ring-white/70",
+				"grid place-items-center rounded-[4px] bg-[var(--surface-face)]/90 shadow-key ring-1 ring-inset ring-white/[0.06] text-white/60 outline-none transition-colors hover:text-white hover:ring-white/35 focus-visible:ring-white/70",
 				small ? "size-[18px]" : "size-6"
 			)}
 		>
@@ -802,6 +801,7 @@ function ExpandedMap({
 	const ctl = useTerrainMap()
 	const [home] = useState(() => homeAtScale(source, props.home))
 	const wrapRef = useRef<HTMLDivElement>(null)
+	useFocusTrap(wrapRef)
 	const closing = useRef(false)
 	// the terrain mounts first, unseen (the panel still shows through); the labels, furniture and
 	// controls a frame later, and with them the view shows; the grow starts two frames after that

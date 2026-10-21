@@ -171,7 +171,13 @@ export function SupplyTags({ vendors, camera }: { vendors: Vendor[]; camera: Cam
 	return (
 		<div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
 			{groups.map((g) => (
-				<span key={g.vendors[0].slug} className="absolute" style={{ left: g.sx, top: g.sy }}>
+				<span
+					key={g.vendors[0].slug}
+					className="absolute left-0 top-0"
+					ref={(el) =>
+						el ? camera.pin(el, g.vendors[0].at[0], g.vendors[0].at[1], undefined, true) : undefined
+					}
+				>
 					<span className="absolute -left-1 -top-1 size-2 rotate-45 ring-1 ring-[#fff2ca]/70 bg-[#121012]" />
 					{/* to the left: origin labels sit to the right of their rings */}
 					<span className="absolute right-3 top-0 -translate-y-1/2 flex flex-col items-end gap-px px-1 py-0.5 rounded-[3px] bg-[#121012]/85 text-[10px] leading-tight text-white/60 map-label whitespace-nowrap">

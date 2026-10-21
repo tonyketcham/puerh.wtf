@@ -98,7 +98,7 @@ function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 				<motion.span
 					layoutId="explorer-current-row"
 					aria-hidden
-					className="absolute inset-y-0 right-0 rounded-lg bg-white/[0.065] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+					className="absolute inset-y-0 right-0 rounded-lg bg-white/[0.065] shadow-key-soft"
 					style={{ left: SWATCH_X - 6 }}
 					transition={PILL_SPRING}
 				/>

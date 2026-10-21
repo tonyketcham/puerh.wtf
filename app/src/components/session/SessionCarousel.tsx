@@ -26,7 +26,7 @@ const RETURN_DELAY_MS = 650
 
 const navButton = cn(
 	"flex items-center justify-center size-7 shrink-0 transition-colors duration-200 rounded-lg",
-	"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
+	"bg-white/5 shadow-key hover:bg-white/10 active:shadow-well text-white/60 hover:text-white",
 	"focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--liquor-text,#8a8a8a)]"
 )
 
@@ -291,7 +291,7 @@ export default function SessionCarousel({
 				<div className="flex justify-center mt-4">
 					<div
 						data-flow-shape
-						className="flex items-center gap-1.5 px-1.5 py-1.5 border bg-heicha-700/80 backdrop-blur-xl border-heicha-500/50 rounded-xl"
+						className="flex items-center gap-1.5 px-1.5 py-1.5 surface-card rounded-xl"
 					>
 						<button onClick={handlePrevious} className={navButton} aria-label="Previous photo">
 							<ChevronLeft className="size-4" />

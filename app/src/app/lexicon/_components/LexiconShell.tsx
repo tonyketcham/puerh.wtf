@@ -1,11 +1,9 @@
 "use client"
 
 import "@/lib/components/entity/page/transitions.css"
-import { useLayoutEffect, type ReactNode } from "react"
-import { useSetAtom } from "jotai"
+import type { ReactNode } from "react"
 import { useParams } from "next/navigation"
 import EditorFrame from "@/lib/components/containers/EditorFrame"
-import { sessionAtom } from "@/lib/store/sessionAtom"
 import LexiconProperties from "./LexiconProperties"
 import LexiconStatusBar from "./LexiconStatusBar"
 
@@ -17,12 +15,6 @@ import LexiconStatusBar from "./LexiconStatusBar"
 export default function LexiconShell({ children }: { children: ReactNode }) {
 	const params = useParams<{ term?: string }>()
 	const slug = params?.term ? safeDecode(params.term) : null
-
-	// a word is no session: peeks stop calling a tea "this", radar compares stand down
-	const setSession = useSetAtom(sessionAtom)
-	useLayoutEffect(() => {
-		setSession(null)
-	}, [setSession])
 
 	return (
 		// [data-statusbar-layout] turns on --statusbar-h (see app.css)

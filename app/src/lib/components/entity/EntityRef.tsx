@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { atom, useAtomValue } from "jotai"
 import { useMemo, type CSSProperties, type ReactNode } from "react"
 import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
-import { readFilters, replaceFilters, toggleFacet, type FacetKey } from "@/lib/filters"
+import { toggleFacet, type FacetKey } from "@/lib/filters"
+import { filtersAtom, replaceFilters } from "@/lib/store/filterState"
 import { isPageKind, type PageKind } from "@/lib/peek"
 import { usePeekTrigger } from "@/lib/components/entity/peek/usePeekTrigger"
 import { useMorphClick } from "@/lib/components/entity/page/viewTransition"
@@ -47,7 +48,7 @@ const FILTER_FACET: Partial<Record<EntityKind, FacetKey>> = { tag: "tags", year:
  *   it first (EntityPeek, §3.1): Peek Definition before Go to Definition. Following the link
  *   morphs the ref into the page's title (a route view transition, see page/viewTransition).
  * - Filter kinds (tag, vintage) are toggle buttons for the Explorer's ?tags= / ?years= filter,
- *   pressed while that filter is on. Rendered under a Suspense boundary (they read the URL).
+ *   pressed while that filter is on. Reads the same live filter atom as the Explorer.
  */
 export default function EntityRef(props: EntityRefProps) {
 	const facet = FILTER_FACET[props.kind]
@@ -106,8 +107,11 @@ function FilterRef({
 	title,
 	...rest
 }: EntityRefProps & { facet: FacetKey }) {
-	const params = useSearchParams()
-	const pressed = readFilters(params).facets[facet].includes(slug)
+	const pressedAtom = useMemo(
+		() => atom((get) => get(filtersAtom).facets[facet].includes(slug)),
+		[facet, slug]
+	)
+	const pressed = useAtomValue(pressedAtom)
 	const color = rest.color ?? undefined
 	return (
 		<button
@@ -125,7 +129,7 @@ function FilterRef({
 			data-recording-key={recordingKey}
 			className={cn(
 				base(rest.variant),
-				pressed && "text-white ring-[var(--ref-color)] bg-[var(--ref-wash)]",
+				pressed && "text-white ring-[var(--ref-color)] bg-[var(--ref-wash)] shadow-well",
 				className
 			)}
 			style={
@@ -185,7 +189,7 @@ function base(variant: EntityRefVariant = "chip") {
 		"transition-[color,background-color,box-shadow] duration-150",
 		variant === "chip" && [
 			"h-6 px-1.5 rounded-[4px] text-xs text-white/80",
-			"ring-1 ring-inset ring-white/[0.08] bg-white/[0.025]",
+			"ring-1 ring-inset ring-white/[0.06] bg-white/[0.025] shadow-key-soft",
 			"hover:text-white hover:ring-white/20 hover:bg-white/[0.06]",
 			"focus-visible:ring-white/50",
 		],
