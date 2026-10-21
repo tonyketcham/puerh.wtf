@@ -44,12 +44,13 @@ flavor_axes:
     start: 6
     finish: 3
 notes:
-  dry_leaf_nose: strong animalistic funk, sweet n sour, like Wistaria-like storage
-    smells (ocean umami/olive), strawberry
-  wet_leaf_nose: face cream, musk, men's cologne, clean body of water, strawberry fields
+  dry_leaf_nose: >-
+    strong animalistic funk, sweet n sour, like Wistaria-like storage smells
+    (ocean umami/olive), strawberry
+  wet_leaf_nose: 'face cream, musk, men''s cologne, clean body of water, strawberry fields'
   mouthfeel: caramel-like melting feeling coating the mouth
-  finish: sweet ol' huigan, mineral rain
-  taste: chocolate, sweetened cream, evergreen, plum, complex spice
+  finish: 'sweet ol'' huigan, mineral rain'
+  taste: 'chocolate, sweetened cream, evergreen, plum, complex spice'
   cha_qi: bright and relaxing body feeling
   empty_cup: sugar water
 tags:
@@ -64,6 +65,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Synopsis
 
