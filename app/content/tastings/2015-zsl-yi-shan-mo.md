@@ -7,14 +7,13 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring
 origin:
   - 88d4ea3a-b772-4472-bd44-566c55bb608e
 production_year: 2015
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21
-purchase_link: https://www.tea-encounter.com/product/2015-yi-shan-mo-2/
-excerpt: spicy, soft, high-grade Yiwu with a bit of age and caramel sweetness
+purchase_link: 'https://www.tea-encounter.com/product/2015-yi-shan-mo-2/'
+excerpt: 'spicy, soft, high-grade Yiwu with a bit of age and caramel sweetness'
 date: 2021-09-07T17:25:13.261Z
 flavor_axes:
   cream:
@@ -48,14 +47,15 @@ flavor_axes:
     start: 3
     finish: 5
 notes:
-  dry_leaf_nose: coffee cherry, cedar, alfalfa, cocoa butter
-  wet_leaf_nose: mushroom, amber, petrichor, warm summer rain, varnish
-  mouthfeel: smooth velvet with a pronounced thickness, silica
-  taste: salted caramel popcorn, warm spices, delicate fruits, cream, river rocks,
+  dry_leaf_nose: 'coffee cherry, cedar, alfalfa, cocoa butter'
+  wet_leaf_nose: 'mushroom, amber, petrichor, warm summer rain, varnish'
+  mouthfeel: 'smooth velvet with a pronounced thickness, silica'
+  taste: >-
+    salted caramel popcorn, warm spices, delicate fruits, cream, river rocks,
     flint
-  finish: cardamom, banana, and starfruit
-  empty_cup: raspberry fruit leather, turbinado sugar
-  cha_qi: intense, espresso punch, no anxiety, positive mindset
+  finish: 'cardamom, banana, and starfruit'
+  empty_cup: 'raspberry fruit leather, turbinado sugar'
+  cha_qi: 'intense, espresso punch, no anxiety, positive mindset'
 tags:
   - 7a127b82-6d5c-42d4-b4c9-6e4a28fc84ba
   - bce623b4-e571-462a-b95b-988beb6dce4c
@@ -69,6 +69,11 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Spring
+harvest:
+  season: spring
 ---
 1. Toffee, salted caramel popcorn, linen, velvet, varnished wood. Smooth with no bitterness and very gentle astringency. Some edamame-like vegetal savoriness. This stuff goes down easy with a nice lifting sensation that results in a tingly mouth and throatfeel. Definitely thick in texture, I can feel it go down prominently. The finish is minty, herbaceous, and long-lasting. \
    \
