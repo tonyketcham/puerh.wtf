@@ -5,56 +5,57 @@ author:
 title: Cloud Mist Green
 style:
   - 6eac899c-0f83-4c99-b02f-2c9bb92e04ae
-season: Early Spring
 production_year: 2021
 picking: young bud + 2 leaves
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: in progress
+excerpt: >-
+  Thick, pillowy green tea with buttered crab, cashews, and a long cooling
+  finish
 date: 2021-04-29T13:42:18.351Z
 flavor_axes:
   cream:
     start: 3
-    finish: 0
+    finish: null
   umami:
     start: 6
-    finish: 0
+    finish: null
   stone:
     start: 4
-    finish: 0
+    finish: null
   spices:
     start: 5
-    finish: 0
+    finish: null
   earth:
     start: 2
-    finish: 0
+    finish: null
   nuts_roast:
     start: 7
-    finish: 0
+    finish: null
   wood:
     start: 0
-    finish: 0
+    finish: null
   vegetal:
     start: 7
-    finish: 0
+    finish: null
   floral:
     start: 6
-    finish: 0
+    finish: null
   fruits:
     start: 4
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: plumeria, orchid, buttered corn
-  wet_leaf_nose: buttered crab, springtime pollen in the air, sea salt, yuzu
+  dry_leaf_nose: 'plumeria, orchid, buttered corn'
+  wet_leaf_nose: 'buttered crab, springtime pollen in the air, sea salt, yuzu'
   mouthfeel: very thick and pillowy
-  finish: lengthy, humid, nutty, and cooling smoothness
-  taste: pending
-  empty_cup: pending
-  cha_qi: pending
+  finish: 'lengthy, humid, nutty, and cooling smoothness'
+  taste: null
+  empty_cup: null
+  cha_qi: null
 tags:
   - 45bc51d4-ca88-4795-94f7-9aa42115feb3
   - 799e7654-d553-4e18-b128-4d4a3e29c7e5
-rating: 50
+rating: -1
 brewing:
   temperature: 175
   material_amount: 5
@@ -62,6 +63,11 @@ brewing:
   vessel: Cat Gaiwan (unlidded)
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Early Spring
+harvest:
+  season: spring
 ---
 ### Infusions
 
