@@ -8,10 +8,11 @@ style:
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2019
-aging_conditions: ""
+aging_conditions: ''
 vendor:
   - 61cb3529-5deb-4007-95e8-75590e524ef7
-purchase_link: https://crimsonlotustea.com/products/2019-spring-altered-state-200g-cake-sheng-raw-puerh-tea?_pos=4&_sid=8edf1efe7&_ss=r
+purchase_link: >-
+  https://crimsonlotustea.com/products/2019-spring-altered-state-200g-cake-sheng-raw-puerh-tea?_pos=4&_sid=8edf1efe7&_ss=r
 excerpt: a creamy ass-kicker of a sheng
 date: 2021-07-28T14:27:08.783Z
 flavor_axes:
@@ -46,12 +47,14 @@ flavor_axes:
     start: 3
     finish: 5
 notes:
-  dry_leaf_nose: sweet stone fruits, yogurt, animalistic
-  wet_leaf_nose: soy sauce, edamame, bamboo, sugar cane, apricot
-  mouthfeel: thick, creamy
+  dry_leaf_nose: 'sweet stone fruits, yogurt, animalistic'
+  wet_leaf_nose: 'soy sauce, edamame, bamboo, sugar cane, apricot'
+  mouthfeel: 'thick, creamy'
   empty_cup: brown sugar
   finish: steamed edamame
-  cha_qi: definitely an ass kicker if you're sensitive to it, anxiety, cold extremities
+  cha_qi: >-
+    definitely an ass kicker if you're sensitive to it, anxiety, cold
+    extremities
   taste: oat & soy milk
 tags:
   - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
@@ -65,6 +68,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Infusions
 
