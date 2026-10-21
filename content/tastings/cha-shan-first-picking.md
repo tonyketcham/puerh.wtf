@@ -7,6 +7,8 @@ title: Cha Shan - First Picking
 style:
   - f4a7586d-1e7e-4e83-bf6b-c5ffe0bf2e07
 season: Early Spring
+origin:
+  - 8a775018-7fc0-4175-bd8b-1818425901ef
 production_year: 2021
 picking: Young Bud + Up to 2 Leaves
 vendor:
