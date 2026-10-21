@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Suspense, useMemo, type CSSProperties, type ReactNode } from "react"
+import { useMemo, type CSSProperties, type ReactNode } from "react"
 import { useAtomValue } from "jotai"
 import { ChevronRight, Filter } from "lucide-react"
 import EntityRef from "@/lib/components/entity/EntityRef"
@@ -92,9 +92,7 @@ export default function EntityPage({
 			<SetEntityPage data={data} />
 
 			<header className="space-y-4">
-				<Suspense fallback={<div className="h-6" />}>
-					<Crumbs data={data} model={model} />
-				</Suspense>
+				<Crumbs data={data} model={model} />
 
 				<EntityTitle
 					kind={data.kind}

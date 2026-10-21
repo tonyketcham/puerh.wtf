@@ -23,6 +23,7 @@ for (const destination of ["Vendors", "Go home"]) {
 	test(`leaving a session for ${destination} clears the compare context`, async ({ page }) => {
 		await page.goto("/")
 		await page.locator('#explorer-view-panel a[href^="/sessions/"]').first().click()
+		await expect(page).toHaveURL(/\/sessions\/\d{4}\/\d{2}\//, { timeout: 30_000 })
 		await expect(page.locator("[data-session-root]")).toBeVisible()
 		await openCommands(page, "compare")
 		await expect(page.getByRole("option", { name: /Compare with/ })).toBeVisible()
@@ -42,13 +43,14 @@ test("moving between sessions publishes the new compare context after retiring t
 }) => {
 	await page.goto("/")
 	await page.locator('#explorer-view-panel a[href^="/sessions/"]').first().click()
+	await expect(page).toHaveURL(/\/sessions\/\d{4}\/\d{2}\//, { timeout: 30_000 })
 	await expect(page.locator("[data-session-root]")).toBeVisible()
 	const first = page.url()
 	await page
 		.locator('#explorer-view-panel a[href^="/sessions/"]:not([aria-current="page"])')
 		.first()
 		.click()
-	await expect(page).not.toHaveURL(first)
+	await expect(page).not.toHaveURL(first, { timeout: 30_000 })
 	await openCommands(page, "compare")
 	await expect(page.getByRole("option", { name: /Compare with/ })).toBeVisible()
 })

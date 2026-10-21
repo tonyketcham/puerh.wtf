@@ -82,9 +82,7 @@ export default function LexiconTermPage({
 			style={{ "--entity-accent": model.accentText } as CSSProperties}
 		>
 			<header className="space-y-4">
-				<Suspense fallback={<div className="h-6" />}>
-					<Crumbs entry={entry} model={model} />
-				</Suspense>
+				<Crumbs entry={entry} model={model} />
 
 				<EntityTitle
 					kind="descriptor"
