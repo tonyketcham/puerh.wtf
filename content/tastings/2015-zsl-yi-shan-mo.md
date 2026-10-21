@@ -7,7 +7,6 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-origin: []
 season: Spring
 origin:
   - 88d4ea3a-b772-4472-bd44-566c55bb608e
