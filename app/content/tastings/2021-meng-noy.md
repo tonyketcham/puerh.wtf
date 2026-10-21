@@ -9,11 +9,11 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 93716a43-b29c-494b-b064-5380f702cd27
-season: Spring
 production_year: 2021
 vendor:
   - c9152d67-3275-4845-9610-21770bf8c0c4
-purchase_link: https://www.farmer-leaf.com/collections/yunnan-pu-erh-tea/products/bulang-meng-noy
+purchase_link: >-
+  https://www.farmer-leaf.com/collections/yunnan-pu-erh-tea/products/bulang-meng-noy
 excerpt: Menghai-character sheng with a nice balance between bite and soothe
 date: 2021-10-25T18:49:58.739Z
 flavor_axes:
@@ -48,12 +48,12 @@ flavor_axes:
     start: 5
     finish: 3
 notes:
-  dry_leaf_nose: burlap; pungent, spiced fruits; raspberry; funk; grenadine
-  wet_leaf_nose: spearmint, apricot, white peach, alpine strawberry, edamame
+  dry_leaf_nose: 'burlap; pungent, spiced fruits; raspberry; funk; grenadine'
+  wet_leaf_nose: 'spearmint, apricot, white peach, alpine strawberry, edamame'
   mouthfeel: medium thickness & astringency
-  taste: oat milk, starfruit, musk, oud, bitters
+  taste: 'oat milk, starfruit, musk, oud, bitters'
   finish: menthol & huigan
-  cha_qi: bright and energetic, cold extremities
+  cha_qi: 'bright and energetic, cold extremities'
   empty_cup: caramel
 tags:
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
@@ -67,6 +67,11 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Spring
+harvest:
+  season: spring
 ---
 ### Infusions
 
