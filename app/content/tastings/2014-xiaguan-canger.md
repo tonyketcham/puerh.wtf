@@ -13,7 +13,7 @@ origin:
 production_year: 2014
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: Lightly smokey, incense-forward Xiaguan experience
+excerpt: 'Lightly smokey, incense-forward Xiaguan experience'
 date: 2022-03-28T17:07:52.869Z
 flavor_axes:
   cream:
@@ -47,10 +47,10 @@ flavor_axes:
     start: 1
     finish: 0
 notes:
-  dry_leaf_nose: cascara, maraschino cherry reduction, cacao nibs
-  wet_leaf_nose: freshly baked peach turnovers, eucalyptus, chocolate-covered blueberries
+  dry_leaf_nose: 'cascara, maraschino cherry reduction, cacao nibs'
+  wet_leaf_nose: 'freshly baked peach turnovers, eucalyptus, chocolate-covered blueberries'
   mouthfeel: lush mineral water
-  taste: sweetened wood, sage, thyme, dried mushrooms, elusive smoke, incense
+  taste: 'sweetened wood, sage, thyme, dried mushrooms, elusive smoke, incense'
   finish: dry and mineral
   empty_cup: hickory smoke
   cha_qi: alert and calm
@@ -69,6 +69,8 @@ images:
     alt: dry leaf
   - image: /images/uploads/313095a3-a82f-4f6e-8d7b-5a53b9745f9a.jpeg
     alt: ushi the cat with the cat gaiwan
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Synopsis
 
