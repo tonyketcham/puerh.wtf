@@ -9,12 +9,11 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - aa7fe22e-c86f-4318-ba17-55361a79eb30
-season: Spring
 production_year: 2018
 vendor:
   - c9152d67-3275-4845-9610-21770bf8c0c4
-purchase_link: https://www.farmer-leaf.com/products/spring-2018-jingmai-tian-xiang
-excerpt: Floral, Raisin Bran, tropical sheng with a Jingmai character
+purchase_link: 'https://www.farmer-leaf.com/products/spring-2018-jingmai-tian-xiang'
+excerpt: 'Floral, Raisin Bran, tropical sheng with a Jingmai character'
 date: 2022-02-04T20:30:50.095Z
 flavor_axes:
   cream:
@@ -48,14 +47,15 @@ flavor_axes:
     start: 6
     finish: 5
 notes:
-  dry_leaf_nose: plum, Christmas spice, blueberry leaf, piña colada, brown sugar
-  wet_leaf_nose: Raisin Bran, floral tropic fruits, naval orange, nectarine, peach
-  taste: Raisin Bran, grains, orchid, dried cranberries, minerals, tropical
-    fruits, guava
-  cha_qi: not very intense, calming with some stimulation
+  dry_leaf_nose: 'plum, Christmas spice, blueberry leaf, piña colada, brown sugar'
+  wet_leaf_nose: 'Raisin Bran, floral tropic fruits, naval orange, nectarine, peach'
+  taste: >-
+    Raisin Bran, grains, orchid, dried cranberries, minerals, tropical fruits,
+    guava
+  cha_qi: 'not very intense, calming with some stimulation'
   mouthfeel: elegant smoothness that evolves to a bit of an astringent bite
-  finish: pleasing huigan, tropical flowers, astringency
-  empty_cup: sugar water, light summer flowers
+  finish: 'pleasing huigan, tropical flowers, astringency'
+  empty_cup: 'sugar water, light summer flowers'
 tags:
   - 45bc51d4-ca88-4795-94f7-9aa42115feb3
   - 16565067-592b-4e62-91aa-f8d2c920b602
@@ -67,6 +67,11 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+season_note: Spring
+harvest:
+  season: spring
 ---
 ### Synopsis
 
