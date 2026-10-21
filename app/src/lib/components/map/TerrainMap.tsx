@@ -739,6 +739,21 @@ const viewAt = ([cx, cy]: Point, upp: number, W: number, H: number): Box => [
 	H * upp,
 ]
 
+/**
+ * The full-screen view's home: the embedded map's home at the scale the embedded map frames it
+ * (its own aspect), centred and spread over the screen. Expanding an untouched map opens on it
+ * (the overlay keeps the embedded map's scale), "back to the origin" there lands on it, and
+ * closing on it hands the embedded map back its own home framing.
+ */
+function homeAtScale(source: TerrainController, home: Box | null | undefined): Box | null {
+	if (!home) return null
+	const W = source.camera.width.get()
+	if (!(W > 0)) return home
+	const [, , w] = source.camera.frame(home)
+	const [x, y, bw, bh] = home
+	return viewAt([x + bw / 2, y + bh / 2], w / W, window.innerWidth, window.innerHeight)
+}
+
 const insetOf = (r: DOMRect, W: number, H: number, radius = 6) =>
 	`inset(${r.top}px ${W - r.right}px ${H - r.bottom}px ${r.left}px round ${radius}px)`
 
@@ -785,6 +800,7 @@ function ExpandedMap({
 }) {
 	const reduce = useReducedMotion() ?? false
 	const ctl = useTerrainMap()
+	const [home] = useState(() => homeAtScale(source, props.home))
 	const wrapRef = useRef<HTMLDivElement>(null)
 	const closing = useRef(false)
 	// the terrain mounts first, unseen (the panel still shows through); the labels, furniture and
@@ -1042,6 +1058,7 @@ function ExpandedMap({
 				<MarksDrawn.Provider value={true}>
 					<TerrainMap
 						{...props}
+						home={home}
 						controller={ctl}
 						frameOnMount={false}
 						expandable={false}

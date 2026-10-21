@@ -44,7 +44,33 @@ function selects(origin, select) {
 
 const roundBBox = (b) => b.map((v) => round(v, 3))
 
-export function deriveFrames(origins, frameParams) {
+/** rounded outward to 0.001°, so the box still holds what it was grown to hold */
+const roundOut = ([w, s, e, n]) => [
+	Math.floor(w * 1000) / 1000,
+	Math.floor(s * 1000) / 1000,
+	Math.ceil(e * 1000) / 1000,
+	Math.ceil(n * 1000) / 1000,
+]
+
+/**
+ * A frame grown by half the camera's widest view on every side of its members, in shared units
+ * (Mercator: a lon/lat pad would be the wrong height away from the equator), back to lon/lat.
+ */
+function viewBBox([w, s, e, n], { project, invert, maxView: [vw, vh] }) {
+	const [x0, y0] = project([w, n])
+	const [x1, y1] = project([e, s])
+	const [W, N] = invert([x0 - vw / 2, y0 - vh / 2])
+	const [E, S] = invert([x1 + vw / 2, y1 + vh / 2])
+	return roundOut([W, S, E, N])
+}
+
+/**
+ * @param {object[]} origins
+ * @param {object[]} frameParams
+ * @param {{ project: Function, invert: Function, maxView: number[] }} [camera] the shared
+ *   projection and the widest view [w, h] in its units, for frames sized by `view`
+ */
+export function deriveFrames(origins, frameParams, camera) {
 	return frameParams.map((params) => {
 		const members = origins.filter((o) => selects(o, params.select))
 		if (!members.length) throw new Error(`frame ${params.id}: no origins match its selection`)
@@ -54,10 +80,15 @@ export function deriveFrames(origins, frameParams) {
 				: [o.geo.lon, o.geo.lat, o.geo.lon, o.geo.lat]
 		)
 		const [w, s, e, n] = union(boxes)
+		if (params.view && !camera) throw new Error(`frame ${params.id}: sized by the view, no camera`)
 		return {
 			...params,
-			bbox: roundBBox([w - params.pad, s - params.pad, e + params.pad, n + params.pad]),
+			bbox: params.view
+				? viewBBox([w, s, e, n], camera)
+				: roundBBox([w - params.pad, s - params.pad, e + params.pad, n + params.pad]),
 			members: members.map((o) => o.slug),
+			// the members' own extent (the overview box is grown from it)
+			span: [w, s, e, n],
 		}
 	})
 }

@@ -31,8 +31,9 @@
  *
  * Width springs in log space, so a zoom feels even whether it doubles or halves; a long
  * flight rises over the map and comes down again instead of sliding across it. Every target is
- * clamped to the camera's limits: about a 3 km view at the closest, the East Asia locator at the
- * farthest, and the view kept over the data.
+ * clamped to the camera's limits: about a 3 km view at the closest, a fixed widest view at the
+ * farthest (about 48° across, or 30° tall on a portrait screen), and the view kept over the data,
+ * which reaches half that widest view past every origin, so a zoom out stays centred on one.
  */
 import {
 	createContext,
@@ -52,7 +53,7 @@ import {
 	type AnimationPlaybackControls,
 	type MotionValue,
 } from "motion/react"
-import { CAMERA_SPRING, fitAspect, FRAMES, SHARED, type Box, type Point } from "./geo"
+import { CAMERA_SPRING, DATA_EXTENT, fitAspect, MAX_VIEW, SHARED, type Box, type Point } from "./geo"
 
 export type ViewTick = {
 	/** [x, y, w, h] in shared units */
@@ -93,13 +94,20 @@ export const pinAt: PinWrite = (s, sx, sy) => {
 export type CameraLimits = {
 	/** the closest view: its shorter side spans at least this many km */
 	minKm: number
-	/** the farthest view must fit inside this box (grown by `slack`), and the center stays in it */
+	/** the data: the view never runs past it (past the edge there is nothing to draw) */
 	bounds: Box
-	slack: number
+	/**
+	 * the farthest view [w, h]: a view of any aspect fits inside it, so a wide map is capped by its
+	 * width and a tall one (a phone held upright) by its height
+	 */
+	maxView: [number, number]
 }
 
-const LOCATOR = FRAMES[0].viewBox
-export const DEFAULT_LIMITS: CameraLimits = { minKm: 3, bounds: LOCATOR, slack: 0.12 }
+/**
+ * The data is the origins grown by half the widest view on every side (scripts/geo frames.mjs), so
+ * keeping the view on it never pushes an origin off the centre, however far out the camera goes.
+ */
+export const DEFAULT_LIMITS: CameraLimits = { minKm: 3, bounds: DATA_EXTENT, maxView: MAX_VIEW }
 
 export type Camera = {
 	cx: MotionValue<number>
@@ -512,10 +520,11 @@ export function useCamera(
 	const clamp = useCallback(
 		([x, y, w, h]: Box): Box => {
 			const [bx, by, bw, bh] = limits.bounds
+			const [mw, mh] = limits.maxView
 			let ccx = x + w / 2
 			let ccy = y + h / 2
-			// farthest: the whole box fits in the (slightly grown) bounds
-			const maxScale = Math.min((bw * (1 + limits.slack)) / w, (bh * (1 + limits.slack)) / h)
+			// farthest: the view fits in the widest view, and on the data (which holds it, see above)
+			const maxScale = Math.min(Math.min(mw, bw) / w, Math.min(mh, bh) / h)
 			// closest: the shorter side spans minKm at the view's latitude
 			const minSide = limits.minKm * SHARED.unitsPerKmAtY(ccy)
 			const minScale = minSide / Math.min(w, h)

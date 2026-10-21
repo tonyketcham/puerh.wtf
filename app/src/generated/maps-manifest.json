@@ -1,10 +1,11 @@
 {
-	"version": "3.1.0",
-	"inputHash": "388d00f17f4bb07134fb34eaf795209e78f680fc15957d233512d16b6256ce88",
+	"version": "3.2.0",
+	"inputHash": "6d713607c357b8886dcb57f17517e9e278e377eec4d9adcb303d1a93289c6f61",
 	"attribution": ["Terrain: AWS Terrain Tiles (Mapzen terrarium; SRTM, GMTED, ETOPO1, 3DEP)","Reference layers and labels: Natural Earth 10m (public domain)","Hanzi labels: Noto Sans SC (SIL Open Font License 1.1)"],
 	"projection": {"type":"mercator","rotate":[-102,0],"center":[0,25],"scale":30000,"translate":[0,0],"controlPoints":[[96,18,-3141.593,3942.512],[100.5,21.5,-785.398,1994.997],[101.469,21.981,-278.031,1723.86],[102,25,0,0],[104,30,1047.198,-2952.924],[110,22.5,4188.79,1430.268],[118.03,27.759,8393.288,-1612.752],[120.7,23.475,9791.297,875.714],[135.987,34.864,17795.552,-5971.979],[141.5,40,20682.152,-9361.03]]},
+	"camera": {"maxView":[25132.7,15708],"overview":[-2670.4,-8885,23247.8,12504.3]},
 	"frames": [
-		{"id":"locator","url":"/maps/frames/locator.json","bbox":[96.9,18.586,141.3,39.3],"viewBox":[-2670.4,-8885,23247.8,12504.3],"zoom":5,"interval":1000,"bands":5,"bytes":96578,"mask":null},
+		{"id":"locator","url":"/maps/frames/locator.json","bbox":[75.9,7.097,162.3,47.426],"viewBox":[-13665.9,-14751.1,45238.9,24551.8],"zoom":5,"interval":1000,"bands":6,"bytes":235282,"mask":null},
 		{"id":"china-east","url":"/maps/frames/china-east.json","bbox":[98.7,20.386,121.9,37.35],"viewBox":[-1727.9,-7583.4,12147.5,10202.9],"zoom":6,"interval":500,"bands":10,"bytes":222865,"mask":null},
 		{
 			"id": "japan",
@@ -485,7 +486,7 @@
 	],
 	"labels": {
 		"url": "/maps/labels.json",
-		"count": 1031,
+		"count": 1546,
 		"tiers": [
 			{"rank":0,"name":"world","maxUnitsPerPx":null,"viewKm":8000},
 			{"rank":1,"name":"region","maxUnitsPerPx":10,"viewKm":2300},
@@ -494,9 +495,9 @@
 			{"rank":4,"name":"detail","maxUnitsPerPx":0.16,"viewKm":37},
 			{"rank":5,"name":"fine","maxUnitsPerPx":0.04,"viewKm":9}
 		],
-		"bytes": 121805
+		"bytes": 182129
 	},
 	"ridges": {"id":"six-mountains","url":"/maps/ridges/six-mountains.json","rows":36,"bytes":60809},
-	"font": {"url":"/fonts/origins-sc.woff2","family":"Noto Sans SC","weight":400,"glyphs":"丁三上东个中丰临丹丽义之乐九乡云井京什仑仙伊会保信倚克公六兰关兴兵养内凤凰刮勐北区千半华南博原厦双口古台合吉名吕君和嘉四国地圳坑坡城堡塔塘墓墨大天太头夷奈子宁宇安宋官宜宣宮家宾富寨屋山岐岛岡岳岷峡峪島崂崎川州巢布平幹广広庄庆库底府庫庭建开律微徽怒恩惠愛感憨成户戸扎挝掛掸攀攸文新日旧昆昌明易春昭普景曲有朗朝本束杭東松林枝枣树桂梁梅梧梨森楚楽歌武民水汉汕江沅沙沧沱河治沾泉波泰泸泽洋洛洞津洪洱济浔浙浜浦海淄淮深混渡渤温港湄湖湘湾溪滆滋滯潮澜濑灣版牧独猴玉班琅理琵琶琼瓦瓯甲甸町留登益盘知石砖磨神福竹糯红纳绍缅義老者肥腊腾自臼舞良花苏莞莱莽菲萍落蒙蓮蛮街西覇诗谷象賀贵贺赣越迈通達那邦邮郑部都鄂鄱酸里重野金钦银镇長长门闽阜阪阳阿陕陵雄青静革韩顺风香馬駱高鲜鶴黄黔鼎龍龙","bytes":49428},
+	"font": {"url":"/fonts/origins-sc.woff2","family":"Noto Sans SC","weight":400,"glyphs":"丁三上不东个中丰临丹丽义之乌乐九乡云井京什仑仙代伊会伯俄保信倚克公六兰关兴兵养内凤凰刮加勐北区千半华南博卡印厅原厦双口古台合吉名吕君和哈嘉四国地圳坑坡坦城埔堡塔塘塞墓墨夏大天太夫头夷奈姆子孟宁宇安宋官宜宣宮家宾富寨尔尼屋山岐岛岡岳岷峡峪島崂崎川州巢布幌平幹广広庄庆库底府度庫庭建开律微徽怒惠愛感憨成户戸扎拉挝掛掸攀攸文斯新日旧昆昌明易春昭普景曲曼有朗朝木本札束杭東松林枝枣柬树桂梁梧梨森楚楽次歌武民水汉汕江沅沈沙沧沱河治沾泉泊波泰泸泽洋洛洞津洪洱济浔浙浜海淄淮深混渡渤温港湄湖湾溪滆滋滨滯潮澜濑灣版牧特猴玉班琅理琵琶琼瓦瓯甘甲甸町留疆登益盘知石砖磨神禄福竹糯红纳绍缅罗義老者肃肥腊腾自臼舞良花苏莞莱莽菲萍萨落蒙蓮藏蛮街西覇诗谷象賀贵贺赣越辽达迈通那邦邮郑部都鄂鄱酸里重野金钦银镇長长门闽阜阪阳阿陕陵雄雅霍青静革韩顺额风香馬駱马高鲁鲜鶴黄黑黔鼎齐龍龙","bytes":54676},
 	"origins": {"file":"src/generated/origins.geo.json","count":55,"bytes":80134}
 }

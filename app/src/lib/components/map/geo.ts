@@ -179,6 +179,31 @@ export const FRAMES: readonly FrameMeta[] = (
 
 export const frameMeta = (id: FrameId) => FRAMES.find((f) => f.id === id)!
 
+/**
+ * The extent of the loaded data: the locator, the widest sheet, which holds every other. It is
+ * the origins grown by half the widest view on every side (scripts/geo frames.mjs), so the camera
+ * can keep any origin centred all the way out.
+ */
+export const DATA_EXTENT: Box = FRAMES[0].viewBox
+
+/** manifest.camera (an older manifest has none: the widest view is then the locator) */
+const rawCamera = (manifest as { camera?: { maxView: number[]; overview: number[] } }).camera
+
+/**
+ * The camera's widest view [w, h] in shared units (params CAMERA.maxView): a view of any aspect
+ * fits inside it.
+ */
+export const MAX_VIEW: [number, number] = (rawCamera?.maxView as [number, number]) ?? [
+	DATA_EXTENT[2],
+	DATA_EXTENT[3],
+]
+
+/**
+ * "East Asia": the origins and a few degrees around them (v2's locator box), what the minimap
+ * shows and /origins zooms out to. The data runs on past it.
+ */
+export const OVERVIEW: Box = (rawCamera?.overview as Box) ?? DATA_EXTENT
+
 const rawDetail = manifest.detail as {
 	zoom: number
 	dataZoom: number

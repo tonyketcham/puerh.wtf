@@ -81,6 +81,15 @@ export async function buildLabels({
 	const [ax1, ay1] = project([E, S])
 	const inArea = ([x, y]) => x >= ax0 && x <= ax1 && y >= ay0 && y <= ay1
 	const at = (lon, lat) => project([lon, lat]).map((v) => round(v, 1))
+	// outside the core, Natural Earth labels keep their hanzi only at the coarsest ranks
+	const [cw, cs, ce, cn] = params.core
+	const [cx0, cy0] = project([cw, cn])
+	const [cx1, cy1] = project([ce, cs])
+	const inCoreUnits = ([x, y]) => x >= cx0 && x <= cx1 && y >= cy0 && y <= cy1
+	const outerZh = (name_zh, rank, lon, lat) =>
+		rank <= params.outerHanziMaxRank || (lon >= cw && lon <= ce && lat >= cs && lat <= cn)
+			? name_zh
+			: null
 	const inDense = (lon, lat) =>
 		params.cities.dense.some(
 			({ bbox: [w, s, e, n] }) => lon >= w && lon <= e && lat >= s && lat <= n
@@ -186,7 +195,7 @@ export async function buildLabels({
 			{
 				kind: "city",
 				name: (p.NAME_EN || p.NAME).replace(/ City$/, ""),
-				name_zh: hanzi ? cityHanzi(p, cities.hanzi) : null,
+				name_zh: hanzi ? outerZh(cityHanzi(p, cities.hanzi), rank, lon, lat) : null,
 				x,
 				y,
 				rank,
@@ -202,18 +211,24 @@ export async function buildLabels({
 	const seaPolys = (
 		await readLayer({ dir, ne, layerPath: ne.labelLayers.marine, bbox: params.bbox, offline })
 	).filter((f) => f.properties.name && !params.seas.exclude.includes(f.properties.featurecla))
+	// Natural Earth writes a few in traditional characters (灣, 馬, 達); the mainland forms
+	const seaOverrides = new Map((places.seas ?? []).map((r) => [r.match, r]))
 	for (const f of await innerPoints(seaPolys)) {
 		const p = f.properties
 		const [lon, lat] = f.geometry.coordinates
 		const [x, y] = at(lon, lat)
+		const rank = rankBy(params.seas.ranks, p.min_label ?? 99)
+		const o = seaOverrides.get(p.name)
 		add(
 			{
 				kind: "sea",
 				name: p.name,
-				name_zh: hanOnly(p.name_zh),
+				// a curated form is kept wherever the sea is
+				name_zh:
+					o && "name_zh" in o ? hanOnly(o.name_zh) : outerZh(hanOnly(p.name_zh), rank, lon, lat),
 				x,
 				y,
-				rank: rankBy(params.seas.ranks, p.min_label ?? 99),
+				rank,
 			},
 			lon,
 			lat
@@ -231,14 +246,15 @@ export async function buildLabels({
 		const p = f.properties
 		const [lon, lat] = f.geometry.coordinates
 		const [x, y] = at(lon, lat)
+		const rank = rankBy(params.lakes.ranks, p.rank)
 		add(
 			{
 				kind: "lake",
 				name: p.name,
-				name_zh: hanOnly(p.name_zh),
+				name_zh: outerZh(hanOnly(p.name_zh), rank, lon, lat),
 				x,
 				y,
-				rank: rankBy(params.lakes.ranks, p.rank),
+				rank,
 			},
 			lon,
 			lat
@@ -274,7 +290,11 @@ export async function buildLabels({
 		.map((r) => ({ ...r, rank: rankBy(params.rivers.ranks, r.scalerank) }))
 	const anchorOk = (p, rank) => inArea(p) && (rank < params.rivers.denseFromRank || inDenseUnits(p))
 	for (const a of riverAnchors(rivers, tiers, params.rivers, anchorOk))
-		named.push({ kind: "river", ...a })
+		named.push({
+			kind: "river",
+			...a,
+			name_zh: a.rank <= params.outerHanziMaxRank || inCoreUnits([a.x, a.y]) ? a.name_zh : null,
+		})
 
 	// de-duplicate: a city or town at the same place as a higher-priority label of the same name
 	// (or one of its curated aliases, e.g. Pu'er's urban district Simao)

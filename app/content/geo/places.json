@@ -33,12 +33,29 @@
 				[103.6, 21.6, 2]
 			]
 		},
-		{ "name": "Thailand", "name_zh": "泰国", "anchors": [[100.3, 18.9, 1]] },
+		{
+			"name": "Thailand",
+			"name_zh": "泰国",
+			"anchors": [
+				[100.9, 15.4, 0],
+				[100.3, 18.9, 2]
+			]
+		},
 		{ "name": "Taiwan", "name_zh": "台灣", "anchors": [[120.96, 23.75, 0]] },
 		{ "name": "Japan", "name_zh": "日本", "anchors": [[138.2, 36.3, 0]] },
 		{ "name": "South Korea", "name_zh": "韩国", "anchors": [[127.9, 36.4, 1]] },
 		{ "name": "North Korea", "name_zh": "朝鲜", "anchors": [[126.8, 39, 1]] },
-		{ "name": "Philippines", "name_zh": "菲律宾", "anchors": [[121, 17.5, 1]] }
+		{ "name": "Philippines", "name_zh": "菲律宾", "anchors": [[121, 17.5, 1]] },
+		{ "name": "India", "name_zh": "印度", "anchors": [[79, 22.5, 0]] },
+		{ "name": "Mongolia", "name_zh": "蒙古", "anchors": [[103, 45.5, 0]] },
+		{ "name": "Bangladesh", "name_zh": "孟加拉国", "anchors": [[89.9, 24.3, 1]] },
+		{ "name": "Nepal", "name_zh": "尼泊尔", "anchors": [[84.1, 28.2, 1]] },
+		{ "name": "Bhutan", "name_zh": "不丹", "anchors": [[90.4, 27.4, 2]] },
+		{ "name": "Cambodia", "name_zh": "柬埔寨", "anchors": [[104.9, 12.7, 1]] },
+		{ "name": "Sri Lanka", "name_zh": "斯里兰卡", "anchors": [[80.7, 7.9, 1]] },
+		{ "name": "Russia", "name_zh": "俄罗斯", "anchors": [[134.6, 45.8, 1]] },
+		{ "name": "Kazakhstan", "name_zh": "哈萨克斯坦", "anchors": [[78.5, 45, 1]] },
+		{ "name": "Kyrgyzstan", "name_zh": "吉尔吉斯斯坦", "anchors": [[76.2, 41.8, 2]] }
 	],
 	"provinces": [
 		{ "name": "Yunnan", "name_zh": "云南", "lon": 100.9, "lat": 25.4, "rank": 1 },
@@ -59,6 +76,15 @@
 		{ "name": "Shaanxi", "name_zh": "陕西", "lon": 108.9, "lat": 35.2, "rank": 1 },
 		{ "name": "Shanxi", "name_zh": "山西", "lon": 112.3, "lat": 37.6, "rank": 1 },
 		{ "name": "Hebei", "name_zh": "河北", "lon": 115.5, "lat": 38.5, "rank": 1 },
+		{ "name": "Tibet", "name_zh": "西藏", "lon": 88.5, "lat": 31.5, "rank": 1 },
+		{ "name": "Xinjiang", "name_zh": "新疆", "lon": 85.5, "lat": 41.5, "rank": 1 },
+		{ "name": "Qinghai", "name_zh": "青海", "lon": 96, "lat": 35.5, "rank": 1 },
+		{ "name": "Gansu", "name_zh": "甘肃", "lon": 102.3, "lat": 38, "rank": 1 },
+		{ "name": "Inner Mongolia", "name_zh": "内蒙古", "lon": 112, "lat": 42.5, "rank": 1 },
+		{ "name": "Ningxia", "name_zh": "宁夏", "lon": 106, "lat": 37.4, "rank": 2 },
+		{ "name": "Heilongjiang", "name_zh": "黑龙江", "lon": 128, "lat": 46.5, "rank": 1 },
+		{ "name": "Jilin", "name_zh": "吉林", "lon": 127.6, "lat": 43.1, "rank": 1 },
+		{ "name": "Liaoning", "name_zh": "辽宁", "lon": 122.4, "lat": 41.6, "rank": 1 },
 		{ "name": "Hyōgo", "name_zh": "兵庫", "lon": 134.86, "lat": 35.04, "rank": 2 },
 		{ "name": "Ōsaka", "name_zh": "大阪", "lon": 135.52, "lat": 34.62, "rank": 2 },
 		{ "name": "Kyōto", "name_zh": "京都", "lon": 135.45, "lat": 35.25, "rank": 2 },
@@ -118,6 +144,18 @@
 			"note": "Natural Earth gives the Mae Klong the Mekong's hanzi; left without hanzi",
 			"match": "Mae Klong",
 			"name_zh": null
+		}
+	],
+	"seas": [
+		{
+			"note": "Natural Earth writes 孟加拉灣 in traditional characters",
+			"match": "Bay of Bengal",
+			"name_zh": "孟加拉湾"
+		},
+		{
+			"note": "Natural Earth writes 馬達班灣 in traditional characters",
+			"match": "Gulf of Martaban",
+			"name_zh": "马达班湾"
 		}
 	]
 }

@@ -41,6 +41,7 @@ import {
 	FRAMES,
 	frameMeta,
 	MAP_ATTRIBUTION,
+	OVERVIEW,
 	ringInk,
 	SPRING,
 	type Box,
@@ -451,17 +452,19 @@ export default function OriginsMap({
 		release()
 		const [vx, vy, vw, vh] = camera.view()
 		const c: Point = [vx + vw / 2, vy + vh / 2]
+		// the next sheet out, then East Asia (the locator runs on past it for the widest views)
 		const next = [...FRAMES]
 			.reverse()
 			.find(
 				(f) =>
+					f.id !== "locator" &&
 					f.viewBox[2] > vw * 1.15 &&
 					c[0] >= f.viewBox[0] &&
 					c[0] <= f.viewBox[0] + f.viewBox[2] &&
 					c[1] >= f.viewBox[1] &&
 					c[1] <= f.viewBox[1] + f.viewBox[3]
 			)
-		go(next?.viewBox ?? FRAMES[0].viewBox)
+		go(next?.viewBox ?? OVERVIEW)
 	}, [camera, go, release])
 
 	const zoomBy = useCallback(

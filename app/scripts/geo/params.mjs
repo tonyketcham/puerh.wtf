@@ -6,7 +6,7 @@
  * maps are stale. Bump SCRIPT_VERSION whenever the pipeline code changes its output.
  */
 
-export const SCRIPT_VERSION = "3.1.0"
+export const SCRIPT_VERSION = "3.2.0"
 
 /**
  * One north-up projection for every shared frame (locator → china-east/japan → yunnan →
@@ -52,9 +52,24 @@ export const TERRAIN = {
 }
 
 /**
+ * The camera's widest view (camera.ts): `lonDeg` of longitude across at `aspect` (w / h), in shared
+ * units [lonDeg × units per degree, that ÷ aspect]. A view of any aspect must fit inside it, so a
+ * wide map is as wide as this and a tall one (a phone held upright) as tall. The locator is grown by
+ * half of it on every side of the origins (frames.mjs, `view`), so any origin can sit at the centre
+ * of the widest view without the view running off the data. v2's widest view was the locator box
+ * plus 12%: 42.8° across at 16:10, 49.7° on the wider hero.
+ */
+export const CAMERA = {
+	maxView: { lonDeg: 48, aspect: 1.6 },
+	/** the "East Asia" box the minimap and /origins zoom out to: the origins plus this (degrees) */
+	overviewPad: 3,
+}
+
+/**
  * Shared frames. Bounds are derived from the origins (see frames.mjs), using:
  *  - select: which origins span the frame
  *  - pad:    degrees added on every side
+ *  - view:   instead of `pad`, half the camera's widest view (CAMERA.maxView) on every side
  *  - circles: pad each origin by its radius_km instead of a point
  * `rivers` / `lakes`: the largest Natural Earth scalerank drawn in the frame.
  * `mask`: the frame's edge is an organic coverage mask built from its members (masks.mjs) instead
@@ -65,14 +80,19 @@ export const FRAMES = [
 	{
 		id: "locator",
 		select: { exclude: ["country", "unknown"] },
-		pad: 3,
-		maxGridPx: 1400,
+		// the origins ± half the widest view (v2: 3° around them, 96.9–141.3°E, 18.6–39.3°N)
+		view: true,
+		// z5 like v2's 1400 px over 44°: the grid grows with the sheet (≈ 1,970 px across)
+		maxGridPx: 2000,
 		blurSigma: 1.2,
 		intervals: [1000],
 		indexEvery: 2,
 		simplify: 0.1,
-		displayPx: 1200,
-		rivers: 2,
+		// the same 19.4 shared units per display px as v2's 1200 px over 23,248 units, so the
+		// simplification, speckle and label spacing are unchanged
+		displayPx: 2340,
+		// scalerank 3 adds the Ganges, the Indus and the Yellow River to the widest view
+		rivers: 3,
 		lakes: 4,
 	},
 	{
@@ -268,8 +288,15 @@ export const LABEL_TIERS = [
  * keeps the font subset small; countries, seas, rivers, lakes and curated places always do.
  */
 export const LABELS = {
-	/** lon/lat area labels may sit in: the locator frame and a little more */
-	bbox: [95.5, 17, 142.5, 40.5],
+	// labels may sit anywhere on the locator frame (build.mjs passes its bbox)
+	/**
+	 * The tea's part of the map (v2's label area, [W, S, E, N]): Natural Earth labels outside it
+	 * (cities, seas, lakes, rivers) carry hanzi only at rank ≤ `outerHanziMaxRank`, the ones the
+	 * widest views show; the rest of India, Mongolia or the Philippines is labelled in Latin. Each
+	 * hanzi costs ~145 B of font. Curated labels (places.json) keep theirs.
+	 */
+	core: [95.5, 17, 142.5, 40.5],
+	outerHanziMaxRank: 1,
 	/** rank from a Natural Earth scalerank: the first [maxScalerank, rank] pair that fits */
 	cities: {
 		hanzi: ["CHN", "TWN", "JPN", "HKG", "MAC"],
@@ -407,8 +434,10 @@ export const BUDGETS = {
 	labels: 40,
 	// 15 KB in plan §4.4, then 16 KB for the native Taiwanese and Japanese forms. Map v2 adds every
 	// label's hanzi (countries, provinces, cities, seas, rivers, lakes, tea towns): ~330 glyphs at
-	// ~145 B each
-	font: 50,
+	// ~145 B each. The widened locator (2026-10-20) adds the countries, provinces, seas and the
+	// coarsest cities and rivers from India to the Sea of Okhotsk (~42 glyphs net; the font now
+	// holds only what labels and origins show, not every river name in the sheets)
+	font: 55,
 }
 
 export const ATTRIBUTION = [

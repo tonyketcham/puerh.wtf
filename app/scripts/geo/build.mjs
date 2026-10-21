@@ -23,6 +23,8 @@
  *   cell:   { id: "z-x-y", kind: "cell", space: "shared", tile: [z, x, y], region, bbox, viewBox (the
  *             tile's exact rect), zoom (data), interval, indexInterval, bands, contourLabels, context }
  *   mask:   8-bit grayscale PNG mapped onto a rect in shared units (manifest: { url, rect, size, bytes })
+ *   manifest.camera:  { maxView: [w, h] (the widest view), overview: [x, y, w, h] (East Asia: the
+ *             minimap, /origins zoomed out) }  in shared units
  *   manifest.detail:  { zoom, dataZoom, interval, indexInterval, cellUrl, regions: [{ id, rect, mask,
  *             members, cells }], cells: [{ id, region, rect, bytes }] }
  *   manifest.details: per origin { id, region, point, sideKm, unitsPerKm, radius, precision, confidence,
@@ -45,6 +47,7 @@ import { geoCircle } from "d3-geo"
 import {
 	ATTRIBUTION,
 	BUDGETS,
+	CAMERA,
 	CONTEXT,
 	CONTOUR_LABELS,
 	CONTROL_POINTS,
@@ -133,9 +136,6 @@ async function removeStale(dir, keep, ext = ".json") {
 	}
 }
 
-/** Every name_zh in a frame or cell context */
-const contextHanzi = (context) => [...context.rivers, ...context.lakes].map((r) => r.name_zh)
-
 async function main() {
 	const started = Date.now()
 	const cache = cacheRoot()
@@ -153,7 +153,17 @@ async function main() {
 	const sharedProjection = makeProjection(SHARED_PROJECTION)
 	const shared = (p) => sharedProjection(p)
 	const unitsPerKm = (lat) => unitsPerKmAt(SHARED_PROJECTION.scale, lat)
-	const frames = deriveFrames(placed, FRAMES).map((f) => {
+	// the camera's widest view in shared units (params CAMERA): the locator is grown by half of it
+	const unitsPerDeg = (SHARED_PROJECTION.scale * Math.PI) / 180
+	const maxView = [
+		round(CAMERA.maxView.lonDeg * unitsPerDeg, 1),
+		round((CAMERA.maxView.lonDeg * unitsPerDeg) / CAMERA.maxView.aspect, 1),
+	]
+	const frames = deriveFrames(placed, FRAMES, {
+		project: shared,
+		invert: (p) => sharedProjection.invert(p),
+		maxView,
+	}).map((f) => {
 		const viewBox = projectBBox(f.bbox, shared)
 		const cover = coverBBox(viewBox, (p) => sharedProjection.invert(p))
 		return { ...f, viewBox, cover, zoom: fitZoom(cover, f.maxGridPx, TERRAIN.maxZoom) }
@@ -235,6 +245,20 @@ async function main() {
 				return [lon, lat, round(x, 3), round(y, 3)]
 			}),
 		},
+		// the camera's widest view [w, h], and the East Asia box the minimap and /origins zoom
+		// out to (the origins + CAMERA.overviewPad°: v2's locator box), in shared units
+		camera: {
+			maxView,
+			overview: projectBBox(
+				[
+					locator.span[0] - CAMERA.overviewPad,
+					locator.span[1] - CAMERA.overviewPad,
+					locator.span[2] + CAMERA.overviewPad,
+					locator.span[3] + CAMERA.overviewPad,
+				].map((v) => round(v, 3)),
+				shared
+			),
+		},
 		frames: [],
 		detail: null,
 		details: [],
@@ -264,7 +288,8 @@ async function main() {
 			viewBox,
 			displayPx: frame.displayPx,
 			labels: CONTOUR_LABELS,
-			thinMaxUpp: (viewBox[2] * THIN.lodFade) / THIN.mapPx,
+			// the widest this sheet is ever drawn: its size, or the widest view if smaller
+			thinMaxUpp: (Math.min(viewBox[2], maxView[0]) * THIN.lodFade) / THIN.mapPx,
 			source,
 		})
 		const context = await frameContext(ctx, {
@@ -278,7 +303,6 @@ async function main() {
 			linePx: CONTEXT.linePx,
 			hardPx: CONTEXT.hardPx,
 		})
-		hanzi.push(...contextHanzi(context))
 		const json = {
 			id: frame.id,
 			kind: "frame",
@@ -408,7 +432,6 @@ async function main() {
 			queue.unshift({ ...cell, thinCoarse: (cell.thinCoarse ?? 0) + 1 })
 			continue
 		}
-		hanzi.push(...contextHanzi(json.context))
 		const bytes = await writeText(path.join(cellDir, `${cell.id}.json`), text)
 		cellBytes += bytes
 		sizes.cells[cell.id] = size
@@ -510,7 +533,7 @@ async function main() {
 		places,
 		origins: placed,
 		ctx,
-		params: LABELS,
+		params: { ...LABELS, bbox: locator.bbox },
 		tiers: LABEL_TIERS,
 	})
 	const labelsText = stringify({ version: SCRIPT_VERSION, tiers: LABEL_TIERS, labels })

@@ -20,6 +20,7 @@ import type { Camera, PinWrite, ViewTick } from "./camera"
 import {
 	CREAM,
 	FRAMES,
+	OVERVIEW,
 	niceKm,
 	SHARED,
 	unprojectShared,
@@ -337,11 +338,14 @@ export function Readout({
 // Locator minimap
 // ---------------------------------------------------------------------------
 
-const LOCATOR = FRAMES[0]
+/** the locator sheet (its land and coast), shown over the East Asia overview box */
+const LOCATOR_URL = FRAMES[0].url
 
 /**
  * The East Asia locator, small, with the view drawn on it (a reticle when the view is too small
- * to see as a box). Loads the locator sheet the first time it's shown.
+ * to see as a box). Loads the locator sheet the first time it's shown, and shows the overview box
+ * of it (the origins and a few degrees around them): the sheet runs on to India and the Pacific
+ * for the widest views, which may run past the minimap's edge.
  */
 export function Minimap({
 	camera,
@@ -361,8 +365,8 @@ export function Minimap({
 	className?: string
 	fade?: MotionValue<number>
 }) {
-	const data = useMapJson<FrameJson>(active ? LOCATOR.url : null)
-	const [x, y, w, h] = LOCATOR.viewBox
+	const data = useMapJson<FrameJson>(active ? LOCATOR_URL : null)
+	const [x, y, w, h] = OVERVIEW
 	const height = Math.round((width * h) / w)
 	const rectRef = useRef<SVGRectElement>(null)
 	const crossRef = useRef<SVGPathElement>(null)
