@@ -1,9 +1,14 @@
+import type { CSSProperties } from "react"
 import { getSession, getSessions } from "@/lib/api"
 import { notFound } from "next/navigation"
-import Image from "next/image"
 import SessionCarousel from "@/components/session/SessionCarousel"
 import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
 import { generateSessionRotation } from "@/app/sessions/[year]/[month]/[slug]/generateSessionRotation"
+import { liquorVars } from "@/lib/liquor"
+import SessionTitle from "@/lib/components/session/SessionTitle"
+import SteepGutter from "@/lib/components/session/SteepGutter"
+import DescriptorHighlighter from "@/lib/components/session/DescriptorHighlighter"
+import FlowAroundArticle from "@/lib/components/session/FlowAroundArticle"
 
 interface SessionPageProps {
 	params: Promise<{
@@ -37,28 +42,42 @@ export default async function SessionPage(props: SessionPageProps) {
 	const rotation = generateSessionRotation(session._slug)
 
 	return (
-		<>
-			{/* Sync session data to the store */}
+		<div
+			className="space-y-8"
+			data-session-root
+			data-session-slug={session._slug}
+			style={liquorVars(session._slug) as CSSProperties}
+		>
+			{/* Sync session data to the store (must stay first: resets per-page atoms) */}
 			<SetSessionState session={session} />
 
-			<h1 className="font-rock-3d text-8xl text-shadow-2xl">{session.title}</h1>
+			<SessionTitle
+				key={`title-${session._slug}`}
+				title={session.title}
+				slug={session._slug}
+				productionYear={session.production_year}
+			/>
 
-			<div className="relative">
-				{session.images && session.images.length > 0 && (
-					<div className="float-right clear-right mb-8 ml-8">
-						<SessionCarousel
-							images={session.images}
-							cssRotation={rotation}
-							recordingKey="session-hero-carousel"
-						/>
-					</div>
-				)}
-
-				<article
-					className="prose prose-invert max-w-none"
-					dangerouslySetInnerHTML={{ __html: session._content.html }}
+			{/* keyed: a fresh gutter (mentions, measurements, arbitration refs) per session */}
+			<SteepGutter key={`gutter-${session._slug}`} slug={session._slug} brewing={session.brewing}>
+				{/* The cube sits inside the notes; the prose flows around both sides of it.
+				    Only FlowAroundArticle rebuilds the article's DOM: everyone else measures it and
+				    highlights via the CSS Custom Highlight API */}
+				<FlowAroundArticle
+					html={session._content.html}
+					obstacle={
+						session.images && session.images.length > 0 ? (
+							<SessionCarousel
+								images={session.images}
+								cssRotation={rotation}
+								recordingKey="session-hero-carousel"
+							/>
+						) : null
+					}
 				/>
-			</div>
-		</>
+			</SteepGutter>
+
+			<DescriptorHighlighter />
+		</div>
 	)
 }

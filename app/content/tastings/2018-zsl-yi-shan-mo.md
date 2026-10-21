@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 88d4ea3a-b772-4472-bd44-566c55bb608e
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2018
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21
@@ -61,6 +63,8 @@ tags:
   - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 89.957
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 205
   material_amount: 5.55

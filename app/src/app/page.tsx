@@ -1,27 +1,54 @@
-import SessionCard from "@/lib/components/SessionCard"
-import Heading2 from "@/lib/components/typography/Heading2"
-import { getSessions } from "@/lib/api"
+import SessionLog from "@/lib/components/home/SessionLog"
+import { getExplorerSessions, getVendors } from "@/lib/api"
+import { getEntityList } from "@/lib/components/entity/page/data"
+import type { DrawnVessel } from "@/lib/components/teaware-drawing/TeawareDrawing"
+import Hero, { type HeroStats } from "@/lib/components/home/Hero"
 
 export default async function HomePage() {
-	const sessions = await getSessions({ limit: 10, withImages: true })
+	const [all, vessels, origins, vendors] = await Promise.all([
+		getExplorerSessions(),
+		getEntityList("vessel"),
+		getEntityList("origin"),
+		getVendors(),
+	])
+	// One clock for the whole list, so every card's tape ages against the same "now".
+	const now = new Date()
+	// how often each vessel was brewed in, and when last
+	const use = new Map<string, { n: number; last: string }>()
+	for (const s of all)
+		for (const v of s.vessel ?? []) {
+			const u = use.get(v._slug) ?? { n: 0, last: "" }
+			u.n++
+			if (s.date > u.last) u.last = s.date
+			use.set(v._slug, u)
+		}
+	const drawn: DrawnVessel[] = vessels.map((v) => ({
+		slug: v.slug,
+		title: v.title,
+		hanzi: v.hanzi,
+		kind: v.vessel?.kind ?? null,
+		material: v.vessel?.material ?? null,
+		volume_ml: v.vessel?.volume_ml ?? null,
+		sessions: use.get(v.slug)?.n ?? 0,
+		lastBrewed: use.get(v.slug)?.last.slice(0, 10).replace(/-/g, ".") || null,
+	}))
+
+	const dates = all.map((s) => s.date).filter(Boolean).sort()
+	const years = all.map((s) => s.production_year).filter((y): y is number => typeof y === "number")
+	const stats: HeroStats = {
+		sessions: all.length,
+		since: dates.length ? new Date(dates[0]).getFullYear() : null,
+		lastSteeped: dates.length ? dates[dates.length - 1].slice(0, 10).replace(/-/g, ".") : null,
+		vintages: years.length ? [Math.min(...years), Math.max(...years)] : null,
+		origins: origins.length,
+		vendors: vendors.length,
+		vessels: vessels.length,
+	}
 
 	return (
 		<div className="relative inset-0 h-screen py-6 space-y-1.5">
-			<section className="block w-full">
-				<Heading2>A tea log</Heading2>
-				<p className="max-w-prose">
-					...for documenting tea sessions to learn complexities like terroir in retrospect while
-					focusing more on an individual tea.
-				</p>
-			</section>
-			<section className="space-y-2.5">
-				<h3 className="my-4 text-sm text-tea-soup-400">🫖 recents</h3>
-				<div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1 items-start">
-					{sessions.map((session) => (
-						<SessionCard key={session.id} session={session} />
-					))}
-				</div>
-			</section>
+			<Hero vessels={drawn} stats={stats} />
+			<SessionLog sessions={all} now={now} />
 		</div>
 	)
 }

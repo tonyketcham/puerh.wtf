@@ -34,6 +34,9 @@ export default defineConfig({
 				origin: "Origin",
 				vendor: "Vendor",
 				tags: "Tags",
+				// top-level on purpose: refs on nested fields are unverified in Flatbread, so
+				// brewing.vessel stays as the free-text note
+				vessel: "Vessel",
 			},
 			overrides: [
 				createSvImgField("images[]image", {
@@ -63,12 +66,16 @@ export default defineConfig({
 			path: "content/cultivars",
 			collection: "Varietal",
 			refs: {
-				style: "Style",
+				styles: "Style",
 			},
 		},
 		{
 			path: "content/origins",
 			collection: "Origin",
+			refs: {
+				// self-ref: village → mountain-area → county → prefecture → province → country
+				parent: "Origin",
+			},
 		},
 		{
 			path: "content/tags",
@@ -77,6 +84,10 @@ export default defineConfig({
 		{
 			path: "content/vendors",
 			collection: "Vendor",
+		},
+		{
+			path: "content/vessels",
+			collection: "Vessel",
 		},
 	],
 	codegen: {

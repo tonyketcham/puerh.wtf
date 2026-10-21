@@ -9,7 +9,10 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 0b66380d-30b5-46a0-bead-826b261eef6f
-season: Spring (April)
+harvest:
+  season: spring
+  month: 4
+season_note: Spring (April)
 production_year: 2020
 elevation: 1800
 vendor:
@@ -63,6 +66,8 @@ tags:
   - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
 rating: 87
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 200
   material_amount: 6

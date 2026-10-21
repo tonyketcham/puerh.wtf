@@ -9,7 +9,6 @@ cultivar:
   - 5762bc4f-df2c-41b9-9848-7fb8652d8d96
 origin:
   - 0c420030-b53f-4f7c-8841-5c34dfcd3085
-season: ''
 production_year: 2020
 picking: Buds
 vendor:
@@ -63,6 +62,8 @@ tags:
   - 16565067-592b-4e62-91aa-f8d2c920b602
   - fa4aa322-0d4a-451a-b470-a49bc8240fd0
 rating: 84
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 200
   material_amount: 6

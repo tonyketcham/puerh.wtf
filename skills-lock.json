@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "technical-drawing": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/technical-drawing/SKILL.md",
+      "computedHash": "6b048fe50406c738fee5e523396b375ee564a0d1b59fa07c3fb238557dc5a031"
+    }
+  }
+}

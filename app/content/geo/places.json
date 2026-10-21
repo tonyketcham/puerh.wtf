@@ -1,0 +1,161 @@
+{
+	"note": "Curated map labels for scripts/geo (plan §4.7.4). lon/lat in degrees; aliases suppress a Natural Earth city of another name at the same spot; rank is the lowest zoom tier a label shows at (scripts/geo/params.mjs LABEL_TIERS: 0 world, 1 region, 2 province, 3 cluster, 4 detail, 5 fine). Hanzi are the local forms: simplified for mainland China, 台 forms for Taiwan, kanji for Japan. Town coordinates were checked against OpenStreetMap (Nominatim) on 2026-10-19; a township's point is its OSM admin centroid when OSM has no seat node.",
+	"countries": [
+		{
+			"name": "China",
+			"name_zh": "中国",
+			"anchors": [
+				[110, 31.5, 0],
+				[102.6, 23.6, 2]
+			]
+		},
+		{
+			"name": "Laos",
+			"name_zh": "老挝",
+			"anchors": [
+				[101.99, 20.29, 0],
+				[101.45, 20.9, 2]
+			]
+		},
+		{
+			"name": "Myanmar",
+			"name_zh": "缅甸",
+			"anchors": [
+				[97.6, 22.6, 0],
+				[99.75, 21.45, 2]
+			]
+		},
+		{
+			"name": "Vietnam",
+			"name_zh": "越南",
+			"anchors": [
+				[105.2, 21.6, 0],
+				[103.6, 21.6, 2]
+			]
+		},
+		{
+			"name": "Thailand",
+			"name_zh": "泰国",
+			"anchors": [
+				[100.9, 15.4, 0],
+				[100.3, 18.9, 2]
+			]
+		},
+		{ "name": "Taiwan", "name_zh": "台灣", "anchors": [[120.96, 23.75, 0]] },
+		{ "name": "Japan", "name_zh": "日本", "anchors": [[138.2, 36.3, 0]] },
+		{ "name": "South Korea", "name_zh": "韩国", "anchors": [[127.9, 36.4, 1]] },
+		{ "name": "North Korea", "name_zh": "朝鲜", "anchors": [[126.8, 39, 1]] },
+		{ "name": "Philippines", "name_zh": "菲律宾", "anchors": [[121, 17.5, 1]] },
+		{ "name": "India", "name_zh": "印度", "anchors": [[79, 22.5, 0]] },
+		{ "name": "Mongolia", "name_zh": "蒙古", "anchors": [[103, 45.5, 0]] },
+		{ "name": "Bangladesh", "name_zh": "孟加拉国", "anchors": [[89.9, 24.3, 1]] },
+		{ "name": "Nepal", "name_zh": "尼泊尔", "anchors": [[84.1, 28.2, 1]] },
+		{ "name": "Bhutan", "name_zh": "不丹", "anchors": [[90.4, 27.4, 2]] },
+		{ "name": "Cambodia", "name_zh": "柬埔寨", "anchors": [[104.9, 12.7, 1]] },
+		{ "name": "Sri Lanka", "name_zh": "斯里兰卡", "anchors": [[80.7, 7.9, 1]] },
+		{ "name": "Russia", "name_zh": "俄罗斯", "anchors": [[134.6, 45.8, 1]] },
+		{ "name": "Kazakhstan", "name_zh": "哈萨克斯坦", "anchors": [[78.5, 45, 1]] },
+		{ "name": "Kyrgyzstan", "name_zh": "吉尔吉斯斯坦", "anchors": [[76.2, 41.8, 2]] }
+	],
+	"provinces": [
+		{ "name": "Yunnan", "name_zh": "云南", "lon": 100.9, "lat": 25.4, "rank": 1 },
+		{ "name": "Sichuan", "name_zh": "四川", "lon": 102.7, "lat": 30.6, "rank": 1 },
+		{ "name": "Guizhou", "name_zh": "贵州", "lon": 106.8, "lat": 26.8, "rank": 1 },
+		{ "name": "Guangxi", "name_zh": "广西", "lon": 108.8, "lat": 23.8, "rank": 1 },
+		{ "name": "Guangdong", "name_zh": "广东", "lon": 113.4, "lat": 23.4, "rank": 1 },
+		{ "name": "Hainan", "name_zh": "海南", "lon": 109.8, "lat": 19.2, "rank": 1 },
+		{ "name": "Fujian", "name_zh": "福建", "lon": 117.4, "lat": 26.2, "rank": 1 },
+		{ "name": "Zhejiang", "name_zh": "浙江", "lon": 120.1, "lat": 29.2, "rank": 1 },
+		{ "name": "Jiangxi", "name_zh": "江西", "lon": 115.7, "lat": 27.6, "rank": 1 },
+		{ "name": "Hunan", "name_zh": "湖南", "lon": 111.7, "lat": 27.6, "rank": 1 },
+		{ "name": "Hubei", "name_zh": "湖北", "lon": 112.3, "lat": 31, "rank": 1 },
+		{ "name": "Anhui", "name_zh": "安徽", "lon": 117.2, "lat": 31.8, "rank": 1 },
+		{ "name": "Jiangsu", "name_zh": "江苏", "lon": 119.4, "lat": 33, "rank": 1 },
+		{ "name": "Shandong", "name_zh": "山东", "lon": 118.2, "lat": 36.3, "rank": 1 },
+		{ "name": "Henan", "name_zh": "河南", "lon": 113.6, "lat": 33.9, "rank": 1 },
+		{ "name": "Shaanxi", "name_zh": "陕西", "lon": 108.9, "lat": 35.2, "rank": 1 },
+		{ "name": "Shanxi", "name_zh": "山西", "lon": 112.3, "lat": 37.6, "rank": 1 },
+		{ "name": "Hebei", "name_zh": "河北", "lon": 115.5, "lat": 38.5, "rank": 1 },
+		{ "name": "Tibet", "name_zh": "西藏", "lon": 88.5, "lat": 31.5, "rank": 1 },
+		{ "name": "Xinjiang", "name_zh": "新疆", "lon": 85.5, "lat": 41.5, "rank": 1 },
+		{ "name": "Qinghai", "name_zh": "青海", "lon": 96, "lat": 35.5, "rank": 1 },
+		{ "name": "Gansu", "name_zh": "甘肃", "lon": 102.3, "lat": 38, "rank": 1 },
+		{ "name": "Inner Mongolia", "name_zh": "内蒙古", "lon": 112, "lat": 42.5, "rank": 1 },
+		{ "name": "Ningxia", "name_zh": "宁夏", "lon": 106, "lat": 37.4, "rank": 2 },
+		{ "name": "Heilongjiang", "name_zh": "黑龙江", "lon": 128, "lat": 46.5, "rank": 1 },
+		{ "name": "Jilin", "name_zh": "吉林", "lon": 127.6, "lat": 43.1, "rank": 1 },
+		{ "name": "Liaoning", "name_zh": "辽宁", "lon": 122.4, "lat": 41.6, "rank": 1 },
+		{ "name": "Hyōgo", "name_zh": "兵庫", "lon": 134.86, "lat": 35.04, "rank": 2 },
+		{ "name": "Ōsaka", "name_zh": "大阪", "lon": 135.52, "lat": 34.62, "rank": 2 },
+		{ "name": "Kyōto", "name_zh": "京都", "lon": 135.45, "lat": 35.25, "rank": 2 },
+		{ "name": "Nara", "name_zh": "奈良", "lon": 135.87, "lat": 34.32, "rank": 2 },
+		{ "name": "Shiga", "name_zh": "滋賀", "lon": 136.1, "lat": 35.25, "rank": 2 },
+		{ "name": "Mie", "name_zh": "三重", "lon": 136.4, "lat": 34.5, "rank": 2 },
+		{ "name": "Gifu", "name_zh": "岐阜", "lon": 137.05, "lat": 35.75, "rank": 2 },
+		{ "name": "Aichi", "name_zh": "愛知", "lon": 137.25, "lat": 35, "rank": 2 },
+		{ "name": "Shizuoka", "name_zh": "静岡", "lon": 138.3, "lat": 35.05, "rank": 2 },
+		{ "name": "Fukui", "name_zh": "福井", "lon": 136.2, "lat": 35.85, "rank": 2 },
+		{ "name": "Yamanashi", "name_zh": "山梨", "lon": 138.6, "lat": 35.6, "rank": 2 },
+		{ "name": "Shan", "name_zh": "掸邦", "lon": 98.3, "lat": 21.3, "rank": 2 },
+		{ "name": "Kachin", "name_zh": "克钦邦", "lon": 97.6, "lat": 26, "rank": 2 },
+		{ "name": "Phongsaly", "name_zh": "丰沙里", "lon": 102.1, "lat": 21.6, "rank": 2 },
+		{ "name": "Luang Namtha", "name_zh": "琅南塔", "lon": 101.2, "lat": 20.7, "rank": 2 },
+		{ "name": "Lai Châu", "name_zh": "莱州", "lon": 103.2, "lat": 22.35, "rank": 2 },
+		{ "name": "Lào Cai", "name_zh": "老街", "lon": 104, "lat": 22.3, "rank": 2 }
+	],
+	"places": [
+		{ "kind": "city", "name": "Jinghong", "name_zh": "景洪", "lon": 100.797, "lat": 22.008, "rank": 2 },
+		{ "kind": "city", "name": "Pu'er", "name_zh": "普洱", "lon": 100.976, "lat": 22.79, "rank": 2, "aliases": ["Simao"] },
+		{ "kind": "city", "name": "Lincang", "name_zh": "临沧", "lon": 100.088, "lat": 23.888, "rank": 2 },
+		{ "kind": "city", "name": "Chaozhou", "name_zh": "潮州", "lon": 116.62, "lat": 23.657, "rank": 2 },
+		{ "kind": "city", "name": "Shizuoka", "name_zh": "静岡", "lon": 138.383, "lat": 34.975, "rank": 2 },
+		{ "kind": "town", "name": "Menghai", "name_zh": "勐海", "lon": 100.441, "lat": 21.955, "rank": 3 },
+		{ "kind": "town", "name": "Mengla", "name_zh": "勐腊", "lon": 101.569, "lat": 21.488, "rank": 3 },
+		{ "kind": "town", "name": "Lancang", "name_zh": "澜沧", "lon": 99.934, "lat": 22.554, "rank": 3 },
+		{ "kind": "town", "name": "Jinggu", "name_zh": "景谷", "lon": 100.704, "lat": 23.499, "rank": 3 },
+		{ "kind": "town", "name": "Zhenyuan", "name_zh": "镇沅", "lon": 101.107, "lat": 24.01, "rank": 3 },
+		{ "kind": "town", "name": "Yiwu", "name_zh": "易武镇", "lon": 101.469, "lat": 21.981, "rank": 3 },
+		{ "kind": "town", "name": "Xiangming", "name_zh": "象明", "lon": 101.31, "lat": 22.128, "rank": 3 },
+		{ "kind": "town", "name": "Mengku", "name_zh": "勐库", "lon": 99.882, "lat": 23.62, "rank": 3 },
+		{ "kind": "town", "name": "Shuangjiang", "name_zh": "双江", "lon": 99.824, "lat": 23.476, "rank": 3 },
+		{ "kind": "town", "name": "Mohan", "name_zh": "磨憨", "lon": 101.688, "lat": 21.191, "rank": 3 },
+		{ "kind": "town", "name": "Ning'er", "name_zh": "宁洱", "lon": 101.045, "lat": 23.062, "rank": 3 },
+		{ "kind": "town", "name": "Mojiang", "name_zh": "墨江", "lon": 101.682, "lat": 23.428, "rank": 3 },
+		{ "kind": "town", "name": "Jiangcheng", "name_zh": "江城", "lon": 101.859, "lat": 22.587, "rank": 3 },
+		{ "kind": "town", "name": "Kakegawa", "name_zh": "掛川", "lon": 137.999, "lat": 34.769, "rank": 3 },
+		{ "kind": "town", "name": "Menghun", "name_zh": "勐混", "lon": 100.387, "lat": 21.842, "rank": 4 },
+		{ "kind": "town", "name": "Menglun", "name_zh": "勐仑", "lon": 101.248, "lat": 21.938, "rank": 4 },
+		{ "kind": "town", "name": "Mengyang", "name_zh": "勐养", "lon": 100.893, "lat": 22.088, "rank": 4 },
+		{ "kind": "town", "name": "Menglong", "name_zh": "勐龙", "lon": 100.677, "lat": 21.583, "rank": 4 },
+		{ "kind": "town", "name": "Huimin", "name_zh": "惠民", "lon": 100.079, "lat": 22.262, "rank": 4 },
+		{ "kind": "town", "name": "Mengsong", "name_zh": "勐宋", "lon": 100.563, "lat": 22.055, "rank": 4 },
+		{ "kind": "town", "name": "Fenghuang", "name_zh": "凤凰", "lon": 116.698, "lat": 23.906, "rank": 4 },
+		{ "kind": "town", "name": "Wazuka", "name_zh": "和束", "lon": 135.905, "lat": 34.796, "rank": 4 },
+		{ "kind": "town", "name": "Shigaraki", "name_zh": "信楽", "lon": 136.059, "lat": 34.878, "rank": 4 },
+		{ "kind": "town", "name": "Makinohara", "name_zh": "牧之原", "lon": 138.225, "lat": 34.74, "rank": 4 }
+	],
+	"rivers": [
+		{
+			"note": "Natural Earth names the Chinese reach of the Mekong 'Lancang' but gives it the Mekong's hanzi",
+			"match": "Lancang",
+			"name_zh": "澜沧江"
+		},
+		{
+			"note": "Natural Earth gives the Mae Klong the Mekong's hanzi; left without hanzi",
+			"match": "Mae Klong",
+			"name_zh": null
+		}
+	],
+	"seas": [
+		{
+			"note": "Natural Earth writes 孟加拉灣 in traditional characters",
+			"match": "Bay of Bengal",
+			"name_zh": "孟加拉湾"
+		},
+		{
+			"note": "Natural Earth writes 馬達班灣 in traditional characters",
+			"match": "Gulf of Martaban",
+			"name_zh": "马达班湾"
+		}
+	]
+}

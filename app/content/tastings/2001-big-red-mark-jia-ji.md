@@ -9,6 +9,12 @@ production_year: 2001
 picking: Predominately high quality, buds and young growth but very broken up
   and shake-like
 aging_conditions: ~20yrs dry in Guangzhou?
+storage:
+  - place: guangzhou
+    from: 2001
+    to: 2021
+    humidity: dry
+    approx: true
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2001-big-red-mark-jia-ji?_pos=1&_sid=7a5d9192d&_ss=r
@@ -60,6 +66,8 @@ tags:
   - bce623b4-e571-462a-b95b-988beb6dce4c
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 63
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 200
   material_amount: 6.06
@@ -67,6 +75,7 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 10
+origin_note: blend
 ---
 The first time I had this many months back, I really wasn't a fan because I tried it hot off the mail. It tasted straight up like cigarette ash. Now I've let it rest for a real long time lookin for an opportunity to give it another spin. Trying Arby's Truth Serum water recipe seemed like the best time for another go at it. 
 

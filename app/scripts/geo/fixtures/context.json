@@ -1,0 +1,123 @@
+{
+	"note": "Synthetic reference layers for geo:test (not real geography): they cross the fixture box so clipping, simplification, naming and river anchors are exercised.",
+	"lines": [
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "rivers",
+				"rank": 5,
+				"name": "Fixture River",
+				"name_zh": "测试河"
+			},
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[101.43, 21.94],
+					[101.47, 21.97],
+					[101.5, 21.985],
+					[101.52, 22],
+					[101.55, 22.02],
+					[101.6, 22.05]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "admin",
+				"rank": 3,
+				"name": ""
+			},
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[101.48, 22.08],
+					[101.49, 22.02],
+					[101.5, 21.96],
+					[101.51, 21.9]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "borders",
+				"rank": 0,
+				"name": ""
+			},
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[101.44, 21.9],
+					[101.48, 21.93],
+					[101.53, 21.95],
+					[101.58, 21.99]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "coast",
+				"rank": 0,
+				"name": ""
+			},
+			"geometry": {
+				"type": "LineString",
+				"coordinates": [
+					[101.45, 22],
+					[101.5, 21.99],
+					[101.56, 21.995]
+				]
+			}
+		}
+	],
+	"lakes": [
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "lakes",
+				"rank": 6,
+				"name": "Fixture Lake",
+				"name_zh": "测试湖"
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[
+						[101.53, 21.97],
+						[101.6, 21.97],
+						[101.6, 22.02],
+						[101.53, 22.02],
+						[101.53, 21.97]
+					]
+				]
+			}
+		}
+	],
+	"land": [
+		{
+			"type": "Feature",
+			"properties": {
+				"layer": "land",
+				"rank": 0,
+				"name": ""
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[
+						[101.4, 21.8],
+						[101.7, 21.8],
+						[101.7, 22],
+						[101.56, 21.995],
+						[101.5, 21.99],
+						[101.45, 22],
+						[101.4, 22],
+						[101.4, 21.8]
+					]
+				]
+			}
+		}
+	]
+}

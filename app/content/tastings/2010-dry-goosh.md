@@ -10,6 +10,12 @@ cultivar:
 production_year: 2010
 picking: Bud & two leaves
 aging_conditions: ~10 years dry somewhere
+storage:
+  - place: unknown
+    from: 2010
+    to: 2020
+    humidity: dry
+    approx: true
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/912113057/2010-dry-goosh-14g
@@ -62,6 +68,8 @@ tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - cda0ff84-5687-4e22-9335-cbb104c271be
 rating: 78
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 200
   material_amount: 7.07
@@ -69,6 +77,7 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 15
+origin_note: blend
 ---
 Visually, this stuff looks frozen in time out here lookin like some 2017 sheng. But the smell of the dry leaf in the heated gaiwan is a bit more of that woody aged smell. I'm noticing a super sweet varnish type of deal with a caramel toffee thing too, then a bit of drier/'cleaner' aged notes like wood and my classic museum description. There are a ton of buds in this with black gunmetal-colored leaves.
 

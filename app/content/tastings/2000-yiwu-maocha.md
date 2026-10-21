@@ -12,6 +12,8 @@ origin:
 production_year: 2000
 picking: bud + 2 leaves
 aging_conditions: Taiwan stored
+storage:
+  - place: taiwan
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 excerpt: a set of wet storage flavors that transform over the session
@@ -61,6 +63,8 @@ notes:
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 72.5
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 205
   material_amount: 7

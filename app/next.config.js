@@ -25,10 +25,6 @@ export default (phase) => {
 					],
 				}),
 		},
-		transpilePackages: [
-			/** see: https://jotai.org/docs/tools/devtools#ui-devtools */
-			...(isDev ? ["jotai-devtools"] : []),
-		],
 		turbopack: {
 			// __dirname is not defined in ES module scope
 			root: path.join(process.cwd(), ".."),

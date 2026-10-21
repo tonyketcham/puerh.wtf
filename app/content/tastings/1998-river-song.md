@@ -3,11 +3,16 @@ id: 268aaac0-d138-4ef3-967e-3907655f0d0d
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 title: River Song
-genre:
+style:
   - d881f184-5372-406a-a47f-421cbacf58bf
 production_year: 1998
 picking: Bud & up to 3 leaves
 aging_conditions: Taiwan for ~20 years
+storage:
+  - place: taiwan
+    from: 1998
+    to: 2018
+    approx: true
 vendor:
   - 555dfab5-d760-4863-8143-3fd9c1a7d14b
 excerpt: A damn captivating, cleanly-stored, well-aged Gong Ting with a ton of character
@@ -58,6 +63,8 @@ tags:
   - 5aff9d97-c256-4bf7-9d36-2f43da99599d
   - 21e82f1f-7568-400e-b151-95639ed3a977
 rating: 89
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 5
@@ -65,6 +72,7 @@ brewing:
   vessel: Jianshui Zitao Teapot
   first_infusion_duration: 5
   infusion_increment: 5
+origin_note: undisclosed
 ---
 
 ## Infusion log

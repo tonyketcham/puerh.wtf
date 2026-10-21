@@ -1,0 +1,302 @@
+/*
+  Origin maps (plan §4.1, §4.5, §4.7). Plain CSS: @font-face and view-transition pseudo-elements
+  are global anyway, and the camera drives these rules without re-rendering anything, through
+  custom properties and transforms it writes on the elements that use them (camera.ts, setSvgView;
+  TerrainMap.tsx):
+
+    upp, tanaka   the view (camera.ts): the transforms of .map-px and .map-tanaka-*
+    --contour-a   1 up close → ~0.4 zoomed out: how much the contours show
+    --ref-a       ~0.8 up close → ~1.5 zoomed out: how strongly borders, coast and rivers read
+    --label-a     label ink, likewise
+*/
+
+/* Hanzi labels: a build-time subset of Noto Sans SC holding only the glyphs the maps use
+   (scripts/geo/lib/font.mjs). Latin falls through to Fira Code. */
+@font-face {
+	font-family: "Puerh Origins SC";
+	src: url("/fonts/origins-sc.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+.map-label {
+	font-family: "Puerh Origins SC", var(--font-fira-code), ui-monospace, monospace;
+	font-feature-settings: "calt" 1;
+}
+
+/* Tanaka offsets: the camera writes each group's offset, the user-unit length of ~0.6 screen px
+   at the current zoom, so the light/dark strokes stay a hair apart at any scale. Until it does,
+   0.6 user units. */
+.map-tanaka-light {
+	transform: translate(-0.6px, -0.6px);
+}
+.map-tanaka-dark {
+	transform: translate(0.6px, 0.6px);
+}
+
+/* Screen-constant marks inside a zoomed map: the camera scales them by its user units per px. */
+.map-px {
+	transform-origin: 0 0;
+	transform-box: view-box;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Terrain emphasis by zoom (plan §4.7.5)
+   --------------------------------------------------------------------------------------------- */
+
+/* a veil of land over each layer's contours: transparent up close, thicker zoomed out */
+.map-contour-veil {
+	opacity: calc(1 - var(--contour-a, 1));
+}
+
+.map-ref-admin {
+	stroke: #fff2ca;
+	stroke-width: 0.75;
+	stroke-opacity: calc(0.13 * var(--ref-a, 1));
+}
+.map-ref-coast {
+	stroke: rgb(160 188 214);
+	stroke-width: 0.8;
+	stroke-opacity: calc(0.38 * var(--ref-a, 1));
+}
+.map-ref-border-casing {
+	stroke: #121012;
+	stroke-width: 3.2;
+	stroke-opacity: 0.85;
+	stroke-linejoin: round;
+}
+.map-ref-border {
+	stroke: #fff2ca;
+	stroke-width: 0.9;
+	stroke-opacity: calc(0.28 * var(--ref-a, 1));
+	stroke-linejoin: round;
+}
+.map-ref-lake {
+	fill: rgb(160 188 214);
+	fill-opacity: 0.05;
+	stroke: rgb(160 188 214);
+	stroke-width: 0.7;
+	stroke-opacity: calc(0.34 * var(--ref-a, 1));
+}
+.map-ref-river {
+	stroke: rgb(160 188 214);
+	stroke-width: 0.85;
+	stroke-opacity: calc(0.36 * var(--ref-a, 1));
+}
+
+/* elevations on index contours: only up close */
+.map-clabels {
+	display: none;
+}
+[data-map-fine] .map-clabels {
+	display: inline;
+}
+.map-clabel {
+	fill-opacity: 0.5;
+	letter-spacing: 0.04em;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Atlas labels (MapLabels.tsx): screen-space HTML, placed by the camera's variables
+   --------------------------------------------------------------------------------------------- */
+
+.map-place {
+	position: absolute;
+	left: 0;
+	top: 0;
+	white-space: nowrap;
+	line-height: 1;
+	pointer-events: none;
+	/* a halo of ground, the cartographer's knock-out, so type reads over line work */
+	text-shadow: 0 0 2px #121012, 0 0 3px #121012, 0 0 6px rgb(18 16 18 / 0.9);
+	/* in and out by a transition (MapLabels keeps a leaving label until it has faded), so one that
+	   comes back mid-fade turns around from where it is */
+	opacity: 1;
+	transition: opacity 200ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+@starting-style {
+	.map-place {
+		opacity: 0;
+	}
+}
+.map-place[data-out] {
+	opacity: 0;
+	transition-duration: 220ms;
+}
+.map-place-ink {
+	opacity: var(--label-a, 1);
+}
+
+/* countries and seas: spaced capitals, hanzi beneath */
+.map-place-country,
+.map-place-sea {
+	text-align: center;
+	text-transform: uppercase;
+}
+.map-place-country .map-place-name {
+	font-size: 11px;
+	letter-spacing: 0.42em;
+	color: rgb(255 242 202 / 0.62);
+}
+.map-place-sea .map-place-name {
+	font-size: 9.5px;
+	letter-spacing: 0.32em;
+	font-style: italic;
+	color: rgb(160 188 214 / 0.62);
+}
+.map-place-country .map-place-zh,
+.map-place-sea .map-place-zh {
+	display: block;
+	margin-top: 4px;
+	font-size: 10px;
+	letter-spacing: 0.3em;
+}
+.map-place-country .map-place-zh {
+	color: rgb(255 242 202 / 0.4);
+}
+.map-place-sea .map-place-zh {
+	color: rgb(160 188 214 / 0.45);
+}
+
+/* provinces: small spaced capitals, hanzi after */
+.map-place-province {
+	font-size: 9px;
+	letter-spacing: 0.26em;
+	text-transform: uppercase;
+	color: rgb(255 242 202 / 0.42);
+}
+.map-place-province .map-place-zh {
+	margin-left: 0.5em;
+	font-size: 9.5px;
+	letter-spacing: 0.12em;
+	color: rgb(255 242 202 / 0.32);
+}
+
+/* settlements: a dot on the point, the name beside it */
+.map-place-city,
+.map-place-town,
+.map-place-origin {
+	font-size: 10px;
+	color: rgb(255 255 255 / 0.66);
+}
+.map-place-town {
+	font-size: 9.5px;
+	color: rgb(255 255 255 / 0.5);
+}
+.map-place-origin {
+	font-size: 9.5px;
+	color: rgb(255 242 202 / 0.55);
+}
+.map-place-city .map-place-zh,
+.map-place-town .map-place-zh,
+.map-place-origin .map-place-zh {
+	font-size: 9.5px;
+	color: rgb(255 255 255 / 0.36);
+}
+.map-place-dot {
+	position: absolute;
+	left: -2px;
+	top: -2px;
+	width: 4px;
+	height: 4px;
+	border-radius: 9999px;
+	background: rgb(255 242 202 / 0.7);
+	box-shadow: 0 0 0 1.5px #121012;
+}
+.map-place-town .map-place-dot {
+	left: -1.5px;
+	top: -1.5px;
+	width: 3px;
+	height: 3px;
+	background: rgb(255 242 202 / 0.5);
+}
+.map-place-origin .map-place-dot {
+	background: transparent;
+	box-shadow: inset 0 0 0 1px rgb(255 242 202 / 0.55), 0 0 0 1.5px #121012;
+}
+
+/* water: italic, cooler */
+.map-place-river,
+.map-place-lake {
+	font-size: 9.5px;
+	font-style: italic;
+	letter-spacing: 0.14em;
+	color: rgb(160 188 214 / 0.72);
+}
+.map-place-river .map-place-zh,
+.map-place-lake .map-place-zh {
+	margin-left: 0.45em;
+	font-style: normal;
+	letter-spacing: 0.06em;
+	color: rgb(160 188 214 / 0.5);
+}
+
+/* graticule degree ticks along the map's edges */
+.map-tick {
+	position: absolute;
+	font-size: 8.5px;
+	line-height: 1;
+	white-space: nowrap;
+	color: rgb(255 242 202 / 0.34);
+	pointer-events: none;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Panel chrome (TerrainMap.tsx): the controls and minimap of a compact map wait for the reader,
+   shown on hover, on focus within and once the map is engaged. Plain descendant selectors on
+   purpose: tailwind's group-hover/-focus-within/-data variants compile to `:is(.group:hover *)`,
+   which restyles every element in the map (~4,000, about 20 ms) when any of them changes; these
+   restyle only the boxes that carry .map-reveal.
+   --------------------------------------------------------------------------------------------- */
+
+.map-reveal {
+	opacity: 0;
+	transition: opacity 200ms var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1));
+}
+.group\/map:hover .map-reveal,
+.group\/map:focus-within .map-reveal,
+.group\/map[data-map-engaged] .map-reveal {
+	opacity: 1;
+}
+@media (hover: none) {
+	.map-reveal {
+		opacity: 1;
+	}
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------------------------------- */
+
+/* Inset → hero (Properties or peek map grows into the origin page's map; see viewTransition.ts) */
+::view-transition-group(.origin-map) {
+	animation-duration: 520ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(.origin-map),
+::view-transition-new(.origin-map) {
+	animation-duration: 360ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+	/* keep both snapshots filling the group while its aspect changes */
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+}
+
+/* Origin hero (plan §3.2): scrolling away fades the plain contours toward the index lines.
+   --minor-contours (1 → ~0.15) is driven from the scroll position (Hero.tsx). */
+[data-contour-fade] [data-contour="minor"] {
+	opacity: var(--minor-contours, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.map-place {
+		transition: none;
+	}
+	::view-transition-old(.origin-map),
+	::view-transition-new(.origin-map) {
+		animation-duration: 160ms;
+	}
+}

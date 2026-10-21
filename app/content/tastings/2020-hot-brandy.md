@@ -54,6 +54,8 @@ notes:
 tags:
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
 rating: 79
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 7
@@ -61,6 +63,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 25
   infusion_increment: 15
+origin_note: blend
 ---
 
 This is specifically for the 2020 Hot Brandy Minis - they may open up differently than the cake version since I'm just gonna throw the ball in and hit it with water.

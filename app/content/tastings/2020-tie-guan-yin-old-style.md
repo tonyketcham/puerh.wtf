@@ -56,6 +56,8 @@ tags:
   - 431f3e60-1948-4d16-8824-e93ad42786e7
   - 45bc51d4-ca88-4795-94f7-9aa42115feb3
 rating: 75.4
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 200
   material_amount: 6.5
@@ -76,6 +78,7 @@ images:
     alt: liquor in the beaker
   - image: /images/uploads/b1a2c04e-4acc-4369-bc49-c20969e5e7c5-min.jpg
     alt: liquor in the cup
+origin_note: undisclosed
 ---
 The smell of the warm dry leaf takes on a familiar heavily roasted oolong aroma, reminiscent of nearly burnt, crusty bread. No rinse. I'm feelin spicy.
 

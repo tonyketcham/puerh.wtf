@@ -9,7 +9,9 @@ cultivar:
   - 155823a5-e457-426e-aa93-020dca00f42e
 origin:
   - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2021
 picking: Bud up to 2 or 3 leaves
 vendor:
@@ -59,6 +61,8 @@ tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
 rating: 71.3
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 196
   material_amount: 5.41

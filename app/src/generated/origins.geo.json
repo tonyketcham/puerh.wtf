@@ -1,0 +1,1842 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"id": "alishan",
+			"properties": {
+				"slug": "alishan",
+				"id": "128e8660-9539-42c3-a23f-3447884a8539",
+				"title": "Alishan",
+				"hanzi": "阿里山",
+				"pinyin": "Ālǐshān",
+				"kind": "mountain-area",
+				"parent": "chiayi",
+				"ancestors": ["chiayi","taiwan"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 12,
+				"elevation_m": [1000,2000],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=Shizhuo%2C%20Alishan",
+				"shared": {"x":9791.3,"y":875.7,"r":61.6},
+				"frames": ["locator","china-east"],
+				"detail": "chiayi"
+			},
+			"geometry": {"type":"Point","coordinates":[120.7,23.475]}
+		},
+		{
+			"type": "Feature",
+			"id": "alishan#area",
+			"properties": {"slug":"alishan","role":"area","radius_km":12},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[120.58234,23.47475],[120.58485,23.4972],[120.59239,23.51867],[120.60464,23.53824],[120.62106,23.55504],[120.64094,23.56835],[120.6634,23.57757],[120.68747,23.58231],[120.71209,23.58235],[120.73618,23.5777],[120.75868,23.56855],[120.77861,23.55532],[120.7951,23.53857],[120.80743,23.51904],[120.81506,23.49759],[120.81766,23.47516],[120.81511,23.45272],[120.80754,23.43125],[120.79527,23.4117],[120.77884,23.39492],[120.75898,23.38163],[120.73654,23.37242],[120.71251,23.36769],[120.68793,23.36765],[120.66388,23.3723],[120.64141,23.38143],[120.62149,23.39465],[120.60499,23.41137],[120.59264,23.43088],[120.58498,23.45232],[120.58234,23.47475]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "anhui",
+			"properties": {
+				"slug": "anhui",
+				"id": "36d86a4a-a612-4325-99f7-f3fa86624f2a",
+				"title": "Anhui",
+				"hanzi": "安徽",
+				"pinyin": "Ānhuī",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 250,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%89%E5%BE%BD%E7%9C%81",
+				"shared": {"x":7974.4,"y":-4069.9,"r":1385.6},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[117.23,31.83]}
+		},
+		{
+			"type": "Feature",
+			"id": "anhui#area",
+			"properties": {"slug":"anhui","role":"area","radius_km":250},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[114.58882,31.71451],[114.61165,32.18402],[114.75004,32.63917],[114.99954,33.05973],[115.35043,33.42673],[115.78783,33.72338],[116.29233,33.93594],[116.84078,34.05446],[117.40756,34.07336],[117.96597,33.99176],[118.48981,33.81351],[118.95486,33.54695],[119.34016,33.20449],[119.62908,32.80187],[119.80991,32.35736],[119.87622,31.89082],[119.82685,31.4228],[119.66562,30.97359],[119.40092,30.5624],[119.04512,30.20658],[118.61394,29.92101],[118.12575,29.71749],[117.60088,29.60442],[117.06087,29.5864],[116.52776,29.66419],[116.02337,29.83461],[115.56856,30.09064],[115.18251,30.42172],[114.88203,30.81407],[114.68082,31.25121],[114.58882,31.71451]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "anxi",
+			"properties": {
+				"slug": "anxi",
+				"id": "531a9fca-a82e-4c0b-96af-5cbdfda27a9d",
+				"title": "Anxi",
+				"hanzi": "安溪",
+				"pinyin": "Ānxī",
+				"kind": "county",
+				"parent": "fujian",
+				"ancestors": ["fujian","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 30,
+				"elevation_m": [300,1000],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%89%E6%BA%AA%E5%8E%BF",
+				"shared": {"x":8327.8,"y":-82.1,"r":156},
+				"frames": ["locator","china-east"],
+				"detail": "anxi"
+			},
+			"geometry": {"type":"Point","coordinates":[117.905,25.142]}
+		},
+		{
+			"type": "Feature",
+			"id": "anxi#area",
+			"properties": {"slug":"anxi","role":"area","radius_km":30},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[117.60697,25.14043],[117.61306,25.19656],[117.63192,25.25032],[117.66275,25.29936],[117.70421,25.34151],[117.75448,25.37494],[117.81137,25.39817],[117.87238,25.41018],[117.93482,25.41045],[117.99595,25.39895],[118.05308,25.37621],[118.10371,25.34321],[118.1456,25.30141],[118.17694,25.25265],[118.19636,25.19905],[118.20303,25.14297],[118.19668,25.08686],[118.17759,25.03318],[118.14662,24.98425],[118.10514,24.94222],[118.05494,24.90891],[117.99824,24.88577],[117.93748,24.87381],[117.87531,24.87355],[117.81443,24.88499],[117.75748,24.90764],[117.70695,24.94052],[117.66503,24.9822],[117.63355,25.03086],[117.61391,25.08438],[117.60697,25.14043]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "asamiya",
+			"properties": {
+				"slug": "asamiya",
+				"id": "27bab493-b309-4b5b-a912-c92a584af28d",
+				"title": "Asamiya",
+				"hanzi": "朝宮",
+				"pinyin": null,
+				"kind": "township",
+				"parent": "shiga",
+				"ancestors": ["shiga","japan"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 3,
+				"elevation_m": [350,500],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BF%A1%E6%A5%BD%E7%94%BA%E6%9C%9D%E5%AE%AE",
+				"shared": {"x":17795.6,"y":-5972,"r":17.2},
+				"frames": ["locator","japan"],
+				"detail": "uji"
+			},
+			"geometry": {"type":"Point","coordinates":[135.987,34.864]}
+		},
+		{
+			"type": "Feature",
+			"id": "asamiya#area",
+			"properties": {"slug":"asamiya","role":"area","radius_km":3},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[135.95412,34.86398],[135.95483,34.86959],[135.95695,34.87496],[135.96038,34.87985],[135.96498,34.88404],[135.97054,34.88736],[135.97682,34.88965],[135.98355,34.89083],[135.99042,34.89083],[135.99715,34.88966],[136.00343,34.88737],[136.009,34.88406],[136.0136,34.87987],[136.01704,34.87498],[136.01916,34.86962],[136.01988,34.86401],[136.01916,34.8584],[136.01704,34.85303],[136.01361,34.84815],[136.00901,34.84396],[136.00345,34.84064],[135.99717,34.83834],[135.99045,34.83717],[135.98358,34.83717],[135.97686,34.83834],[135.97058,34.84063],[135.96501,34.84394],[135.96041,34.84813],[135.95697,34.85301],[135.95484,34.85837],[135.95412,34.86398]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "banpo-laozhai",
+			"properties": {
+				"slug": "banpo-laozhai",
+				"id": "6d5bd978-7928-4e63-b7f5-6ce0b3f44e9a",
+				"title": "Banpo Laozhai",
+				"hanzi": "半坡老寨",
+				"pinyin": "Bànpō Lǎozhài",
+				"kind": "village",
+				"parent": "nannuo",
+				"ancestors": ["nannuo","menghai","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [1600,1800],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%8A%E5%9D%A1%E5%AF%A8",
+				"shared": {"x":-733,"y":1745.3,"r":5.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.6,21.943]}
+		},
+		{
+			"type": "Feature",
+			"id": "bulang",
+			"properties": {
+				"slug": "bulang",
+				"id": "2fc8193d-5bf0-46f3-9c4d-d836693b7837",
+				"title": "Bulang Shan",
+				"hanzi": "布朗山",
+				"pinyin": "Bùlǎng Shān",
+				"kind": "mountain-area",
+				"parent": "menghai",
+				"ancestors": ["menghai","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 15,
+				"elevation_m": [1200,1900],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B8%83%E6%9C%97%E5%B1%B1%E5%B8%83%E6%9C%97%E6%97%8F%E4%B9%A1",
+				"shared": {"x":-811.6,"y":1910.5,"r":76},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.45,21.65]}
+		},
+		{
+			"type": "Feature",
+			"id": "bulang#area",
+			"properties": {"slug":"bulang","role":"area","radius_km":15},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.30486,21.64962],[100.30794,21.67768],[100.31722,21.70452],[100.33232,21.72899],[100.35256,21.75001],[100.37708,21.76665],[100.40479,21.77819],[100.43447,21.78412],[100.46484,21.78419],[100.49456,21.77839],[100.52233,21.76697],[100.54693,21.75043],[100.56728,21.72951],[100.5825,21.70511],[100.59192,21.6783],[100.59514,21.65025],[100.59201,21.6222],[100.58268,21.59537],[100.56755,21.57092],[100.5473,21.54994],[100.52281,21.53332],[100.49513,21.5218],[100.4655,21.51587],[100.43518,21.51581],[100.40551,21.5216],[100.37779,21.533],[100.35321,21.54951],[100.33285,21.57041],[100.3176,21.59479],[100.30813,21.62158],[100.30486,21.64962]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "chiayi",
+			"properties": {
+				"slug": "chiayi",
+				"id": "8524c796-29b5-484b-b578-cddcd9ae6564",
+				"title": "Chiayi",
+				"hanzi": "嘉義",
+				"pinyin": "Jiāyì",
+				"kind": "county",
+				"parent": "taiwan",
+				"ancestors": ["taiwan"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 30,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%98%89%E7%BE%A9%E7%B8%A3",
+				"shared": {"x":9725.3,"y":884.8,"r":154},
+				"frames": ["locator","china-east"],
+				"detail": "chiayi"
+			},
+			"geometry": {"type":"Point","coordinates":[120.574,23.459]}
+		},
+		{
+			"type": "Feature",
+			"id": "chiayi#area",
+			"properties": {"slug":"chiayi","role":"area","radius_km":30},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[120.2799,23.45745],[120.28592,23.51359],[120.30454,23.56734],[120.33497,23.61637],[120.37588,23.65852],[120.42549,23.69194],[120.48162,23.71517],[120.54182,23.72718],[120.60342,23.72745],[120.66374,23.71596],[120.72011,23.69321],[120.77006,23.66022],[120.81141,23.61843],[120.84234,23.56967],[120.86151,23.51607],[120.8681,23.45999],[120.86184,23.40389],[120.84302,23.3502],[120.81246,23.30127],[120.77152,23.25923],[120.72199,23.22592],[120.66602,23.20278],[120.60605,23.19081],[120.54469,23.19055],[120.48461,23.20199],[120.42841,23.22465],[120.37853,23.25753],[120.33717,23.29921],[120.30611,23.34788],[120.28674,23.4014],[120.2799,23.45745]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "china",
+			"properties": {
+				"slug": "china",
+				"id": "946cbaee-f788-4336-98c5-0744b1c8a59b",
+				"title": "China",
+				"hanzi": "中国",
+				"pinyin": "Zhōngguó",
+				"kind": "country",
+				"parent": null,
+				"ancestors": [],
+				"groups": [],
+				"precision": "country",
+				"radius_km": 2500,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%AD%E5%9B%BD",
+				"shared": {"x":1570.8,"y":-6058.8,"r":14371.1},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[105,35]}
+		},
+		{
+			"type": "Feature",
+			"id": "china#area",
+			"properties": {"slug":"china","role":"area","radius_km":2500},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[82.2048,24.21677],[79.73634,28.22831],[78.02549,32.56617],[77.21371,37.09928],[77.48072,41.67639],[79.05147,46.11641],[82.18097,50.19604],[87.08422,53.64076],[93.77185,56.13561],[101.82129,57.38102],[110.29842,57.19721],[118.07365,55.61218],[124.32928,52.84675],[128.77117,49.21283],[131.4827,45.01823],[132.70029,40.52434],[132.67509,35.94263],[131.62074,31.44553],[129.70621,27.17844],[127.06532,23.26837],[123.81019,19.82883],[120.0439,16.96107],[115.87036,14.75257],[111.40063,13.27366],[106.75496,12.57323],[102.06079,12.67502],[97.44778,13.57556],[93.04193,15.24447],[88.96122,17.62704],[85.31452,20.64822],[82.2048,24.21677]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "dingjiazhai",
+			"properties": {
+				"slug": "dingjiazhai",
+				"id": "f0f3169e-eaea-4193-83ca-eeabfe61a28b",
+				"title": "Dingjiazhai",
+				"hanzi": "丁家寨",
+				"pinyin": "Dīngjiā Zhài",
+				"kind": "village",
+				"parent": "yiwu",
+				"ancestors": ["yiwu","mengla","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [1300,1500],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%81%E5%AE%B6%E5%AF%A8",
+				"shared": {"x":-273.8,"y":1675.9,"r":5.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.477,22.066]}
+		},
+		{
+			"type": "Feature",
+			"id": "fengqing",
+			"properties": {
+				"slug": "fengqing",
+				"id": "28adb012-09db-48e8-83b1-d396a1b04528",
+				"title": "Fengqing",
+				"hanzi": "凤庆",
+				"pinyin": "Fèngqìng",
+				"kind": "county",
+				"parent": "lincang",
+				"ancestors": ["lincang","yunnan","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 30,
+				"elevation_m": [1500,2100],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%87%A4%E5%BA%86%E5%8E%BF",
+				"shared": {"x":-1094.8,"y":232.4,"r":155.4},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": "suanzaoshu"
+			},
+			"geometry": {"type":"Point","coordinates":[99.909,24.597]}
+		},
+		{
+			"type": "Feature",
+			"id": "fengqing#area",
+			"properties": {"slug":"fengqing","role":"area","radius_km":30},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[99.61229,24.59544],[99.61835,24.65157],[99.63713,24.70533],[99.66782,24.75436],[99.7091,24.79651],[99.75915,24.82994],[99.81579,24.85317],[99.87653,24.86518],[99.93869,24.86545],[99.99955,24.85395],[100.05643,24.83121],[100.10682,24.79822],[100.14853,24.75642],[100.17974,24.70765],[100.19908,24.65406],[100.20572,24.59798],[100.1994,24.54187],[100.1804,24.48818],[100.14957,24.43926],[100.10826,24.39722],[100.05829,24.36391],[100.00183,24.34078],[99.94134,24.32881],[99.87944,24.32855],[99.81882,24.33999],[99.76213,24.36265],[99.71181,24.39553],[99.67008,24.4372],[99.63874,24.48586],[99.61919,24.53939],[99.61229,24.59544]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "fuding",
+			"properties": {
+				"slug": "fuding",
+				"id": "983b2971-0260-4437-a5bf-8e8e80a9483a",
+				"title": "Fuding",
+				"hanzi": "福鼎",
+				"pinyin": "Fúdǐng",
+				"kind": "county",
+				"parent": "fujian",
+				"ancestors": ["fujian","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 25,
+				"elevation_m": [100,900],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%A6%8F%E9%BC%8E%E5%B8%82",
+				"shared": {"x":9535.3,"y":-1295.8,"r":132.4},
+				"frames": ["locator","china-east"],
+				"detail": "fuding"
+			},
+			"geometry": {"type":"Point","coordinates":[120.211,27.222]}
+		},
+		{
+			"type": "Feature",
+			"id": "fuding#area",
+			"properties": {"slug":"fuding","role":"area","radius_km":25},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[119.95817,27.22089],[119.96338,27.26766],[119.97943,27.31245],[120.00563,27.35329],[120.04083,27.38839],[120.0835,27.41621],[120.13177,27.43553],[120.18353,27.4455],[120.23649,27.44569],[120.28833,27.43608],[120.33678,27.41709],[120.37969,27.38957],[120.41521,27.35472],[120.44176,27.31406],[120.45821,27.26939],[120.46383,27.22266],[120.45841,27.1759],[120.44219,27.13117],[120.41589,27.09041],[120.38066,27.05541],[120.33805,27.02768],[120.28992,27.00843],[120.23836,26.99849],[120.18561,26.99831],[120.13396,27.00788],[120.08566,27.0268],[120.04281,27.05423],[120.00728,27.08899],[119.98062,27.12956],[119.96401,27.17418],[119.95817,27.22089]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "fujian",
+			"properties": {
+				"slug": "fujian",
+				"id": "0c420030-b53f-4f7c-8841-5c34dfcd3085",
+				"title": "Fujian",
+				"hanzi": "福建",
+				"pinyin": "Fújiàn",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 250,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%A6%8F%E5%BB%BA%E7%9C%81",
+				"shared": {"x":8493.3,"y":-692.6,"r":1311.9},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[118.221,26.193]}
+		},
+		{
+			"type": "Feature",
+			"id": "fujian#area",
+			"properties": {"slug":"fujian","role":"area","radius_km":250},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[115.71953,26.08318],[115.74377,26.55258],[115.87713,27.00715],[116.11499,27.42676],[116.4478,27.79259],[116.8614,28.08806],[117.33745,28.29965],[117.85435,28.41758],[118.38825,28.43639],[118.9144,28.3552],[119.40843,28.17779],[119.84778,27.91235],[120.21276,27.57109],[120.48757,27.16953],[120.6609,26.72575],[120.72625,26.2595],[120.68209,25.79128],[120.53159,25.34141],[120.28234,24.92923],[119.94584,24.57227],[119.53692,24.28557],[119.0731,24.08115],[118.5739,23.96753],[118.06007,23.94943],[117.55291,24.0276],[117.07346,24.19879],[116.6418,24.45589],[116.27626,24.78813],[115.99278,25.18156],[115.80416,25.61949],[115.71953,26.08318]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "gedeng",
+			"properties": {
+				"slug": "gedeng",
+				"id": "8f94266b-da17-4f30-8a46-d6b4b4dffbd3",
+				"title": "Gedeng",
+				"hanzi": "革登",
+				"pinyin": "Gédēng",
+				"kind": "mountain-area",
+				"parent": "mengla",
+				"ancestors": ["mengla","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "mountain-area",
+				"radius_km": 4,
+				"elevation_m": [1000,1500],
+				"confidence": "low",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%9D%A9%E7%99%BB%E8%8C%B6%E5%8E%82",
+				"shared": {"x":-405.8,"y":1645.3,"r":20.3},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.225,22.12]}
+		},
+		{
+			"type": "Feature",
+			"id": "gedeng#area",
+			"properties": {"slug":"gedeng","role":"area","radius_km":4},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.18617,22.11997],[101.18701,22.12745],[101.18951,22.13461],[101.19357,22.14112],[101.19899,22.14672],[101.20556,22.15114],[101.21297,22.1542],[101.22092,22.15577],[101.22904,22.15578],[101.23698,22.15422],[101.2444,22.15116],[101.25097,22.14675],[101.25641,22.14116],[101.26047,22.13465],[101.26298,22.1275],[101.26383,22.12002],[101.26299,22.11254],[101.26048,22.10539],[101.25642,22.09887],[101.251,22.09328],[101.24443,22.08886],[101.23702,22.08579],[101.22908,22.08423],[101.22097,22.08422],[101.21303,22.08578],[101.20561,22.08883],[101.19904,22.09325],[101.1936,22.09883],[101.18954,22.10534],[101.18702,22.11249],[101.18617,22.11997]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "guafengzhai",
+			"properties": {
+				"slug": "guafengzhai",
+				"id": "64c1d082-e669-4788-8e31-c5d9d80e577c",
+				"title": "Guafengzhai",
+				"hanzi": "刮风寨",
+				"pinyin": "Guāfēng Zhài",
+				"kind": "village",
+				"parent": "yiwu",
+				"ancestors": ["yiwu","mengla","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [1200,2000],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%88%AE%E9%A3%8E%E5%AF%A8",
+				"shared": {"x":-208.4,"y":1693.4,"r":5.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.602,22.035]}
+		},
+		{
+			"type": "Feature",
+			"id": "guangdong",
+			"properties": {
+				"slug": "guangdong",
+				"id": "335d9541-d1dd-4fc4-b319-27f687138218",
+				"title": "Guangdong",
+				"hanzi": "广东",
+				"pinyin": "Guǎngdōng",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 300,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B9%BF%E4%B8%9C%E7%9C%81",
+				"shared": {"x":5916.7,"y":975.5,"r":1538.1},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[113.3,23.3]}
+		},
+		{
+			"type": "Feature",
+			"id": "guangdong#area",
+			"properties": {"slug":"guangdong","role":"area","radius_km":300},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[110.36892,23.14579],[110.39191,23.70922],[110.54293,24.25589],[110.8169,24.76161],[111.20298,25.20369],[111.68478,25.56204],[112.241,25.82022],[112.84635,25.96627],[113.47283,25.99339],[114.09125,25.9003],[114.67289,25.69136],[115.19105,25.37626],[115.62251,24.96954],[115.94857,24.48977],[116.15586,23.95858],[116.23668,23.39963],[116.18911,22.83751],[116.01677,22.29662],[115.72844,21.80016],[115.33743,21.36922],[114.86101,21.02197],[114.31955,20.77293],[113.73581,20.63247],[113.13404,20.60643],[112.53913,20.69588],[111.97574,20.89711],[111.46738,21.20176],[111.03563,21.59711],[110.69923,22.06656],[110.47336,22.59024],[110.36892,23.14579]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "guangxi",
+			"properties": {
+				"slug": "guangxi",
+				"id": "0d1f9381-ed1b-4464-b6d4-3f777fa44871",
+				"title": "Guangxi",
+				"hanzi": "广西",
+				"pinyin": "Guǎngxī",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 300,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B9%BF%E8%A5%BF%E5%A3%AE%E6%97%8F%E8%87%AA%E6%B2%BB%E5%8C%BA",
+				"shared": {"x":3560.5,"y":690,"r":1543.9},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[108.8,23.8]}
+		},
+		{
+			"type": "Feature",
+			"id": "guangxi#area",
+			"properties": {"slug":"guangxi","role":"area","radius_km":300},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[105.85784,23.64513],[105.88061,24.20857],[106.03195,24.75531],[106.30678,25.26114],[106.69425,25.70335],[107.17795,26.06184],[107.73647,26.32014],[108.3444,26.46626],[108.97357,26.49339],[109.59465,26.40025],[110.17873,26.19121],[110.69898,25.87599],[111.13207,25.46913],[111.45924,24.98923],[111.66708,24.45795],[111.74792,23.89898],[111.69987,23.33687],[111.52663,22.79605],[111.23703,22.2997],[110.84449,21.86891],[110.36632,21.52179],[109.82297,21.27285],[109.23726,21.13246],[108.63348,21.10643],[108.03658,21.19584],[107.47126,21.39698],[106.96109,21.70151],[106.52769,22.09672],[106.1899,22.56604],[105.96295,23.08963],[105.85784,23.64513]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "guoyoulin",
+			"properties": {
+				"slug": "guoyoulin",
+				"id": "cec576a6-8a4a-4d0d-879e-7ab33f775304",
+				"title": "Guoyoulin",
+				"hanzi": "国有林",
+				"pinyin": "Guóyǒulín",
+				"kind": "forest",
+				"parent": "yiwu",
+				"ancestors": ["yiwu","mengla","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 10,
+				"elevation_m": [1650,1650],
+				"confidence": "low",
+				"source": "https://yunnansourcing.com/products/2024-yunnan-sourcing-guo-you-lin-ancient-arbor-raw-pu-erh-tea-cake",
+				"shared": {"x":-261.8,"y":1797.8,"r":50.7},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.5,21.85]}
+		},
+		{
+			"type": "Feature",
+			"id": "guoyoulin#area",
+			"properties": {"slug":"guoyoulin","role":"area","radius_km":10},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.40311,21.84983],[101.40518,21.86853],[101.4114,21.88643],[101.42149,21.90273],[101.43502,21.91673],[101.4514,21.92781],[101.4699,21.93548],[101.48971,21.93942],[101.50998,21.93945],[101.52981,21.93557],[101.54834,21.92795],[101.56475,21.91691],[101.57833,21.90296],[101.58848,21.88668],[101.59476,21.86881],[101.59689,21.85011],[101.59479,21.83141],[101.58856,21.81353],[101.57845,21.79723],[101.56492,21.78325],[101.54855,21.77218],[101.53007,21.76451],[101.51027,21.76058],[101.49003,21.76055],[101.47022,21.76442],[101.45171,21.77204],[101.43531,21.78306],[101.42173,21.79701],[101.41157,21.81327],[101.40527,21.83114],[101.40311,21.84983]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "hekai",
+			"properties": {
+				"slug": "hekai",
+				"id": "008ec9cc-0c87-4e83-a1fc-8d9cd22a1ba3",
+				"title": "Hekai",
+				"hanzi": "贺开",
+				"pinyin": "Hèkāi",
+				"kind": "mountain-area",
+				"parent": "menghai",
+				"ancestors": ["menghai","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 6,
+				"elevation_m": [1500,1900],
+				"confidence": "medium",
+				"source": "https://www.geonames.org/search.html?q=Hekai&country=CN",
+				"shared": {"x":-788,"y":1834.5,"r":30.4},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.495,21.785]}
+		},
+		{
+			"type": "Feature",
+			"id": "hekai#area",
+			"properties": {"slug":"hekai","role":"area","radius_km":6},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.43689,21.78494],[100.43814,21.79616],[100.44188,21.80689],[100.44795,21.81667],[100.45607,21.82506],[100.46589,21.8317],[100.47698,21.8363],[100.48887,21.83866],[100.50102,21.83867],[100.51291,21.83633],[100.52402,21.83175],[100.53385,21.82513],[100.54199,21.81675],[100.54807,21.80699],[100.55183,21.79626],[100.55311,21.78504],[100.55185,21.77382],[100.5481,21.76309],[100.54203,21.75332],[100.53391,21.74493],[100.52409,21.73829],[100.513,21.7337],[100.50113,21.73134],[100.48898,21.73133],[100.4771,21.73367],[100.466,21.73824],[100.45617,21.74486],[100.44803,21.75324],[100.44194,21.763],[100.43818,21.77372],[100.43689,21.78494]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "houkeng",
+			"properties": {
+				"slug": "houkeng",
+				"id": "f62cd431-7994-4e07-b68b-64e068b058bf",
+				"title": "Houkeng",
+				"hanzi": "猴坑",
+				"pinyin": "Hóukēng",
+				"kind": "village",
+				"parent": "anhui",
+				"ancestors": ["anhui","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [400,750],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%8C%B4%E5%9D%91",
+				"shared": {"x":8467.6,"y":-3177,"r":5.5},
+				"frames": ["locator","china-east"],
+				"detail": "huangshan"
+			},
+			"geometry": {"type":"Point","coordinates":[118.172,30.37]}
+		},
+		{
+			"type": "Feature",
+			"id": "huangshan",
+			"properties": {
+				"slug": "huangshan",
+				"id": "8a775018-7fc0-4175-bd8b-1818425901ef",
+				"title": "Huangshan",
+				"hanzi": "黄山",
+				"pinyin": "Huángshān",
+				"kind": "mountain-area",
+				"parent": "anhui",
+				"ancestors": ["anhui","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 12,
+				"elevation_m": [300,1200],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%BB%84%E5%B1%B1%E9%A3%8E%E6%99%AF%E5%8C%BA",
+				"shared": {"x":8461.4,"y":-3036.4,"r":65.3},
+				"frames": ["locator","china-east"],
+				"detail": "huangshan"
+			},
+			"geometry": {"type":"Point","coordinates":[118.16,30.138]}
+		},
+		{
+			"type": "Feature",
+			"id": "huangshan#area",
+			"properties": {"slug":"huangshan","role":"area","radius_km":12},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[118.03521,30.13774],[118.03786,30.16018],[118.04586,30.18166],[118.05884,30.20123],[118.07626,30.21804],[118.09734,30.23134],[118.12117,30.24057],[118.14671,30.24531],[118.17282,30.24535],[118.19838,30.24069],[118.22225,30.23155],[118.24339,30.21831],[118.26088,30.20156],[118.27395,30.18203],[118.28204,30.16058],[118.28479,30.13814],[118.28208,30.1157],[118.27404,30.09424],[118.26103,30.07469],[118.24361,30.05791],[118.22254,30.04463],[118.19874,30.03542],[118.17326,30.03069],[118.1472,30.03065],[118.1217,30.0353],[118.09787,30.04442],[118.07674,30.05764],[118.05925,30.07436],[118.04615,30.09387],[118.03802,30.11531],[118.03521,30.13774]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "hunan",
+			"properties": {
+				"slug": "hunan",
+				"id": "bd1ed919-2541-4302-b734-6f1c86adc2bf",
+				"title": "Hunan",
+				"hanzi": "湖南",
+				"pinyin": "Húnán",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 250,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%B9%96%E5%8D%97%E7%9C%81",
+				"shared": {"x":5078.9,"y":-1518.7,"r":1328.4},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[111.7,27.6]}
+		},
+		{
+			"type": "Feature",
+			"id": "hunan#area",
+			"properties": {"slug":"hunan","role":"area","radius_km":250},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[109.16734,27.48882],[109.19125,27.95825],[109.32571,28.41296],[109.56616,28.83279],[109.90301,29.19891],[110.32193,29.49466],[110.80434,29.70648],[111.3283,29.82455],[111.86956,29.84338],[112.40292,29.7621],[112.90363,29.58448],[113.34872,29.31878],[113.71824,28.97723],[113.9962,28.57541],[114.17118,28.13146],[114.23674,27.66514],[114.19139,27.19696],[114.03848,26.74725],[113.78577,26.33531],[113.44495,25.97862],[113.03106,25.69219],[112.56182,25.48799],[112.0569,25.3745],[111.53725,25.35642],[111.02431,25.4345],[110.53931,25.60551],[110.10248,25.86235],[109.73236,26.19431],[109.44507,26.58748],[109.25363,27.02522],[109.16734,27.48882]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "japan",
+			"properties": {
+				"slug": "japan",
+				"id": "cc7f3b69-018a-426c-b937-9b8d7341db23",
+				"title": "Japan",
+				"hanzi": "日本",
+				"pinyin": null,
+				"kind": "country",
+				"parent": null,
+				"ancestors": [],
+				"groups": [],
+				"precision": "country",
+				"radius_km": 900,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%97%A5%E6%9C%AC",
+				"shared": {"x":19498.3,"y":-7075.5,"r":5277.1},
+				"frames": ["locator"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[139.239,36.575]}
+		},
+		{
+			"type": "Feature",
+			"id": "japan#area",
+			"properties": {"slug":"japan","role":"area","radius_km":900},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[129.43769,35.03097],[129.14873,36.70116],[129.29188,38.38386],[129.8907,40.00528],[130.94911,41.48903],[132.44442,42.75969],[134.3212,43.74769],[136.48871,44.39532],[138.8246,44.66281],[141.18622,44.53324],[143.42774,44.01484],[145.41806,43.13985],[147.05459,41.96041],[148.26961,40.54264],[149.02959,38.96054],[149.32994,37.29065],[149.18814,35.60799],[148.63724,33.98326],[147.72085,32.48097],[146.48967,31.15808],[144.99924,30.06306],[143.30857,29.23506],[141.47918,28.70321],[139.57435,28.48603],[137.65827,28.59105],[135.7953,29.01464],[134.04912,29.74206],[132.48196,30.74784],[131.1538,31.99626],[130.12151,33.442],[129.43769,35.03097]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "jinghong",
+			"properties": {
+				"slug": "jinghong",
+				"id": "f8595c3d-73e0-4540-a1e1-c1b69dc4d739",
+				"title": "Jinghong",
+				"hanzi": "景洪",
+				"pinyin": "Jǐnghóng",
+				"kind": "county",
+				"parent": "xishuangbanna",
+				"ancestors": ["xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 40,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AF%E6%B4%AA%E5%B8%82",
+				"shared": {"x":-629.9,"y":1712.6,"r":203.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.797,22.001]}
+		},
+		{
+			"type": "Feature",
+			"id": "jinghong#area",
+			"properties": {"slug":"jinghong","role":"area","radius_km":40},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.40903,21.99829],[100.4168,22.07314],[100.44121,22.14486],[100.48122,22.21031],[100.53509,22.26661],[100.60047,22.31128],[100.6745,22.34237],[100.75391,22.35851],[100.83523,22.35898],[100.91486,22.34377],[100.9893,22.31354],[101.05529,22.26963],[101.10992,22.21397],[101.15081,22.149],[101.1762,22.07756],[101.18498,22.0028],[101.17681,21.92798],[101.15206,21.85637],[101.11185,21.79109],[101.05793,21.73498],[100.99267,21.69049],[100.91892,21.65954],[100.83987,21.64348],[100.75896,21.64301],[100.67971,21.65815],[100.60554,21.68823],[100.53969,21.73196],[100.48502,21.78744],[100.44393,21.85225],[100.41822,21.92357],[100.40903,21.99829]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "jingmai",
+			"properties": {
+				"slug": "jingmai",
+				"id": "aa7fe22e-c86f-4318-ba17-55361a79eb30",
+				"title": "Jingmai Shan",
+				"hanzi": "景迈山",
+				"pinyin": "Jǐngmài Shān",
+				"kind": "mountain-area",
+				"parent": "puer",
+				"ancestors": ["puer","yunnan","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 5,
+				"elevation_m": [1100,1700],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AF%E8%BF%88",
+				"shared": {"x":-1053.5,"y":1608.6,"r":25.4},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[99.988,22.185]}
+		},
+		{
+			"type": "Feature",
+			"id": "jingmai#area",
+			"properties": {"slug":"jingmai","role":"area","radius_km":5},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[99.93944,22.18496],[99.94049,22.19431],[99.94362,22.20325],[99.94868,22.2114],[99.95547,22.21839],[99.96368,22.22392],[99.97295,22.22775],[99.98288,22.22972],[99.99304,22.22972],[100.00297,22.22778],[100.01225,22.22396],[100.02047,22.21844],[100.02727,22.21145],[100.03235,22.20332],[100.0355,22.19438],[100.03656,22.18503],[100.0355,22.17568],[100.03237,22.16674],[100.0273,22.15859],[100.02051,22.1516],[100.01231,22.14607],[100.00304,22.14224],[99.99311,22.14028],[99.98296,22.14028],[99.97303,22.14222],[99.96376,22.14604],[99.95554,22.15156],[99.94874,22.15854],[99.94366,22.16667],[99.94051,22.17561],[99.93944,22.18496]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "junshan",
+			"properties": {
+				"slug": "junshan",
+				"id": "40658a3d-1d91-48ae-96b6-7723bc1ad57c",
+				"title": "Junshan Island",
+				"hanzi": "君山岛",
+				"pinyin": "Jūnshān Dǎo",
+				"kind": "village",
+				"parent": "hunan",
+				"ancestors": ["hunan","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [30,65],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%90%9B%E5%B1%B1%E5%B2%9B",
+				"shared": {"x":5759.6,"y":-2564.2,"r":5.4},
+				"frames": ["locator","china-east"],
+				"detail": "junshan"
+			},
+			"geometry": {"type":"Point","coordinates":[113,29.355]}
+		},
+		{
+			"type": "Feature",
+			"id": "kyoto",
+			"properties": {
+				"slug": "kyoto",
+				"id": "d7c09ca5-918b-4e34-99be-119f4e4de0e4",
+				"title": "Kyoto",
+				"hanzi": "京都",
+				"pinyin": null,
+				"kind": "province",
+				"parent": "japan",
+				"ancestors": ["japan"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 60,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%AC%E9%83%BD%E5%BA%9C",
+				"shared": {"x":17514.4,"y":-6218.9,"r":346},
+				"frames": ["locator","japan"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[135.45,35.25]}
+		},
+		{
+			"type": "Feature",
+			"id": "kyoto#area",
+			"properties": {"slug":"kyoto","role":"area","radius_km":60},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[134.78933,35.24312],[134.80158,35.35548],[134.84227,35.4633],[134.90973,35.56184],[135.00106,35.64675],[135.11231,35.71427],[135.23857,35.76141],[135.37424,35.78606],[135.5133,35.78713],[135.64953,35.76457],[135.77687,35.71938],[135.88968,35.65358],[135.98299,35.57009],[136.05273,35.47261],[136.09591,35.36544],[136.11075,35.25329],[136.09671,35.14107],[136.05452,35.03368],[135.98612,34.93578],[135.89455,34.85161],[135.78384,34.7848],[135.65878,34.73823],[135.52476,34.7139],[135.38754,34.71284],[135.25299,34.73511],[135.1269,34.77975],[135.01469,34.84484],[134.92122,34.92759],[134.8506,35.02442],[134.80595,35.13114],[134.78933,35.24312]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "laoshan",
+			"properties": {
+				"slug": "laoshan",
+				"id": "cc42ad0c-ef8e-4056-8ae4-ec9bb77ce98d",
+				"title": "Laoshan",
+				"hanzi": "崂山",
+				"pinyin": "Láoshān",
+				"kind": "mountain-area",
+				"parent": "shandong",
+				"ancestors": ["shandong","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 12,
+				"elevation_m": [100,600],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B4%82%E5%B1%B1%E5%8C%BA",
+				"shared": {"x":9728.5,"y":-6799.2,"r":70},
+				"frames": ["locator","china-east"],
+				"detail": "laoshan"
+			},
+			"geometry": {"type":"Point","coordinates":[120.58,36.15]}
+		},
+		{
+			"type": "Feature",
+			"id": "laoshan#area",
+			"properties": {"slug":"laoshan","role":"area","radius_km":12},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[120.44635,36.14972],[120.44918,36.17217],[120.45774,36.19365],[120.47164,36.21322],[120.49029,36.23003],[120.51288,36.24334],[120.53841,36.25257],[120.56576,36.25731],[120.59374,36.25735],[120.62111,36.25269],[120.64669,36.24354],[120.66933,36.2303],[120.68806,36.21355],[120.70206,36.19402],[120.71071,36.17257],[120.71365,36.15013],[120.71074,36.12769],[120.70213,36.10623],[120.68819,36.08668],[120.66952,36.0699],[120.64696,36.05662],[120.62149,36.04742],[120.5942,36.04269],[120.5663,36.04265],[120.53899,36.04729],[120.51347,36.05642],[120.49085,36.06963],[120.47211,36.08635],[120.45808,36.10586],[120.44936,36.12729],[120.44635,36.14972]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "lincang",
+			"properties": {
+				"slug": "lincang",
+				"id": "cb234402-91d9-44e5-894d-0a55e3d03e1c",
+				"title": "Lincang",
+				"hanzi": "临沧",
+				"pinyin": "Líncāng",
+				"kind": "prefecture",
+				"parent": "yunnan",
+				"ancestors": ["yunnan","china"],
+				"groups": [],
+				"precision": "prefecture",
+				"radius_km": 120,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%B4%E6%B2%A7%E5%B8%82",
+				"shared": {"x":-1099.6,"y":632.7,"r":618.1},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[99.9,23.9]}
+		},
+		{
+			"type": "Feature",
+			"id": "lincang#area",
+			"properties": {"slug":"lincang","role":"area","radius_km":120},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[98.72002,23.87517],[98.73916,24.10009],[98.80926,24.31644],[98.92747,24.51471],[99.08879,24.68611],[99.28621,24.82305],[99.51105,24.91941],[99.75329,24.97089],[100.00211,24.97517],[100.24636,24.93208],[100.47509,24.84352],[100.67813,24.71348],[100.84652,24.54775],[100.97291,24.3537],[101.05194,24.13992],[101.08035,23.91582],[101.05717,23.69122],[100.98368,23.47591],[100.86328,23.27924],[100.70138,23.10969],[100.50507,22.97455],[100.28286,22.87963],[100.0443,22.82897],[99.79957,22.82476],[99.55913,22.86716],[99.33325,22.95437],[99.13162,23.08265],[98.96296,23.24651],[98.83465,23.43891],[98.75241,23.65153],[98.72002,23.87517]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "liubao",
+			"properties": {
+				"slug": "liubao",
+				"id": "7b2ca948-e20b-483f-9dab-3c669515b4b9",
+				"title": "Liubao",
+				"hanzi": "六堡",
+				"pinyin": "Liùbǎo",
+				"kind": "township",
+				"parent": "guangxi",
+				"ancestors": ["guangxi","china"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 1,
+				"elevation_m": [300,1250],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%85%AD%E5%A0%A1%E9%95%87",
+				"shared": {"x":4907.7,"y":681.9,"r":5.1},
+				"frames": ["locator","china-east"],
+				"detail": "liubao"
+			},
+			"geometry": {"type":"Point","coordinates":[111.373,23.814]}
+		},
+		{
+			"type": "Feature",
+			"id": "luoshuidong",
+			"properties": {
+				"slug": "luoshuidong",
+				"id": "936afe2e-e2cd-48cc-bafe-e12a0424f602",
+				"title": "Luoshuidong",
+				"hanzi": "落水洞",
+				"pinyin": "Luòshuǐdòng",
+				"kind": "village",
+				"parent": "yiwu",
+				"ancestors": ["yiwu","mengla","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "village",
+				"radius_km": 1,
+				"elevation_m": [1200,1450],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E8%90%BD%E6%B0%B4%E6%B4%9E%20%E5%8B%90%E8%85%8A",
+				"shared": {"x":-271.2,"y":1709.2,"r":5.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.482,22.007]}
+		},
+		{
+			"type": "Feature",
+			"id": "mangzhi",
+			"properties": {
+				"slug": "mangzhi",
+				"id": "ff781a76-c57d-472a-9f3f-98c4f36b527b",
+				"title": "Mangzhi",
+				"hanzi": "莽枝",
+				"pinyin": "Mǎngzhī",
+				"kind": "mountain-area",
+				"parent": "mengla",
+				"ancestors": ["mengla","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "mountain-area",
+				"radius_km": 4,
+				"elevation_m": [1100,1600],
+				"confidence": "low",
+				"source": "https://m.thepaper.cn/newsDetail_forward_27145484",
+				"shared": {"x":-411,"y":1662.3,"r":20.3},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.215,22.09]}
+		},
+		{
+			"type": "Feature",
+			"id": "mangzhi#area",
+			"properties": {"slug":"mangzhi","role":"area","radius_km":4},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.17618,22.08997],[101.17702,22.09745],[101.17952,22.10461],[101.18357,22.11112],[101.189,22.11672],[101.19556,22.12114],[101.20298,22.1242],[101.21092,22.12577],[101.21903,22.12578],[101.22698,22.12422],[101.23439,22.12116],[101.24096,22.11675],[101.2464,22.11116],[101.25046,22.10465],[101.25297,22.0975],[101.25382,22.09002],[101.25298,22.08254],[101.25047,22.07539],[101.24642,22.06887],[101.24099,22.06328],[101.23443,22.05886],[101.22702,22.05579],[101.21908,22.05423],[101.21097,22.05422],[101.20303,22.05578],[101.19561,22.05883],[101.18905,22.06325],[101.18361,22.06883],[101.17955,22.07534],[101.17703,22.08249],[101.17618,22.08997]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "manzhuan",
+			"properties": {
+				"slug": "manzhuan",
+				"id": "e9a17dc5-6d6c-433a-9570-5f4c5f7a6236",
+				"title": "Manzhuan",
+				"hanzi": "蛮砖",
+				"pinyin": "Mánzhuān",
+				"kind": "mountain-area",
+				"parent": "mengla",
+				"ancestors": ["mengla","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "mountain-area",
+				"radius_km": 8,
+				"elevation_m": [900,1500],
+				"confidence": "low",
+				"source": "https://zh.wikipedia.org/wiki/象明彝族乡",
+				"shared": {"x":-345.6,"y":1662.3,"r":40.7},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.34,22.09]}
+		},
+		{
+			"type": "Feature",
+			"id": "manzhuan#area",
+			"properties": {"slug":"manzhuan","role":"area","radius_km":8},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.26235,22.08989],[101.26402,22.10485],[101.26901,22.11917],[101.27711,22.1322],[101.28795,22.1434],[101.30108,22.15226],[101.3159,22.15839],[101.33178,22.16154],[101.34802,22.16156],[101.36391,22.15845],[101.37876,22.15235],[101.3919,22.14352],[101.40278,22.13235],[101.41091,22.11933],[101.41594,22.10503],[101.41765,22.09007],[101.41596,22.07511],[101.41096,22.0608],[101.40285,22.04777],[101.39201,22.03659],[101.37889,22.02773],[101.36407,22.0216],[101.34821,22.01846],[101.33198,22.01844],[101.31611,22.02155],[101.30128,22.02764],[101.28814,22.03647],[101.27726,22.04763],[101.26912,22.06064],[101.26408,22.07494],[101.26235,22.08989]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "menghai",
+			"properties": {
+				"slug": "menghai",
+				"id": "db44b2c0-1481-477c-af92-b554e56c5d26",
+				"title": "Menghai",
+				"hanzi": "勐海",
+				"pinyin": "Měnghǎi",
+				"kind": "county",
+				"parent": "xishuangbanna",
+				"ancestors": ["xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 40,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8B%90%E6%B5%B7%E5%8E%BF",
+				"shared": {"x":-811.1,"y":1735.7,"r":203.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.451,21.96]}
+		},
+		{
+			"type": "Feature",
+			"id": "menghai#area",
+			"properties": {"slug":"menghai","role":"area","radius_km":40},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.06314,21.95729],[100.07091,22.03214],[100.09532,22.10387],[100.13531,22.16931],[100.18917,22.22561],[100.25453,22.27028],[100.32853,22.30137],[100.40793,22.31751],[100.48922,22.31798],[100.56883,22.30277],[100.64325,22.27254],[100.70921,22.22863],[100.76383,22.17297],[100.80471,22.108],[100.83009,22.03656],[100.83887,21.9618],[100.8307,21.88698],[100.80596,21.81537],[100.76576,21.75009],[100.71185,21.69398],[100.64661,21.64949],[100.57288,21.61854],[100.49386,21.60248],[100.41297,21.60201],[100.33374,21.61715],[100.2596,21.64723],[100.19376,21.69096],[100.13911,21.74644],[100.09803,21.81125],[100.07233,21.88257],[100.06314,21.95729]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "mengla",
+			"properties": {
+				"slug": "mengla",
+				"id": "085425bb-508a-49af-94b8-22a0fff12985",
+				"title": "Mengla",
+				"hanzi": "勐腊",
+				"pinyin": "Měnglà",
+				"kind": "county",
+				"parent": "xishuangbanna",
+				"ancestors": ["xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 60,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8B%90%E8%85%8A%E5%8E%BF",
+				"shared": {"x":-272.8,"y":1907.7,"r":304},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.479,21.655]}
+		},
+		{
+			"type": "Feature",
+			"id": "mengla#area",
+			"properties": {"slug":"mengla","role":"area","radius_km":60},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.89848,21.64891],[100.90959,21.76124],[100.94563,21.86897],[101.00509,21.96737],[101.08539,22.05211],[101.18303,22.11948],[101.29374,22.16649],[101.41263,22.19107],[101.53445,22.19213],[101.65383,22.16964],[101.76547,22.12457],[101.86448,22.05893],[101.9465,21.97561],[102.00795,21.87827],[102.04618,21.77119],[102.05956,21.65907],[102.04757,21.54682],[102.01078,21.43933],[101.95086,21.3413],[101.87045,21.25697],[101.77306,21.19],[101.66295,21.14331],[101.54488,21.11891],[101.42396,21.11785],[101.30542,21.14018],[101.19438,21.18494],[101.09567,21.25018],[101.01358,21.33309],[100.95169,21.43006],[100.91274,21.53689],[100.89848,21.64891]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "mori-machi",
+			"properties": {
+				"slug": "mori-machi",
+				"id": "f7c2c4fa-fe2a-4d67-ac4f-b25f258d1497",
+				"title": "Mori-machi",
+				"hanzi": "森町",
+				"pinyin": null,
+				"kind": "township",
+				"parent": "shizuoka",
+				"ancestors": ["shizuoka","japan"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 8,
+				"elevation_m": [100,400],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%A3%AE%E7%94%BA%20%E9%9D%99%E5%B2%A1%E7%9C%8C",
+				"shared": {"x":18811.3,"y":-5954.1,"r":45.9},
+				"frames": ["locator","japan"],
+				"detail": "mori-machi"
+			},
+			"geometry": {"type":"Point","coordinates":[137.927,34.836]}
+		},
+		{
+			"type": "Feature",
+			"id": "mori-machi#area",
+			"properties": {"slug":"mori-machi","role":"area","radius_km":8},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[137.83935,34.83588],[137.84122,34.85084],[137.84685,34.86515],[137.85599,34.87819],[137.86823,34.88939],[137.88304,34.89825],[137.89979,34.90439],[137.91772,34.90754],[137.93606,34.90756],[137.954,34.90445],[137.97076,34.89834],[137.98561,34.88951],[137.99789,34.87834],[138.00706,34.86532],[138.01273,34.85102],[138.01465,34.83606],[138.01275,34.8211],[138.00709,34.80679],[137.99794,34.79376],[137.9857,34.78258],[137.97089,34.77373],[137.95417,34.7676],[137.93626,34.76446],[137.91795,34.76444],[137.90004,34.76754],[137.8833,34.77364],[137.86847,34.78246],[137.85619,34.79362],[137.847,34.80663],[137.8413,34.82092],[137.83935,34.83588]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "nannuo",
+			"properties": {
+				"slug": "nannuo",
+				"id": "da6f3abe-cbeb-4409-8971-13dd08fb468f",
+				"title": "Nannuo Shan",
+				"hanzi": "南糯山",
+				"pinyin": "Nánnuò Shān",
+				"kind": "mountain-area",
+				"parent": "menghai",
+				"ancestors": ["menghai","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "mountain-area",
+				"radius_km": 6,
+				"elevation_m": [1200,1800],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%97%E7%B3%AF%E5%B1%B1",
+				"shared": {"x":-733,"y":1744.2,"r":30.5},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.6,21.945]}
+		},
+		{
+			"type": "Feature",
+			"id": "nannuo#area",
+			"properties": {"slug":"nannuo","role":"area","radius_km":6},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.54183,21.94494],[100.54308,21.95616],[100.54682,21.96689],[100.55289,21.97667],[100.56102,21.98506],[100.57086,21.9917],[100.58196,21.9963],[100.59386,21.99866],[100.60603,21.99867],[100.61793,21.99633],[100.62905,21.99175],[100.6389,21.98513],[100.64704,21.97675],[100.65313,21.96699],[100.6569,21.95626],[100.65817,21.94504],[100.65691,21.93382],[100.65316,21.92309],[100.64709,21.91332],[100.63896,21.90493],[100.62913,21.89829],[100.61802,21.8937],[100.60613,21.89134],[100.59398,21.89133],[100.58208,21.89367],[100.57097,21.89824],[100.56113,21.90486],[100.55298,21.91324],[100.54689,21.923],[100.54311,21.93372],[100.54183,21.94494]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "pingkengtou",
+			"properties": {
+				"slug": "pingkengtou",
+				"id": "fd718fc0-9386-4221-ab6c-60df4a55627a",
+				"title": "Pingkengtou",
+				"hanzi": "平坑头",
+				"pinyin": "Píngkēngtóu",
+				"kind": "township",
+				"parent": "guangdong",
+				"ancestors": ["guangdong","china"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 5,
+				"elevation_m": [700,1200],
+				"confidence": "low",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B9%8C%E5%B2%BD%E6%9D%91",
+				"shared": {"x":7678.6,"y":609.8,"r":25.8},
+				"frames": ["locator","china-east"],
+				"detail": "pingkengtou"
+			},
+			"geometry": {"type":"Point","coordinates":[116.665,23.94]}
+		},
+		{
+			"type": "Feature",
+			"id": "pingkengtou#area",
+			"properties": {"slug":"pingkengtou","role":"area","radius_km":5},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[116.6158,23.93996],[116.61687,23.94931],[116.62003,23.95825],[116.62517,23.9664],[116.63204,23.97339],[116.64036,23.97892],[116.64976,23.98275],[116.65982,23.98472],[116.67011,23.98472],[116.68017,23.98278],[116.68957,23.97896],[116.6979,23.97344],[116.70479,23.96645],[116.70994,23.95832],[116.71312,23.94938],[116.7142,23.94003],[116.71313,23.93068],[116.70995,23.92174],[116.70482,23.91359],[116.69794,23.9066],[116.68963,23.90107],[116.68023,23.89724],[116.67018,23.89528],[116.6599,23.89528],[116.64984,23.89722],[116.64044,23.90104],[116.63212,23.90656],[116.62523,23.91354],[116.62008,23.92167],[116.61689,23.93061],[116.6158,23.93996]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "puer",
+			"properties": {
+				"slug": "puer",
+				"id": "c3cbf8da-049f-4d79-8867-ebc708c0f72b",
+				"title": "Pu'er",
+				"hanzi": "普洱",
+				"pinyin": "Pǔ'ěr",
+				"kind": "prefecture",
+				"parent": "yunnan",
+				"ancestors": ["yunnan","china"],
+				"groups": [],
+				"precision": "prefecture",
+				"radius_km": 150,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AE%E6%B4%B1%E5%B8%82",
+				"shared": {"x":-576,"y":1146.4,"r":767.3},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[100.9,23]}
+		},
+		{
+			"type": "Feature",
+			"id": "puer#area",
+			"properties": {"slug":"puer","role":"area","radius_km":150},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[99.43532,22.96151],[99.45714,23.24278],[99.54233,23.51371],[99.68752,23.76236],[99.88659,23.97772],[100.13092,24.15018],[100.40975,24.27203],[100.71064,24.33779],[101.02005,24.34449],[101.32405,24.29185],[101.60897,24.18222],[101.86207,24.02054],[102.07215,23.81405],[102.23008,23.57197],[102.32915,23.30503],[102.36537,23.02502],[102.33754,22.7442],[102.24726,22.47481],[102.09878,22.22851],[101.89879,22.01593],[101.65606,21.84617],[101.38109,21.72649],[101.08565,21.66199],[100.78232,21.65542],[100.48399,21.70705],[100.20336,21.81468],[99.95241,21.97374],[99.74197,22.17743],[99.58125,22.41702],[99.47743,22.68221],[99.43532,22.96151]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "qianjiazhai",
+			"properties": {
+				"slug": "qianjiazhai",
+				"id": "a6060fae-eee1-4d8d-920d-3eeae937db1a",
+				"title": "Qianjiazhai",
+				"hanzi": "千家寨",
+				"pinyin": "Qiānjiā Zhài",
+				"kind": "mountain-area",
+				"parent": "puer",
+				"ancestors": ["puer","yunnan","china"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 10,
+				"elevation_m": [2100,2500],
+				"confidence": "low",
+				"source": "https://ir.xtbg.ac.cn/bitstream/353005/2294/1/%e5%93%80%e7%89%a2%e5%b1%b1%e5%9b%bd%e5%ae%b6%e8%87%aa%e7%84%b6%e4%bf%9d%e6%8a%a4%e5%8c%ba%e4%ba%91%e5%8d%97%e7%9c%81%e9%95%87%e6%b2%85%e5%8d%83%e5%ae%b6%e5%af%a8%e9%87%8e%e7%94%9f%e5%8f%a4%e8%8c%b6%e6%a0%91%e8%80%83%e5%af%9f%e8%ae%ba%e8%af%81%e6%84%8f%e8%a7%81.pdf",
+				"shared": {"x":-404.2,"y":463,"r":51.6},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": "suanzaoshu"
+			},
+			"geometry": {"type":"Point","coordinates":[101.228,24.196]}
+		},
+		{
+			"type": "Feature",
+			"id": "qianjiazhai#area",
+			"properties": {"slug":"qianjiazhai","role":"area","radius_km":10},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.12941,24.19583],[101.13151,24.21453],[101.13784,24.23242],[101.14811,24.24873],[101.16188,24.26272],[101.17854,24.2738],[101.19737,24.28148],[101.21753,24.28542],[101.23816,24.28545],[101.25834,24.28157],[101.27719,24.27395],[101.29389,24.26291],[101.30771,24.24895],[101.31803,24.23268],[101.32442,24.21481],[101.32659,24.19611],[101.32446,24.17741],[101.31811,24.15952],[101.30782,24.14323],[101.29405,24.12925],[101.2774,24.11818],[101.25859,24.11051],[101.23845,24.10658],[101.21786,24.10655],[101.1977,24.11042],[101.17887,24.11804],[101.16218,24.12906],[101.14836,24.143],[101.13802,24.15927],[101.13161,24.17713],[101.12941,24.19583]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "shandong",
+			"properties": {
+				"slug": "shandong",
+				"id": "a46f0a1e-ddbd-4203-b427-87cac691c307",
+				"title": "Shandong",
+				"hanzi": "山东",
+				"pinyin": "Shāndōng",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 250,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B1%B1%E4%B8%9C%E7%9C%81",
+				"shared": {"x":8482.3,"y":-6896.5,"r":1460.7},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[118.2,36.3]}
+		},
+		{
+			"type": "Feature",
+			"id": "shandong#area",
+			"properties": {"slug":"shandong","role":"area","radius_km":250},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[115.41635,36.17951],[115.43783,36.6491],[115.58141,37.10475],[115.84284,37.52616],[116.21215,37.89419],[116.6738,38.19189],[117.20725,38.4053],[117.78782,38.52435],[118.38804,38.54334],[118.97929,38.46137],[119.53347,38.28236],[120.02468,38.01481],[120.4307,37.67129],[120.73402,37.26773],[120.92257,36.82258],[120.98994,36.3558],[120.93536,35.88797],[120.76328,35.43934],[120.48289,35.02903],[120.10745,34.67423],[119.65355,34.38964],[119.14045,34.18692],[118.58931,34.07432],[118.02248,34.05638],[117.4628,34.13384],[116.93288,34.30357],[116.45443,34.55867],[116.04748,34.88872],[115.72973,35.28013],[115.51575,35.71655],[115.41635,36.17951]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "shiga",
+			"properties": {
+				"slug": "shiga",
+				"id": "226e972e-597c-44fe-9ae7-4c3510f34237",
+				"title": "Shiga",
+				"hanzi": "滋賀",
+				"pinyin": null,
+				"kind": "province",
+				"parent": "japan",
+				"ancestors": ["japan"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 50,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%BB%8B%E8%B3%80%E7%9C%8C",
+				"shared": {"x":17844.2,"y":-6218.9,"r":288.3},
+				"frames": ["locator","japan"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[136.08,35.25]}
+		},
+		{
+			"type": "Feature",
+			"id": "shiga#area",
+			"properties": {"slug":"shiga","role":"area","radius_km":50},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[135.52942,35.24522],[135.53993,35.33884],[135.57412,35.42861],[135.63056,35.51061],[135.70683,35.58122],[135.79961,35.63732],[135.90482,35.67642],[136.0178,35.6968],[136.13355,35.69754],[136.24692,35.67862],[136.35288,35.64086],[136.44674,35.58596],[136.52437,35.51634],[136.5824,35.43507],[136.61831,35.34575],[136.63062,35.25228],[136.61887,35.15877],[136.58364,35.06929],[136.52655,34.98774],[136.45013,34.91764],[136.35772,34.86204],[136.25335,34.82333],[136.14151,34.80317],[136.02704,34.80244],[135.91483,34.82116],[135.80974,34.85853],[135.71629,34.91294],[135.63855,34.98205],[135.57991,35.06286],[135.54297,35.15187],[135.52942,35.24522]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "shizuoka",
+			"properties": {
+				"slug": "shizuoka",
+				"id": "a18f5415-d2ea-4e01-809f-915a82a96ede",
+				"title": "Shizuoka",
+				"hanzi": "静岡",
+				"pinyin": null,
+				"kind": "province",
+				"parent": "japan",
+				"ancestors": ["japan"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 60,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%9D%99%E5%B2%A1%E7%9C%8C",
+				"shared": {"x":19006.6,"y":-6058.8,"r":344.9},
+				"frames": ["locator","japan"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[138.3,35]}
+		},
+		{
+			"type": "Feature",
+			"id": "shizuoka#area",
+			"properties": {"slug":"shizuoka","role":"area","radius_km":60},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[137.64136,34.99314],[137.65357,35.1055],[137.69415,35.21332],[137.7614,35.31185],[137.85246,35.39676],[137.96336,35.46428],[138.08923,35.51141],[138.22448,35.53606],[138.3631,35.53713],[138.4989,35.51457],[138.62585,35.46939],[138.73831,35.40359],[138.83133,35.32011],[138.90086,35.22263],[138.94392,35.11545],[138.95872,35.0033],[138.94473,34.89108],[138.90268,34.78369],[138.83449,34.68579],[138.74321,34.60162],[138.63283,34.53481],[138.50815,34.48823],[138.37454,34.4639],[138.23772,34.46284],[138.10358,34.48511],[137.97787,34.52975],[137.866,34.59485],[137.77282,34.6776],[137.70242,34.77443],[137.65792,34.88116],[137.64136,34.99314]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "suanzaoshu",
+			"properties": {
+				"slug": "suanzaoshu",
+				"id": "0b66380d-30b5-46a0-bead-826b261eef6f",
+				"title": "Suan Zao Shu",
+				"hanzi": "酸枣树",
+				"pinyin": "Suānzǎoshù",
+				"kind": "village",
+				"parent": "puer",
+				"ancestors": ["puer","yunnan","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 35,
+				"elevation_m": [1800,1800],
+				"confidence": "low",
+				"source": "https://yunnansourcing.com/products/2025-yunnan-sourcing-suan-zao-shu-old-arbor-raw-pu-erh-tea-cake",
+				"shared": {"x":-674.9,"y":860.3,"r":179.7},
+				"frames": ["locator","china-east","yunnan"],
+				"detail": "suanzaoshu"
+			},
+			"geometry": {"type":"Point","coordinates":[100.711,23.502]}
+		},
+		{
+			"type": "Feature",
+			"id": "suanzaoshu#area",
+			"properties": {"slug":"suanzaoshu","role":"area","radius_km":35},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.36778,23.49989],[100.37472,23.56539],[100.39638,23.62813],[100.43182,23.68536],[100.47952,23.73458],[100.53739,23.77363],[100.6029,23.80078],[100.67316,23.81485],[100.74508,23.81521],[100.81551,23.80185],[100.88134,23.77536],[100.93967,23.7369],[100.98796,23.68816],[101.0241,23.63129],[101.04651,23.56877],[101.05423,23.50335],[101.04696,23.43789],[101.02502,23.37524],[100.9894,23.31814],[100.94166,23.26908],[100.88389,23.23018],[100.81861,23.20315],[100.74866,23.18914],[100.67708,23.18878],[100.60697,23.20208],[100.54137,23.22846],[100.48314,23.26677],[100.43482,23.31535],[100.39852,23.37209],[100.37583,23.43451],[100.36778,23.49989]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "taiwan",
+			"properties": {
+				"slug": "taiwan",
+				"id": "6bf85dc9-8aac-415a-aeb6-0f4f224d411e",
+				"title": "Taiwan",
+				"hanzi": "台灣",
+				"pinyin": "Táiwān",
+				"kind": "country",
+				"parent": null,
+				"ancestors": [],
+				"groups": [],
+				"precision": "country",
+				"radius_km": 200,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8F%B0%E7%81%A3",
+				"shared": {"x":9862,"y":804.9,"r":1027.7},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[120.835,23.599]}
+		},
+		{
+			"type": "Feature",
+			"id": "taiwan#area",
+			"properties": {"slug":"taiwan","role":"area","radius_km":200},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[118.87414,23.53024],[118.89863,23.90553],[119.00828,24.26792],[119.19893,24.60141],[119.46273,24.89115],[119.78831,25.12414],[120.16129,25.28986],[120.56491,25.38077],[120.98084,25.39274],[121.39012,25.32522],[121.77414,25.18128],[122.11556,24.96748],[122.39921,24.69349],[122.61279,24.37162],[122.74732,24.01626],[122.79755,23.64312],[122.76199,23.26858],[122.64289,22.90894],[122.44604,22.57972],[122.18037,22.29503],[121.85757,22.06701],[121.49154,21.90531],[121.09785,21.81677],[120.6931,21.80513],[120.29431,21.87086],[119.9183,22.01121],[119.58099,22.22024],[119.29686,22.48911],[119.0783,22.80638],[118.93514,23.15848],[118.87414,23.53024]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "uji",
+			"properties": {
+				"slug": "uji",
+				"id": "af8954b3-fbf4-445d-830e-fe31a287646e",
+				"title": "Uji",
+				"hanzi": "宇治",
+				"pinyin": null,
+				"kind": "county",
+				"parent": "kyoto",
+				"ancestors": ["kyoto","japan"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 6,
+				"elevation_m": [50,500],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%87%E6%B2%BB%E5%B8%82",
+				"shared": {"x":17697.6,"y":-5985.4,"r":34.4},
+				"frames": ["locator","japan"],
+				"detail": "uji"
+			},
+			"geometry": {"type":"Point","coordinates":[135.8,34.885]}
+		},
+		{
+			"type": "Feature",
+			"id": "uji#area",
+			"properties": {"slug":"uji","role":"area","radius_km":6},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[135.73422,34.88493],[135.73564,34.89615],[135.73987,34.90689],[135.74673,34.91666],[135.75592,34.92506],[135.76704,34.9317],[135.7796,34.9363],[135.79306,34.93866],[135.80682,34.93867],[135.82028,34.93633],[135.83285,34.93175],[135.84399,34.92513],[135.8532,34.91675],[135.86008,34.90698],[135.86434,34.89625],[135.86578,34.88503],[135.86435,34.87381],[135.8601,34.86308],[135.85323,34.85331],[135.84404,34.84493],[135.83292,34.83829],[135.82037,34.8337],[135.80693,34.83134],[135.79319,34.83133],[135.77974,34.83366],[135.76718,34.83824],[135.75605,34.84486],[135.74684,34.85323],[135.73995,34.86299],[135.73568,34.87371],[135.73422,34.88493]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "weidong",
+			"properties": {
+				"slug": "weidong",
+				"id": "93716a43-b29c-494b-b064-5380f702cd27",
+				"title": "Weidong (Meng Noy)",
+				"hanzi": null,
+				"pinyin": null,
+				"kind": "township",
+				"parent": "bulang",
+				"ancestors": ["bulang","menghai","xishuangbanna","yunnan","china"],
+				"groups": [],
+				"precision": "township",
+				"radius_km": 15,
+				"elevation_m": null,
+				"confidence": "low",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B8%83%E6%9C%97%E5%B1%B1%E5%B8%83%E6%9C%97%E6%97%8F%E4%B9%A1",
+				"shared": {"x":-828.9,"y":1946.6,"r":76},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[100.417,21.586]}
+		},
+		{
+			"type": "Feature",
+			"id": "weidong#area",
+			"properties": {"slug":"weidong","role":"area","radius_km":15},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.27193,21.58562],[100.275,21.61368],[100.28428,21.64053],[100.29937,21.66499],[100.31961,21.68601],[100.34411,21.70265],[100.37181,21.71419],[100.40148,21.72012],[100.43184,21.72019],[100.46154,21.71439],[100.4893,21.70297],[100.51389,21.68643],[100.53423,21.66551],[100.54944,21.64111],[100.55886,21.6143],[100.56207,21.58625],[100.55895,21.5582],[100.54962,21.53137],[100.5345,21.50692],[100.51426,21.48594],[100.48977,21.46932],[100.46211,21.4578],[100.43249,21.45187],[100.40219,21.45181],[100.37253,21.4576],[100.34482,21.469],[100.32025,21.48551],[100.2999,21.50641],[100.28466,21.53079],[100.2752,21.55758],[100.27193,21.58562]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "wuyi-zhejiang",
+			"properties": {
+				"slug": "wuyi-zhejiang",
+				"id": "3c4be15a-42d8-4f20-b698-9101d9743586",
+				"title": "Wuyi County",
+				"hanzi": "武义",
+				"pinyin": "Wǔyì",
+				"kind": "county",
+				"parent": "zhejiang",
+				"ancestors": ["zhejiang","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 25,
+				"elevation_m": [300,800],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%AD%A6%E4%B9%89%E5%8E%BF",
+				"shared": {"x":9326.3,"y":-2289.7,"r":134.5},
+				"frames": ["locator","china-east"],
+				"detail": "wuyi-zhejiang"
+			},
+			"geometry": {"type":"Point","coordinates":[119.812,28.897]}
+		},
+		{
+			"type": "Feature",
+			"id": "wuyi-zhejiang#area",
+			"properties": {"slug":"wuyi-zhejiang","role":"area","radius_km":25},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[119.5552,28.89587],[119.56049,28.94265],[119.57678,28.98744],[119.60339,29.02828],[119.63914,29.06338],[119.68248,29.0912],[119.73152,29.11053],[119.78409,29.1205],[119.8379,29.12069],[119.89056,29.11107],[119.93977,29.09209],[119.98336,29.06456],[120.01943,29.02971],[120.0464,28.98905],[120.0631,28.94437],[120.0688,28.89764],[120.06329,28.85089],[120.04681,28.80616],[120.02009,28.7654],[119.98431,28.7304],[119.94103,28.70267],[119.89215,28.68342],[119.83979,28.67349],[119.78621,28.67331],[119.73376,28.68288],[119.68471,28.70179],[119.64119,28.72922],[119.6051,28.76398],[119.57802,28.80455],[119.56113,28.84916],[119.5552,28.89587]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "wuyishan",
+			"properties": {
+				"slug": "wuyishan",
+				"id": "7cf0189b-9d42-41a3-b6dc-a630042b737f",
+				"title": "Wuyishan",
+				"hanzi": "武夷山",
+				"pinyin": "Wǔyíshān",
+				"kind": "county",
+				"parent": "fujian",
+				"ancestors": ["fujian","china"],
+				"groups": [],
+				"precision": "county",
+				"radius_km": 15,
+				"elevation_m": [200,700],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%AD%A6%E5%A4%B7%E5%B1%B1%E5%B8%82",
+				"shared": {"x":8393.3,"y":-1612.8,"r":79.8},
+				"frames": ["locator","china-east"],
+				"detail": "wuyishan"
+			},
+			"geometry": {"type":"Point","coordinates":[118.03,27.759]}
+		},
+		{
+			"type": "Feature",
+			"id": "wuyishan#area",
+			"properties": {"slug":"wuyishan","role":"area","radius_km":15},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[117.87756,27.7586],[117.88078,27.78666],[117.89052,27.81351],[117.90637,27.83798],[117.92764,27.859],[117.95339,27.87564],[117.9825,27.88719],[118.01369,27.89312],[118.0456,27.89319],[118.07682,27.88739],[118.10599,27.87596],[118.13183,27.85942],[118.15321,27.83849],[118.16919,27.81409],[118.17907,27.78728],[118.18244,27.75923],[118.17915,27.73118],[118.16934,27.70435],[118.15345,27.67991],[118.13218,27.65893],[118.10645,27.64231],[118.07739,27.63079],[118.04627,27.62487],[118.01444,27.62481],[117.98329,27.6306],[117.95417,27.642],[117.92836,27.6585],[117.90697,27.6794],[117.89095,27.70377],[117.881,27.73056],[117.87756,27.7586]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "xishuangbanna",
+			"properties": {
+				"slug": "xishuangbanna",
+				"id": "c9928fe7-20d4-45e3-be00-2f5004c1e8f4",
+				"title": "Xishuangbanna",
+				"hanzi": "西双版纳",
+				"pinyin": "Xīshuāngbǎnnà",
+				"kind": "prefecture",
+				"parent": "yunnan",
+				"ancestors": ["yunnan","china"],
+				"groups": [],
+				"precision": "prefecture",
+				"radius_km": 90,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E8%A5%BF%E5%8F%8C%E7%89%88%E7%BA%B3%E5%82%A3%E6%97%8F%E8%87%AA%E6%B2%BB%E5%B7%9E",
+				"shared": {"x":-628.3,"y":1713.1,"r":457.1},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[100.8,22]}
+		},
+		{
+			"type": "Feature",
+			"id": "xishuangbanna#area",
+			"properties": {"slug":"xishuangbanna","role":"area","radius_km":90},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[99.92721,21.98626],[99.9427,22.15485],[99.99577,22.31677],[100.08422,22.46489],[100.20426,22.5927],[100.35066,22.69455],[100.517,22.76592],[100.6959,22.80365],[100.87943,22.80605],[101.05943,22.77303],[101.22791,22.70604],[101.3774,22.60807],[101.50133,22.48345],[101.59429,22.3377],[101.6523,22.17724],[101.67293,22.00912],[101.6554,21.8407],[101.60062,21.67933],[101.51108,21.53202],[101.39077,21.40516],[101.24495,21.30424],[101.07996,21.2336],[100.90293,21.19629],[100.72147,21.19391],[100.54338,21.22657],[100.37634,21.29286],[100.22754,21.38993],[100.10345,21.51359],[100.0095,21.65849],[99.94985,21.81836],[99.92721,21.98626]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "yibang",
+			"properties": {
+				"slug": "yibang",
+				"id": "4cfabb09-c73f-43ca-9f6f-4e46fc7344a7",
+				"title": "Yibang",
+				"hanzi": "倚邦",
+				"pinyin": "Yǐbāng",
+				"kind": "mountain-area",
+				"parent": "mengla",
+				"ancestors": ["mengla","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "village",
+				"radius_km": 6,
+				"elevation_m": [1300,1900],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%80%9A%E9%82%A6",
+				"shared": {"x":-354,"y":1594.5,"r":30.5},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.324,22.21]}
+		},
+		{
+			"type": "Feature",
+			"id": "yiwu",
+			"properties": {
+				"slug": "yiwu",
+				"id": "88d4ea3a-b772-4472-bd44-566c55bb608e",
+				"title": "Yiwu",
+				"hanzi": "易武",
+				"pinyin": "Yìwǔ",
+				"kind": "mountain-area",
+				"parent": "mengla",
+				"ancestors": ["mengla","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "mountain-area",
+				"radius_km": 15,
+				"elevation_m": [1100,1900],
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%98%93%E6%AD%A6%E9%95%87",
+				"shared": {"x":-278,"y":1723.9,"r":76.2},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.469,21.981]}
+		},
+		{
+			"type": "Feature",
+			"id": "yiwu#area",
+			"properties": {"slug":"yiwu","role":"area","radius_km":15},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[101.32353,21.98062],[101.32661,22.00867],[101.33591,22.03552],[101.35104,22.05999],[101.37134,22.08101],[101.39591,22.09765],[101.42368,22.10919],[101.45344,22.11512],[101.48388,22.11519],[101.51367,22.10939],[101.5415,22.09797],[101.56615,22.08143],[101.58655,22.06051],[101.60181,22.0361],[101.61125,22.0093],[101.61447,21.98125],[101.61134,21.9532],[101.60198,21.92637],[101.58683,21.90192],[101.56653,21.88094],[101.54197,21.86432],[101.51424,21.8528],[101.48453,21.84687],[101.45415,21.84681],[101.42441,21.8526],[101.39662,21.864],[101.37198,21.88051],[101.35158,21.90141],[101.3363,21.92579],[101.32681,21.95258],[101.32353,21.98062]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "youle",
+			"properties": {
+				"slug": "youle",
+				"id": "756d197f-6e4a-42bb-ad12-6cde329e1939",
+				"title": "Youle",
+				"hanzi": "攸乐",
+				"pinyin": "Yōulè",
+				"kind": "mountain-area",
+				"parent": "jinghong",
+				"ancestors": ["jinghong","xishuangbanna","yunnan","china"],
+				"groups": ["six-ancient-tea-mountains"],
+				"precision": "mountain-area",
+				"radius_km": 8,
+				"elevation_m": [1000,1700],
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%9F%BA%E8%AF%BA%E5%B1%B1%E5%9F%BA%E8%AF%BA%E6%97%8F%E4%B9%A1",
+				"shared": {"x":-502.7,"y":1707.5,"r":40.6},
+				"frames": ["locator","china-east","yunnan","six-mountains"],
+				"detail": "jinghong"
+			},
+			"geometry": {"type":"Point","coordinates":[101.04,22.01]}
+		},
+		{
+			"type": "Feature",
+			"id": "youle#area",
+			"properties": {"slug":"youle","role":"area","radius_km":8},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[100.9624,22.00989],[100.96407,22.02485],[100.96905,22.03917],[100.97714,22.0522],[100.98798,22.0634],[101.0011,22.07226],[101.01592,22.07839],[101.03179,22.08154],[101.04802,22.08156],[101.0639,22.07845],[101.07873,22.07235],[101.09187,22.06352],[101.10274,22.05235],[101.11087,22.03933],[101.11589,22.02503],[101.1176,22.01007],[101.11592,21.99511],[101.11092,21.9808],[101.10282,21.96777],[101.09198,21.95659],[101.07887,21.94773],[101.06406,21.9416],[101.0482,21.93846],[101.03199,21.93844],[101.01612,21.94155],[101.0013,21.94764],[100.98817,21.95647],[100.9773,21.96763],[100.96916,21.98064],[100.96412,21.99494],[100.9624,22.00989]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "yunnan-unknown",
+			"properties": {
+				"slug": "yunnan-unknown",
+				"id": "03a34248-fdb2-4ae9-a8a1-588ccd273f8b",
+				"title": "It's a mystery",
+				"hanzi": null,
+				"pinyin": null,
+				"kind": "unknown",
+				"parent": "yunnan",
+				"ancestors": ["yunnan","china"],
+				"groups": [],
+				"precision": "unknown",
+				"radius_km": 350,
+				"elevation_m": null,
+				"confidence": "low",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%91%E5%8D%97%E7%9C%81",
+				"shared": {"x":-261.8,"y":0,"r":1818.5},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[101.5,25]}
+		},
+		{
+			"type": "Feature",
+			"id": "yunnan-unknown#area",
+			"properties": {"slug":"yunnan-unknown","role":"area","radius_km":350},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[98.03783,24.78713],[98.05544,25.44464],[98.22484,26.08441],[98.54091,26.67804],[98.99162,27.19875],[99.55808,27.62266],[100.21525,27.93007],[100.93297,28.10651],[101.67755,28.14362],[102.41371,28.03964],[103.10666,27.79951],[103.7242,27.43457],[104.23839,26.9619],[104.62704,26.40334],[104.87446,25.7843],[104.97191,25.13251],[104.91754,24.47666],[104.71604,23.84517],[104.37803,23.26502],[103.91937,22.76068],[103.36034,22.35319],[102.72475,22.05942],[102.03903,21.89145],[101.33132,21.85618],[100.63049,21.95505],[99.96517,22.18401],[99.36282,22.53366],[98.84873,22.98957],[98.44515,23.5328],[98.17036,24.14058],[98.03783,24.78713]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "yunnan",
+			"properties": {
+				"slug": "yunnan",
+				"id": "2227c151-aacf-4522-beec-78a2f4143759",
+				"title": "Yunnan",
+				"hanzi": "云南",
+				"pinyin": "Yúnnán",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 350,
+				"elevation_m": null,
+				"confidence": "high",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%91%E5%8D%97%E7%9C%81",
+				"shared": {"x":-261.8,"y":0,"r":1818.5},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[101.5,25]}
+		},
+		{
+			"type": "Feature",
+			"id": "yunnan#area",
+			"properties": {"slug":"yunnan","role":"area","radius_km":350},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[98.03783,24.78713],[98.05544,25.44464],[98.22484,26.08441],[98.54091,26.67804],[98.99162,27.19875],[99.55808,27.62266],[100.21525,27.93007],[100.93297,28.10651],[101.67755,28.14362],[102.41371,28.03964],[103.10666,27.79951],[103.7242,27.43457],[104.23839,26.9619],[104.62704,26.40334],[104.87446,25.7843],[104.97191,25.13251],[104.91754,24.47666],[104.71604,23.84517],[104.37803,23.26502],[103.91937,22.76068],[103.36034,22.35319],[102.72475,22.05942],[102.03903,21.89145],[101.33132,21.85618],[100.63049,21.95505],[99.96517,22.18401],[99.36282,22.53366],[98.84873,22.98957],[98.44515,23.5328],[98.17036,24.14058],[98.03783,24.78713]]
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "zhejiang",
+			"properties": {
+				"slug": "zhejiang",
+				"id": "17d7f031-bcfd-4551-bf9f-1444bd87bc39",
+				"title": "Zhejiang",
+				"hanzi": "浙江",
+				"pinyin": "Zhèjiāng",
+				"kind": "province",
+				"parent": "china",
+				"ancestors": ["china"],
+				"groups": [],
+				"precision": "province",
+				"radius_km": 200,
+				"elevation_m": null,
+				"confidence": "medium",
+				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%B5%99%E6%B1%9F%E7%9C%81",
+				"shared": {"x":9424.8,"y":-2441.2,"r":1078.3},
+				"frames": ["locator","china-east"],
+				"detail": null
+			},
+			"geometry": {"type":"Point","coordinates":[120,29.15]}
+		},
+		{
+			"type": "Feature",
+			"id": "zhejiang#area",
+			"properties": {"slug":"zhejiang","role":"area","radius_km":200},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [
+					[[117.94287,29.07784],[117.96696,29.45321],[118.08059,29.81596],[118.27969,30.15003],[118.55616,30.44047],[118.89816,30.67417],[119.29054,30.84045],[119.71552,30.93171],[120.15361,30.94372],[120.58463,30.87594],[120.98874,30.7315],[121.34756,30.51702],[121.64508,30.24231],[121.8684,29.91982],[122.00827,29.56402],[122.05939,29.19071],[122.02048,28.81629],[121.89419,28.45705],[121.68679,28.12842],[121.4078,27.84443],[121.06952,27.61708],[120.68646,27.45593],[120.27478,27.36771],[119.85166,27.35611],[119.43471,27.4216],[119.04132,27.56146],[118.688,27.76985],[118.38984,28.03802],[118.15984,28.35465],[118.00842,28.70628],[117.94287,29.07784]]
+				]
+			}
+		}
+	]
+}

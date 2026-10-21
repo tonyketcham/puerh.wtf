@@ -9,6 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2011
 aging_conditions: Dry Hong Kong
+storage:
+  - place: hong-kong
+    humidity: dry
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/939452398/2011-golden-xiaguan-sampler-60g
@@ -57,6 +60,8 @@ tags:
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
   - ae41e89d-31d3-49e5-a262-229ca366f7e9
 rating: 79.3
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 205
   material_amount: 6.08
@@ -73,6 +78,7 @@ images:
     alt: Tea juice in the cup
   - image: /images/uploads/da4c40c2-6f83-4d63-b678-e7f249c182fb-min.jpg
     alt: big bag
+origin_note: blend
 ---
 
 This material is 6 years aged prior to the pressing in 2011.

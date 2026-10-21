@@ -15,8 +15,19 @@ export default function Panel({ children, className, header, id, backdropClassNa
 			id={id}
 			className={cn("flex flex-col space-y-10 pointer-events-none font-fira-code", className)}
 		>
-			<div className="relative flex flex-col min-h-0 overflow-hidden border shadow-lg pointer-events-auto grow rounded-2xl border-heicha-500">
-				<div className={cn("absolute inset-0 backdrop-blur-xl bg-[#171617]", backdropClassName)} />
+			{/* overlays raised from inside (the entity peek) dock against this box's outer edge */}
+			{/* the edge is surface-plate's shadow stack, not a border: its outer hairline spreads 1px past
+			    the 15px corner, so the face keeps the 15px inner radius the headers are concentric with */}
+			<div
+				data-overlay-panel
+				className="relative flex flex-col min-h-0 overflow-hidden pointer-events-auto surface-plate grow rounded-[15px]"
+			>
+				<div
+					className={cn(
+						"absolute inset-0 backdrop-blur-xl surface-grain surface-face",
+						backdropClassName
+					)}
+				/>
 
 				{/* Content Wrapper */}
 				<div className="relative flex flex-col h-full">
@@ -30,6 +41,7 @@ export default function Panel({ children, className, header, id, backdropClassNa
 						{children}
 					</SimpleBar>
 				</div>
+				<div aria-hidden className="surface-tooth" />
 			</div>
 		</div>
 	)

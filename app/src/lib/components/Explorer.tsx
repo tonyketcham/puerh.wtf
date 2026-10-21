@@ -2,516 +2,508 @@
 
 import SiteHeader from "./SiteHeader"
 import FileTree from "./filetree/FileTree"
-import type { SessionPreview } from "../types/session"
+import type { ExplorerSession } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
-import PanelSection from "@/lib/components/containers/PanelSection"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
-import { Search as SearchIcon, X as CloseIcon } from "lucide-react"
-import { motion, AnimatePresence } from "motion/react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react"
+import { useAtom } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
+import {
+	EMPTY_FACETS,
+	hasAnyFilter,
+	matchesFilters,
+	toggleEntityFilter,
+	type FacetKey,
+	type FacetState,
+} from "@/lib/filters"
+import { filtersAtom, replaceFilters } from "@/lib/store/filterState"
+import { sessionMatchesDescriptor } from "@/lib/descriptors"
+import { LEGACY_ORIGIN_SLUGS, originChain } from "@/lib/origins"
+import { buildRelationIndex, sessionsOf } from "@/lib/relations"
+import type { PageKind } from "@/lib/peek"
+import { descriptorAtom, explorerSortAtom } from "@/lib/store/sessionAtom"
+import { sortSessions } from "@/lib/sessionSort"
+import SessionSortToggle from "@/lib/components/explorer/SessionSortToggle"
+import YearRuler from "@/lib/components/explorer/YearRuler"
+import FilterTokens, { type FilterToken } from "@/lib/components/explorer/FilterTokens"
+import DescriptorReferences from "@/lib/components/explorer/DescriptorReferences"
+import ActivityRail, {
+	EXPLORER_PANEL_ID,
+	explorerTabId,
+} from "@/lib/components/explorer/ActivityRail"
+import OriginsView from "@/lib/components/explorer/OriginsView"
+import VendorsView from "@/lib/components/explorer/VendorsView"
+import StylesView from "@/lib/components/explorer/StylesView"
+import LexiconView from "@/lib/components/explorer/LexiconView"
+import {
+	EXPLORER_VIEWS,
+	explorerHoverAtom,
+	explorerViewAtom,
+	explorerDrawerOpenAtom,
+	EXPLORER_DOCK_QUERY,
+	type ExplorerView,
+} from "@/lib/components/explorer/state"
+import { stripSlash } from "@/lib/components/explorer/views"
+import { EXPLORER_DRAWER_ID } from "@/lib/components/explorer/ExplorerToggle"
+import { useMediaQuery } from "@/lib/utils/useMediaQuery"
+import { useFocusTrap } from "@/lib/utils/useFocusTrap"
 import { cn } from "@/lib/utils/cn"
+import { X } from "lucide-react"
 
 export interface ExplorerProps {
-	sessions: SessionPreview[]
+	sessions: ExplorerSession[]
 	vendors: Vendor[]
 	categories: Category[]
 	recordingKey?: string
 }
 
-type FacetState = {
-	styles: string[]
-	origins: string[]
-	years: string[]
-	vendors: string[]
-	cultivars: string[]
-	tags: string[]
-}
-
-type TypeaheadItem = {
-	id: string
-	label: string
-	subLabel?: string
-	type: "tea" | "vendor" | "tag" | "style"
-	action: () => void
-}
-
-function useUrlSync(initial: { q: string; facets: FacetState }) {
-	const router = useRouter()
+/** All filter controls read and update the same atom; URL persistence lives at the root. */
+function useFilters() {
 	const pathname = usePathname()
-	const searchParams = useSearchParams()
-	const [q, setQ] = useState(initial.q)
-	const [facets, setFacets] = useState<FacetState>(initial.facets)
+	const [filters, setFilters] = useAtom(filtersAtom)
 
-	// Initialize from URL once
-	useEffect(() => {
-		const qParam = searchParams.get("q") || ""
-		const readList = (k: string) => (searchParams.get(k) || "").split(",").filter(Boolean)
-		setQ(qParam)
-		setFacets({
-			styles: readList("styles"),
-			origins: readList("origins"),
-			years: readList("years"),
-			vendors: readList("vendors"),
-			cultivars: readList("cultivars"),
-			tags: readList("tags"),
-		})
-	}, [])
-
-	// Write to URL on change (replace, no scroll)
-	useEffect(() => {
-		const params = new URLSearchParams()
-		if (q) params.set("q", q)
-		const setList = (key: keyof FacetState) => {
-			const arr = facets[key]
-			if (arr.length) params.set(key, arr.join(","))
-		}
-		setList("styles")
-		setList("origins")
-		setList("years")
-		setList("vendors")
-		setList("cultivars")
-		setList("tags")
-		router.replace(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`)
-	}, [q, facets, pathname, router])
-
-	return { q, setQ, facets, setFacets }
-}
-
-function normalize(text?: string | null) {
-	return (text || "").toLowerCase()
-}
-
-function unique<T>(arr: T[]): T[] {
-	return Array.from(new Set(arr))
-}
-
-export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
-	// URL-synced search state
-	const { q, setQ, facets, setFacets } = useUrlSync({
-		q: "",
-		facets: { styles: [], origins: [], years: [], vendors: [], cultivars: [], tags: [] },
-	})
-
-	const [searchOpen, setSearchOpen] = useState(false)
-	const inputRef = useRef<HTMLInputElement | null>(null)
-
-	useEffect(() => {
-		if (searchOpen) {
-			inputRef.current?.focus()
-		}
-	}, [searchOpen])
-
-	// Derived facet options
-	const facetOptions = useMemo(() => {
-		const styles = categories.map((c) => ({ value: c._slug, label: c.title }))
-		const years = unique(
-			sessions
-				.map((s) => (s.production_year ? String(Math.trunc(Number(s.production_year))) : null))
-				.filter(Boolean) as string[]
-		).sort((a, b) => Number(b) - Number(a))
-		const originsRaw = sessions.flatMap((s) => s.origin || [])
-		const origins = unique(
-			originsRaw.map((o) => ({
-				value: o?._slug ?? o?.id ?? "",
-				label: o?.location || o?.municipality || o?.country || (o?._slug ?? ""),
+	const setFacets = useCallback(
+		(next: FacetState | ((current: FacetState) => FacetState)) => {
+			setFilters((current) => ({
+				...current,
+				facets: typeof next === "function" ? next(current.facets) : next,
 			}))
-		).filter((o) => o.value)
-		const cultivarRaw = sessions.flatMap((s) => s.cultivar || [])
-		const cultivars = unique(cultivarRaw.map((c) => ({ value: c._slug, label: c.title }))).filter(
-			(c) => !!c.value
-		)
-		const tagsRaw = sessions.flatMap((s) => s.tags || [])
-		const tags = unique(
-			tagsRaw.map((t) => ({ value: t?._slug ?? "", label: t?.title ?? "" }))
-		).filter((t) => !!t.value)
-		const vendorList = vendors.map((v) => ({ value: v._slug, label: v.title }))
-		return { styles, years, origins, cultivars, tags, vendors: vendorList }
-	}, [sessions, vendors, categories])
+		},
+		[setFilters]
+	)
 
-	// Filtering logic for sessions
-	const filteredSessions = useMemo(() => {
-		const query = normalize(q)
-		const hasQ = query.length > 0
-		return sessions.filter((s) => {
-			// Facets
-			if (facets.styles.length) {
-				const catSlugs = (s.style || []).map((st) => st.category._slug)
-				if (!facets.styles.some((slug) => catSlugs.includes(slug))) return false
-			}
-			if (facets.years.length) {
-				const yearStr = s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
-				if (!facets.years.includes(yearStr)) return false
-			}
-			if (facets.vendors.length) {
-				const vendorSlugs = (s.vendor || []).map((v) => v._slug)
-				if (!facets.vendors.some((slug) => vendorSlugs.includes(slug))) return false
-			}
-			if (facets.cultivars.length) {
-				const cultivarSlugs = (s.cultivar || []).map((c) => c._slug)
-				if (!facets.cultivars.some((slug) => cultivarSlugs.includes(slug))) return false
-			}
-			if (facets.tags.length) {
-				const tagSlugs = (s.tags || []).map((t) => t?._slug || "")
-				if (!facets.tags.some((slug) => tagSlugs.includes(slug))) return false
-			}
-			if (facets.origins.length) {
-				const originSlugs = (s.origin || []).map((o) => o?._slug || o?.id || "")
-				if (!facets.origins.some((slug) => originSlugs.includes(slug))) return false
-			}
+	const setQ = useCallback(
+		(q: string) => setFilters((current) => ({ ...current, q })),
+		[setFilters]
+	)
 
-			// Query matching
-			if (!hasQ) return true
-			const haystack = [
-				s.title,
-				s.tea_name || "",
-				String(s.production_year || ""),
-				...(s.vendor || []).map((v) => v.title),
-				...(s.cultivar || []).map((c) => c.title),
-				...(s.tags || []).map((t) => t?.title || ""),
-				...(s.origin || []).flatMap((o) => [o?.location, o?.municipality, o?.country, o?._slug]),
-			]
-				.filter(Boolean)
-				.map((t) => normalize(String(t)))
-			return haystack.some((t) => t.includes(query))
-		})
-	}, [sessions, facets, q])
+	return { q: filters.q, setQ, facets: filters.facets, setFacets, filters, pathname }
+}
 
-	// Filter vendors/categories lists by query only (simple quick filter)
-	const filteredVendors = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return vendors
-		return vendors.filter((v) => normalize(v.title).includes(query))
-	}, [vendors, q])
+const yearOf = (s: ExplorerSession) =>
+	s.production_year ? String(Math.trunc(Number(s.production_year))) : ""
 
-	const filteredCategories = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return categories
-		return categories.filter((c) => normalize(c.title).includes(query))
-	}, [categories, q])
+const FACET_KIND: Record<FacetKey, string> = {
+	styles: "style",
+	origins: "origin",
+	years: "vintage",
+	vendors: "vendor",
+	cultivars: "cultivar",
+	tags: "tag",
+	vessels: "vessel",
+}
 
-	// Typeahead
-	const typeaheadItems: TypeaheadItem[] = useMemo(() => {
-		const items: TypeaheadItem[] = []
-		const add = (it: TypeaheadItem) => items.push(it)
-		// Teas
-		for (const s of sessions.slice(0, 300)) {
-			add({
-				id: `tea:${s.id}`,
-				label: s.title,
-				subLabel: s.production_year ? String(Math.trunc(Number(s.production_year))) : undefined,
-				type: "tea",
-				action: () => {
-					location.href = buildLink(s)
-				},
-			})
-		}
-		// Vendors
-		for (const v of vendors) {
-			add({
-				id: `vendor:${v._slug}`,
-				label: v.title,
-				type: "vendor",
-				action: () => setFacets((f) => ({ ...f, vendors: unique([...f.vendors, v._slug]) })),
-			})
-		}
-		// Tags
-		const tags = unique(
-			sessions.flatMap((s) =>
-				(s.tags || []).map((t) => ({ slug: t?._slug || "", title: t?.title || "" }))
-			)
-		).filter((t) => t.slug)
-		for (const t of tags) {
-			add({
-				id: `tag:${t.slug}`,
-				label: t.title,
-				type: "tag",
-				action: () => setFacets((f) => ({ ...f, tags: unique([...f.tags, t.slug]) })),
-			})
-		}
-		// Styles (categories)
-		for (const c of categories) {
-			add({
-				id: `style:${c._slug}`,
-				label: c.title,
-				type: "style",
-				action: () => setFacets((f) => ({ ...f, styles: unique([...f.styles, c._slug]) })),
-			})
-		}
-		return items
-	}, [sessions, vendors, categories, setFacets])
+/** The facet an entity view leaves out of its own counts, so its list keeps every option. */
+const VIEW_FACET: Record<ExplorerView, FacetKey | null> = {
+	sessions: null,
+	origins: "origins",
+	vendors: "vendors",
+	styles: "styles",
+	lexicon: null,
+}
 
-	const [showSuggestions, setShowSuggestions] = useState(false)
-	const suggestions = useMemo(() => {
-		const query = normalize(q)
-		if (!query) return [] as TypeaheadItem[]
-		return typeaheadItems.filter((it) => normalize(it.label).includes(query)).slice(0, 8)
-	}, [q, typeaheadItems])
+const VIEW_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 
-	// Saved views (localStorage)
-	const saveCurrentView = () => {
-		const name = window.prompt("Save current filters as:")
-		if (!name) return
-		const payload = { q, facets }
-		const key = "explorer_saved_views"
-		const existing = JSON.parse(localStorage.getItem(key) || "{}") as Record<string, unknown>
-		existing[name] = payload
-		localStorage.setItem(key, JSON.stringify(existing))
-	}
-	const [savedViews, setSavedViews] = useState<
-		{ name: string; data: { q: string; facets: FacetState } }[]
-	>([])
+/**
+ * Below xl the Explorer is a modal drawer: a navigation puts it away, Escape closes it, focus
+ * moves in when it opens and back to the masthead toggle when it closes, and the page under
+ * it holds still. Docked (xl and up) none of this applies.
+ */
+function useDrawer(pathname: string | null) {
+	const [open, setOpen] = useAtom(explorerDrawerOpenAtom)
+	const drawer = !useMediaQuery(EXPLORER_DOCK_QUERY)
+	const drawerRef = useRef<HTMLDivElement>(null)
+	const closeDrawer = useCallback(() => setOpen(false), [setOpen])
+	const previousPath = useRef(pathname)
+
 	useEffect(() => {
-		try {
-			const existing = JSON.parse(localStorage.getItem("explorer_saved_views") || "{}") as Record<
-				string,
-				{ q: string; facets: FacetState }
-			>
-			setSavedViews(Object.entries(existing).map(([name, data]) => ({ name, data })))
-		} catch {
-			setSavedViews([])
+		if (previousPath.current !== pathname) setOpen(false)
+		previousPath.current = pathname
+	}, [pathname, setOpen])
+
+	const drawerOpen = drawer && open
+	useFocusTrap(drawerRef, drawerOpen)
+	useEffect(() => {
+		if (!drawerOpen) return
+		const root = document.documentElement
+		const overflow = root.style.overflow
+		root.style.overflow = "hidden"
+		drawerRef.current?.focus({ preventScroll: true })
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setOpen(false)
 		}
-	}, [showSuggestions])
-	const loadSavedView = (data: { q: string; facets: FacetState }) => {
-		setQ(data.q)
-		setFacets(data.facets)
-	}
+		window.addEventListener("keydown", onKey)
+		return () => {
+			window.removeEventListener("keydown", onKey)
+			root.style.overflow = overflow
+			document.querySelector<HTMLElement>("[data-explorer-toggle]")?.focus({ preventScroll: true })
+		}
+	}, [drawerOpen, setOpen])
 
-	// Simple chips UI for active facets
-	const removeFacet = (key: keyof FacetState, val: string) => {
-		setFacets((f) => ({ ...f, [key]: (f[key] as string[]).filter((v) => v !== val) }))
-	}
+	return { drawerOpen, closeDrawer, drawerRef }
+}
 
-	const rightSlot = (
-		<div
-			className={cn("flex items-center gap-1", searchOpen && "flex-1")}
-			data-recording-key="explorer-search-controls"
-		>
-			<motion.div
-				className={cn("relative h-7", searchOpen ? "w-full" : "w-7")}
-				animate={{ width: searchOpen ? "100%" : 28 }}
-				transition={{ type: "spring", stiffness: 300, damping: 30 }}
-			>
-				{/* Collapsed icon button */}
-				<AnimatePresence initial={false}>
-					{!searchOpen && (
-						<motion.button
-							key="search-collapsed"
-							aria-label="Open search"
-							onClick={() => setSearchOpen(true)}
-							className="flex items-center justify-center border rounded-md w-7 h-7 border-heicha-500 text-white/80 hover:text-white"
-							data-recording-key="explorer-search-toggle"
-							initial={{ opacity: 0, x: 8 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 8 }}
-							transition={{ duration: 0.15 }}
-						>
-							<SearchIcon size={14} />
-						</motion.button>
-					)}
-				</AnimatePresence>
+/**
+ * The left sidebar: site header plus the Explorer panel. An activity rail switches the panel
+ * between Sessions (the file tree) and the entity views, Origins (a tree), Vendors, Styles
+ * and the flavor Lexicon (plan §2.1, §2.5). The vintage ruler and the filter tokens sit
+ * above every view: filters narrow the entity views' counts too, each view ignoring its own
+ * facet.
+ */
+export default function Explorer({ sessions, vendors, categories, recordingKey }: ExplorerProps) {
+	const { q, setQ, facets, setFacets, filters, pathname } = useFilters()
+	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
+	const [sort, setSort] = useAtom(explorerSortAtom)
+	const [view, setView] = useAtom(explorerViewAtom)
+	const [hover, setHover] = useAtom(explorerHoverAtom)
+	const reduce = useReducedMotion()
+	const { drawerOpen, closeDrawer, drawerRef } = useDrawer(pathname)
 
-				{/* Expanded input */}
-				<AnimatePresence initial={false}>
-					{searchOpen && (
-						<motion.div
-							key="search-expanded"
-							className="absolute inset-0 flex items-center"
-							initial={{ clipPath: "inset(0 0 0 100%)" }}
-							animate={{ clipPath: "inset(0 0 0 0%)" }}
-							exit={{ clipPath: "inset(0 0 0 100%)" }}
-							transition={{ duration: 0.2 }}
-						>
-							<div className="relative w-full">
-								<SearchIcon
-									size={14}
-									className="absolute -translate-y-1/2 left-2 top-1/2 text-white/60"
-								/>
-								<input
-									ref={inputRef}
-									value={q}
-									onChange={(e) => {
-										setQ(e.target.value)
-										setShowSuggestions(true)
-									}}
-									placeholder="Search..."
-									className={cn(
-										"w-full pr-8 text-white border rounded-md pl-7 h-7 border-heicha-500 bg-heicha-800/70 text-[13px] placeholder-white/40",
-										"focus:outline-none focus:ring-1 focus:ring-white/20"
-									)}
-									data-recording-key="explorer-search-input"
-									onKeyDown={(e) => {
-										if (e.key === "Escape") {
-											setSearchOpen(false)
-											setShowSuggestions(false)
-										}
-									}}
-								/>
-								<button
-									aria-label="Close search"
-									onClick={() => {
-										setSearchOpen(false)
-										setShowSuggestions(false)
-									}}
-									className="absolute -translate-y-1/2 right-1 top-1/2 text-white/70 hover:text-white"
-								>
-									<CloseIcon size={14} />
-								</button>
-								{showSuggestions && suggestions.length > 0 && (
-									<div className="absolute z-50 mt-1 overflow-hidden border rounded-md shadow-xl w-72 border-heicha-500 bg-heicha-800/95">
-										<ul>
-											{suggestions.map((sug) => (
-												<li
-													key={sug.id}
-													className="px-3 py-2 text-sm cursor-pointer text-white/80 hover:bg-white/10"
-													onMouseDown={(e) => {
-														e.preventDefault()
-														sug.action()
-														setShowSuggestions(false)
-													}}
-												>
-													<span className="opacity-90">{sug.label}</span>
-													{sug.subLabel && (
-														<span className="ml-2 text-white/50">{sug.subLabel}</span>
-													)}
-													<span className="ml-2 text-xs text-white/40">{sug.type}</span>
-												</li>
-											))}
-										</ul>
-									</div>
-								)}
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</motion.div>
+	const query = q.toLowerCase().trim()
+	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
 
-			{/* <button
-				onClick={saveCurrentView}
-				title="Save view"
-				className="px-2 text-xs border rounded-md h-7 border-heicha-500 text-white/70 hover:text-white"
-				data-recording-key="explorer-save-view"
-			>
-				★
-			</button>
-			<div className="relative">
-				<button
-					title="Saved views"
-					className="px-2 text-xs border rounded-md h-7 border-heicha-500 text-white/70 hover:text-white"
-					onClick={() => setShowSuggestions((v) => !v)}
-				>
-					Views
-				</button>
-				{showSuggestions && savedViews.length > 0 && (
-					<div className="absolute right-0 z-50 w-56 mt-1 overflow-hidden border rounded-md shadow-xl border-heicha-500 bg-heicha-800/95">
-						<ul>
-							{savedViews.map(({ name, data }) => (
-								<li
-									key={name}
-									className="px-3 py-2 text-sm cursor-pointer text-white/80 hover:bg-white/10"
-									onMouseDown={(e) => {
-										e.preventDefault()
-										loadSavedView(data)
-										setShowSuggestions(false)
-									}}
-								>
-									{name}
-								</li>
-							))}
-						</ul>
-					</div>
-				)}
-			</div> */}
-		</div>
+	// Reuse the non-year pool while scrubbing: relation/query matching does not change
+	// with either handle. Only membership in the selected year set needs recomputing.
+	const { styles, origins, vendors: vendorFilters, cultivars, tags, vessels } = facets
+	const otherFacetsJson = JSON.stringify({
+		styles,
+		origins,
+		vendors: vendorFilters,
+		cultivars,
+		tags,
+		vessels,
+		years: EMPTY_FACETS.years,
+	})
+	const otherFacets = useMemo<FacetState>(() => JSON.parse(otherFacetsJson), [otherFacetsJson])
+	const sessionsExceptYears = useMemo(
+		() => sessions.filter((s) => matchesFilters(s, otherFacets, query)),
+		[sessions, otherFacets, query]
+	)
+	const selectedYearSet = useMemo(() => new Set(facets.years), [facets.years])
+	const filteredSessions = useMemo(
+		() =>
+			selectedYearSet.size
+				? sessionsExceptYears.filter((s) => selectedYearSet.has(yearOf(s)))
+				: sessionsExceptYears,
+		[sessionsExceptYears, selectedYearSet]
+	)
+	// The open entity view counts sessions passing every filter but its own
+	const viewFacet = VIEW_FACET[view]
+	const viewPool = useMemo(
+		() =>
+			viewFacet && facets[viewFacet].length
+				? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: [viewFacet] }))
+				: filteredSessions,
+		[viewFacet, sessions, facets, query, filteredSessions]
+	)
+	// display order (sessions arrive newest first, so date needs no sort)
+	const orderedSessions = useMemo(
+		() => (sort === "date" ? sessions : sortSessions(sessions, sort)),
+		[sessions, sort]
+	)
+	const sortedSessions = useMemo(() => {
+		if (sort === "date") return filteredSessions
+		const kept = new Set(filteredSessions.map((s) => s.id))
+		return orderedSessions.filter((s) => kept.has(s.id))
+	}, [filteredSessions, orderedSessions, sort])
+	const sessionTreeData = useMemo(
+		() => [
+			{
+				id: "sessions",
+				title: "Sessions",
+				children: sortedSessions,
+				total: hasAnyFilter(filters) ? sessions.length : undefined,
+				actions: (
+					<SessionSortToggle value={sort} onChange={setSort} recordingKey="explorer-session-sort" />
+				),
+			},
+		],
+		[sortedSessions, filters, sessions.length, sort, setSort]
 	)
 
-	// Active filters chips row
-	const chips = (
-		<div className="flex flex-wrap gap-1">
-			{facets.styles.map((s) => (
-				<button
-					key={`style-${s}`}
-					onClick={() => removeFacet("styles", s)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					style:{s}
-				</button>
-			))}
-			{facets.vendors.map((v) => (
-				<button
-					key={`vendor-${v}`}
-					onClick={() => removeFacet("vendors", v)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					vendor:{v}
-				</button>
-			))}
-			{facets.tags.map((t) => (
-				<button
-					key={`tag-${t}`}
-					onClick={() => removeFacet("tags", t)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					tag:{t}
-				</button>
-			))}
-			{facets.cultivars.map((c) => (
-				<button
-					key={`cultivar-${c}`}
-					onClick={() => removeFacet("cultivars", c)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					cultivar:{c}
-				</button>
-			))}
-			{facets.origins.map((o) => (
-				<button
-					key={`origin-${o}`}
-					onClick={() => removeFacet("origins", o)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					origin:{o}
-				</button>
-			))}
-			{facets.years.map((y) => (
-				<button
-					key={`year-${y}`}
-					onClick={() => removeFacet("years", y)}
-					className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-white/80 hover:bg-white/15"
-				>
-					year:{y}
-				</button>
-			))}
-		</div>
+	// Descriptor "find references"
+	const descriptorTerm = descriptor?.term ?? null
+	const references = useMemo(() => {
+		if (!descriptorTerm) return null
+		const all = new Set(
+			sessions.filter((s) => sessionMatchesDescriptor(s, descriptorTerm)).map((s) => s._slug)
+		)
+		const visible = sortedSessions.filter((s) => all.has(s._slug)).map((s) => s._slug)
+		return { total: all.size, visible }
+	}, [descriptorTerm, sessions, sortedSessions])
+
+	// The entity row under the pointer previews its vintages on the ruler
+	const previewYears = useMemo(() => {
+		if (!hover) return null
+		const years = sessionsOf(index, hover.kind, hover.slug)
+			.map((s) => Math.trunc(Number(s.production_year)))
+			.filter((y) => Number.isFinite(y) && y > 0)
+		return years.length ? new Set(years) : null
+	}, [hover, index])
+
+	// Active filter tokens (labels resolved from the data, so command-bar filters read nicely)
+	const labels = useMemo(() => {
+		const map = {
+			styles: new Map<string, { label: string; color?: string }>(),
+			vendors: new Map<string, { label: string }>(),
+			origins: new Map<string, { label: string }>(),
+			cultivars: new Map<string, { label: string }>(),
+			tags: new Map<string, { label: string }>(),
+			vessels: new Map<string, { label: string }>(),
+		}
+		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const st of index.nodes.style.values())
+			map.styles.set(st.slug, { label: st.title, color: st.color ?? undefined })
+		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
+		for (const s of sessions) {
+			// label every node of the chain, so a filter on a parent (e.g. ?origins=yunnan) reads nicely
+			for (const o of (s.origin || []).flatMap(originChain)) {
+				const label = { label: o.title || o._slug }
+				map.origins.set(o._slug, label)
+				map.origins.set(o.id, label)
+			}
+			for (const c of s.cultivar || []) map.cultivars.set(c._slug, { label: c.title })
+			for (const t of s.tags || []) if (t?._slug) map.tags.set(t._slug, { label: t.title })
+			for (const v of s.vessel || []) if (v?._slug) map.vessels.set(v._slug, { label: v.title })
+		}
+		for (const [legacy, slug] of Object.entries(LEGACY_ORIGIN_SLUGS)) {
+			const label = map.origins.get(slug)
+			if (label) map.origins.set(legacy, label)
+		}
+		return map
+	}, [categories, vendors, sessions, index])
+
+	const vintages = useMemo(
+		() => [...new Set(sessions.map(yearOf).filter(Boolean).map(Number))].sort((a, b) => a - b),
+		[sessions]
 	)
+
+	const tokens = useMemo(() => {
+		const out: FilterToken[] = []
+		if (q) {
+			out.push({ id: "q", kind: "find", label: `“${q}”`, onRemove: () => setQ("") })
+		}
+		for (const key of ["styles", "vendors", "origins", "cultivars", "vessels", "tags"] as const) {
+			for (const value of facets[key]) {
+				const meta = labels[key].get(value) as { label: string; color?: string } | undefined
+				out.push({
+					id: `${key}:${value}`,
+					kind: FACET_KIND[key],
+					label: meta?.label ?? value,
+					color: meta?.color,
+					onRemove: () => setFacets((f) => ({ ...f, [key]: f[key].filter((v) => v !== value) })),
+				})
+			}
+		}
+		// years: collapse consecutive vintages into one range token ("2005–2015")
+		const years = [...new Set(facets.years.map(Number))]
+			.filter(Number.isFinite)
+			.sort((a, b) => a - b)
+		const runs: number[][] = []
+		for (const y of years) {
+			const last = runs[runs.length - 1]
+			const prev = last?.[last.length - 1]
+			const iy = vintages.indexOf(y)
+			const ip = prev === undefined ? -1 : vintages.indexOf(prev)
+			// adjacent on the calendar, or adjacent vintages with no sessions in between
+			const contiguous =
+				prev !== undefined && (y === prev + 1 || (iy > -1 && ip > -1 && iy === ip + 1))
+			if (last && contiguous) last.push(y)
+			else runs.push([y])
+		}
+		for (const [i, run] of runs.entries()) {
+			const label = run.length === 1 ? String(run[0]) : `${run[0]}–${run[run.length - 1]}`
+			const remove = new Set(run.map(String))
+			out.push({
+				// Dragging changes this range's endpoints, not the identity of the filter.
+				id: `years:${i}`,
+				kind: FACET_KIND.years,
+				label,
+				onRemove: () =>
+					setFacets((f) => ({
+						...f,
+						years: f.years.filter((y) => !remove.has(String(Math.trunc(Number(y))))),
+					})),
+			})
+		}
+		return out
+	}, [q, facets, labels, vintages, setFacets, setQ])
+
+	const clearAll = useCallback(() => replaceFilters({ q: "", facets: EMPTY_FACETS }), [])
+
+	const onToggleFilter = useCallback(
+		(kind: PageKind, slug: string) => {
+			const id = kind === "origin" ? index.nodes.origin.get(slug)?.id : undefined
+			replaceFilters((current) => toggleEntityFilter(current, kind, slug, id))
+		},
+		[index]
+	)
+
+	const filtered = hasAnyFilter({ q, facets })
+
+	// views slide toward the side of the rail they were picked from
+	const [direction, setDirection] = useState(0)
+	const changeView = useCallback(
+		(next: ExplorerView) => {
+			setDirection(Math.sign(EXPLORER_VIEWS.indexOf(next) - EXPLORER_VIEWS.indexOf(view)))
+			setView(next)
+			// the hovered row is about to unmount without a pointerleave
+			setHover(null)
+		},
+		[view, setView, setHover]
+	)
+
+	// a lexicon word's "find all references": pin it and show the sessions that list it
+	const findReferences = useCallback(
+		(term: string) => {
+			setDescriptor({ term, pinned: true })
+			changeView("sessions")
+		},
+		[setDescriptor, changeView]
+	)
+
+	const viewProps = {
+		index,
+		pool: viewPool,
+		filters,
+		narrowed: filtered,
+		pathname: stripSlash(pathname ?? ""),
+		onToggleFilter,
+	}
 
 	return (
-		<div
-			className="fixed inset-y-0 left-0 z-20 flex flex-col w-[340px] p-8 space-y-10 pointer-events-none font-fira-code"
-			data-recording-key={recordingKey}
-		>
-			<SiteHeader />
+		<MotionConfig reducedMotion="user">
+			{/* below xl: the scrim behind the drawer (a click on the page puts it away) */}
+			<div
+				aria-hidden
+				onClick={closeDrawer}
+				className={cn(
+					"fixed inset-0 z-[44] bg-black/55 transition-opacity duration-300 xl:hidden motion-reduce:transition-none",
+					drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+				)}
+			/>
+			<div
+				ref={drawerRef}
+				id={EXPLORER_DRAWER_ID}
+				// docked from xl; below it app.css zeroes --explorer-w and the Explorer slides in
+				// over the page from the masthead's toggle (CSS places it, so nothing jumps on hydration)
+				className={cn(
+					"fixed top-0 left-0 bottom-[var(--statusbar-h)] flex flex-col pointer-events-none font-fira-code outline-none",
+					"xl:z-20 xl:w-[var(--explorer-w)] xl:p-6 xl:space-y-8 2xl:p-8 2xl:space-y-10",
+					"max-xl:z-[45] max-xl:w-[min(22rem,calc(100vw-2.5rem))] max-xl:p-3 max-xl:duration-300 max-xl:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+					// visible at once on the way in (so it can take focus), hidden only once it is out
+					drawerOpen
+						? "max-xl:transition-[translate]"
+						: "max-xl:transition-[translate,visibility] max-xl:-translate-x-full max-xl:invisible"
+				)}
+				tabIndex={-1}
+				// a dialog only while it is out; closed, `invisible` already keeps it out of focus,
+				// clicks and the accessibility tree, and the docked rail stays live before hydration
+				role={drawerOpen ? "dialog" : undefined}
+				aria-modal={drawerOpen || undefined}
+				aria-label={drawerOpen ? "Explorer" : undefined}
+				data-recording-key={recordingKey}
+			>
+				{/* the drawer sits under the compact masthead, which already carries the mark */}
+				<SiteHeader className="max-xl:hidden" />
 
-			{/* The actual sidebar panel. Make this interactive. */}
-			<Panel className="flex-1 contain-size" backdropClassName="bg-[rgba(45,40,45,0.35)]">
-				<PanelSection title="Explorer" rightSlot={rightSlot}>
-					<div className="mb-2">{chips}</div>
-					<FileTree
-						data={[
-							{ id: "sessions", title: "Sessions", children: filteredSessions },
-							{ id: "vendors", title: "Vendors", children: filteredVendors },
-							{
-								id: "categories",
-								title: "Categories",
-								children: filteredCategories,
-							},
-						]}
-					/>
-				</PanelSection>
-			</Panel>
-		</div>
+				{/* The actual sidebar panel. Make this interactive. */}
+				<Panel className="flex-1 contain-size">
+					<div className="relative">
+						{/* header: the activity rail (a tablist), concentric with the panel: its 15px inner radius
+						    less this 6px inset gives the tabs their 9px radius */}
+						<div className="sticky top-0 z-10 p-0 surface-strip">
+							<div className="flex items-center gap-1.5 p-1.5 overflow-hidden backdrop-blur-xl bg-panel-header-bg surface-grain">
+								<h2 className="sr-only">Explorer</h2>
+								<div className="flex-1 min-w-0">
+									<ActivityRail value={view} onChange={changeView} recordingKey="explorer-rail" />
+								</div>
+								<button
+									type="button"
+									onClick={closeDrawer}
+									aria-label="Close Explorer"
+									className="grid w-7 h-7 rounded-[9px] outline-none shrink-0 place-items-center text-white/45 hover:text-white hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-white/50 xl:hidden"
+								>
+									<X size={14} strokeWidth={1.75} aria-hidden />
+								</button>
+							</div>
+						</div>
+						<div className="p-4">
+							<YearRuler
+								sessions={sessions}
+								filteredSessions={sessionsExceptYears}
+								activeYears={facets.years}
+								onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
+								previewYears={view === "sessions" ? null : previewYears}
+							/>
+							<FilterTokens tokens={tokens} onClearAll={clearAll} />
+							{/* only a pinned descriptor earns the bar (it shifts the tree); a hover preview
+							    just dims rows and drops in dots, which costs no layout */}
+							<DescriptorReferences
+								descriptor={descriptor?.pinned ? descriptor : null}
+								total={references?.total ?? 0}
+								hidden={references ? references.total - references.visible.length : 0}
+								onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}
+								onClear={() => setDescriptor(null)}
+							/>
+							<div
+								id={EXPLORER_PANEL_ID}
+								role="tabpanel"
+								aria-labelledby={explorerTabId(view)}
+								className="relative"
+							>
+								<AnimatePresence mode="popLayout" initial={false} custom={direction}>
+									<motion.div
+										key={view}
+										custom={direction}
+										variants={{
+											enter: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * 14 }),
+											center: { opacity: 1, x: 0 },
+											exit: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * -14 }),
+										}}
+										initial="enter"
+										animate="center"
+										exit="exit"
+										transition={
+											// direction 0: the remembered view arriving after hydration, not a pick
+											direction === 0
+												? { duration: 0 }
+												: reduce
+												? { duration: 0.12 }
+												: {
+														...VIEW_SPRING,
+														opacity: { duration: 0.16 },
+												  }
+										}
+									>
+										{view === "sessions" && (
+											<FileTree
+												referenceSlugs={references?.visible ?? null}
+												order={sort}
+												data={sessionTreeData}
+											/>
+										)}
+										{/* entity rows run a little wider than the padding: names need the room */}
+										{view !== "sessions" && (
+											<div className="-mx-2">
+												{view === "origins" && <OriginsView {...viewProps} />}
+												{view === "vendors" && <VendorsView {...viewProps} vendors={vendors} />}
+												{view === "styles" && <StylesView {...viewProps} categories={categories} />}
+												{view === "lexicon" && (
+													<LexiconView {...viewProps} onFindReferences={findReferences} />
+												)}
+											</div>
+										)}
+									</motion.div>
+								</AnimatePresence>
+							</div>
+						</div>
+					</div>
+				</Panel>
+			</div>
+		</MotionConfig>
 	)
 }

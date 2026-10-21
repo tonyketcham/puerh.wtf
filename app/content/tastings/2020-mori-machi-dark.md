@@ -9,7 +9,9 @@ cultivar:
   - c51714ff-cb3a-4c2e-bafe-d98c74d42ec2
 origin:
   - f7c2c4fa-fe2a-4d67-ac4f-b25f258d1497
-season: Spring (first and second harvests)
+harvest:
+  season: spring
+season_note: Spring (first and second harvests)
 production_year: 2020
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
@@ -65,6 +67,8 @@ tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
 rating: 84.1224
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 205
   material_amount: 5

@@ -1,52 +1,28 @@
 "use client"
 
-import RadarChart from "@/lib/components/dataviz/radar/RadarChart"
-import DetailsListItem from "@/lib/components/DetailsListItem"
-import type { Cultivar, SessionFull, SessionNotes } from "@/lib/types/session"
-import SimpleBar from "simplebar-react"
 import "simplebar-react/dist/simplebar.min.css"
-import PanelSection from "./containers/PanelSection"
 import Panel from "./containers/Panel"
 import type { PropsWithChildren } from "react"
-import { useAtom, useAtomValue } from "jotai"
-import { flavorAxesAtom, notesAtom, sessionAtom } from "@/lib/store/sessionAtom"
-import Chip from "@/lib/components/Chip"
+import FlavorProfilePanel from "@/lib/components/properties/FlavorProfilePanel"
+import ProvenancePanels from "@/lib/components/properties/ProvenancePanels"
+import NotesPanel from "@/lib/components/properties/NotesPanel"
 
-const noteDisplayConfig: Record<keyof SessionNotes, { title: string; icon: string }> = {
-	dry_leaf_nose: {
-		title: "Dry Leaf",
-		icon: "🍃",
-	},
-	wet_leaf_nose: {
-		title: "Wet Leaf",
-		icon: "💧",
-	},
-	mouthfeel: {
-		title: "Mouthfeel",
-		icon: "👄",
-	},
-	taste: {
-		title: "Taste",
-		icon: "👅",
-	},
-	finish: {
-		title: "Finish",
-		icon: "🏁",
-	},
-	empty_cup: {
-		title: "Empty Cup",
-		icon: "🥣",
-	},
-	cha_qi: {
-		title: "Cha Qi",
-		icon: "✨",
-	},
-}
-
+/**
+ * Fixed right "Properties" panel. Sits above the status bar (bottom inset = --statusbar-h)
+ * and exposes [data-properties-panel] so :root can publish --rightpanel-w for centering
+ * the command bar over the editor column.
+ *
+ * Below lg it joins the page flow under the editor as a full-width card at its natural height:
+ * on a phone the page is the one scroller, so the panel's own SimpleBar stands down (app.css)
+ * rather than trapping Source, Record and Notes in a box inside the page. From lg the aside
+ * dissolves (contents) so its fixed card leaves no gap in the frame.
+ */
 export function SessionPropertiesPanel({ children }: PropsWithChildren<unknown>) {
 	return (
-		<aside>
-			<Panel className="fixed inset-y-0 right-0 w-[340px] h-full p-8">{children}</Panel>
+		<aside data-properties-panel className="min-w-0 lg:contents">
+			<Panel className="relative lg:fixed lg:top-0 lg:right-0 lg:bottom-[var(--statusbar-h)] lg:w-[var(--properties-w)] lg:p-5 2xl:p-8">
+				{children}
+			</Panel>
 		</aside>
 	)
 }
@@ -54,67 +30,12 @@ export function SessionPropertiesPanel({ children }: PropsWithChildren<unknown>)
 export default function SessionProperties() {
 	return (
 		<>
-			<PanelSection title="Flavor Profile" hasBottomBorder hasPadding={false}>
-				<FlavorProfile />
-			</PanelSection>
+			<FlavorProfilePanel />
 
-			<PanelSection title="Metadata">
-				<ul className="space-y-4">
-					<MetaData />
-				</ul>
-			</PanelSection>
+			{/* Provenance / Source / Record (plan §3.4) */}
+			<ProvenancePanels />
 
-			<PanelSection title="Notes">
-				<ul className="space-y-4">
-					<Notes />
-				</ul>
-			</PanelSection>
-		</>
-	)
-}
-
-function FlavorProfile() {
-	const flavorAxes = useAtomValue(flavorAxesAtom)
-
-	return <RadarChart data={flavorAxes ?? {}} />
-}
-
-function Notes() {
-	const notes = useAtomValue(notesAtom) ?? []
-
-	return (
-		<>
-			{Object.entries(notes).map(([key, value]) => {
-				if (!value) return null
-				const config = noteDisplayConfig[key as keyof SessionNotes]
-				if (!config) return null
-
-				return <DetailsListItem key={key} icon={config.icon} title={config.title} value={value} />
-			})}
-		</>
-	)
-}
-
-function MetaData() {
-	const session = useAtomValue(sessionAtom)
-	console.log({ session })
-	return (
-		<>
-			{session?.production_year && (
-				<DetailsListItem icon={null} title="Production Year" value={session.production_year} />
-			)}
-			{session?.cultivar && <Cultivars values={session.cultivar} />}
-		</>
-	)
-}
-
-function Cultivars({ values }: { values: Cultivar[] }) {
-	return (
-		<>
-			{values.map((value) => (
-				// <DetailsListItem key={value.id} icon={null} title="Cultivar" value={value.title} />
-				<Chip key={value.id}>{value.title}</Chip>
-			))}
+			<NotesPanel />
 		</>
 	)
 }

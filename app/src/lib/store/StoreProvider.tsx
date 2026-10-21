@@ -3,16 +3,13 @@
 import { Provider } from "jotai"
 import type { PropsWithChildren } from "react"
 
-import { createStore } from "jotai"
-import { DevTools } from "jotai-devtools"
-import "jotai-devtools/styles.css"
-
-const store = createStore()
+import { store } from "./store"
+import FilterUrlSync from "./FilterUrlSync"
 
 export const StoreProvider = ({ children }: PropsWithChildren) => {
 	return (
 		<Provider store={store}>
-			{DevTools({ store }) as React.ReactNode}
+			<FilterUrlSync />
 			{children}
 		</Provider>
 	)

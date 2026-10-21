@@ -57,6 +57,8 @@ tags:
   - 34b1faf0-825a-40ba-b906-ed8de96966ac
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
 rating: 80
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 6
@@ -64,6 +66,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 10
+origin_note: blend
 ---
 
 The liquor's definitely cloudier on this compared to the 2018 version. Got a different set of dry/wet leaf notes that weren't better or worse - just different. The wet leaf was much more savory than the 2018 when hot, and then went into a fruity sweetness when it cooled down.

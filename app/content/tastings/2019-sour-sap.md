@@ -9,7 +9,9 @@ cultivar:
   - fc3f963c-9a67-4320-9557-681500f5c215
 origin:
   - 531a9fca-a82e-4c0b-96af-5cbdfda27a9d
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2019
 picking: Up to 3rd or 4th leaf
 elevation: 2000
@@ -64,6 +66,8 @@ notes:
   cha_qi: Relaxing the muscles, noticing my ADHD symptoms kind of fading away -
     not bouncing my legs at all, not gritting my teeth, not worrying about time.
     Nice, gentle headspace and body feeling.
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 200
   material_amount: 6
@@ -71,8 +75,6 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 25
   infusion_increment: 5
-genre:
-  - 1d3f656f-db1b-4a6a-97ab-81940e17be12
 tags:
   - 07c49409-da16-4cc2-87bf-f84dae0ba418
   - 16565067-592b-4e62-91aa-f8d2c920b602

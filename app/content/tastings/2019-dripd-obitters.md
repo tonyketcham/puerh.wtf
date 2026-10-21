@@ -57,6 +57,8 @@ tags:
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
 rating: 84
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 6
@@ -64,6 +66,7 @@ brewing:
   vessel: Jianshui Zitao Xishi Clay Pot
   first_infusion_duration: 7
   infusion_increment: 5
+origin_note: blend
 ---
 
 Yea this is a funky smellin one.

@@ -10,7 +10,10 @@ cultivar:
   - e784f1e1-4399-43a0-a9fe-767bec4fc3a2
 origin:
   - 27bab493-b309-4b5b-a912-c92a584af28d
-season: June
+harvest:
+  season: summer
+  month: 6
+season_note: June
 production_year: 2019
 picking: Young leaves
 elevation: 400
@@ -62,6 +65,8 @@ tags:
   - 7a127b82-6d5c-42d4-b4c9-6e4a28fc84ba
   - bce623b4-e571-462a-b95b-988beb6dce4c
 rating: 67.4
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 205
   material_amount: 5

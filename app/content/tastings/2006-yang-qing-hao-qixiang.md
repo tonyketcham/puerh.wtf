@@ -14,9 +14,19 @@ origin:
   - e9a17dc5-6d6c-433a-9570-5f4c5f7a6236
   - 756d197f-6e4a-42bb-ad12-6cde329e1939
   - 8f94266b-da17-4f30-8a46-d6b4b4dffbd3
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2006
 aging_conditions: 2 years US, ~12 years Taiwan
+storage:
+  - place: taiwan
+    from: 2006
+    to: 2018
+    approx: true
+  - place: united-states
+    from: 2019
+    to: 2021
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/910741471/black-friday-yang-qing-hao-special-28g
@@ -70,6 +80,8 @@ tags:
   - 9df29a3e-d882-4bc0-b4f1-8ab03e6960f6
   - d1d6a167-6c51-46ca-8887-fdf533afaa0e
 rating: 85.54
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 204
   material_amount: 7.07

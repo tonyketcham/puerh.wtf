@@ -14,6 +14,8 @@ const config = {
 				"ink-muted": "rgba(255,255,255,0.8)",
 				"border-muted": "rgba(255,255,255,0.05)",
 				brand: "#edc446",
+				// the wrappers' print red: registration marks, the hero's hanzi
+				crimson: "#d8452f",
 				"bai-cha": {
 					50: "#fefefe",
 					100: "#fdfdfd",
@@ -37,6 +39,13 @@ const config = {
 			},
 			lineHeight: {
 				"extra-tight": "1.13703",
+			},
+			// the embossed controls (see app.css): --tw-shadow, so they compose with ring-* states
+			boxShadow: {
+				key: "inset 0 1px 0 rgb(255 248 230 / 0.1), inset 0 -1px 0 rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.55)",
+				// chips: the same cap, barely proud of the surface
+				"key-soft": "inset 0 1px 0 rgb(255 248 230 / 0.05), 0 1px 1px rgb(0 0 0 / 0.35)",
+				well: "inset 0 1px 2px rgb(0 0 0 / 0.6), inset 0 0 0 1px rgb(0 0 0 / 0.35), 0 1px 0 rgb(255 248 230 / 0.06)",
 			},
 			dropShadow: {
 				split: "0px 4px 0px rgba(255, 255, 255, 0.25)",

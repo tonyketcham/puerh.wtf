@@ -10,7 +10,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 64c1d082-e669-4788-8e31-c5d9d80e577c
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2020
 picking: Bud & up to 3 leaves
 elevation: 1200
@@ -67,6 +69,8 @@ tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
   - 2179f410-8755-4a99-97ca-69f2b959784c
 rating: 85.8
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 brewing:
   temperature: 204
   material_amount: 5

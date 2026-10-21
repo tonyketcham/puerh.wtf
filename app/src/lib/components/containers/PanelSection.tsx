@@ -17,11 +17,13 @@ export default function PanelSection({
 }: PanelSectionProps) {
 	return (
 		<div className="relative">
-			<div className="sticky top-0 p-0 border-b border-heicha-500">
-				<div className="px-4 py-3 overflow-hidden backdrop-blur-xl bg-panel-header-bg ring-1 ring-heicha-500/10">
-					<div className="flex items-center gap-2">
-						<h2 className="text-sm font-medium text-white/80 flex-1">{title}</h2>
-						{rightSlot}
+			<div className="sticky top-0 z-10 p-0 surface-strip">
+				{/* concentric with the panel: a 5px inset puts a 22px control's 10px corner on the panel's
+				    15px inner radius (15 − 5); a text slot steps in to the title's 16px gutter instead */}
+				<div className="py-[5px] pl-4 pr-[5px] overflow-hidden backdrop-blur-xl bg-panel-header-bg surface-grain">
+					<div className="flex items-center gap-2 h-[22px]">
+						<h2 className="flex-1 text-xs font-medium text-white/95">{title}</h2>
+						<div className="flex shrink-0 [&>span]:pr-[11px]">{rightSlot}</div>
 					</div>
 				</div>
 			</div>

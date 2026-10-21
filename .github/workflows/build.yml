@@ -25,6 +25,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      # origin maps are committed: fail fast if origins changed without `pnpm geo` (plan §4.3.1)
+      - run: pnpm --filter puerh.wtf geo:check
       - run: pnpm --filter puerh.wtf build
   log-build:
     strategy:

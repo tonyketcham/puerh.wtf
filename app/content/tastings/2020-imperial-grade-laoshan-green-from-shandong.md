@@ -9,7 +9,10 @@ cultivar:
   - 06e8d630-3549-441a-bee9-e3c3c74fcf1f
 origin:
   - cc42ad0c-ef8e-4056-8ae4-ec9bb77ce98d
-season: early April
+harvest:
+  season: spring
+  month: 4
+season_note: early April
 production_year: 2020
 picking: tippy young growth without the fuzz
 elevation: 300
@@ -61,6 +64,8 @@ tags:
   - 799e7654-d553-4e18-b128-4d4a3e29c7e5
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 79.12
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 180
   material_amount: 5

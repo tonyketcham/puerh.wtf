@@ -1,0 +1,2 @@
+# geo:test compares fixtures byte for byte on every OS: never rewrite their line endings
+fixtures/** -text

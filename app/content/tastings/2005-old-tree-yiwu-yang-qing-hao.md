@@ -12,6 +12,10 @@ origin:
 production_year: 2005
 picking: Bud & up to 3 or 4 leaves
 aging_conditions: 15 years of mystery
+storage:
+  - place: unknown
+    from: 2005
+    to: 2020
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 excerpt: my first YQH, pretty decent
@@ -62,6 +66,8 @@ notes:
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
 rating: 81
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 205
   material_amount: 7.11

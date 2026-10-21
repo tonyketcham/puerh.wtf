@@ -1,19 +1,43 @@
 import Link from "next/link"
 import Github from "./icons/Github"
 import Instagram from "./icons/Instagram"
+import { cn } from "@/lib/utils/cn"
+import ExplorerToggle from "./explorer/ExplorerToggle"
 
-export default function SiteHeader() {
+/**
+ * `compact` is the masthead while the Explorer is a drawer (below xl): same mark, one size
+ * down, with the drawer's toggle and the links at its side.
+ */
+export default function SiteHeader({
+	compact = false,
+	className,
+}: {
+	compact?: boolean
+	className?: string
+}) {
 	return (
-		<header className="flex flex-row justify-between px-4 py-1 font-rock-3d">
+		<header className={cn("flex flex-row justify-between px-4 py-1 font-rock-3d", className)}>
 			<Link href="/" aria-label="home" className="pointer-events-auto">
-				<h1 className="text-[64px] leading-13 text-bai-cha-100 select-none drop-shadow-split">
+				<h1
+					className={cn(
+						"text-bai-cha-100 select-none drop-shadow-split",
+						// the docked rail is 300px until 2xl: the full mark and its links don't fit side by side
+						compact ? "text-[44px] leading-9" : "text-[52px] leading-11 2xl:text-[64px] 2xl:leading-13"
+					)}
+				>
 					<span>puerh</span>
 					<br />
-					<span className="block -ml-4">.wtf</span>
+					<span className={cn("block", compact ? "-ml-3" : "-ml-4")}>.wtf</span>
 				</h1>
 			</Link>
 
-			<div className="flex flex-col m-auto space-y-1.5 pt-4 opacity-80 text-white">
+			<div
+				className={cn(
+					"flex opacity-80 text-white",
+					compact ? "flex-row items-center gap-3" : "flex-col m-auto space-y-1.5 pt-4"
+				)}
+			>
+				{compact && <ExplorerToggle className="mr-1" />}
 				<a
 					aria-label="source code"
 					href="https://github.com/tonyketcham/puerh.wtf"

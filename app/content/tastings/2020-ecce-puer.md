@@ -55,6 +55,8 @@ notes:
 tags:
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
 rating: 74
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 200
   material_amount: 6
@@ -62,6 +64,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 15
   infusion_increment: 10
+origin_note: blend
 ---
 
 The cake has a wonderfully light compression that you can pick large leaves apart from individually, just using your hands and minimal force.

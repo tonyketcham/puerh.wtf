@@ -1,16 +1,20 @@
-import SessionProperties, { SessionPropertiesPanel } from "@/lib/components/SessionProperties"
+import SessionProperties from "@/lib/components/SessionProperties"
+import StatusBar from "@/lib/components/session/StatusBar"
+import SessionBreadcrumb from "@/lib/components/session/SessionBreadcrumb"
+import EditorFrame from "@/lib/components/containers/EditorFrame"
 import type { PropsWithChildren } from "react"
 
 export default async function SessionLayout({ children }: PropsWithChildren) {
 	return (
-		<main className="flex-1 bg-background text-ink">
-			<div className="grid grid-cols-12 gap-8 p-8">
-				<div className="col-span-8 space-y-8">{children}</div>
+		// [data-statusbar-layout] turns on --statusbar-h (see app.css)
+		<div className="flex-1 bg-background text-ink" data-statusbar-layout>
+			<EditorFrame panel={<SessionProperties />}>
+				{/* persists across sessions, so shared crumbs hold still while the tail changes */}
+				<SessionBreadcrumb className="mb-4" recordingKey="session-breadcrumb" />
+				<div className="space-y-8">{children}</div>
+			</EditorFrame>
 
-				<SessionPropertiesPanel>
-					<SessionProperties />
-				</SessionPropertiesPanel>
-			</div>
-		</main>
+			<StatusBar />
+		</div>
 	)
 }

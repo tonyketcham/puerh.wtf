@@ -4,10 +4,12 @@ export type TreeNode = {
 	id: string
 	title: string
 	production_year?: number | null
+	rating?: number | null
 	_slug?: string
 	_collection?: string
 	date?: string
 	children?: TreeNode[]
+	vendor?: { title: string }[] | null
 	style?: {
 		category: Category
 	}[]

@@ -1,19 +1,36 @@
 "use client"
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { motion } from "motion/react"
+import { motion, useReducedMotion } from "motion/react"
+import { useAtom, useAtomValue } from "jotai"
 import { cn } from "@/lib/utils/cn"
 import BoxCarousel, {
+	type BoxCarouselRef,
+	type BoxCarouselSnapshot,
 	type CarouselItem,
 	type RotationDirection,
-	type BoxCarouselRef,
 } from "@/components/fancy/carousel/box-carousel"
+import { currentLiquorAtom, hoveredNoteStageAtom } from "@/lib/store/sessionAtom"
+import { liftLiquor, rgbCss } from "@/lib/liquor"
+import { buildStageImageMap } from "@/lib/noteStages"
+import CubeCaption, { createCubeCaptionStore } from "./CubeCaption"
 
 type ImageItem = {
 	image: string
 	alt: string
 }
+
+/** How long the cube lingers on a note's photo after the pointer leaves the note */
+const RETURN_DELAY_MS = 650
+
+const navButton = cn(
+	"flex items-center justify-center size-7 shrink-0 transition-colors duration-200 rounded-lg",
+	"bg-white/5 shadow-key hover:bg-white/10 active:shadow-well text-white/60 hover:text-white",
+	"focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--liquor-text,#8a8a8a)]"
+)
+
+// ---------------------------------------------------------------------------
 
 interface SessionCarouselProps {
 	images: ImageItem[]
@@ -25,73 +42,33 @@ interface SessionCarouselProps {
 	 */
 	cssRotation?: number
 	/**
-	 * Enable continuous rotation (smooth, infinite rotation)
-	 * Takes precedence over autoPlay if both are enabled
-	 * @default false
+	 * Enable continuous rotation (disabled by the cube while any scroll control is on)
+	 * @default true
 	 */
 	continuousRotation?: boolean
-	/**
-	 * Speed of continuous rotation in degrees per second
-	 * Positive values rotate in the direction specified by `direction`
-	 * Negative values rotate in the opposite direction
-	 * @default 30
-	 */
+	/** Degrees per second for continuous rotation */
 	continuousSpeed?: number
-	/**
-	 * Pause continuous rotation on hover
-	 * @default true
-	 */
 	pauseOnHover?: boolean
-	/**
-	 * Pause continuous rotation during drag interaction
-	 * @default true
-	 */
 	pauseOnDrag?: boolean
-	/**
-	 * Speed multiplier during turns (90-degree transitions)
-	 * Higher values make turns faster, creating a dynamic rotation effect
-	 * @default 3
-	 */
 	turnSpeedMultiplier?: number
-	/**
-	 * Scale factor when hovered (as percentage, e.g., 1.05 = 5% larger)
-	 * @default 1.05
-	 */
+	/** Scale when hovered (1.05 = 5% larger) */
 	hoverScale?: number
-	/**
-	 * Enable scroll wheel control for rotation
-	 * When enabled, scroll wheel will control rotation instead of continuous rotation
-	 * @default false
-	 */
+	/** Wheel over the cube turns it */
 	enableScrollControl?: boolean
-	/**
-	 * Sensitivity of scroll wheel control (higher = more rotation per scroll)
-	 * @default 1
-	 */
 	scrollSensitivity?: number
-	/**
-	 * Enable page scroll control for rotation
-	 * When enabled, carousel rotation is tied to page scroll position
-	 * @default false
-	 */
+	/** Page scroll turns the cube while it's in view */
 	enablePageScrollControl?: boolean
-	/**
-	 * Sensitivity of page scroll control (higher = more rotation per scroll pixel)
-	 * @default 0.5
-	 */
 	pageScrollSensitivity?: number
-	/**
-	 * Offset from top of viewport where scroll control starts (in pixels)
-	 * @default 0
-	 */
 	scrollOffset?: number
-	/**
-	 * Initial rotation offset in degrees
-	 * @default 0
-	 */
+	/** Resting pose of the cube in degrees */
 	initialRotationOffset?: number
 }
 
+/**
+ * Render budget: a face change while the page scrolls re-renders only the caption. The cube is
+ * memoized with stable props, and the visible face lives in a tiny store only CubeCaption
+ * subscribes to — this component holds no per-face state.
+ */
 export default function SessionCarousel({
 	images,
 	direction = "right",
@@ -112,8 +89,9 @@ export default function SessionCarousel({
 }: SessionCarouselProps) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const carouselRef = useRef<BoxCarouselRef>(null)
-	const [containerWidth, setContainerWidth] = useState<number>(288) // 72 * 4 (w-72 is 288px)
+	const [containerWidth, setContainerWidth] = useState<number>(288) // w-72
 	const [isLoaded, setIsLoaded] = useState<boolean>(false)
+	const prefersReducedMotion = useReducedMotion()
 
 	// Observe container size for responsive width/height
 	useEffect(() => {
@@ -123,22 +101,17 @@ export default function SessionCarousel({
 		const ro = new ResizeObserver((entries) => {
 			for (const entry of entries) {
 				const w = Math.floor(entry.contentRect.width)
-				if (w !== containerWidth) {
-					setContainerWidth(w)
-					if (!isLoaded) setIsLoaded(true)
-				}
+				setContainerWidth((prev) => (prev === w ? prev : w))
+				setIsLoaded(true)
 			}
 		})
 		ro.observe(el)
 		return () => ro.disconnect()
-	}, [containerWidth, isLoaded])
+	}, [])
 
-	// Mark as loaded when images are available
 	useEffect(() => {
-		if (images && images.length > 0 && !isLoaded) {
-			setIsLoaded(true)
-		}
-	}, [images, isLoaded])
+		if (images && images.length > 0) setIsLoaded(true)
+	}, [images])
 
 	const width = containerWidth
 	const height = useMemo(() => {
@@ -157,40 +130,133 @@ export default function SessionCarousel({
 			})),
 		[images]
 	)
+	/** Remount the cube when the photo set changes (session navigation) */
+	const itemsKey = useMemo(() => items.map((item) => item.src).join("|"), [items])
+	const alts = useMemo(() => items.map((item) => item.alt), [items])
 
-	const handlePrevious = () => {
-		carouselRef.current?.prev()
+	const stageMap = useMemo(() => buildStageImageMap(images), [images])
+
+	// -------------------------------------------------------------------------
+	// Cube ↔ notes link (hoveredNoteStageAtom)
+	// -------------------------------------------------------------------------
+
+	const [hoveredStage, setHoveredStage] = useAtom(hoveredNoteStageAtom)
+	const visibleIndexRef = useRef(0)
+	const [captionStore] = useState(createCubeCaptionStore)
+
+	/** true while the cube itself is hovered/dragged/focused: it drives the atom, not vice versa */
+	const cubeActiveRef = useRef(false)
+	/** where to return once the notes stop pointing at a photo */
+	const snapshotRef = useRef<BoxCarouselSnapshot | null>(null)
+	const returnTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+	const clearReturnTimer = () => {
+		if (returnTimerRef.current) clearTimeout(returnTimerRef.current)
+		returnTimerRef.current = null
 	}
 
-	const handleNext = () => {
-		carouselRef.current?.next()
-	}
+	// Notes → cube
+	useEffect(() => {
+		if (cubeActiveRef.current) return
+		const cube = carouselRef.current
+		if (!cube) return
+		clearReturnTimer()
+
+		const target = hoveredStage ? stageMap.byStage[hoveredStage] : undefined
+		if (target != null) {
+			if (!snapshotRef.current) snapshotRef.current = cube.getSnapshot()
+			cube.goTo(target)
+			return
+		}
+
+		if (snapshotRef.current) {
+			returnTimerRef.current = setTimeout(() => {
+				const snapshot = snapshotRef.current
+				snapshotRef.current = null
+				if (snapshot && !cubeActiveRef.current) carouselRef.current?.restore(snapshot)
+			}, RETURN_DELAY_MS)
+		}
+	}, [hoveredStage, stageMap])
+
+	useEffect(() => clearReturnTimer, [])
+
+	// Cube → caption + notes. Called from the cube's turn (often a page-scroll frame): the caption
+	// store and the notes highlight both update as transitions, after the frame.
+	const handleIndexChange = useCallback(
+		(index: number) => {
+			// shortest way round the cube, so last → first still counts as "next"
+			const n = items.length || 1
+			const delta = (((index - visibleIndexRef.current) % n) + n) % n
+			visibleIndexRef.current = index
+			captionStore.set({ index, direction: delta === 0 || delta <= n / 2 ? 1 : -1 })
+			if (cubeActiveRef.current) {
+				const stage = stageMap.stages[index] ?? null
+				startTransition(() => setHoveredStage(stage))
+			}
+		},
+		[captionStore, setHoveredStage, stageMap, items.length]
+	)
+
+	const handleInteractingChange = useCallback(
+		(active: boolean) => {
+			cubeActiveRef.current = active
+			if (active) {
+				// the reader grabbed the cube: it owns the view now
+				clearReturnTimer()
+				snapshotRef.current = null
+				setHoveredStage(stageMap.stages[visibleIndexRef.current] ?? null)
+			} else {
+				setHoveredStage(null)
+			}
+		},
+		[setHoveredStage, stageMap]
+	)
+
+	// Reset local link state when the photo set changes
+	useEffect(() => {
+		clearReturnTimer()
+		snapshotRef.current = null
+		cubeActiveRef.current = false
+		visibleIndexRef.current = 0
+		captionStore.set({ index: 0, direction: 1 })
+	}, [itemsKey, captionStore])
+
+	const liquor = useAtomValue(currentLiquorAtom)
+	const accent = useMemo(() => rgbCss(liftLiquor(liquor.rgb)), [liquor])
+
+	const handlePrevious = () => carouselRef.current?.prev()
+	const handleNext = () => carouselRef.current?.next()
 
 	return (
-		<div className="relative" data-recording-key={recordingKey}>
+		<div className="relative" data-recording-key={recordingKey} data-photo-cube>
 			<motion.div
 				ref={containerRef}
+				// the outline the notes flow around (FlowAroundArticle)
+				data-flow-shape
+				data-flow-rotate={cssRotation}
 				className={cn(
 					"p-2 drop-shadow-2xl drop-shadow-heicha-600/40 w-72",
 					"bg-[radial-gradient(circle_1.5px_at_1.5px_1.5px,_rgba(255,255,255,0.2)_1.5px,_transparent_0)]",
 					"bg-[size:16px_16px]"
 				)}
 				style={{
-					transform: `rotate(${cssRotation}deg)`,
+					rotate: cssRotation,
 					minHeight: height + 16, // Reserve height (height + padding)
 				}}
-				initial={{ scale: 0.9, opacity: 0 }}
+				initial={{ scale: 0.92, opacity: 0 }}
 				animate={{
-					scale: isLoaded ? 1 : 0.9,
+					scale: isLoaded ? 1 : 0.92,
 					opacity: isLoaded ? 1 : 0,
 				}}
-				transition={{
-					duration: 0.5,
-					ease: "easeOut",
-				}}
+				transition={
+					prefersReducedMotion
+						? { duration: 0 }
+						: { type: "spring", stiffness: 220, damping: 26, opacity: { duration: 0.3 } }
+				}
 			>
 				{items.length > 0 && (
 					<BoxCarousel
+						key={itemsKey}
 						ref={carouselRef}
 						items={items}
 						width={width}
@@ -198,7 +264,7 @@ export default function SessionCarousel({
 						direction={direction}
 						enableDrag
 						debug={false}
-						autoPlay={!continuousRotation} // Disable autoPlay when continuous rotation is enabled
+						autoPlay={!continuousRotation}
 						continuousRotation={continuousRotation}
 						continuousSpeed={continuousSpeed}
 						turnSpeedMultiplier={turnSpeedMultiplier}
@@ -211,39 +277,39 @@ export default function SessionCarousel({
 						pauseOnHover={pauseOnHover}
 						pauseOnDrag={pauseOnDrag}
 						initialRotationOffset={initialRotationOffset}
+						wireframeOffset={8}
+						edgeRadius={44}
+						wireframeColor={accent}
+						onIndexChange={handleIndexChange}
+						onInteractingChange={handleInteractingChange}
 					/>
 				)}
 			</motion.div>
 
-			{/* Navigation buttons */}
-			<div className="flex justify-center mt-4">
-				<div className="flex items-center space-x-2 px-2 py-1.5 border bg-heicha-700/80 backdrop-blur-xl border-heicha-500/50 rounded-xl">
-					<button
-						onClick={handlePrevious}
-						className={cn(
-							"flex items-center justify-center w-8 h-8 transition-all duration-200 rounded-lg",
-							"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
-							"focus:outline-none focus:ring-1 focus:ring-tea-soup-500/50",
-							"disabled:opacity-50 disabled:cursor-not-allowed"
-						)}
-						aria-label="Previous image"
+			{/* Navigation + caption: which note this face belongs to */}
+			{items.length > 0 && (
+				<div className="flex justify-center mt-4">
+					<div
+						data-flow-shape
+						className="flex items-center gap-1.5 px-1.5 py-1.5 surface-card rounded-xl"
 					>
-						<ChevronLeft className="w-4 h-4" />
-					</button>
-					<button
-						onClick={handleNext}
-						className={cn(
-							"flex items-center justify-center w-8 h-8 transition-all duration-200 rounded-lg",
-							"bg-white/5 hover:bg-white/10 text-white/60 hover:text-white",
-							"focus:outline-none focus:ring-1 focus:ring-tea-soup-500/50",
-							"disabled:opacity-50 disabled:cursor-not-allowed"
-						)}
-						aria-label="Next image"
-					>
-						<ChevronRight className="w-4 h-4" />
-					</button>
+						<button onClick={handlePrevious} className={navButton} aria-label="Previous photo">
+							<ChevronLeft className="size-4" />
+						</button>
+
+						<CubeCaption
+							store={captionStore}
+							stages={stageMap.stages}
+							alts={alts}
+							accent={accent}
+						/>
+
+						<button onClick={handleNext} className={navButton} aria-label="Next photo">
+							<ChevronRight className="size-4" />
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	)
 }

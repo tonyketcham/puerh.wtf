@@ -58,6 +58,8 @@ tags:
   - d1d6a167-6c51-46ca-8887-fdf533afaa0e
   - 9df29a3e-d882-4bc0-b4f1-8ab03e6960f6
 rating: 69
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
 brewing:
   temperature: 204
   material_amount: 5.73
@@ -76,6 +78,7 @@ images:
     alt: pu soup
   - image: /images/uploads/9d615e7f-d170-4360-a4dd-d0a8197ae5e4-min.jpg
     alt: pu ready for flushing
+origin_note: blend
 ---
 This tea seems to be an interesting find by [LP](https://puerh.wtf/vendor/liquid-proust), coming from a Taiwanese producer and distributor called [GABA Tea (May Zest Tea Co., Ltd)](https://www.facebook.com/mzt.gaba)
 

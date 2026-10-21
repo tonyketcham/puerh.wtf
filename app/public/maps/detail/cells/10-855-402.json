@@ -1,0 +1,15 @@
+{
+	"id": "10-855-402",
+	"kind": "cell",
+	"space": "shared",
+	"tile": [10,855,402],
+	"region": "laoshan",
+	"bbox": [120.58594,35.74651,120.9375,36.03133],
+	"viewBox": [9731.57,-6722.29,184.08,184.08],
+	"zoom": 11,
+	"interval": 50,
+	"indexInterval": 250,
+	"bands": [],
+	"contourLabels": [],
+	"context": {"land":"","coast":"","borders":"","admin":"","rivers":[],"lakes":[]}
+}

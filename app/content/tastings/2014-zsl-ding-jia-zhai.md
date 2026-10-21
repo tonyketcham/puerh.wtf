@@ -11,6 +11,11 @@ origin:
   - f0f3169e-eaea-4193-83ca-eeabfe61a28b
 production_year: 2014
 aging_conditions: 6 years wet storage in Xishuangbanna
+storage:
+  - place: xishuangbanna
+    from: 2014
+    to: 2020
+    humidity: wet
 vendor:
   - b812cdac-a64b-4c80-b42b-a36843b22e21
 purchase_link: https://www.tea-encounter.com/product/zsl-2014-ding-jia-zhai/
@@ -62,6 +67,8 @@ tags:
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
   - 7a127b82-6d5c-42d4-b4c9-6e4a28fc84ba
 rating: 87.5671289
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 203
   material_amount: 7

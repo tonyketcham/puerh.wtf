@@ -7,7 +7,9 @@ style:
   - 195317f7-1885-40d3-9dcd-a83e7fbe44de
 origin:
   - 7cf0189b-9d42-41a3-b6dc-a630042b737f
-season: Spring
+harvest:
+  season: spring
+season_note: Spring
 production_year: 2020
 vendor:
   - 4be78aa2-c969-4eb4-b98c-10cc3d4c9653
@@ -57,6 +59,8 @@ notes:
 tags:
   - dc360789-6d18-449f-83e2-6cbad9b49035
 rating: 73
+vessel:
+  - e24985b5-0710-45df-bf86-daaf302b7d79
 brewing:
   temperature: 212
   material_amount: 6

@@ -19,7 +19,10 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			// Resolve React types here, independent of the legacy CMS's hoisted React 16 types.
+			"react": ["./node_modules/@types/react/index.d.ts"],
+			"react/*": ["./node_modules/@types/react/*.d.ts"]
 		},
 		"forceConsistentCasingInFileNames": true
 	},
@@ -30,5 +33,5 @@
 		".next/types/**/*.ts",
 		".next/dev/types/**/*.ts"
 	],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "out"]
 }

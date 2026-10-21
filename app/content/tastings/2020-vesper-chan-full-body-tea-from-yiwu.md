@@ -9,9 +9,16 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 88d4ea3a-b772-4472-bd44-566c55bb608e
-season: 2018 & 2019
+harvest:
+  years:
+    - 2018
+    - 2019
+season_note: 2018 & 2019
 production_year: 2020
 aging_conditions: dry storage
+storage:
+  - place: unknown
+    humidity: dry
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
 purchase_link: https://www.liquidproust.com/listing/863032931/2020-full-body-tea-from-yiwu-vesper-chan
@@ -60,6 +67,8 @@ notes:
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
 rating: 93.58
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 200
   material_amount: 7.91

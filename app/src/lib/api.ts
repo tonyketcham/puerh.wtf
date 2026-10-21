@@ -1,11 +1,70 @@
-import { gql, GraphQLClient } from "graphql-request"
-import type { SessionFull, SessionPreview, SessionPreviewWithFeatureImage } from "./types/session"
+import { gql } from "graphql-request"
+import * as flatbread from "./flatbread"
+import {
+	FLAVOR_AXES,
+	type ExplorerSession,
+	type SessionFull,
+	type SessionPreviewWithFeatureImage,
+} from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
+import type { Origin, OriginRef } from "./types/origin"
 
-const flatbread = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
-	headers: {},
-})
+// Shared GraphQL selection sets (interpolated into the gql strings below)
+const FLAVOR_AXES_FIELDS = FLAVOR_AXES.map((axis) => `${axis} { start finish }`).join("\n")
+
+const NOTES_FIELDS = `
+	dry_leaf_nose
+	wet_leaf_nose
+	mouthfeel
+	taste
+	finish
+	empty_cup
+	cha_qi
+`
+
+/**
+ * An origin plus its parent chain. Flatbread resolves the Origin → Origin self-ref one level per
+ * selection, so nest it as deep as the tree goes (village → … → country is 6 nodes).
+ * The deepest chains today (Banpo Laozhai, Weidong) are exactly 6; getOrigins() throws if the
+ * content grows deeper so truncation can't go unnoticed.
+ */
+const ORIGIN_DEPTH = 6
+const ORIGIN_NODE_FIELDS = `_slug id title hanzi pinyin kind`
+const ORIGIN_FIELDS = Array.from({ length: ORIGIN_DEPTH - 1 }).reduce<string>(
+	(inner) => `${ORIGIN_NODE_FIELDS} parent { ${inner} }`,
+	ORIGIN_NODE_FIELDS
+)
+
+/** The vessel a session was brewed in (top-level ref; brewing.vessel stays the free-text note). */
+const VESSEL_FIELDS = `
+	id
+	_slug
+	title
+	hanzi
+	kind
+	material
+	volume_ml
+	image
+`
+
+/** Storage stints, hand-parsed from aging_conditions (plan §3.5). */
+const STORAGE_FIELDS = `
+	place
+	from
+	to
+	humidity
+	approx
+`
+
+const BREWING_FIELDS = `
+	temperature
+	material_amount
+	liquid_amount
+	vessel
+	first_infusion_duration
+	infusion_increment
+`
 
 export async function getSessions(options?: {
 	order?: "ASC" | "DESC"
@@ -60,7 +119,7 @@ export async function getExplorerSessions(options?: {
 	order?: "ASC" | "DESC"
 	sortBy?: string
 	limit?: number
-}): Promise<SessionPreview[]> {
+}): Promise<ExplorerSession[]> {
 	const { order = "DESC", sortBy = "date", limit } = options || {}
 
 	const query = gql`
@@ -76,6 +135,7 @@ export async function getExplorerSessions(options?: {
 				excerpt
 				style {
 					id
+					_slug
 					title
 					color
 					category {
@@ -98,19 +158,37 @@ export async function getExplorerSessions(options?: {
 				tags {
 					_slug
 					title
+					color
 				}
 				origin {
-					_slug
-					id
-					country
-					location
-					municipality
+					${ORIGIN_FIELDS}
+				}
+				origin_note
+				rating
+				notes {
+					${NOTES_FIELDS}
+				}
+				flavor_axes {
+					${FLAVOR_AXES_FIELDS}
+				}
+				brewing {
+					${BREWING_FIELDS}
+				}
+				vessel {
+					${VESSEL_FIELDS}
+				}
+				storage {
+					${STORAGE_FIELDS}
+				}
+				images {
+					alt
+					image
 				}
 			}
 		}
 	`
 
-	const { allSessions }: { allSessions: SessionPreview[] } = await flatbread.request(query, {
+	const { allSessions }: { allSessions: ExplorerSession[] } = await flatbread.request(query, {
 		order,
 		sortBy,
 		limit,
@@ -183,15 +261,20 @@ export async function getSession(slug: string): Promise<SessionFull> {
 				date
 				production_year
 				excerpt
-				season
+				harvest {
+					season
+					month
+					years
+				}
+				season_note
 				elevation
 				aging_conditions
 				rating
 				purchase_link
 				picking
-				genre
 				style {
 					id
+					_slug
 					title
 					color
 					category {
@@ -211,56 +294,34 @@ export async function getSession(slug: string): Promise<SessionFull> {
 					title
 				}
 				notes {
-					dry_leaf_nose
-					wet_leaf_nose
-					finish
-					empty_cup
-					mouthfeel
-					taste
-					cha_qi
+					${NOTES_FIELDS}
 				}
 				flavor_axes {
-					vegetal {
-						start
-						finish
-					}
-					floral {
-						start
-						finish
-					}
-					fruits {
-						start
-						finish
-					}
-					spices {
-						start
-						finish
-					}
-					wood {
-						start
-						finish
-					}
-					earth {
-						start
-						finish
-					}
-					nuts_roast {
-						start
-						finish
-					}
-					cream {
-						start
-						finish
-					}
-					stone {
-						start
-						finish
-					}
-					umami {
-						start
-						finish
-					}
+					${FLAVOR_AXES_FIELDS}
 				}
+				brewing {
+					${BREWING_FIELDS}
+				}
+				vessel {
+					${VESSEL_FIELDS}
+				}
+				storage {
+					${STORAGE_FIELDS}
+				}
+				author {
+					_slug
+					title
+					image
+				}
+				tags {
+					_slug
+					title
+					color
+				}
+				origin {
+					${ORIGIN_FIELDS}
+				}
+				origin_note
 				images {
 					alt
 					image
@@ -274,6 +335,52 @@ export async function getSession(slug: string): Promise<SessionFull> {
 
 	const { Session } = await flatbread.request(query, { id: sessionId })
 	return Session
+}
+
+export async function getOrigins(): Promise<Origin[]> {
+	const query = gql`
+		query AllOrigins {
+			allOrigins(sortBy: "_slug") {
+				${ORIGIN_FIELDS}
+				groups
+				description
+				geo {
+					lat
+					lon
+					precision
+					radius_km
+					elevation_m
+					confidence
+					source
+				}
+			}
+		}
+	`
+
+	const { allOrigins }: { allOrigins: Origin[] } = await flatbread.request(query)
+	assertOriginDepth(allOrigins)
+	return allOrigins
+}
+
+/**
+ * Every origin is listed with at least its own parent, so if the last node of any selected chain
+ * still has a parent in the full list, the tree outgrew ORIGIN_DEPTH and chains are being cut short.
+ */
+function assertOriginDepth(origins: Origin[]) {
+	const parentOf = new Map(origins.map((origin) => [origin.id, origin.parent?.id]))
+	for (const origin of origins) {
+		let node: OriginRef | null | undefined = origin
+		let depth = 1
+		while (node?.parent) {
+			node = node.parent
+			depth++
+		}
+		if (depth === ORIGIN_DEPTH && node && parentOf.get(node.id)) {
+			throw new Error(
+				`Origin "${origin._slug}" is deeper than ORIGIN_DEPTH (${ORIGIN_DEPTH}); raise it in lib/api.ts`
+			)
+		}
+	}
 }
 
 export type VendorDetail = {

@@ -7,6 +7,10 @@ style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2018
 aging_conditions: 2 years Guangzhao
+storage:
+  - place: guangzhou
+    from: 2018
+    to: 2020
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
 purchase_link: https://white2tea.com/products/2018-waffles?_pos=3&_sid=4eb2a61b7&_ss=r
@@ -58,6 +62,8 @@ tags:
   - 34b1faf0-825a-40ba-b906-ed8de96966ac
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
 rating: 86
+vessel:
+  - fbf9715e-7b7d-4521-9ffc-a458920e3a4c
 brewing:
   temperature: 210
   material_amount: 6
@@ -65,6 +71,7 @@ brewing:
   vessel: Jianshui Zitao Xishi pot
   first_infusion_duration: 10
   infusion_increment: 10
+origin_note: blend
 ---
 
 The identifiable baked goods in the nose of the leaf are neat. There's a solid banana aspect but on the other side backed up against it you get this pancakey syrupiness, which goes with the name.

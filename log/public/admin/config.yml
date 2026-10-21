@@ -65,13 +65,44 @@ collections:
         collection: 'origins'
         multiple: true
         value_field: 'id'
-        search_fields: ['location', 'municipality', 'country']
-        display_fields: ['location', 'municipality', 'country']
+        search_fields: ['title', 'hanzi', 'pinyin']
+        display_fields: ['title', 'kind']
         required: false
 
-      - label: 'Season'
-        name: 'season'
+      - label: 'Origin Note'
+        name: 'origin_note'
+        widget: 'select'
+        hint: 'Why there is no origin: a blend, the vendor did not say, or unknown'
+        options: ['blend', 'undisclosed', 'unknown']
+        required: false
+
+      - label: 'Harvest'
+        name: 'harvest'
+        widget: 'object'
+        required: false
+        fields:
+          - label: 'Season'
+            name: 'season'
+            widget: 'select'
+            options: ['spring', 'summer', 'autumn', 'winter']
+            required: false
+          - label: 'Month (1-12)'
+            name: 'month'
+            widget: 'number'
+            value_type: 'int'
+            min: 1
+            max: 12
+            required: false
+          - label: 'Years'
+            name: 'years'
+            widget: 'list'
+            field: { label: 'Year', name: 'year', widget: 'number', value_type: 'int' }
+            required: false
+
+      - label: 'Season Note'
+        name: 'season_note'
         widget: 'string'
+        hint: 'Free-text harvest detail, e.g. "mid-April" or "first and second flush"'
         required: false
 
       - label: 'Production Year'
@@ -94,8 +125,42 @@ collections:
       - label: 'Aging Conditions'
         name: 'aging_conditions'
         widget: 'string'
+        hint: 'Free text as you would say it; the structured Storage below drives the timeline and map'
         required: false
         default: null
+
+      - label: 'Storage'
+        label_singular: 'Stint'
+        name: 'storage'
+        widget: 'list'
+        summary: '{{fields.place}} {{fields.from}}–{{fields.to}} {{fields.humidity}}'
+        collapsed: true
+        required: false
+        hint: 'Where it aged, in order. Places: guangzhou, hong-kong, kunming, menghai, bulang, xishuangbanna, fujian, taiwan, malaysia, united-states, white2tea, home, unknown (add new ones in app/src/lib/storage.ts)'
+        fields:
+          - label: 'Place'
+            name: 'place'
+            widget: 'string'
+          - label: 'From (year)'
+            name: 'from'
+            widget: 'number'
+            value_type: 'int'
+            required: false
+          - label: 'To (year)'
+            name: 'to'
+            widget: 'number'
+            value_type: 'int'
+            required: false
+          - label: 'Humidity'
+            name: 'humidity'
+            widget: 'select'
+            options: ['dry', 'natural', 'wet']
+            required: false
+          - label: 'Approximate'
+            name: 'approx'
+            widget: 'boolean'
+            hint: 'The text hedges ("~20 years", "perhaps Taiwan?")'
+            required: false
 
       - label: 'Vendor'
         name: 'vendor'
@@ -395,10 +460,21 @@ collections:
             widget: 'number'
             min: 0
 
-          - label: 'Vessel Type'
+          - label: 'Vessel Note'
             name: 'vessel'
             widget: 'string'
-            default: 'Jianshui Zitao Xishi pot'
+            hint: 'Free text; pick the vessel itself in "Vessel" below'
+            required: false
+
+      - label: 'Vessel'
+        name: 'vessel'
+        widget: 'relation'
+        collection: 'vessels'
+        multiple: true
+        value_field: 'id'
+        search_fields: ['title', 'kind', 'material']
+        display_fields: ['title']
+        required: false
 
       - label: 'Images'
         label_singular: 'Image'
@@ -550,29 +626,76 @@ collections:
     folder: 'app/content/origins'
     create: true
     delete: true
-    slug: '{{location}}-{{municipality}}-{{country}}'
-    identifier_field: 'id'
-    summary: '{{location}} - {{municipality}} - {{country}}'
+    slug: '{{title}}'
+    identifier_field: 'title'
+    summary: '{{title}} · {{kind}}'
     extension: 'md'
     fields:
       - label: 'ID'
         name: 'id'
         widget: 'id'
 
-      - label: 'Location'
-        name: 'location'
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+        hint: 'Short romanized name without suffixes (Jingmai, not Jingmai Shan). It becomes the file slug.'
+
+      - label: 'Hanzi / Kanji'
+        name: 'hanzi'
         widget: 'string'
         required: false
 
-      - label: 'Municipality'
-        name: 'municipality'
+      - label: 'Pinyin'
+        name: 'pinyin'
         widget: 'string'
         required: false
 
-      - label: 'Country'
-        name: 'country'
-        widget: 'string'
+      - label: 'Kind'
+        name: 'kind'
+        widget: 'select'
+        options:
+          ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'forest', 'unknown']
+
+      - label: 'Parent'
+        name: 'parent'
+        widget: 'relation'
+        collection: 'origins'
+        value_field: 'id'
+        search_fields: ['title', 'hanzi', 'pinyin']
+        display_fields: ['title', 'kind']
         required: false
+
+      - label: 'Groups'
+        name: 'groups'
+        widget: 'list'
+        hint: 'Cross-cutting sets, e.g. six-ancient-tea-mountains'
+        required: false
+
+      - label: 'Geo'
+        name: 'geo'
+        widget: 'object'
+        required: false
+        fields:
+          - { label: 'Latitude', name: 'lat', widget: 'number', value_type: 'float' }
+          - { label: 'Longitude', name: 'lon', widget: 'number', value_type: 'float' }
+          - label: 'Precision'
+            name: 'precision'
+            widget: 'select'
+            hint: 'What the point actually means'
+            options:
+              ['country', 'province', 'prefecture', 'county', 'mountain-area', 'township', 'village', 'forest', 'unknown']
+          - { label: 'Radius (km)', name: 'radius_km', widget: 'number', value_type: 'float' }
+          - label: 'Elevation range (m)'
+            name: 'elevation_m'
+            widget: 'list'
+            hint: '[min, max] in meters'
+            field: { label: 'Meters', name: 'm', widget: 'number', value_type: 'int' }
+            required: false
+          - label: 'Confidence'
+            name: 'confidence'
+            widget: 'select'
+            options: ['high', 'medium', 'low']
+          - { label: 'Source URL', name: 'source', widget: 'string' }
 
       - label: 'Description'
         name: 'description'
@@ -711,6 +834,60 @@ collections:
       - label: 'Excerpt'
         name: 'excerpt'
         widget: 'string'
+
+  - label: 'Teaware'
+    name: 'vessels'
+    label_singular: 'Vessel'
+    description: 'Gaiwans, pots and pouring bowls'
+    folder: 'app/content/vessels'
+    create: true
+    delete: true
+    slug: '{{slug}}'
+    identifier_field: 'title'
+    summary: '{{title}} · {{kind}}'
+    extension: 'md'
+    fields:
+      - label: 'ID'
+        name: 'id'
+        widget: 'id'
+
+      - label: 'Name'
+        name: 'title'
+        widget: 'string'
+        hint: 'Short: it becomes the /teaware/ slug'
+
+      - label: 'Hanzi'
+        name: 'hanzi'
+        widget: 'string'
+        required: false
+
+      - label: 'Shape'
+        name: 'kind'
+        widget: 'select'
+        options: ['gaiwan', 'teapot', 'shiboridashi', 'chawan']
+
+      - label: 'Material'
+        name: 'material'
+        widget: 'string'
+        hint: 'Clay or glaze, e.g. "Jianshui zitao clay", "porcelain"'
+        required: false
+
+      - label: 'Volume (mL)'
+        name: 'volume_ml'
+        widget: 'number'
+        value_type: 'int'
+        min: 0
+        required: false
+
+      - label: 'Photo'
+        name: 'image'
+        widget: 'image'
+        required: false
+
+      - label: 'Description'
+        name: 'description'
+        widget: 'markdown'
+        required: false
 
   - label: 'Tags'
     label_singular: 'Tag'

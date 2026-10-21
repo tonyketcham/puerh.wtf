@@ -9,7 +9,10 @@ cultivar:
   - be108267-b99b-42f1-9d2a-3c7db0ac469a
 origin:
   - 8a775018-7fc0-4175-bd8b-1818425901ef
-season: mid-April
+harvest:
+  season: spring
+  month: 4
+season_note: mid-April
 production_year: 2020
 picking: large bud & 2 leaves
 elevation: 300
@@ -63,6 +66,8 @@ notes:
 tags:
   - 799e7654-d553-4e18-b128-4d4a3e29c7e5
 rating: 81
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 brewing:
   temperature: 185
   material_amount: 4
