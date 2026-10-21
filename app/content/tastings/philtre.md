@@ -12,9 +12,10 @@ origin:
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/collections/latest-additions/products/2021-philtre
-excerpt: a cliff notes blend of some of the best traits you could ask for from a
-  sheng, at a great price
+purchase_link: 'https://white2tea.com/collections/latest-additions/products/2021-philtre'
+excerpt: >-
+  a cliff notes blend of some of the best traits you could ask for from a sheng,
+  at a great price
 date: 2021-07-14T14:01:52.176Z
 flavor_axes:
   cream:
@@ -48,14 +49,15 @@ flavor_axes:
     start: 5
     finish: 6
 notes:
-  dry_leaf_nose: marble, animalistic, a bit dank, soap bar, tomato vine, mineral salts
-  wet_leaf_nose: honeysuckle, ocean breeze, fresh rain, apricot, honeydew,
-    watermelon rind, rice noodles
+  dry_leaf_nose: 'marble, animalistic, a bit dank, soap bar, tomato vine, mineral salts'
+  wet_leaf_nose: >-
+    honeysuckle, ocean breeze, fresh rain, apricot, honeydew, watermelon rind,
+    rice noodles
   mouthfeel: sticky medium thickness moving to thicker down the line with astringency
-  finish: nice huigan, vaporous spices, strong sweetness in the throat
+  finish: 'nice huigan, vaporous spices, strong sweetness in the throat'
   empty_cup: warm spring rain
-  cha_qi: superb feeling of clear focus, a bit cannabis-like in body and head feel
-  taste: ripe banana, holy basil, carrot, mineral salts, kombu
+  cha_qi: 'superb feeling of clear focus, a bit cannabis-like in body and head feel'
+  taste: 'ripe banana, holy basil, carrot, mineral salts, kombu'
 tags:
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
   - dc360789-6d18-449f-83e2-6cbad9b49035
@@ -70,6 +72,8 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
 ---
 ### Infusions
 
