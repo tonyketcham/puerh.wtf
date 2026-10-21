@@ -1,0 +1,12 @@
+/* Recessed pinholes: dark bore, warm lower lip, matching the chrome's wells. */
+.dotField::before {
+	content: "";
+	position: absolute;
+	inset: -8px;
+	pointer-events: none;
+	background-image:
+		radial-gradient(circle at 2px 2px, rgb(0 0 0 / 0.65) 0.9px, transparent 1.5px),
+		radial-gradient(circle at 2px 3px, rgb(246 239 224 / 0.28) 0.9px, transparent 1.6px);
+	background-size: 16px 16px;
+	mask-image: radial-gradient(ellipse at center, black 55%, transparent 100%);
+}
