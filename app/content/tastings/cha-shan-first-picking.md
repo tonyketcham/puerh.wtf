@@ -6,14 +6,13 @@ author:
 title: Cha Shan - First Picking
 style:
   - f4a7586d-1e7e-4e83-bf6b-c5ffe0bf2e07
-season: Early Spring
 origin:
   - 8a775018-7fc0-4175-bd8b-1818425901ef
 production_year: 2021
 picking: Young Bud + Up to 2 Leaves
 vendor:
   - b744b7f2-1067-49ef-9a1f-5570d0761ba6
-purchase_link: https://sweetestdew.com/products/mao-feng-sample-pack
+purchase_link: 'https://sweetestdew.com/products/mao-feng-sample-pack'
 excerpt: A floral-forward and sweet Huang Shan Mao Feng
 date: 2021-06-13T03:03:48.631Z
 flavor_axes:
@@ -48,15 +47,17 @@ flavor_axes:
     start: 3
     finish: 3
 notes:
-  dry_leaf_nose: Bright flowers 2x, bunny hay, sunflower seeds, nectar
-  wet_leaf_nose: snow crab, collards, summer field, flowers, rock salt
-  empty_cup: cleanliness, toasted sugar
+  dry_leaf_nose: 'Bright flowers 2x, bunny hay, sunflower seeds, nectar'
+  wet_leaf_nose: 'snow crab, collards, summer field, flowers, rock salt'
+  empty_cup: 'cleanliness, toasted sugar'
   mouthfeel: velvet fullness
-  cha_qi: full body relaxation, loose and comfy, dope as a dog with glasses on and
+  cha_qi: >-
+    full body relaxation, loose and comfy, dope as a dog with glasses on and
     nothin to do
-  taste: sweet flowers, lemon cucumber water, rock salt, bush basil, ultra-light
+  taste: >-
+    sweet flowers, lemon cucumber water, rock salt, bush basil, ultra-light
     vegetable dashi, copper
-  finish: delicate & light, moving towards savory + astringent
+  finish: 'delicate & light, moving towards savory + astringent'
 tags:
   - 16565067-592b-4e62-91aa-f8d2c920b602
   - 799e7654-d553-4e18-b128-4d4a3e29c7e5
@@ -69,6 +70,11 @@ brewing:
   vessel: Glass Beaker
   first_infusion_duration: 90
   infusion_increment: 10
+vessel:
+  - b4ecec68-ce8c-4994-b559-58eae59dacdb
+season_note: Early Spring
+harvest:
+  season: spring
 ---
 This is our first encounter with The Sweetest Dew's teas with a Huang Shan Mao Feng.
 
