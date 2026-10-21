@@ -9,16 +9,17 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - 0b66380d-30b5-46a0-bead-826b261eef6f
-season: Autumn
 production_year: 2019
 picking: Bud + up to 2 or 3 leaves
 elevation: 1800
 aging_conditions: 2 years 62-65%RH US in mylar
 vendor:
   - 4279ab9e-2bba-4bd2-99c4-954cfc8aa10d
-purchase_link: https://yunnansourcing.us/products/2019-yunnan-sourcing-autumn-suan-zao-shu-old-arbor-raw-pu-erh-tea-cake
-excerpt: maofeng-type beat flipped with almond and PSL if it were in the young
-  sheng angle
+purchase_link: >-
+  https://yunnansourcing.us/products/2019-yunnan-sourcing-autumn-suan-zao-shu-old-arbor-raw-pu-erh-tea-cake
+excerpt: >-
+  maofeng-type beat flipped with almond and PSL if it were in the young sheng
+  angle
 date: 2021-10-19T13:37:52.228Z
 flavor_axes:
   cream:
@@ -52,12 +53,12 @@ flavor_axes:
     start: 3
     finish: 3
 notes:
-  dry_leaf_nose: caramel, ocean-side herbs, rocky hills, soy milk
-  wet_leaf_nose: almond extract, condensed milk, poached peach, cardamom
+  dry_leaf_nose: 'caramel, ocean-side herbs, rocky hills, soy milk'
+  wet_leaf_nose: 'almond extract, condensed milk, poached peach, cardamom'
   empty_cup: saltwater toffee
   finish: a bit of herbal lift and huigan
-  mouthfeel: on the thinner side of thickness, astringent
-  taste: almond extract, potato, rain water, summer flowers
+  mouthfeel: 'on the thinner side of thickness, astringent'
+  taste: 'almond extract, potato, rain water, summer flowers'
   cha_qi: calm awakening
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
@@ -69,6 +70,16 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Autumn
+harvest:
+  season: autumn
+storage:
+  - place: united-states
+    from: 2019
+    to: 2021
+    approx: true
 ---
 ### Synopsis
 
