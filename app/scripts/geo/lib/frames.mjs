@@ -2,7 +2,7 @@
  * Step 1: map frames derived from the origins.
  *
  *   shared frames:  locator · china-east · japan · yunnan · six-mountains   (one projection)
- *   insets:         one per placed origin (24 km box, or area bbox + 30%)   (local, north-up)
+ *   detail framing: per precise origin, the square the camera frames it by (cells: cells.mjs)
  */
 import { round } from "./util.mjs"
 
@@ -62,19 +62,17 @@ export function deriveFrames(origins, frameParams) {
 	})
 }
 
-/** Insets for origins precise enough to deserve one */
-export function deriveInsets(origins, inset) {
+/**
+ * Origins precise enough for detail coverage, with the square the camera frames them by (the
+ * session panel, the hero): max(minSideKm, radius_km × 2 × areaPad), v2's patch size.
+ */
+export function deriveDetails(origins, detail) {
+	const { minSideKm, areaPad } = detail.frame
 	return origins
-		.filter((o) => o.geo && inset.precision.includes(o.geo.precision) && o.kind !== "unknown")
-		.map((o) => {
-			const sideKm = Math.max(inset.minSideKm, (o.geo.radius_km ?? 0) * 2 * inset.areaPad)
-			// A slightly larger lon/lat box than the square so the azimuthal square's corners are covered.
-			const bbox = roundBBox(circleBBox(o.geo.lon, o.geo.lat, (sideKm / 2) * 1.08))
-			return {
-				id: o.slug,
-				origin: o,
-				sideKm: round(sideKm, 3),
-				bbox,
-			}
-		})
+		.filter((o) => o.geo && detail.precision.includes(o.geo.precision) && o.kind !== "unknown")
+		.map((o) => ({
+			id: o.slug,
+			origin: o,
+			sideKm: round(Math.max(minSideKm, (o.geo.radius_km ?? 0) * 2 * areaPad), 3),
+		}))
 }

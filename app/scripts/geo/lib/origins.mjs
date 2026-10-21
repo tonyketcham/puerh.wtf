@@ -55,16 +55,12 @@ export async function readOrigins(dir) {
 	return origins
 }
 
+/** Curated map labels (content/geo/places.json, plan §4.7.4) */
+export async function readPlaces(file) {
+	return JSON.parse(await readFile(file, "utf8"))
+}
+
 /** The hashed view of the origins (no derived fields) */
 export function originInputs(origins) {
 	return origins.map(({ parentSlug: _p, ancestors: _a, ...rest }) => rest)
-}
-
-/** Han characters used by origin labels, sorted by code point */
-export function hanziSet(origins) {
-	const chars = new Set()
-	for (const o of origins) {
-		for (const ch of o.hanzi ?? "") if (/\p{Script=Han}/u.test(ch)) chars.add(ch)
-	}
-	return [...chars].sort((a, b) => a.codePointAt(0) - b.codePointAt(0)).join("")
 }

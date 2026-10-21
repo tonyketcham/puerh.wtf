@@ -4,7 +4,9 @@
  */
 import { contourGrid, thresholdsFor } from "./contour.mjs"
 import { blur, extent, sample, stitch } from "./grid.mjs"
-import { quantize, subpath, polygonsPath } from "./project.mjs"
+import { contourLabels } from "./annotate.mjs"
+import { latticeGap, thinBand, thinContext } from "./thin.mjs"
+import { projectRings, quantize, ringsPath, subpath } from "./project.mjs"
 import { latToPx, lonToPx, pixelWindow } from "./tiles.mjs"
 import { round } from "./util.mjs"
 
@@ -12,7 +14,17 @@ import { round } from "./util.mjs"
  * `intervals` lists candidate contour intervals, finest first; the finest that yields at
  * most `maxBands` bands wins, so steep insets stay legible (and within budget).
  * Every `indexEvery`-th contour is an index line. `clip` is the padded viewBox ([x0, y0, x1, y1]).
- * @returns {Promise<{ raw, grid, interval: number, indexInterval: number, bands: { elev: number, index: boolean, d: string }[] }>}
+ * Paths are written with `decimals` places. With `labels` (CONTOUR_LABELS), `viewBox` and
+ * `displayPx` (its drawn width), index contours also get elevation label anchors (where
+ * `labelAccept` allows). `has` limits the tiles read (the rest of the grid has no data), and
+ * `areaBeforeClip` judges speckle on whole rings (detail cells; see projectRings).
+ * With `thinMaxUpp` (the coarsest shared units per CSS px the sheet is drawn at) and curves, each
+ * intermediate band gets `thin`: where its stretches give way when bunched (thin.mjs; `thinCoarse`:
+ * longer runs). `project`
+ * must then be Web Mercator, as the shared projection is.
+ * @returns {Promise<{ raw, grid, interval: number, indexInterval: number,
+ *   bands: { elev: number, index: boolean, d: string, thin?: string }[],
+ *   contourLabels: { elev: number, x: number, y: number, angle: number }[] }>}
  */
 export async function renderTerrain({
 	bbox,
@@ -27,24 +39,51 @@ export async function renderTerrain({
 	minArea,
 	clip = null,
 	curve = true,
+	decimals = 1,
+	viewBox = null,
+	displayPx = null,
+	labels = null,
+	labelAccept = null,
+	pixelWin = null,
+	has = null,
+	areaBeforeClip = false,
+	thinMaxUpp = null,
+	thinCoarse = 0,
 	source,
 }) {
-	const win = pixelWindow(bbox, zoom, margin)
-	const raw = await stitch(win, source)
+	const win = pixelWin ?? pixelWindow(bbox, zoom, margin)
+	const raw = await stitch(win, source, has)
 	const grid = blur(raw, blurSigma)
 	const interval =
 		intervals.find((iv) => thresholdsFor(grid.values, iv).length <= maxBands) ??
 		intervals[intervals.length - 1]
 	const indexInterval = interval * indexEvery
 	const contours = await contourGrid(grid, { interval, simplify })
-	const bands = contours
-		.map(({ elev, polygons }) => ({
-			elev,
-			index: elev % indexInterval === 0,
-			d: polygonsPath(polygons, project, { minArea, clip, curve }),
-		}))
-		.filter((b) => b.d)
-	return { raw, grid, interval, indexInterval, bands }
+	const thinning = thinMaxUpp && curve ? thinContext(grid, project) : null
+	const tierMax = thinning ? Math.ceil(Math.log2(thinMaxUpp) + 0.5) : 0
+	const bands = []
+	const indexBands = []
+	for (const { elev, polygons } of contours) {
+		const rings = projectRings(polygons, project, {
+			minArea,
+			clip,
+			decimals,
+			step: curve ? 2 : 1,
+			areaBeforeClip,
+		})
+		const d = ringsPath(rings, { curve, decimals })
+		if (!d) continue
+		const index = elev % indexInterval === 0
+		const gap = thinning ? latticeGap(elev, interval, indexInterval) : null
+		const thin = gap ? thinBand(rings, gap, thinning, decimals, tierMax, thinCoarse) : null
+		bands.push(thin ? { elev, index, d, thin } : { elev, index, d })
+		if (index) indexBands.push({ elev, rings })
+	}
+	const anchors =
+		labels && viewBox
+			? contourLabels(indexBands, viewBox, labels, viewBox[2] / displayPx, decimals, labelAccept)
+			: []
+	return { raw, grid, interval, indexInterval, bands, contourLabels: anchors }
 }
 
 /**

@@ -1,15 +1,20 @@
 /**
  * Step 6: projections and SVG path strings.
  *
- * Paths are written in tenths of a unit (0.1 px) with relative `l` segments, which
- * keeps them small and, after rounding, byte-identical on every OS.
+ * Paths are written in fixed decimals of a unit (frames 0.1, detail patches 0.01) with relative
+ * `l` segments, which keeps them small and, after rounding, byte-identical on every OS.
+ * Internally, points are quantized to integers of 10^-decimals units.
  */
-import { geoAzimuthalEqualArea, geoConicEqualArea } from "d3-geo"
+import { geoAzimuthalEqualArea, geoConicEqualArea, geoMercator } from "d3-geo"
 
-const EARTH_KM = 6371.0088
+/** Mean earth radius (km), the sphere d3 projects */
+export const EARTH_KM = 6371.0088
 
 /** Build a d3 projection from a plain, serializable description */
 export function makeProjection(p) {
+	if (p.type === "mercator") {
+		return geoMercator().rotate(p.rotate).center(p.center).scale(p.scale).translate(p.translate)
+	}
 	if (p.type === "conicEqualArea") {
 		return geoConicEqualArea()
 			.parallels(p.parallels)
@@ -24,25 +29,14 @@ export function makeProjection(p) {
 	throw new Error(`unknown projection ${p.type}`)
 }
 
-/** North-up local projection for an inset of `sideKm`, mapped to [-size/2, size/2] */
-export function insetProjection(lon, lat, sideKm, size) {
-	return {
-		type: "azimuthalEqualArea",
-		rotate: [-lon, -lat],
-		scale: round4(size / (sideKm / EARTH_KM)),
-		translate: [0, 0],
-	}
-}
-
-const round4 = (v) => Math.round(v * 1e4) / 1e4
-
-/** Integer tenths → shortest decimal string ("12.3", "-0.4" → "-.4", "5") */
-function fmt(t) {
+/** Integer steps of 10^-decimals → shortest decimal string (tenths: "12.3", "-0.4" → "-.4", "5") */
+export function fmt(t, decimals = 1) {
 	const neg = t < 0
 	const a = neg ? -t : t
-	const i = Math.floor(a / 10)
-	const f = a % 10
-	const s = f ? `${i || ""}.${f}` : `${i}`
+	const scale = 10 ** decimals
+	const i = Math.floor(a / scale)
+	const f = a % scale
+	const s = f ? `${i || ""}.${String(f).padStart(decimals, "0").replace(/0+$/, "")}` : `${i}`
 	return neg ? `-${s}` : s
 }
 
@@ -57,14 +51,16 @@ function joinNums(nums) {
 }
 
 /**
- * Quantize projected points [x, y, hard?] to integer tenths, dropping repeats.
+ * Quantize projected points [x, y, hard?] to integers of 10^-decimals units (multiples of
+ * `step` of them), dropping repeats.
  * `hard` marks vertices created by clipping; splines pass through them exactly.
  */
-function quantizeProjected(points) {
+function quantizeProjected(points, decimals = 1, step = 1) {
+	const scale = 10 ** decimals / step
 	const out = []
 	for (const p of points) {
-		const x = Math.round(p[0] * 10)
-		const y = Math.round(p[1] * 10)
+		const x = Math.round(p[0] * scale) * step
+		const y = Math.round(p[1] * scale) * step
 		const last = out[out.length - 1]
 		if (last && last[0] === x && last[1] === y) {
 			if (p[2]) last[2] = true
@@ -75,9 +71,9 @@ function quantizeProjected(points) {
 	return out
 }
 
-/** Project and quantize a ring/line of [lon, lat] to integer tenths, dropping repeats */
-export function quantize(points, project) {
-	return quantizeProjected(points.map((pt) => project(pt)).filter(Boolean))
+/** Project and quantize a ring/line of [lon, lat] to integer steps, dropping repeats */
+export function quantize(points, project, decimals = 1) {
+	return quantizeProjected(points.map((pt) => project(pt)).filter(Boolean), decimals)
 }
 
 /**
@@ -161,7 +157,7 @@ export function clipLine(line, [x0, y0, x1, y1]) {
 	return pieces
 }
 
-/** Shoelace area in (tenths)², absolute */
+/** Shoelace area in (quantized steps)², absolute */
 export function ringArea(q) {
 	let a = 0
 	for (let i = 0, j = q.length - 1; i < q.length; j = i++) {
@@ -171,36 +167,51 @@ export function ringArea(q) {
 }
 
 /** One subpath: M x y l dx dy … [z] */
-export function subpath(q, close) {
-	const nums = [fmt(q[0][0]), fmt(q[0][1])]
+export function subpath(q, close, decimals = 1) {
+	const f = (t) => fmt(t, decimals)
+	const nums = [f(q[0][0]), f(q[0][1])]
 	const rel = []
 	for (let i = 1; i < q.length; i++) {
-		rel.push(fmt(q[i][0] - q[i - 1][0]), fmt(q[i][1] - q[i - 1][1]))
+		rel.push(f(q[i][0] - q[i - 1][0]), f(q[i][1] - q[i - 1][1]))
 	}
 	return `M${joinNums(nums)}${rel.length ? `l${joinNums(rel)}` : ""}${close ? "z" : ""}`
 }
 
 /**
- * Closed quadratic B-spline through the ring's edge midpoints, with the ring's
- * vertices as control points: M m₀ q c₁ m₁ … z. Corners left by simplification
- * become curves without adding vertices, and the curve never leaves the hull.
- * Hard (clip) vertices are doubled, which pins the curve to them, so edges along
- * the clip rectangle stay straight and outside the visible frame.
+ * Closed quadratic B-spline through the ring's edge midpoints, with the ring's vertices as
+ * control points. Corners left by simplification become curves without adding vertices, and
+ * the curve never leaves the hull. Hard (clip) vertices are doubled, which pins the curve to
+ * them, so edges along the clip rectangle stay straight and outside the visible frame.
+ *
+ * Written as M m₀ q c₀ m₁ t m₂ m₃ … z: after the first segment each control point is the
+ * reflection of the previous one through the shared midpoint (2·mᵢ − cᵢ₋₁ = cᵢ), which is
+ * exactly SVG's smooth quadratic `t`, so every further vertex costs one pair of numbers.
+ * The reflection is exact only when the midpoints are, so splines need vertices on even steps
+ * (projectRings `step: 2`); odd sums throw rather than drift.
  */
-export function splineSubpath(ring) {
+export function splineSubpath(ring, decimals = 1) {
+	const fmt1 = (t) => fmt(t, decimals)
 	const q = ring.flatMap((p) => (p[2] ? [p, p] : [p]))
 	const n = q.length
-	const mid = (a, b) => [Math.round((a[0] + b[0]) / 2), Math.round((a[1] + b[1]) / 2)]
+	const mid = (a, b) => {
+		const x = a[0] + b[0]
+		const y = a[1] + b[1]
+		if (x % 2 || y % 2) throw new Error("splineSubpath: vertices must sit on even steps")
+		return [x / 2, y / 2]
+	}
 	const start = mid(q[n - 1], q[0])
-	let cur = start
+	const first = mid(q[0], q[1 % n])
+	const head = [q[0][0] - start[0], q[0][1] - start[1], first[0] - start[0], first[1] - start[1]]
+	let cur = first
 	const nums = []
-	for (let i = 0; i < n; i++) {
-		const c = q[i]
-		const m = i === n - 1 ? start : mid(c, q[i + 1])
-		nums.push(fmt(c[0] - cur[0]), fmt(c[1] - cur[1]), fmt(m[0] - cur[0]), fmt(m[1] - cur[1]))
+	for (let i = 1; i < n; i++) {
+		const m = i === n - 1 ? start : mid(q[i], q[i + 1])
+		nums.push(fmt1(m[0] - cur[0]), fmt1(m[1] - cur[1]))
 		cur = m
 	}
-	return `M${joinNums([fmt(start[0]), fmt(start[1])])}q${joinNums(nums)}z`
+	return `M${joinNums([fmt1(start[0]), fmt1(start[1])])}q${joinNums(head.map(fmt1))}${
+		nums.length ? `t${joinNums(nums)}` : ""
+	}z`
 }
 
 /** [x, y, w, h] viewBox grown by `pad` on every side → [x0, y0, x1, y1] */
@@ -209,14 +220,20 @@ export function clipRect([x, y, w, h], pad) {
 }
 
 /**
- * Polygons → path. `minArea` is in units² (rings smaller than that are speckle).
- * `clip` ([x0, y0, x1, y1], projected units) drops what falls outside the frame.
- * `curve` writes each ring as a closed quadratic B-spline instead of a polyline.
+ * Polygons → quantized rings (integers of 10^-decimals units, multiples of `step`). `minArea`
+ * is in units² (rings smaller than that are speckle). `clip` ([x0, y0, x1, y1], projected
+ * units) drops what falls outside the frame; clip-made vertices are flagged hard.
+ * `areaBeforeClip` tests minArea on the whole ring, not the part left after clipping, so a ring
+ * crossing the edge between two detail cells is kept (or dropped) in both.
  * @param {number[][][][]} polygons MultiPolygon coordinates in lon/lat
  */
-export function polygonsPath(polygons, project, { minArea = 0, clip = null, curve = false } = {}) {
-	const minTenths = minArea * 100
-	let d = ""
+export function projectRings(
+	polygons,
+	project,
+	{ minArea = 0, clip = null, decimals = 1, step = 1, areaBeforeClip = false } = {}
+) {
+	const minSteps = minArea * 100 ** decimals
+	const rings = []
 	for (const polygon of polygons) {
 		for (const ring of polygon) {
 			let pts = ring.map((pt) => project(pt)).filter(Boolean)
@@ -225,31 +242,70 @@ export function polygonsPath(polygons, project, { minArea = 0, clip = null, curv
 				const b = pts[pts.length - 1]
 				if (a[0] === b[0] && a[1] === b[1]) pts = pts.slice(0, -1)
 			}
+			if (areaBeforeClip) {
+				const whole = quantizeProjected(pts, decimals, step)
+				if (whole.length < 3 || ringArea(whole) < minSteps) continue
+			}
 			if (clip) pts = clipRing(pts, clip)
-			const q = quantizeProjected(pts)
+			const q = quantizeProjected(pts, decimals, step)
 			if (q.length > 1 && q[0][0] === q[q.length - 1][0] && q[0][1] === q[q.length - 1][1]) q.pop()
-			if (q.length < 3 || ringArea(q) < minTenths) continue
-			d += curve ? splineSubpath(q) : subpath(q, true)
+			if (q.length < 3 || (!areaBeforeClip && ringArea(q) < minSteps)) continue
+			rings.push(q)
 		}
 	}
+	return rings
+}
+
+/** Quantized rings → path; `curve` writes each ring as a closed quadratic B-spline */
+export function ringsPath(rings, { curve = false, decimals = 1 } = {}) {
+	let d = ""
+	for (const q of rings) d += curve ? splineSubpath(q, decimals) : subpath(q, true, decimals)
 	return d
 }
 
-/** Lines → path; clips to `clip` and drops pieces shorter than `minLength` units */
-export function linesPath(lines, project, { minLength = 0, clip = null } = {}) {
-	let d = ""
+/**
+ * Polygons → path (see projectRings). `curve` writes each ring as a closed quadratic B-spline
+ * instead of a polyline.
+ * @param {number[][][][]} polygons MultiPolygon coordinates in lon/lat
+ */
+export function polygonsPath(
+	polygons,
+	project,
+	{ minArea = 0, clip = null, curve = false, decimals = 1 } = {}
+) {
+	return ringsPath(
+		projectRings(polygons, project, { minArea, clip, decimals, step: curve ? 2 : 1 }),
+		{
+			curve,
+			decimals,
+		}
+	)
+}
+
+/** Lines → quantized pieces; clips to `clip` and drops pieces shorter than `minLength` units */
+export function projectLines(lines, project, { minLength = 0, clip = null, decimals = 1 } = {}) {
+	const scale = 10 ** decimals
+	const out = []
 	for (const line of lines) {
 		const pts = line.map((pt) => project(pt)).filter(Boolean)
 		for (const piece of clip ? clipLine(pts, clip) : [pts]) {
-			const q = quantizeProjected(piece)
+			const q = quantizeProjected(piece, decimals)
 			if (q.length < 2) continue
 			let len = 0
 			for (let i = 1; i < q.length; i++)
 				len += Math.hypot(q[i][0] - q[i - 1][0], q[i][1] - q[i - 1][1])
-			if (len / 10 < minLength) continue
-			d += subpath(q, false)
+			if (len / scale < minLength) continue
+			out.push(q)
 		}
 	}
+	return out
+}
+
+/** Lines → path; clips to `clip` and drops pieces shorter than `minLength` units */
+export function linesPath(lines, project, { minLength = 0, clip = null, decimals = 1 } = {}) {
+	let d = ""
+	for (const q of projectLines(lines, project, { minLength, clip, decimals }))
+		d += subpath(q, false, decimals)
 	return d
 }
 

@@ -19,9 +19,9 @@
 				"elevation_m": [1000,2000],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=Shizhuo%2C%20Alishan",
-				"shared": {"x":8922.2,"y":187.5,"r":56.2},
+				"shared": {"x":9791.3,"y":875.7,"r":61.6},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/alishan.json"
+				"detail": "chiayi"
 			},
 			"geometry": {"type":"Point","coordinates":[120.7,23.475]}
 		},
@@ -54,9 +54,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%89%E5%BE%BD%E7%9C%81",
-				"shared": {"x":6784.8,"y":-3961.4,"r":1162.4},
+				"shared": {"x":7974.4,"y":-4069.9,"r":1385.6},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[117.23,31.83]}
 		},
@@ -89,9 +89,9 @@
 				"elevation_m": [300,1000],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%89%E6%BA%AA%E5%8E%BF",
-				"shared": {"x":7493.1,"y":-513,"r":140.8},
+				"shared": {"x":8327.8,"y":-82.1,"r":156},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/anxi.json"
+				"detail": "anxi"
 			},
 			"geometry": {"type":"Point","coordinates":[117.905,25.142]}
 		},
@@ -124,9 +124,9 @@
 				"elevation_m": [350,500],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BF%A1%E6%A5%BD%E7%94%BA%E6%9C%9D%E5%AE%AE",
-				"shared": {"x":14625.6,"y":-6993.9,"r":13.5},
+				"shared": {"x":17795.6,"y":-5972,"r":17.2},
 				"frames": ["locator","japan"],
-				"inset": "/maps/inset/asamiya.json"
+				"detail": "uji"
 			},
 			"geometry": {"type":"Point","coordinates":[135.987,34.864]}
 		},
@@ -159,9 +159,9 @@
 				"elevation_m": [1600,1800],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%8A%E5%9D%A1%E5%AF%A8",
-				"shared": {"x":-678.3,"y":1602.4,"r":4.7},
+				"shared": {"x":-733,"y":1745.3,"r":5.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/banpo-laozhai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.6,21.943]}
 		},
@@ -183,9 +183,9 @@
 				"elevation_m": [1200,1900],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B8%83%E6%9C%97%E5%B1%B1%E5%B8%83%E6%9C%97%E6%97%8F%E4%B9%A1",
-				"shared": {"x":-752.8,"y":1755.4,"r":70.8},
+				"shared": {"x":-811.6,"y":1910.5,"r":76},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/bulang.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.45,21.65]}
 		},
@@ -218,9 +218,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%98%89%E7%BE%A9%E7%B8%A3",
-				"shared": {"x":8863.6,"y":204,"r":140.4},
+				"shared": {"x":9725.3,"y":884.8,"r":154},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/chiayi.json"
+				"detail": "chiayi"
 			},
 			"geometry": {"type":"Point","coordinates":[120.574,23.459]}
 		},
@@ -253,9 +253,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%AD%E5%9B%BD",
-				"shared": {"x":1302.8,"y":-5242.8,"r":10723.2},
+				"shared": {"x":1570.8,"y":-6058.8,"r":14371.1},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[105,35]}
 		},
@@ -288,9 +288,9 @@
 				"elevation_m": [1300,1500],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%81%E5%AE%B6%E5%AF%A8",
-				"shared": {"x":-253.2,"y":1540.9,"r":4.7},
+				"shared": {"x":-273.8,"y":1675.9,"r":5.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/dingjiazhai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.477,22.066]}
 		},
@@ -312,9 +312,9 @@
 				"elevation_m": [1500,2100],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%87%A4%E5%BA%86%E5%8E%BF",
-				"shared": {"x":-991.7,"y":204.2,"r":141.8},
+				"shared": {"x":-1094.8,"y":232.4,"r":155.4},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": "/maps/inset/fengqing.json"
+				"detail": "suanzaoshu"
 			},
 			"geometry": {"type":"Point","coordinates":[99.909,24.597]}
 		},
@@ -347,9 +347,9 @@
 				"elevation_m": [100,900],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%A6%8F%E9%BC%8E%E5%B8%82",
-				"shared": {"x":8427.6,"y":-1732.3,"r":117},
+				"shared": {"x":9535.3,"y":-1295.8,"r":132.4},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/fuding.json"
+				"detail": "fuding"
 			},
 			"geometry": {"type":"Point","coordinates":[120.211,27.222]}
 		},
@@ -382,9 +382,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%A6%8F%E5%BB%BA%E7%9C%81",
-				"shared": {"x":7575.6,"y":-1079,"r":1172.3},
+				"shared": {"x":8493.3,"y":-692.6,"r":1311.9},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[118.221,26.193]}
 		},
@@ -417,9 +417,9 @@
 				"elevation_m": [1000,1500],
 				"confidence": "low",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%9D%A9%E7%99%BB%E8%8C%B6%E5%8E%82",
-				"shared": {"x":-375,"y":1512,"r":18.9},
+				"shared": {"x":-405.8,"y":1645.3,"r":20.3},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/gedeng.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.225,22.12]}
 		},
@@ -452,9 +452,9 @@
 				"elevation_m": [1200,2000],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%88%AE%E9%A3%8E%E5%AF%A8",
-				"shared": {"x":-192.7,"y":1557.4,"r":4.7},
+				"shared": {"x":-208.4,"y":1693.4,"r":5.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/guafengzhai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.602,22.035]}
 		},
@@ -476,9 +476,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B9%BF%E4%B8%9C%E7%9C%81",
-				"shared": {"x":5409.9,"y":668.6,"r":1413},
+				"shared": {"x":5916.7,"y":975.5,"r":1538.1},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[113.3,23.3]}
 		},
@@ -511,9 +511,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B9%BF%E8%A5%BF%E5%A3%AE%E6%97%8F%E8%87%AA%E6%B2%BB%E5%8C%BA",
-				"shared": {"x":3244.8,"y":549.6,"r":1416.1},
+				"shared": {"x":3560.5,"y":690,"r":1543.9},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[108.8,23.8]}
 		},
@@ -546,9 +546,9 @@
 				"elevation_m": [1650,1650],
 				"confidence": "low",
 				"source": "https://yunnansourcing.com/products/2024-yunnan-sourcing-guo-you-lin-ancient-arbor-raw-pu-erh-tea-cake",
-				"shared": {"x":-242.4,"y":1654.3,"r":47.2},
+				"shared": {"x":-261.8,"y":1797.8,"r":50.7},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/guoyoulin.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.5,21.85]}
 		},
@@ -581,9 +581,9 @@
 				"elevation_m": [1500,1900],
 				"confidence": "medium",
 				"source": "https://www.geonames.org/search.html?q=Hekai&country=CN",
-				"shared": {"x":-730.1,"y":1684.8,"r":28.3},
+				"shared": {"x":-788,"y":1834.5,"r":30.4},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/hekai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.495,21.785]}
 		},
@@ -616,9 +616,9 @@
 				"elevation_m": [400,750],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E7%8C%B4%E5%9D%91",
-				"shared": {"x":7293,"y":-3252.3,"r":4.7},
+				"shared": {"x":8467.6,"y":-3177,"r":5.5},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/houkeng.json"
+				"detail": "huangshan"
 			},
 			"geometry": {"type":"Point","coordinates":[118.172,30.37]}
 		},
@@ -640,9 +640,9 @@
 				"elevation_m": [300,1200],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%BB%84%E5%B1%B1%E9%A3%8E%E6%99%AF%E5%8C%BA",
-				"shared": {"x":7302,"y":-3131.1,"r":56.1},
+				"shared": {"x":8461.4,"y":-3036.4,"r":65.3},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/huangshan.json"
+				"detail": "huangshan"
 			},
 			"geometry": {"type":"Point","coordinates":[118.16,30.138]}
 		},
@@ -675,9 +675,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%B9%96%E5%8D%97%E7%9C%81",
-				"shared": {"x":4484.4,"y":-1526,"r":1176.2},
+				"shared": {"x":5078.9,"y":-1518.7,"r":1328.4},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[111.7,27.6]}
 		},
@@ -710,9 +710,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%97%A5%E6%9C%AC",
-				"shared": {"x":15753.1,"y":-8209.3,"r":3919.4},
+				"shared": {"x":19498.3,"y":-7075.5,"r":5277.1},
 				"frames": ["locator"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[139.239,36.575]}
 		},
@@ -745,9 +745,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AF%E6%B4%AA%E5%B8%82",
-				"shared": {"x":-582.6,"y":1572.9,"r":188.8},
+				"shared": {"x":-629.9,"y":1712.6,"r":203.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/jinghong.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.797,22.001]}
 		},
@@ -780,9 +780,9 @@
 				"elevation_m": [1100,1700],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AF%E8%BF%88",
-				"shared": {"x":-973,"y":1471.7,"r":23.6},
+				"shared": {"x":-1053.5,"y":1608.6,"r":25.4},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": "/maps/inset/jingmai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[99.988,22.185]}
 		},
@@ -815,9 +815,9 @@
 				"elevation_m": [30,65],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%90%9B%E5%B1%B1%E5%B2%9B",
-				"shared": {"x":5009.8,"y":-2489.5,"r":4.7},
+				"shared": {"x":5759.6,"y":-2564.2,"r":5.4},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/junshan.json"
+				"detail": "junshan"
 			},
 			"geometry": {"type":"Point","coordinates":[113,29.355]}
 		},
@@ -839,9 +839,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%AC%E9%83%BD%E5%BA%9C",
-				"shared": {"x":14350.7,"y":-7130.2,"r":270.1},
+				"shared": {"x":17514.4,"y":-6218.9,"r":346},
 				"frames": ["locator","japan"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[135.45,35.25]}
 		},
@@ -874,9 +874,9 @@
 				"elevation_m": [100,600],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B4%82%E5%B1%B1%E5%8C%BA",
-				"shared": {"x":7963.8,"y":-6366.3,"r":55},
+				"shared": {"x":9728.5,"y":-6799.2,"r":70},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/laoshan.json"
+				"detail": "laoshan"
 			},
 			"geometry": {"type":"Point","coordinates":[120.58,36.15]}
 		},
@@ -909,9 +909,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B8%B4%E6%B2%A7%E5%B8%82",
-				"shared": {"x":-1001.6,"y":570.4,"r":567.1},
+				"shared": {"x":-1099.6,"y":632.7,"r":618.1},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[99.9,23.9]}
 		},
@@ -944,9 +944,9 @@
 				"elevation_m": [300,1250],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%85%AD%E5%A0%A1%E9%95%87",
-				"shared": {"x":4470.4,"y":469.3,"r":4.7},
+				"shared": {"x":4907.7,"y":681.9,"r":5.1},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/liubao.json"
+				"detail": "liubao"
 			},
 			"geometry": {"type":"Point","coordinates":[111.373,23.814]}
 		},
@@ -968,9 +968,9 @@
 				"elevation_m": [1200,1450],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E8%90%BD%E6%B0%B4%E6%B4%9E%20%E5%8B%90%E8%85%8A",
-				"shared": {"x":-250.9,"y":1571.9,"r":4.7},
+				"shared": {"x":-271.2,"y":1709.2,"r":5.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/luoshuidong.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.482,22.007]}
 		},
@@ -992,9 +992,9 @@
 				"elevation_m": [1100,1600],
 				"confidence": "low",
 				"source": "https://m.thepaper.cn/newsDetail_forward_27145484",
-				"shared": {"x":-379.9,"y":1527.7,"r":18.9},
+				"shared": {"x":-411,"y":1662.3,"r":20.3},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/mangzhi.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.215,22.09]}
 		},
@@ -1027,9 +1027,9 @@
 				"elevation_m": [900,1500],
 				"confidence": "low",
 				"source": "https://zh.wikipedia.org/wiki/象明彝族乡",
-				"shared": {"x":-319.4,"y":1528,"r":37.8},
+				"shared": {"x":-345.6,"y":1662.3,"r":40.7},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/manzhuan.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.34,22.09]}
 		},
@@ -1062,9 +1062,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8B%90%E6%B5%B7%E5%8E%BF",
-				"shared": {"x":-750.4,"y":1592.7,"r":188.8},
+				"shared": {"x":-811.1,"y":1735.7,"r":203.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/menghai.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.451,21.96]}
 		},
@@ -1097,9 +1097,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8B%90%E8%85%8A%E5%8E%BF",
-				"shared": {"x":-253,"y":1756.6,"r":283.2},
+				"shared": {"x":-272.8,"y":1907.7,"r":304},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/mengla.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.479,21.655]}
 		},
@@ -1132,9 +1132,9 @@
 				"elevation_m": [100,400],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%A3%AE%E7%94%BA%20%E9%9D%99%E5%B2%A1%E7%9C%8C",
-				"shared": {"x":15445.3,"y":-7194.3,"r":35.9},
+				"shared": {"x":18811.3,"y":-5954.1,"r":45.9},
 				"frames": ["locator","japan"],
-				"inset": "/maps/inset/mori-machi.json"
+				"detail": "mori-machi"
 			},
 			"geometry": {"type":"Point","coordinates":[137.927,34.836]}
 		},
@@ -1167,9 +1167,9 @@
 				"elevation_m": [1200,1800],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8D%97%E7%B3%AF%E5%B1%B1",
-				"shared": {"x":-678.3,"y":1601.4,"r":28.3},
+				"shared": {"x":-733,"y":1744.2,"r":30.5},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/nannuo.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.6,21.945]}
 		},
@@ -1202,9 +1202,9 @@
 				"elevation_m": [700,1200],
 				"confidence": "low",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%B9%8C%E5%B2%BD%E6%9D%91",
-				"shared": {"x":6979.2,"y":180.7,"r":23.5},
+				"shared": {"x":7678.6,"y":609.8,"r":25.8},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/pingkengtou.json"
+				"detail": "pingkengtou"
 			},
 			"geometry": {"type":"Point","coordinates":[116.665,23.94]}
 		},
@@ -1237,9 +1237,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%99%AE%E6%B4%B1%E5%B8%82",
-				"shared": {"x":-528.5,"y":1048.8,"r":708.8},
+				"shared": {"x":-576,"y":1146.4,"r":767.3},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[100.9,23]}
 		},
@@ -1272,9 +1272,9 @@
 				"elevation_m": [2100,2500],
 				"confidence": "low",
 				"source": "https://ir.xtbg.ac.cn/bitstream/353005/2294/1/%e5%93%80%e7%89%a2%e5%b1%b1%e5%9b%bd%e5%ae%b6%e8%87%aa%e7%84%b6%e4%bf%9d%e6%8a%a4%e5%8c%ba%e4%ba%91%e5%8d%97%e7%9c%81%e9%95%87%e6%b2%85%e5%8d%83%e5%ae%b6%e5%af%a8%e9%87%8e%e7%94%9f%e5%8f%a4%e8%8c%b6%e6%a0%91%e8%80%83%e5%af%9f%e8%ae%ba%e8%af%81%e6%84%8f%e8%a7%81.pdf",
-				"shared": {"x":-367.3,"y":421.5,"r":47.3},
+				"shared": {"x":-404.2,"y":463,"r":51.6},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": "/maps/inset/qianjiazhai.json"
+				"detail": "suanzaoshu"
 			},
 			"geometry": {"type":"Point","coordinates":[101.228,24.196]}
 		},
@@ -1307,9 +1307,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B1%B1%E4%B8%9C%E7%9C%81",
-				"shared": {"x":6939.7,"y":-6312.6,"r":1143.1},
+				"shared": {"x":8482.3,"y":-6896.5,"r":1460.7},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[118.2,36.3]}
 		},
@@ -1342,9 +1342,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%BB%8B%E8%B3%80%E7%9C%8C",
-				"shared": {"x":14615.3,"y":-7197.3,"r":224.9},
+				"shared": {"x":17844.2,"y":-6218.9,"r":288.3},
 				"frames": ["locator","japan"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[136.08,35.25]}
 		},
@@ -1377,9 +1377,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E9%9D%99%E5%B2%A1%E7%9C%8C",
-				"shared": {"x":15579.5,"y":-7318.6,"r":268.9},
+				"shared": {"x":19006.6,"y":-6058.8,"r":344.9},
 				"frames": ["locator","japan"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[138.3,35]}
 		},
@@ -1412,9 +1412,9 @@
 				"elevation_m": [1800,1800],
 				"confidence": "low",
 				"source": "https://yunnansourcing.com/products/2025-yunnan-sourcing-suan-zao-shu-old-arbor-raw-pu-erh-tea-cake",
-				"shared": {"x":-616.8,"y":784.3,"r":165.4},
+				"shared": {"x":-674.9,"y":860.3,"r":179.7},
 				"frames": ["locator","china-east","yunnan"],
-				"inset": "/maps/inset/suanzaoshu.json"
+				"detail": "suanzaoshu"
 			},
 			"geometry": {"type":"Point","coordinates":[100.711,23.502]}
 		},
@@ -1447,9 +1447,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%8F%B0%E7%81%A3",
-				"shared": {"x":8977.2,"y":114.1,"r":936.2},
+				"shared": {"x":9862,"y":804.9,"r":1027.7},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[120.835,23.599]}
 		},
@@ -1482,9 +1482,9 @@
 				"elevation_m": [50,500],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%AE%87%E6%B2%BB%E5%B8%82",
-				"shared": {"x":14544.1,"y":-6984.4,"r":27.1},
+				"shared": {"x":17697.6,"y":-5985.4,"r":34.4},
 				"frames": ["locator","japan"],
-				"inset": "/maps/inset/uji.json"
+				"detail": "uji"
 			},
 			"geometry": {"type":"Point","coordinates":[135.8,34.885]}
 		},
@@ -1517,9 +1517,9 @@
 				"elevation_m": null,
 				"confidence": "low",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%B8%83%E6%9C%97%E5%B1%B1%E5%B8%83%E6%9C%97%E6%97%8F%E4%B9%A1",
-				"shared": {"x":-769.2,"y":1788.8,"r":70.8},
+				"shared": {"x":-828.9,"y":1946.6,"r":76},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/weidong.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[100.417,21.586]}
 		},
@@ -1552,9 +1552,9 @@
 				"elevation_m": [300,800],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%AD%A6%E4%B9%89%E5%8E%BF",
-				"shared": {"x":8129.2,"y":-2579.5,"r":116.9},
+				"shared": {"x":9326.3,"y":-2289.7,"r":134.5},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/wuyi-zhejiang.json"
+				"detail": "wuyi-zhejiang"
 			},
 			"geometry": {"type":"Point","coordinates":[119.812,28.897]}
 		},
@@ -1587,9 +1587,9 @@
 				"elevation_m": [200,700],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%AD%A6%E5%A4%B7%E5%B1%B1%E5%B8%82",
-				"shared": {"x":7390.1,"y":-1885.4,"r":70.3},
+				"shared": {"x":8393.3,"y":-1612.8,"r":79.8},
 				"frames": ["locator","china-east"],
-				"inset": "/maps/inset/wuyishan.json"
+				"detail": "wuyishan"
 			},
 			"geometry": {"type":"Point","coordinates":[118.03,27.759]}
 		},
@@ -1622,9 +1622,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E8%A5%BF%E5%8F%8C%E7%89%88%E7%BA%B3%E5%82%A3%E6%97%8F%E8%87%AA%E6%B2%BB%E5%B7%9E",
-				"shared": {"x":-581.2,"y":1573.5,"r":424.9},
+				"shared": {"x":-628.3,"y":1713.1,"r":457.1},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[100.8,22]}
 		},
@@ -1657,9 +1657,9 @@
 				"elevation_m": [1300,1900],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%80%9A%E9%82%A6",
-				"shared": {"x":-326.8,"y":1465,"r":28.3},
+				"shared": {"x":-354,"y":1594.5,"r":30.5},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/yibang.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.324,22.21]}
 		},
@@ -1681,9 +1681,9 @@
 				"elevation_m": [1100,1900],
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%98%93%E6%AD%A6%E9%95%87",
-				"shared": {"x":-257.2,"y":1585.5,"r":70.8},
+				"shared": {"x":-278,"y":1723.9,"r":76.2},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/yiwu.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.469,21.981]}
 		},
@@ -1716,9 +1716,9 @@
 				"elevation_m": [1000,1700],
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E5%9F%BA%E8%AF%BA%E5%B1%B1%E5%9F%BA%E8%AF%BA%E6%97%8F%E4%B9%A1",
-				"shared": {"x":-464.9,"y":1569.1,"r":37.8},
+				"shared": {"x":-502.7,"y":1707.5,"r":40.6},
 				"frames": ["locator","china-east","yunnan","six-mountains"],
-				"inset": "/maps/inset/youle.json"
+				"detail": "jinghong"
 			},
 			"geometry": {"type":"Point","coordinates":[101.04,22.01]}
 		},
@@ -1751,9 +1751,9 @@
 				"elevation_m": null,
 				"confidence": "low",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%91%E5%8D%97%E7%9C%81",
-				"shared": {"x":-236.4,"y":-0.4,"r":1653.6},
+				"shared": {"x":-261.8,"y":0,"r":1818.5},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[101.5,25]}
 		},
@@ -1786,9 +1786,9 @@
 				"elevation_m": null,
 				"confidence": "high",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E4%BA%91%E5%8D%97%E7%9C%81",
-				"shared": {"x":-236.4,"y":-0.4,"r":1653.6},
+				"shared": {"x":-261.8,"y":0,"r":1818.5},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[101.5,25]}
 		},
@@ -1821,9 +1821,9 @@
 				"elevation_m": null,
 				"confidence": "medium",
 				"source": "https://nominatim.openstreetmap.org/search?format=json&q=%E6%B5%99%E6%B1%9F%E7%9C%81",
-				"shared": {"x":8197.1,"y":-2722.3,"r":933.4},
+				"shared": {"x":9424.8,"y":-2441.2,"r":1078.3},
 				"frames": ["locator","china-east"],
-				"inset": null
+				"detail": null
 			},
 			"geometry": {"type":"Point","coordinates":[120,29.15]}
 		},

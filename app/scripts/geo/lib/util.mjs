@@ -14,6 +14,7 @@ export const appRoot = path.resolve(geoDir, "..", "..")
 
 export const paths = {
 	origins: path.join(appRoot, "content", "origins"),
+	places: path.join(appRoot, "content", "geo", "places.json"),
 	generated: path.join(appRoot, "src", "generated"),
 	originsGeo: path.join(appRoot, "src", "generated", "origins.geo.json"),
 	manifest: path.join(appRoot, "src", "generated", "maps-manifest.json"),
@@ -92,6 +93,12 @@ export async function writeText(file, text) {
 	await mkdir(path.dirname(file), { recursive: true })
 	await writeFile(file, text.replace(/\r\n/g, "\n"), "utf8")
 	return Buffer.byteLength(text)
+}
+
+export async function writeBinary(file, buffer) {
+	await mkdir(path.dirname(file), { recursive: true })
+	await writeFile(file, buffer)
+	return buffer.length
 }
 
 export function relativeToApp(file) {

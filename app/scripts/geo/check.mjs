@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * geo:check (CI, no network): hash the inputs (origin frontmatter + pipeline params +
- * SCRIPT_VERSION) and compare with the committed maps-manifest.json, then make sure
- * every file the manifest lists is present.
+ * geo:check (CI, no network): hash the inputs (origin frontmatter + content/geo/places.json +
+ * pipeline params + SCRIPT_VERSION) and compare with the committed maps-manifest.json, then make
+ * sure every file the manifest lists is present.
  */
 import { access, readFile } from "node:fs/promises"
 import path from "node:path"
 import { inputHash } from "./lib/inputs.mjs"
-import { readOrigins } from "./lib/origins.mjs"
+import { readOrigins, readPlaces } from "./lib/origins.mjs"
 import { appRoot, paths } from "./lib/util.mjs"
 
 async function main() {
@@ -19,11 +19,11 @@ async function main() {
 		process.exit(1)
 	}
 
-	const hash = inputHash(await readOrigins(paths.origins))
+	const hash = inputHash(await readOrigins(paths.origins), await readPlaces(paths.places))
 	if (manifest.inputHash !== hash) {
 		console.error(
 			[
-				"geo:check: origins or map pipeline params changed since the maps were generated.",
+				"geo:check: origins, curated places or map pipeline params changed since the maps were generated.",
 				"Run `pnpm geo` (needs network the first time) and commit public/maps, src/generated and public/fonts.",
 				`  manifest ${manifest.inputHash}`,
 				`  current  ${hash}`,
@@ -32,9 +32,12 @@ async function main() {
 		process.exit(1)
 	}
 
+	const detail = manifest.detail ?? { cells: [], regions: [], cellUrl: "" }
 	const urls = [
-		...manifest.frames.map((f) => f.url),
-		...manifest.insets.map((f) => f.url),
+		...manifest.frames.flatMap((f) => [f.url, f.mask?.url]),
+		...detail.cells.map((c) => detail.cellUrl.replace("{id}", c.id)),
+		...detail.regions.map((r) => r.mask?.url),
+		manifest.labels?.url,
 		manifest.ridges?.url,
 		manifest.font?.url,
 	].filter(Boolean)
@@ -57,9 +60,11 @@ async function main() {
 		process.exit(1)
 	}
 	console.log(
-		`geo:check ok · ${manifest.frames.length} frames, ${
-			manifest.insets.length
-		} insets · ${hash.slice(0, 12)}`
+		`geo:check ok · ${manifest.frames.length} frames, ${detail.cells.length} detail cells in ${
+			detail.regions.length
+		} regions, ${manifest.details.length} origins, ${
+			manifest.labels?.count ?? 0
+		} labels · ${hash.slice(0, 12)}`
 	)
 }
 

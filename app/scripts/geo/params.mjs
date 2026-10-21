@@ -1,26 +1,44 @@
 /**
- * Geo pipeline parameters (plan §4.2–§4.4).
+ * Geo pipeline parameters (plan §4.2–§4.4, §4.7).
  *
  * Everything here is plain data: `geo:check` hashes it (together with the origin
- * frontmatter and SCRIPT_VERSION) to decide whether the committed maps are stale.
- * Bump SCRIPT_VERSION whenever the pipeline code changes its output.
+ * frontmatter, content/geo/places.json and SCRIPT_VERSION) to decide whether the committed
+ * maps are stale. Bump SCRIPT_VERSION whenever the pipeline code changes its output.
  */
 
-export const SCRIPT_VERSION = "1.0.0"
+export const SCRIPT_VERSION = "3.1.0"
 
 /**
- * One projection for every shared frame (locator → china-east → yunnan → six-mountains),
- * so LOD layers register exactly and the camera can tween a viewBox between them.
- * Units: 1 unit ≈ 212 m (scale 30000 ⇒ ~524 units per degree of latitude).
+ * One north-up projection for every shared frame (locator → china-east/japan → yunnan →
+ * six-mountains) and every detail patch, so all LOD layers register exactly and the camera can
+ * tween a viewBox between them (plan §4.7.1). Web Mercator, so a terrain tile's pixel grid is a
+ * plain affine of shared units.
+ *
+ * Units: scale 30000 ⇒ 523.6 units per degree of longitude. Units per km = scale ÷ (6371.0088 ×
+ * cos φ): 1 unit ≈ 192 m at 25°N, 197 m at 22°N, 174 m at 35°N.
+ * The runtime mirrors this in src/lib/components/map/projection.ts; geo:test checks they agree.
  */
 export const SHARED_PROJECTION = {
-	type: "conicEqualArea",
-	parallels: [20, 30],
+	type: "mercator",
 	rotate: [-102, 0],
 	center: [0, 25],
 	scale: 30000,
 	translate: [0, 0],
 }
+
+/** lon/lat points written to maps-manifest.json with their d3 projection (runtime cross-check) */
+export const CONTROL_POINTS = [
+	[96, 18],
+	[100.5, 21.5],
+	[101.469, 21.981],
+	[102, 25],
+	[104, 30],
+	[110, 22.5],
+	[118.03, 27.759],
+	[120.7, 23.475],
+	[135.987, 34.864],
+	[141.5, 40],
+]
 
 export const TERRAIN = {
 	url: "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
@@ -38,6 +56,10 @@ export const TERRAIN = {
  *  - select: which origins span the frame
  *  - pad:    degrees added on every side
  *  - circles: pad each origin by its radius_km instead of a point
+ * `rivers` / `lakes`: the largest Natural Earth scalerank drawn in the frame.
+ * `mask`: the frame's edge is an organic coverage mask built from its members (masks.mjs) instead
+ *   of a feathered rectangle: each member adds a disk of min(radius_km, capKm) + padKm, shrunk to
+ *   stay inside the frame. Frames without one (locator, china-east) cover their whole box.
  */
 export const FRAMES = [
 	{
@@ -78,6 +100,7 @@ export const FRAMES = [
 		displayPx: 1000,
 		rivers: 9,
 		lakes: 9,
+		mask: { capKm: 40, padKm: 60, kmPerPx: 2 },
 	},
 	{
 		id: "yunnan",
@@ -91,6 +114,7 @@ export const FRAMES = [
 		displayPx: 1200,
 		rivers: 9,
 		lakes: 9,
+		mask: { capKm: 40, padKm: 75, kmPerPx: 2 },
 	},
 	{
 		id: "six-mountains",
@@ -99,8 +123,9 @@ export const FRAMES = [
 			precision: ["village", "township", "mountain-area", "forest"],
 		},
 		circles: true,
-		pad: 0.04,
-		maxGridPx: 2400,
+		// room around the members' areas for the organic edge (v2: 0.04; more needs more tiles)
+		pad: 0.15,
+		maxGridPx: 2600,
 		blurSigma: 2.5,
 		intervals: [100],
 		indexEvery: 5,
@@ -108,37 +133,227 @@ export const FRAMES = [
 		displayPx: 1600,
 		rivers: 10,
 		lakes: 10,
+		mask: { capKm: 20, padKm: 38, kmPerPx: 1 },
 	},
 ]
 
-/** Per-origin insets (Properties › Provenance) */
-export const INSET = {
+/**
+ * Coverage-tiled detail (plan §4.7.2, v3): the finest LOD layer. Every origin of a listed
+ * precision contributes a disk of R = min(radius_km, capKm) + padKm; the detail cells are the
+ * footprints of terrarium tiles at `zoom` that meet a disk (axis-aligned rects in the shared
+ * Mercator), each contoured from `dataZoom` tiles. Only the `dataZoom` tiles that meet a disk are
+ * fetched; the rest of a cell is left empty, which is outside every disk and so under a zero mask.
+ *
+ * Every cell uses the same interval, blur and simplification on a grid with `marginPx` around it,
+ * so lines continue across cells; paths are clipped to the cell rect + `clipPadKm` and the runtime clips
+ * each cell to its exact rect, so no clip edge is ever drawn and seams vanish.
+ */
+export const DETAIL = {
 	precision: ["village", "township", "mountain-area", "forest", "county"],
-	/** box side: max(minSideKm, radius_km × 2 × areaPad) */
-	minSideKm: 24,
-	areaPad: 1.3,
-	/** viewBox is [-size/2, -size/2, size, size] in a north-up azimuthal projection; 1 unit = 1 px at displayPx */
-	size: 360,
-	/** ≈ display resolution: z11 for a 24 km box. SRTM is ~30–90 m here, so z12 only adds stair-steps */
-	maxGridPx: 480,
-	blurSigma: 2.75,
+	capKm: 40,
+	padKm: 15,
+	/** cell = one terrarium tile footprint at this zoom (≈ 36 km at 22°N) */
+	zoom: 10,
 	/**
-	 * plan: inset 50 m, index 250 m. Boxes wider than `fineSideKm` scale the floor up
-	 * (50 m × side / fineSideKm), and steep boxes step up until ≤ maxBands, so a panel stays legible.
+	 * a cell over this many KB (gzip) is split into its four child tiles (the steepest ground: 50 m
+	 * contours over 3 km of relief), down to cells of `maxZoom`
 	 */
-	intervals: [50, 100, 200, 500],
-	fineSideKm: 48,
-	maxBands: 30,
+	splitAboveKb: 25,
+	maxZoom: 11,
+	/** contoured from tiles at this zoom (≈ 70 m per px at 22°N) */
+	dataZoom: 11,
+	/** grid margin around each cell (dataZoom px): pad + blur + simplification context */
+	marginPx: 48,
+	/** paths run this far past the cell rect (km); hard clip vertices stay out of sight */
+	clipPadKm: 1.2,
+	/** coordinates are written in hundredths of a shared unit (≈ 2 m) */
+	decimals: 2,
+	blurSigma: 2.75,
+	interval: 50,
 	indexEvery: 5,
-	simplify: 0.045,
-	displayPx: 360,
+	/**
+	 * mapshaper weighted Visvalingam by a fixed threshold in grid px (not a percentage), so a line
+	 * simplifies the same way in both cells it crosses
+	 */
+	simplify: "weighted interval=2",
+	/** a cell is laid out as if drawn this many px wide (speckle, label spacing, reference lines) */
+	displayPx: 512,
 	rivers: 10,
 	lakes: 10,
+	/**
+	 * the camera framing of an origin (the session panel, the hero): a square of
+	 * max(minSideKm, radius_km × 2 × areaPad) around it, as v2's patches were
+	 */
+	frame: { minSideKm: 24, areaPad: 1.3 },
+	/** organic edge mask per connected region of cells (masks.mjs) */
+	mask: { kmPerPx: 1 },
+}
+
+/**
+ * Contour thinning (lib/thin.mjs): each intermediate stretch carries the coarsest zoom it may be
+ * stroked at. A sheet is drawn at most at `lodFade` × its size (a cell: one z`DETAIL.zoom` tile) across
+ * a map `mapPx` CSS px wide (the peek, the panel), so a stretch that still shows at that many units
+ * per px shows at every zoom of the sheet and is written as such.
+ */
+export const THIN = {
+	mapPx: 200,
+	lodFade: 1.45,
+	/** a z`DETAIL.maxZoom` cell over budget thins in longer runs, up to this many doublings */
+	maxCoarse: 4,
+}
+
+/**
+ * The coverage field behind every organic mask (detail regions and the masked frames): per disk a
+ * Gaussian of σ = sigmaFrac × R′ (R′ = R − insetKm) lowered to reach zero at R′, summed
+ * (metaball-style, so close disks merge without creases), then smoothstep(lo, hi). A lone disk is
+ * fully opaque out to ≈ 0.58 R′ and gone by ≈ 0.96 R′: a soft rim of ~40% of the radius.
+ */
+export const MASK = {
+	sigmaFrac: 0.6,
+	insetKm: 1,
+	lo: 0.04,
+	hi: 0.5,
+}
+
+/**
+ * Reference layers (plan §4.7.3) folded into every frame and patch `context`.
+ * Simplification tolerance is a fraction of one display pixel (in metres on the ground):
+ * rivers and province lines keep `linePx`; land, coast and borders are simplified harder.
+ */
+export const CONTEXT = {
+	linePx: 0.6,
+	hardPx: 1.2,
+}
+
+/**
+ * Elevation labels on index contours (plan §4.7.4), per frame and patch: a few anchors per
+ * index band on long straight runs of the contour, spaced apart. Lengths are display px (the
+ * frame's or patch's displayPx across its viewBox); `perBand` is per `areaPx`² of display, so
+ * a big frame gets proportionally more.
+ */
+export const CONTOUR_LABELS = {
+	perBand: 3,
+	areaPx: 360,
+	spacingPx: 80,
+	insetPx: 16,
+	minRunPx: 9,
+}
+
+/**
+ * Label zoom tiers (plan §4.7.4). A label's `rank` is the lowest tier at which it may show; the
+ * runtime shows ranks ≤ the current tier and resolves collisions by rank. The current tier is
+ * the highest whose `maxUnitsPerPx` is ≥ the camera's shared units per CSS px
+ * (null = unbounded). `viewKm` is the rough view width at 1200 px, for orientation only.
+ *
+ *   0 world     East Asia locator      countries, oceans and major seas
+ *   1 region    china-east / japan     provinces, major cities, big rivers, seas
+ *   2 province  yunnan                 prefecture cities, tea counties, rivers, lakes, neighbours' provinces
+ *   3 cluster   six-mountains          tea towns, mountain areas, counties, more river anchors
+ *   4 detail    one detail patch       villages, small towns, dense river anchors
+ *   5 fine      a ~10 km view          everything left
+ */
+export const LABEL_TIERS = [
+	{ rank: 0, name: "world", maxUnitsPerPx: null, viewKm: 8000 },
+	{ rank: 1, name: "region", maxUnitsPerPx: 10, viewKm: 2300 },
+	{ rank: 2, name: "province", maxUnitsPerPx: 2.5, viewKm: 580 },
+	{ rank: 3, name: "cluster", maxUnitsPerPx: 0.66, viewKm: 150 },
+	{ rank: 4, name: "detail", maxUnitsPerPx: 0.16, viewKm: 37 },
+	{ rank: 5, name: "fine", maxUnitsPerPx: 0.04, viewKm: 9 },
+]
+
+/**
+ * Label sources and the rank each one gets (labels.mjs). Labels outside `bbox` are dropped.
+ * Hanzi: Natural Earth NAME_ZH for China, the native forms for Taiwan (NAME_ZHT, 臺 → 台, as the
+ * origins write it) and Japan (NAME_JA kanji). Other countries' cities carry no hanzi, which
+ * keeps the font subset small; countries, seas, rivers, lakes and curated places always do.
+ */
+export const LABELS = {
+	/** lon/lat area labels may sit in: the locator frame and a little more */
+	bbox: [95.5, 17, 142.5, 40.5],
+	/** rank from a Natural Earth scalerank: the first [maxScalerank, rank] pair that fits */
+	cities: {
+		hanzi: ["CHN", "TWN", "JPN", "HKG", "MAC"],
+		/** everywhere in the label area */
+		maxScalerank: 4,
+		/** denser where the tea is; [W, S, E, N] */
+		dense: [
+			{ bbox: [97.5, 20.5, 106.2, 29.3], maxScalerank: 8 }, // Yunnan and its borderlands
+			{ bbox: [134.6, 33.8, 139.2, 36], maxScalerank: 8 }, // Kansai to Shizuoka
+			{ bbox: [115.8, 23, 122.2, 31.2], maxScalerank: 6 }, // Fujian, Zhejiang, Taiwan
+		],
+		ranks: [
+			[1, 1],
+			[3, 2],
+			[5, 3],
+			[7, 4],
+			[99, 5],
+		],
+		/** admin-0 and admin-1 capitals show one tier earlier */
+		capitalBoost: 1,
+		/**
+		 * Cities carry hanzi (and cost font glyphs) only at rank ≤ this, inside a dense area, or
+		 * within `hanziNearKm` of an origin; the rest are labelled in Latin only.
+		 */
+		hanziMaxRank: 2,
+		hanziNearKm: 80,
+	},
+	seas: {
+		/** by Natural Earth min_label */
+		ranks: [
+			[2, 0],
+			[4, 1],
+			[6, 2],
+			[99, 3],
+		],
+		exclude: ["river"],
+	},
+	lakes: {
+		ranks: [
+			[2, 1],
+			[5, 2],
+			[7, 3],
+			[99, 4],
+		],
+	},
+	rivers: {
+		/** rivers named at all: Natural Earth scalerank everywhere, and in the dense areas (cities.dense) */
+		maxScalerank: 6,
+		denseMaxScalerank: 10,
+		/** the lowest tier a river is named at, by scalerank */
+		ranks: [
+			[2, 1],
+			[5, 2],
+			[8, 3],
+			[99, 4],
+		],
+		/** anchors along the line every `spacingPx` px at each tier, coarse tiers first */
+		spacingPx: 600,
+		/** the finest tier that gets river anchors */
+		maxRank: 4,
+		/** anchors at this tier and finer only inside the dense areas */
+		denseFromRank: 4,
+		/** the angle is the chord over this many px around the anchor (smooths meanders) */
+		chordPx: 60,
+		/** chain line pieces whose ends are closer than this (units) */
+		joinUnits: 0.5,
+	},
+	origins: {
+		/** by geo.precision; precisions not listed get no origin label */
+		ranks: {
+			county: 3,
+			"mountain-area": 3,
+			township: 3,
+			forest: 4,
+			village: 4,
+		},
+	},
 }
 
 /** "Unknown Pleasures" ridgelines over the six-mountains frame */
 export const RIDGES = {
 	frame: "six-mountains",
+	/** the ridges span the members' areas plus this (degrees), v2's frame, not the padded one */
+	pad: 0.04,
 	rows: 36,
 	samples: 220,
 	width: 1000,
@@ -151,7 +366,7 @@ export const RIDGES = {
 	blurSigma: 4,
 }
 
-/** Context lines (Natural Earth 10 m; public domain). Only clipped, projected output is committed. */
+/** Natural Earth 10 m (public domain). Only clipped, projected output is committed. */
 export const NATURAL_EARTH = {
 	baseUrl: "https://naciscdn.org/naturalearth/10m",
 	layers: {
@@ -159,10 +374,19 @@ export const NATURAL_EARTH = {
 		rivers: "physical/ne_10m_rivers_lake_centerlines",
 		lakes: "physical/ne_10m_lakes",
 		admin: "cultural/ne_10m_admin_1_states_provinces_lines",
+		land: "physical/ne_10m_land",
+		borders: "cultural/ne_10m_admin_0_boundary_lines_land",
 	},
-	/** provinces only (dashed); never national borders */
+	/** label sources (labels.mjs) */
+	labelLayers: {
+		places: "cultural/ne_10m_populated_places",
+		marine: "physical/ne_10m_geography_marine_polys",
+	},
+	/** province lines (dashed) */
 	adminCountries: ["China", "Taiwan", "Japan"],
 	adminClass: "Admin-1 boundary",
+	/** national borders: Natural Earth's default view, never the disputed or indefinite lines */
+	borderClasses: ["International boundary (verify)"],
 }
 
 /** Hanzi subset for map labels (plan §4.1). Pinned to a google/fonts commit and verified by hash. */
@@ -173,20 +397,22 @@ export const FONT = {
 	weight: 400,
 }
 
-/** gzip budgets in KB (plan §4.4) */
+/** gzip budgets in KB (plan §4.4, §4.7.7) */
 export const BUDGETS = {
-	inset: 20,
+	cell: 25,
 	base: 150, // locator + yunnan
 	frame: 150, // any other single shared frame
 	cluster: 250,
 	ridges: 60,
-	// 15 KB in plan §4.4; raised for the five native Taiwanese and Japanese forms (台灣 嘉義 朝宮
-	// 滋賀 静岡) the simplified set doesn't share, which cost ~1 KB together
-	font: 16,
+	labels: 40,
+	// 15 KB in plan §4.4, then 16 KB for the native Taiwanese and Japanese forms. Map v2 adds every
+	// label's hanzi (countries, provinces, cities, seas, rivers, lakes, tea towns): ~330 glyphs at
+	// ~145 B each
+	font: 50,
 }
 
 export const ATTRIBUTION = [
 	"Terrain: AWS Terrain Tiles (Mapzen terrarium; SRTM, GMTED, ETOPO1, 3DEP)",
-	"Context lines: Natural Earth 10m (public domain)",
+	"Reference layers and labels: Natural Earth 10m (public domain)",
 	"Hanzi labels: Noto Sans SC (SIL Open Font License 1.1)",
 ]
