@@ -12,51 +12,51 @@ origin:
 production_year: 2019
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/products/2019-laconic/
-excerpt: in progress
+purchase_link: 'https://white2tea.com/products/2019-laconic/'
+excerpt: 'Peaches n cream, Meyer lemon, and a cooling minty finish'
 date: 2021-04-09T13:55:34.545Z
 flavor_axes:
   cream:
     start: 4
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 5
-    finish: 0
+    finish: null
   spices:
     start: 7
-    finish: 0
+    finish: null
   earth:
     start: 4
-    finish: 0
+    finish: null
   nuts_roast:
     start: 2
-    finish: 0
+    finish: null
   wood:
     start: 2
-    finish: 0
+    finish: null
   vegetal:
     start: 6
-    finish: 0
+    finish: null
   floral:
     start: 5
-    finish: 0
+    finish: null
   fruits:
     start: 5
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: pineapple, peach, toffee, roots, tepache
-  wet_leaf_nose: pineapple, apricot, sassafras, wintergreen, mulling spices
-  mouthfeel: more astringent than juicy, medium thickness
+  dry_leaf_nose: 'pineapple, peach, toffee, roots, tepache'
+  wet_leaf_nose: 'pineapple, apricot, sassafras, wintergreen, mulling spices'
+  mouthfeel: 'more astringent than juicy, medium thickness'
   finish: cooling and minty
   taste: Meyer lemon
   empty_cup: herbal rain
   cha_qi: port forwarding a Minecraft server through your brain mind & very relaxing
 tags:
   - 2b24db28-78d9-4cd3-a9d9-6bad49b88c53
-rating: 50
+rating: -1
 brewing:
   temperature: 205
   material_amount: 6.69
@@ -64,6 +64,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Infusions
 
