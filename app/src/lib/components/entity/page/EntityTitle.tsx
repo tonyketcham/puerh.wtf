@@ -92,8 +92,10 @@ export default function EntityTitle({
 					className="block pointer-events-none select-none [text-shadow:none] text-transparent bg-clip-text"
 					style={{ ...stacked, backgroundImage: gradient }}
 					initial={reduce ? { opacity: 0 } : { clipPath: "inset(100% 0% 0% 0%)" }}
-					animate={reduce ? { opacity: 1 } : { clipPath: "inset(0% 0% 0% 0%)" }}
-					transition={reduce ? { duration: 0.2 } : { ...POUR, delay: 0.22 }}
+					animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
+					transition={
+						reduce ? { duration: 0.2, clipPath: { duration: 0 } } : { ...POUR, delay: 0.22 }
+					}
 				>
 					{display}
 				</motion.span>

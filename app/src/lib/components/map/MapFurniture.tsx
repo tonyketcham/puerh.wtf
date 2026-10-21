@@ -133,6 +133,7 @@ export function GraticuleTicks({
 	// its own state: a new grid (a zoom changing the step, a pan past the extent) re-renders the
 	// ticks only, not the whole map around them
 	const grid = useGraticule(camera)
+	// Live pins move along the edge while keeping the other screen coordinate fixed.
 	const ref = useRef<HTMLDivElement | null>(null)
 	useEffect(() => {
 		const el = ref.current

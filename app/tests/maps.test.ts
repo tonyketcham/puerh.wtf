@@ -14,7 +14,8 @@ test("terrain falls back to the page when workers fail to start", async ({ page 
 				state.terrainWorkerLoads.push(message.url)
 				// Fail after the renderer has sent its initial loads, as a script load error does.
 				this.timer ??= window.setTimeout(
-					() => this.dispatchEvent(new ErrorEvent("error", { message: "Worker script unavailable" })),
+					() =>
+						this.dispatchEvent(new ErrorEvent("error", { message: "Worker script unavailable" })),
 					0
 				)
 			}
@@ -35,13 +36,17 @@ test("terrain falls back to the page when workers fail to start", async ({ page 
 	// that was previously requested only in the failed workers, then paint visible terrain.
 	await expect
 		.poll(() =>
-			page.evaluate(() => (window as typeof window & { terrainWorkerLoads: string[] }).terrainWorkerLoads)
+			page.evaluate(
+				() => (window as typeof window & { terrainWorkerLoads: string[] }).terrainWorkerLoads
+			)
 		)
 		.not.toHaveLength(0)
 	const workerLoads = await page.evaluate(
 		() => (window as typeof window & { terrainWorkerLoads: string[] }).terrainWorkerLoads
 	)
-	await expect.poll(() => workerLoads.some((url) => loaded.has(url)), { timeout: 15_000 }).toBe(true)
+	await expect
+		.poll(() => workerLoads.some((url) => loaded.has(url)), { timeout: 15_000 })
+		.toBe(true)
 	await expect
 		.poll(
 			() =>
@@ -49,7 +54,9 @@ test("terrain falls back to the page when workers fail to start", async ({ page 
 					return canvases.some((element) => {
 						const canvas = element as HTMLCanvasElement
 						if (!canvas.width || !canvas.height) return false
-						const data = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height).data
+						const data = canvas
+							.getContext("2d")!
+							.getImageData(0, 0, canvas.width, canvas.height).data
 						let opaque = 0
 						for (let i = 3; i < data.length; i += 4) if (data[i] > 128) opaque++
 						return opaque > canvas.width * canvas.height * 0.25
@@ -66,34 +73,47 @@ async function panLabelPositions(page: Page, map: Locator, kind: "ticks" | "supp
 		const state = window as typeof window & { mapPanPositions: number[][] }
 		state.mapPanPositions = []
 		root.addEventListener("pointermove", () => {
-			requestAnimationFrame(() => requestAnimationFrame(() => {
-				const bounds = root.getBoundingClientRect()
-				const labels = Array.from(root.querySelectorAll<HTMLElement>(kind === "ticks" ? ".map-tick" : ".map-label"))
-				const positions = labels.flatMap((label) => {
-					if (getComputedStyle(label).visibility === "hidden") return []
-					const r = label.getBoundingClientRect()
-					if (kind === "ticks")
-						return [label.dataset.axis === "lon" ? r.top - bounds.top - 4 : r.left - bounds.left - 4]
-					const arrow = label.textContent?.trim()[0]
-					if (arrow === "←") return [r.left - bounds.left - 10]
-					if (arrow === "→") return [bounds.right - r.right - 10]
-					if (arrow === "↑") return [r.top - bounds.top - 32]
-					if (arrow === "↓") return [bounds.bottom - r.bottom - 36]
-					return []
+			requestAnimationFrame(() =>
+				requestAnimationFrame(() => {
+					const bounds = root.getBoundingClientRect()
+					const labels = Array.from(
+						root.querySelectorAll<HTMLElement>(kind === "ticks" ? ".map-tick" : ".map-label")
+					)
+					const positions = labels.flatMap((label) => {
+						if (getComputedStyle(label).visibility === "hidden") return []
+						const r = label.getBoundingClientRect()
+						if (kind === "ticks")
+							return [
+								label.dataset.axis === "lon" ? r.top - bounds.top - 4 : r.left - bounds.left - 4,
+							]
+						const arrow = label.textContent?.trim()[0]
+						if (arrow === "←") return [r.left - bounds.left - 10]
+						if (arrow === "→") return [bounds.right - r.right - 10]
+						if (arrow === "↑") return [r.top - bounds.top - 32]
+						if (arrow === "↓") return [bounds.bottom - r.bottom - 36]
+						return []
+					})
+					if (positions.length) state.mapPanPositions.push(positions)
 				})
-				if (positions.length) state.mapPanPositions.push(positions)
-			}))
+			)
 		})
 		const r = root.getBoundingClientRect()
-		for (const y of [0.4, 0.6, 0.3, 0.7]) for (const x of [0.35, 0.65, 0.5]) {
-			const px = r.left + x * r.width
-			const py = r.top + y * r.height
-			const el = document.elementFromPoint(px, py)
-			if (el && root.contains(el) && !el.closest("a, button, input, select, textarea, [data-map-ui]"))
-				return { x: px, y: py }
-		}
+		for (const y of [0.4, 0.6, 0.3, 0.7])
+			for (const x of [0.35, 0.65, 0.5]) {
+				const px = r.left + x * r.width
+				const py = r.top + y * r.height
+				const el = document.elementFromPoint(px, py)
+				if (
+					el &&
+					root.contains(el) &&
+					!el.closest("a, button, input, select, textarea, [data-map-ui]")
+				)
+					return { x: px, y: py }
+			}
 		throw new Error("No clear map surface to pan")
 	}, kind)
+	const longitude = map.locator(".map-tick[data-axis=lon]:visible").first()
+	const initialX = await longitude.evaluate((el) => el.getBoundingClientRect().left)
 	await page.mouse.move(start.x, start.y)
 	await page.mouse.down()
 	try {
@@ -101,8 +121,14 @@ async function panLabelPositions(page: Page, map: Locator, kind: "ticks" | "supp
 			await page.mouse.move(start.x + i * 7, start.y + i * 8)
 			await page.evaluate(() => new Promise(requestAnimationFrame))
 		}
-		await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))))
-		return await page.evaluate(() => (window as typeof window & { mapPanPositions: number[][] }).mapPanPositions)
+		await page.evaluate(
+			() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+		)
+		const finalX = await longitude.evaluate((el) => el.getBoundingClientRect().left)
+		expect(Math.abs(finalX - initialX)).toBeGreaterThan(20)
+		return await page.evaluate(
+			() => (window as typeof window & { mapPanPositions: number[][] }).mapPanPositions
+		)
 	} finally {
 		await page.mouse.up()
 	}
@@ -123,10 +149,29 @@ test("supply labels stay on their map edges while panning", async ({ page }) => 
 	await page.emulateMedia({ reducedMotion: "reduce" })
 	await page.goto("/origins?at=yiwu")
 	const map = page.locator("[data-origins-map=index]")
-	await page.getByRole("group", { name: "Map layers" }).getByRole("button", { name: "supply lines", exact: true }).click()
+	await page
+		.getByRole("group", { name: "Map layers" })
+		.getByRole("button", { name: "supply lines", exact: true })
+		.click()
 	await expect(map).toBeVisible()
 	await expect(map.locator(".map-label").filter({ hasText: /^← Tea Encounter/ })).toBeVisible()
 	const samples = await panLabelPositions(page, map, "supply")
 	expect(samples.length).toBeGreaterThan(0)
 	expect(samples.flat().every((offset) => Math.abs(offset) < 1)).toBe(true)
+})
+
+test("origin map controls zoom and return to Yunnan", async ({ page }) => {
+	await page.emulateMedia({ reducedMotion: "reduce" })
+	await page.goto("/origins?at=yiwu")
+	const map = page.locator("[data-origins-map=index]")
+	const view = map.locator("[data-map-pane] > svg")
+	const width = async () => Number((await view.getAttribute("viewBox"))?.split(" ")[2])
+	await expect.poll(width).toBeGreaterThan(0)
+	const original = await width()
+	await map.getByRole("button", { name: "Zoom out (−)", exact: true }).click()
+	await expect.poll(width).toBeGreaterThan(original * 1.5)
+	await map.getByRole("button", { name: "Zoom in (+)", exact: true }).click()
+	await expect.poll(width).toBeLessThan(original * 1.2)
+	await map.getByRole("button", { name: "Back to Yunnan", exact: true }).click()
+	await expect.poll(width).toBeGreaterThan(original * 4)
 })

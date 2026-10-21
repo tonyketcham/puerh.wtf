@@ -695,6 +695,7 @@ export default function OriginsMap({
 				className="absolute inset-0 overflow-hidden pointer-events-none"
 				style={{ opacity: overlayOpacity }}
 			>
+				{/* edge tags stay in viewport space; vendor diamonds pin themselves */}
 				{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
 				{/* a pan moves this box, not each pin */}
 				<div ref={mover} className="absolute inset-0">
@@ -1185,7 +1186,7 @@ function MapChrome({
 			<motion.div
 				data-map-reserve=""
 				data-map-ui=""
-				className="absolute right-3 top-3 z-10 flex items-center gap-1"
+				className="absolute right-3 top-3 z-10 flex items-center gap-1 pointer-events-auto"
 				style={{ opacity: chromeOpacity }}
 			>
 				{filteredToView && (
