@@ -9,13 +9,13 @@ cultivar:
   - 81f275f7-8b08-4764-9431-a2820d88ed75
 origin:
   - fd718fc0-9386-4221-ab6c-60df4a55627a
-season: April
 production_year: 2020
 elevation: 1100
 vendor:
   - 4279ab9e-2bba-4bd2-99c4-954cfc8aa10d
-purchase_link: https://yunnansourcing.com/products/chou-shi-king-of-duck-shit-dan-cong-oolong-tea?_pos=1&_sid=4e368654f&_ss=r
-excerpt: a bright, floral, and creamy Dan Cong
+purchase_link: >-
+  https://yunnansourcing.com/products/chou-shi-king-of-duck-shit-dan-cong-oolong-tea?_pos=1&_sid=4e368654f&_ss=r
+excerpt: 'a bright, floral, and creamy Dan Cong'
 date: 2021-01-28T14:44:38.951Z
 flavor_axes:
   cream:
@@ -49,13 +49,13 @@ flavor_axes:
     start: 6
     finish: 0
 notes:
-  dry_leaf_nose: buttered biscuits, jasmine, sweetcorn, sautéed spinach
-  wet_leaf_nose: jasmine, fresh-cut sugarcane, oat milk
-  mouthfeel: oily, rich, and luscious with a tingle
+  dry_leaf_nose: 'buttered biscuits, jasmine, sweetcorn, sautéed spinach'
+  wet_leaf_nose: 'jasmine, fresh-cut sugarcane, oat milk'
+  mouthfeel: 'oily, rich, and luscious with a tingle'
   cha_qi: comforting and light
   empty_cup: jasmine cream
-  finish: crab, scallops, gentle with decent length
-  taste: jasmine, spring flowers, pistachio, cashew milk
+  finish: 'crab, scallops, gentle with decent length'
+  taste: 'jasmine, spring flowers, pistachio, cashew milk'
 tags:
   - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
 rating: 86.4
@@ -66,6 +66,10 @@ brewing:
   vessel: Mini Porcelain Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+season_note: April
+harvest:
+  season: spring
+  month: 4
 ---
 ### Infusions
 
