@@ -12,7 +12,7 @@ production_year: 2021
 aging_conditions: in my little mylar of 2021 w2t sheng with 62% relative humidity
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/products/2021-green-hype
+purchase_link: 'https://white2tea.com/products/2021-green-hype'
 excerpt: Solid daily with some respectable twang
 date: 2023-05-18T23:30:16.469Z
 flavor_axes:
@@ -47,12 +47,12 @@ flavor_axes:
     start: 4
     finish: 3
 notes:
-  dry_leaf_nose: moss, sauna, caramel, sugar
-  wet_leaf_nose: baked peaches and apricots, cut grass, oats to feed the horses
-  finish: diffused dryness, menthol, baking soda, holy basil
-  mouthfeel: s m o o t h, silicone, roof of mouth + side of tongue dryness
-  taste: pine nut, molasses, oat milk, grapefruit, raspberry
-  cha_qi: calm, positive, and collected
+  dry_leaf_nose: 'moss, sauna, caramel, sugar'
+  wet_leaf_nose: 'baked peaches and apricots, cut grass, oats to feed the horses'
+  finish: 'diffused dryness, menthol, baking soda, holy basil'
+  mouthfeel: 's m o o t h, silicone, roof of mouth + side of tongue dryness'
+  taste: 'pine nut, molasses, oat milk, grapefruit, raspberry'
+  cha_qi: 'calm, positive, and collected'
   empty_cup: caramel
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
@@ -66,6 +66,10 @@ brewing:
   vessel: Cat gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+storage:
+  - place: home
 ---
 ### Synopsis
 
