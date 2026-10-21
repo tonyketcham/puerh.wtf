@@ -8,7 +8,7 @@ style:
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
-  - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
+  - 2227c151-aacf-4522-beec-78a2f4143759
 harvest:
   season: spring
 season_note: Spring
@@ -84,6 +84,7 @@ images:
     alt: liquor in the beaker
   - image: /images/uploads/842a1e05-632a-4d81-8165-afd1ce63aaab.jpg
     alt: liquor in the cup
+origin_note: undisclosed
 ---
 Excited to try this tea with Arby's Truth Serum water; this is the tea that Arby, Max, and Glenn used in their Between Two Teapots episode on water.
 

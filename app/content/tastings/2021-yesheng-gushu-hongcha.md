@@ -8,7 +8,7 @@ style:
 cultivar:
   - 155823a5-e457-426e-aa93-020dca00f42e
 origin:
-  - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
+  - 2227c151-aacf-4522-beec-78a2f4143759
 harvest:
   season: spring
 season_note: Spring
