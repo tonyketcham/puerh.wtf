@@ -5,56 +5,55 @@ author:
 title: Laochapo (Unroasted)
 style:
   - a1d47bd4-b2a2-4b33-933f-1ab0c7f6b4f1
-season: Winter
 production_year: 2020
 picking: Mature leaves
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: in progress
+excerpt: Sweet gourd seeds and pumpkin with an oily feel and minty finish
 date: 2021-03-21T20:28:16.800Z
 flavor_axes:
   cream:
     start: 4
-    finish: 0
+    finish: null
   umami:
     start: 3
-    finish: 0
+    finish: null
   stone:
     start: 5
-    finish: 0
+    finish: null
   spices:
     start: 6
-    finish: 0
+    finish: null
   earth:
     start: 5
-    finish: 0
+    finish: null
   nuts_roast:
     start: 6
-    finish: 0
+    finish: null
   wood:
     start: 5
-    finish: 0
+    finish: null
   vegetal:
     start: 4
-    finish: 0
+    finish: null
   floral:
     start: 3
-    finish: 0
+    finish: null
   fruits:
     start: 3
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: pumpkin guts, green beans, wood stain & varnish
-  wet_leaf_nose: oud, spicy/woody/earthy shit, varnish, pumpkin seeds
-  taste: "varnish, gourd seed, pumpkin guts, golden beet, "
-  mouthfeel: in progress
-  finish: in progress
-  empty_cup: in progress
-  cha_qi: in progress
+  dry_leaf_nose: 'pumpkin guts, green beans, wood stain & varnish'
+  wet_leaf_nose: 'oud, spicy/woody/earthy shit, varnish, pumpkin seeds'
+  taste: 'varnish, gourd seed, pumpkin guts, golden beet, '
+  mouthfeel: null
+  finish: null
+  empty_cup: null
+  cha_qi: null
 tags:
   - 9df29a3e-d882-4bc0-b4f1-8ab03e6960f6
   - 815c4584-1559-468f-9e65-794f079f0af2
-rating: 50
+rating: -1
 brewing:
   temperature: 200
   material_amount: 5
@@ -62,6 +61,11 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 15
   infusion_increment: 30
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
+season_note: Winter
+harvest:
+  season: winter
 ---
 ### Infusions
 
