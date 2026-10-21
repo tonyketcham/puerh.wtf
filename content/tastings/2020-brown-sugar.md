@@ -2,7 +2,7 @@
 id: 082dea61-1d6a-4a4b-900c-06628d5b671b
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: 2020 Brown Sugar
+title: 2020 Brown Sugar
 style:
   - c643f7be-2f09-46fa-8284-4bd79fd4e5bd
 production_year: 2020
