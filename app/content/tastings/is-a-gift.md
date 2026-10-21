@@ -10,8 +10,8 @@ cultivar:
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/collections/latest-additions/products/2021-is-a-gift
-excerpt: in progress
+purchase_link: 'https://white2tea.com/collections/latest-additions/products/2021-is-a-gift'
+excerpt: 'Thick, oily, and juicy with gentle sweetness and a strongly cooling finish'
 date: 2021-07-20T15:03:27.589Z
 flavor_axes:
   cream:
@@ -45,13 +45,15 @@ flavor_axes:
     start: 6
     finish: 7
 notes:
-  dry_leaf_nose: limestone, chamois leather, white grape, nectarine, sugarcane
-  wet_leaf_nose: edamame, wheatgrass, lemon, spring meadow, that carwash foam that smells dope
-  empty_cup: lemongrass, kombucha leather
+  dry_leaf_nose: 'limestone, chamois leather, white grape, nectarine, sugarcane'
+  wet_leaf_nose: >-
+    edamame, wheatgrass, lemon, spring meadow, that carwash foam that smells
+    dope
+  empty_cup: 'lemongrass, kombucha leather'
   cha_qi: chill but not very intense
-  finish: coriander, mint, sugarcane, some astringency
-  mouthfeel: thicc, juicy, n oily
-  taste: in progress
+  finish: 'coriander, mint, sugarcane, some astringency'
+  mouthfeel: 'thicc, juicy, n oily'
+  taste: null
 tags:
   - df35bab2-67b1-4e8f-92c1-c366634ae5b3
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
@@ -64,6 +66,8 @@ brewing:
   vessel: Cat Gaiwan
   infusion_increment: 10
   first_infusion_duration: 15
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Infusions
 
