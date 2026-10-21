@@ -12,8 +12,8 @@ origin:
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/collections/latest-additions/products/2021-bosch
-excerpt: An aggressive, mineral/bitter-heavy blend with good huigan
+purchase_link: 'https://white2tea.com/collections/latest-additions/products/2021-bosch'
+excerpt: 'An aggressive, mineral/bitter-heavy blend with good huigan'
 date: 2021-07-19T13:52:03.580Z
 flavor_axes:
   cream:
@@ -47,13 +47,13 @@ flavor_axes:
     start: 5
     finish: 6
 notes:
-  dry_leaf_nose: white peach, orange peel, bergamot, toffee, marble
-  wet_leaf_nose: apricot, white peach, cherry, cranberry, sage, orange biscuits
-  mouthfeel: chalky, light-medium thickness, more self-sticking than oily or coating
-  cha_qi: muscle relaxing, full-body calm & comfort, a bit heady
-  finish: mint, coriander, long lasting, astringent
+  dry_leaf_nose: 'white peach, orange peel, bergamot, toffee, marble'
+  wet_leaf_nose: 'apricot, white peach, cherry, cranberry, sage, orange biscuits'
+  mouthfeel: 'chalky, light-medium thickness, more self-sticking than oily or coating'
+  cha_qi: 'muscle relaxing, full-body calm & comfort, a bit heady'
+  finish: 'mint, coriander, long lasting, astringent'
   empty_cup: salted caramel
-  taste: honeydew melon, medicinal bitters, hops, rain water, radish, trees
+  taste: 'honeydew melon, medicinal bitters, hops, rain water, radish, trees'
 tags:
   - dc360789-6d18-449f-83e2-6cbad9b49035
 rating: 71.5
@@ -64,6 +64,8 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
 ---
 ### Infusions
 
