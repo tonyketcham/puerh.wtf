@@ -9,7 +9,6 @@ cultivar:
   - 155823a5-e457-426e-aa93-020dca00f42e
 origin:
   - 03a34248-fdb2-4ae9-a8a1-588ccd273f8b
-season: Spring
 production_year: 2021
 picking: Bud & up to 3 young leaves
 vendor:
@@ -48,13 +47,13 @@ flavor_axes:
     start: 7
     finish: 8
 notes:
-  dry_leaf_nose: white grape, melon, Riesling, ice wine, purple drank, cucumber, cannabis
-  wet_leaf_nose: sweet musky flowers, hay, freeze dried corn, wild honey, terpene collection
+  dry_leaf_nose: 'white grape, melon, Riesling, ice wine, purple drank, cucumber, cannabis'
+  wet_leaf_nose: 'sweet musky flowers, hay, freeze dried corn, wild honey, terpene collection'
   mouthfeel: intensely oily & juicy with a medium-strong thickness
-  empty_cup: spring floral perfume, grapefruit & cucumber zest
-  cha_qi: legs tingly, muscles relaxed, feelin like I'm on a cloud
-  finish: refreshing sweetness, herbaceous vapor, black walnut
-  taste: in progress
+  empty_cup: 'spring floral perfume, grapefruit & cucumber zest'
+  cha_qi: 'legs tingly, muscles relaxed, feelin like I''m on a cloud'
+  finish: 'refreshing sweetness, herbaceous vapor, black walnut'
+  taste: null
 tags:
   - c6fb8a51-046b-46cb-a69f-d4ac973bf8ba
   - 7e71f8d3-e51e-4807-be4d-245dee27032d
@@ -69,6 +68,11 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+season_note: Spring
+harvest:
+  season: spring
 ---
 The aromatics off of this stuff are incredible. It smells fresh off the press and ***intense***. Definitely has that *ye sheng* smell as if it's gonna punch you in the cock. Strongly dank.
 
