@@ -3,7 +3,7 @@ id: b670193b-cbfe-45d2-b215-d6501684bcc7
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
   - bbec234d-2b4a-4f6c-be3d-ef003f4148fa
-title: "Chen Yun: 古树七子饼 Wild Yabao"
+title: 'Chen Yun: 古树七子饼 Wild Yabao'
 style:
   - 6df83990-d5a8-42f9-abc4-4b6fe05e2cef
 cultivar:
@@ -14,7 +14,7 @@ production_year: 2006
 aging_conditions: moderate Taiwan storage
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-purchase_link: https://www.liquidproust.com/listing/1118419835/2006-wild-yabao-357g
+purchase_link: 'https://www.liquidproust.com/listing/1118419835/2006-wild-yabao-357g'
 excerpt: a yabao b2b sheng phoenix with a shou mei comeback
 date: 2021-12-05T21:51:00.458Z
 flavor_axes:
@@ -49,13 +49,13 @@ flavor_axes:
     start: 6
     finish: 5
 notes:
-  dry_leaf_nose: old wet cedar, wet mulch, pancake syrup, all-purpose flour
-  wet_leaf_nose: cherry wood, brighter/sweeter version of the dry leaf, a bit spicy
-  finish: stevia, wintergreen
-  taste: pine, lemon,
+  dry_leaf_nose: 'old wet cedar, wet mulch, pancake syrup, all-purpose flour'
+  wet_leaf_nose: 'cherry wood, brighter/sweeter version of the dry leaf, a bit spicy'
+  finish: 'stevia, wintergreen'
+  taste: 'pine, lemon,'
   mouthfeel: silky smooth with an astringent follow up
-  cha_qi: rather neutral, a bit relaxing
-  empty_cup: hay, grains
+  cha_qi: 'rather neutral, a bit relaxing'
+  empty_cup: 'hay, grains'
 tags:
   - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
   - bce623b4-e571-462a-b95b-988beb6dce4c
@@ -67,6 +67,10 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 12
   infusion_increment: 10
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+storage:
+  - place: taiwan
 ---
 ### Synopsis
 
