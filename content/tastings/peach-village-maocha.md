@@ -55,7 +55,7 @@ notes:
 tags:
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
   - 32a591b3-86a3-4ee1-b69a-0bcab15078a3
-rating: 50
+rating: 95
 brewing:
   temperature: 200
   material_amount: 5
