@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { FLAVOR_AXES, type SessionFlavorAxes } from "@/lib/types/session"
+import { hasFinishProfile } from "@/lib/sessionScores"
 
 const SIZE = 22
 /** rim radius as a share of the glyph (9px of 22 at the default size) */
@@ -68,7 +69,7 @@ export default function FlavorGlyph({
 		)
 	}
 	const start = shape(axes, "start", size)
-	const finish = shape(axes, "finish", size)
+	const finish = hasFinishProfile(axes) ? shape(axes, "finish", size) : start
 	return (
 		<svg
 			width={size}

@@ -82,3 +82,21 @@ test("scored finishes retain their phase control", async ({ page }) => {
 	await page.goto("/sessions/2021/01/2015-zsl-wa-long/")
 	await expect(page.getByRole("slider", { name: "Flavor phase, start to finish" })).toBeVisible()
 })
+
+test("active flavor glyphs preserve missing finishes and honor a recorded zero", async ({
+	page,
+}) => {
+	await page.goto("/tests/session-score-states/")
+	for (const finish of ["null", "undefined", "0"]) {
+		const glyphs = page.locator(`[data-glyph-finish="${finish}"] svg`)
+		const resting = await glyphs.nth(0).locator("path").last().getAttribute("d")
+		const active = await glyphs.nth(1).locator("path").last().getAttribute("d")
+		if (finish === "0") {
+			expect(active).not.toEqual(resting)
+			expect(active).toContain("M11.00 11.00")
+		} else {
+			expect(active).toEqual(resting)
+			expect(active).not.toContain("M11.00 11.00")
+		}
+	}
+})

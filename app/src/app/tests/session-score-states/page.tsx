@@ -1,6 +1,7 @@
 import TestPageWrapper from "@/lib/components/TestPageWrapper"
 import SessionCard from "@/lib/components/SessionCard"
 import MiniRadar from "@/lib/components/dataviz/radar/MiniRadar"
+import FlavorGlyph from "@/lib/components/command/FlavorGlyph"
 import { buildRelationIndex, computeStats, flavorCentroid, ratingRank } from "@/lib/relations"
 import { FLAVOR_AXES, type ExplorerSession, type SessionFlavorAxes } from "@/lib/types/session"
 
@@ -52,6 +53,22 @@ export default function ScoreStatesTestPage() {
 				<div data-mini-double>
 					<MiniRadar data={profile(0)} color="currentColor" className="size-24" />
 				</div>
+				{[null, undefined, 0].map((finish) => (
+					<div key={String(finish)} data-glyph-finish={String(finish)}>
+						{[false, true].map((active) => (
+							<FlavorGlyph
+								key={String(active)}
+								axes={
+									Object.fromEntries(
+										FLAVOR_AXES.map((axis) => [axis, { start: 6, finish }])
+									) as SessionFlavorAxes
+								}
+								active={active}
+								color="currentColor"
+							/>
+						))}
+					</div>
+				))}
 			</main>
 		</TestPageWrapper>
 	)
