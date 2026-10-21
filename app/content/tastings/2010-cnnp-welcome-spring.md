@@ -2,19 +2,18 @@
 id: dc945dfd-ec10-4fc5-9d48-d3752a7046b0
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: "CNNP: Welcome Spring"
+title: 'CNNP: Welcome Spring'
 style:
   - 95ff3bee-9373-4fef-aafb-5368b48e29c4
   - dd6b3158-e788-4564-bee5-78778637c230
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring
 production_year: 2010
 aging_conditions: ~10 years humid HK
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-purchase_link: https://www.liquidproust.com/listing/964440262/2010-cnnp-welcome-spring-400g
-excerpt: a loamy, earthy sheng with some medium wet age on it
+purchase_link: 'https://www.liquidproust.com/listing/964440262/2010-cnnp-welcome-spring-400g'
+excerpt: 'a loamy, earthy sheng with some medium wet age on it'
 date: 2021-10-14T14:54:55.315Z
 flavor_axes:
   cream:
@@ -48,12 +47,12 @@ flavor_axes:
     start: 2
     finish: 3
 notes:
-  dry_leaf_nose: dank earth, freeze dried corn, Tylenol, an old-ass wooden house
-  wet_leaf_nose: maple, brown sugar, wet river rocks, grilled corn
+  dry_leaf_nose: 'dank earth, freeze dried corn, Tylenol, an old-ass wooden house'
+  wet_leaf_nose: 'maple, brown sugar, wet river rocks, grilled corn'
   mouthfeel: slick with medium thickness
-  empty_cup: brown sugar, dirt
-  taste: sweet corn, fertilizer, medicine, loam, wood, petrichor, brook in the woods
-  finish: mint, corn, camphor
+  empty_cup: 'brown sugar, dirt'
+  taste: 'sweet corn, fertilizer, medicine, loam, wood, petrichor, brook in the woods'
+  finish: 'mint, corn, camphor'
   cha_qi: comfy like a fall day in the woods
 tags:
   - 9df29a3e-d882-4bc0-b4f1-8ab03e6960f6
@@ -66,6 +65,17 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+season_note: Spring
+harvest:
+  season: spring
+storage:
+  - place: hong-kong
+    from: 2011
+    to: 2021
+    humidity: wet
+    approx: true
 ---
 ### Infusions
 
