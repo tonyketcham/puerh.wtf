@@ -9,8 +9,8 @@ production_year: 2020
 picking: mixture of predominately non-huangpian material
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/collections/latest-additions/products/2020-brown-sugar
-excerpt: your standard, well-done shou
+purchase_link: 'https://white2tea.com/collections/latest-additions/products/2020-brown-sugar'
+excerpt: 'your standard, well-done shou'
 date: 2021-01-25T14:59:05.279Z
 flavor_axes:
   cream:
@@ -45,12 +45,12 @@ flavor_axes:
     finish: 4
 notes:
   dry_leaf_nose: raisin bran cereal
-  wet_leaf_nose: honey bunches of oats, barrel-aged rum
+  wet_leaf_nose: 'honey bunches of oats, barrel-aged rum'
   empty_cup: wet-piled funk
   cha_qi: made me feel more alert
-  mouthfeel: juicy, more velvety after opening up
-  finish: menthol, light camphor, slight huigan
-  taste: dark-roasted coffee, bran, breakfast cereals, cacao nibs
+  mouthfeel: 'juicy, more velvety after opening up'
+  finish: 'menthol, light camphor, slight huigan'
+  taste: 'dark-roasted coffee, bran, breakfast cereals, cacao nibs'
 tags: []
 rating: 77.1
 brewing:
@@ -60,6 +60,8 @@ brewing:
   vessel: Glazed Shiboridashi
   first_infusion_duration: 25
   infusion_increment: 15
+vessel:
+  - 030e0191-ac7f-4338-8ed1-f963adc755b7
 ---
 God damn this thing's like an iron brick, almost bested my pick. The leaves leave a lot of funky wet piled smells on ya fingies too.
 
