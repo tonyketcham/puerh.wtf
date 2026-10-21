@@ -9,7 +9,9 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2005
 aging_conditions: Wistaria's funky Taiwanese storage ~15 years
-excerpt: ok
+excerpt: >-
+  Light oily softness, old-arbor sweetness, and cedar with a deeply relaxing
+  feel
 date: 2021-04-27T00:15:46.014Z
 flavor_axes:
   cream:
@@ -43,10 +45,10 @@ flavor_axes:
     start: 3
     finish: 3
 notes:
-  dry_leaf_nose: cedar, pine, fresh + dry mulch, very old leather, hay
-  wet_leaf_nose: intense cedar wood + sap, drying flowers, old + verdant forests, bamboo
+  dry_leaf_nose: 'cedar, pine, fresh + dry mulch, very old leather, hay'
+  wet_leaf_nose: 'intense cedar wood + sap, drying flowers, old + verdant forests, bamboo'
   cha_qi: extremely positive and full-body relaxing
-  empty_cup: hay, alfalfa
+  empty_cup: 'hay, alfalfa'
   finish: ok
   taste: ok
   mouthfeel: ok
@@ -64,6 +66,15 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 15
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+storage:
+  - place: taiwan
+    from: 2006
+    to: 2021
+    approx: true
+vendor:
+  - 772aac4f-955b-4f1e-9c6e-045d3f0be72e
 ---
 I've held back, but it's finally time to indulge in the tea I've been eyeing most from Wistaria. 
 
