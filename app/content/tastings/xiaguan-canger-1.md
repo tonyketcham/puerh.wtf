@@ -10,7 +10,7 @@ cultivar:
 production_year: 2009
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: Rounded Xiaguan smoke into incense, coriander, and orange peel
+excerpt: 'Rounded Xiaguan smoke into incense, coriander, and orange peel'
 date: 2022-03-29T19:47:48.989Z
 flavor_axes:
   cream:
@@ -44,12 +44,12 @@ flavor_axes:
     start: 2
     finish: 4
 notes:
-  dry_leaf_nose: tropical resort smell, leather, resinous wood
-  wet_leaf_nose: flame-kissed and wet firewood, warm spring rain, wet granite, herblore
-  mouthfeel: silica, viscous, honey water
-  taste: black walnut, savory herbs, live wood, incense, coriander, orange peel
+  dry_leaf_nose: 'tropical resort smell, leather, resinous wood'
+  wet_leaf_nose: 'flame-kissed and wet firewood, warm spring rain, wet granite, herblore'
+  mouthfeel: 'silica, viscous, honey water'
+  taste: 'black walnut, savory herbs, live wood, incense, coriander, orange peel'
   finish: pulling dryness with an effervescent tingle
-  cha_qi: mildly weedy/inebriated buzz, calming and grounding
+  cha_qi: 'mildly weedy/inebriated buzz, calming and grounding'
   empty_cup: spring moss with wet leaves from last fall
 tags:
   - 815c4584-1559-468f-9e65-794f079f0af2
@@ -61,6 +61,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Synopsis
 
