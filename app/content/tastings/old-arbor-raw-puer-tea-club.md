@@ -8,11 +8,10 @@ style:
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin: []
-season: Spring
 production_year: 2021
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: grassy, medicinal old arbor sheng
+excerpt: 'grassy, medicinal old arbor sheng'
 date: 2021-07-26T15:57:40.160Z
 flavor_axes:
   cream:
@@ -46,13 +45,13 @@ flavor_axes:
     start: 3
     finish: 0
 notes:
-  dry_leaf_nose: sticky jasmine rice, melon rind, starfruit, old arbor
-  wet_leaf_nose: funk, jasmine, limestone, edamame, mango, cantaloupe
-  empty_cup: caramel, sea salt
+  dry_leaf_nose: 'sticky jasmine rice, melon rind, starfruit, old arbor'
+  wet_leaf_nose: 'funk, jasmine, limestone, edamame, mango, cantaloupe'
+  empty_cup: 'caramel, sea salt'
   cha_qi: potent with pressure in the head
-  finish: grassy, astringent, bitter, holy basil, caramel
-  taste: limestone, medicinal bitterness, flour, apricot, floral vegetable broth
-  mouthfeel: super tingly, gelatinous
+  finish: 'grassy, astringent, bitter, holy basil, caramel'
+  taste: 'limestone, medicinal bitterness, flour, apricot, floral vegetable broth'
+  mouthfeel: 'super tingly, gelatinous'
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
 rating: 66
@@ -63,6 +62,11 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Spring
+harvest:
+  season: spring
 ---
 The rinse is honestly quite nice. Surprisingly strong flavor with some buddy/trichomey green tea-adjacent notes like fresh grass and pumpkin seeds.
 
