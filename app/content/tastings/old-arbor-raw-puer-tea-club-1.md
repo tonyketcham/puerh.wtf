@@ -8,7 +8,6 @@ style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Early Spring
 production_year: 2021
 picking: Bud + up to 2 leaves
 vendor:
@@ -47,14 +46,15 @@ flavor_axes:
     start: 6
     finish: 5
 notes:
-  dry_leaf_nose: sweet rainforest, ripe white peach, mango, sour peach rings/sour belts
-  wet_leaf_nose: clean, wet linens; peach strudel; apricot jam; Danish
-  mouthfeel: mountain water, juicy and hydrating
+  dry_leaf_nose: 'sweet rainforest, ripe white peach, mango, sour peach rings/sour belts'
+  wet_leaf_nose: 'clean, wet linens; peach strudel; apricot jam; Danish'
+  mouthfeel: 'mountain water, juicy and hydrating'
   empty_cup: rock candy
-  taste: fine flour, oats, Herbes de Provence, chalky rock, coconut sugar, spring
+  taste: >-
+    fine flour, oats, Herbes de Provence, chalky rock, coconut sugar, spring
     water
   cha_qi: cerebral and central-body buzz
-  finish: star fruit, cannabis, grassy tart medicine with a twang
+  finish: 'star fruit, cannabis, grassy tart medicine with a twang'
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
   - dc360789-6d18-449f-83e2-6cbad9b49035
@@ -67,6 +67,11 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+season_note: Early Spring
+harvest:
+  season: spring
 ---
 ### Synopsis
 
