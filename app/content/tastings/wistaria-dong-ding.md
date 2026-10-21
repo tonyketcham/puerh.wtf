@@ -4,49 +4,49 @@ author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
 title: Wistaria Dong Ding
 style:
-  - 195317f7-1885-40d3-9dcd-a83e7fbe44de
+  - 38200e4a-4e3c-4e38-93f4-19aba8b78c95
 production_year: 1987
-excerpt: Good!
+excerpt: 'Dried red fruits, baked goods, and spiced wood with a lasting minty finish'
 date: 2022-06-16T14:37:57.733Z
 flavor_axes:
   cream:
     start: 4
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 4
-    finish: 0
+    finish: null
   spices:
     start: 7
-    finish: 0
+    finish: null
   earth:
     start: 3
-    finish: 0
+    finish: null
   nuts_roast:
     start: 5
-    finish: 0
+    finish: null
   wood:
     start: 5
-    finish: 0
+    finish: null
   vegetal:
     start: 0
-    finish: 0
+    finish: null
   floral:
     start: 3
-    finish: 0
+    finish: null
   fruits:
     start: 6
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: toffee, potpourri, cinnamon, cardamom, sea salt
-  wet_leaf_nose: mulled cherries, Grandma's house, scones, Christmas fruitcake, coconut
+  dry_leaf_nose: 'toffee, potpourri, cinnamon, cardamom, sea salt'
+  wet_leaf_nose: 'mulled cherries, Grandma''s house, scones, Christmas fruitcake, coconut'
   mouthfeel: silica and oily
-  finish: lasting mint and softness, nearly zero astringency
-  taste: dehydrated red fruits, baked goods, spiced wood
-  empty_cup: cinnamon bark, cask wood
-  cha_qi: :)
+  finish: 'lasting mint and softness, nearly zero astringency'
+  taste: 'dehydrated red fruits, baked goods, spiced wood'
+  empty_cup: 'cinnamon bark, cask wood'
+  cha_qi: ':)'
 rating: 91
 brewing:
   temperature: 205
@@ -55,6 +55,8 @@ brewing:
   vessel: Thousand Lines Xishi Chaozhou
   first_infusion_duration: 10
   infusion_increment: 5
+vessel:
+  - 40283c5b-a685-43e6-9e27-22a162a75c51
 ---
 ### Synopsis
 
