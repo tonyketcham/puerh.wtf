@@ -5,57 +5,57 @@ author:
 title: Laochapo (Roasted)
 style:
   - a1d47bd4-b2a2-4b33-933f-1ab0c7f6b4f1
-season: Winter
 production_year: 2020
 picking: Mature leaves
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: in progress
+excerpt: Smoked paprika and hardwood campfire with a smokehouse barbecue aroma
 date: 2021-03-21T20:28:41.191Z
 flavor_axes:
   cream:
     start: 3
-    finish: 0
+    finish: null
   umami:
     start: 6
-    finish: 0
+    finish: null
   stone:
     start: 5
-    finish: 0
+    finish: null
   spices:
     start: 9
-    finish: 0
+    finish: null
   earth:
     start: 5
-    finish: 0
+    finish: null
   nuts_roast:
     start: 8
-    finish: 0
+    finish: null
   wood:
     start: 7
-    finish: 0
+    finish: null
   vegetal:
     start: 4
-    finish: 0
+    finish: null
   floral:
     start: 4
-    finish: 0
+    finish: null
   fruits:
     start: 3
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: smoked paprika, campfire ashes, that deeeeep/warming campfire
-    smell, smoker's clothes
-  wet_leaf_nose: smokehouse barbecue, apple wood, seared king oyster mushrooms
-  empty_cup: a dying out fire, old-growth wood with some charcoal on it
-  mouthfeel: in progress
-  taste: in progress
-  finish: in progress
-  cha_qi: in progress
+  dry_leaf_nose: >-
+    smoked paprika, campfire ashes, that deeeeep/warming campfire smell,
+    smoker's clothes
+  wet_leaf_nose: 'smokehouse barbecue, apple wood, seared king oyster mushrooms'
+  empty_cup: 'a dying out fire, old-growth wood with some charcoal on it'
+  mouthfeel: null
+  taste: null
+  finish: null
+  cha_qi: null
 tags:
   - eb1d0494-6f02-48bc-8c34-936dda1a1549
   - 815c4584-1559-468f-9e65-794f079f0af2
-rating: 50
+rating: -1
 brewing:
   temperature: 200
   material_amount: 5
@@ -63,6 +63,11 @@ brewing:
   vessel: Cat Gaiwan
   infusion_increment: 30
   first_infusion_duration: 15
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+season_note: Winter
+harvest:
+  season: winter
 ---
 This tea was included as a part of white2tea's March 2021 tea club. Brewed using the [truth serum](http://empiricaltea.com/water-recipe-truth-serum/) water recipe.
 
