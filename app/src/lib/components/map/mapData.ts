@@ -91,3 +91,60 @@ export function useMapJsonAll<T>(urls: readonly string[]): T[] | null {
 export function prefetchMapJson(url: string | null | undefined) {
 	if (url && !cachedMapJson(url)) loadMapJson(url).catch(() => {})
 }
+
+// ---------------------------------------------------------------------------
+// Organic edge masks (8-bit grayscale PNGs, scripts/geo/lib/masks.mjs)
+// ---------------------------------------------------------------------------
+
+/**
+ * A decoded mask: `image` carries the gray as alpha (for destination-in compositing), `gray` the
+ * values themselves (to test, at a point, how much of a layer shows).
+ */
+export type MapMask = { image: ImageBitmap; gray: Uint8ClampedArray; w: number; h: number }
+
+const masks = new Map<string, { data?: MapMask; promise: Promise<MapMask> }>()
+
+/** Fetch and decode (once) a mask PNG. */
+export function loadMapMask(url: string): Promise<MapMask> {
+	let entry = masks.get(url)
+	if (!entry) {
+		const promise = (async () => {
+			const img = new Image()
+			img.src = url
+			await img.decode()
+			const w = img.naturalWidth
+			const h = img.naturalHeight
+			const read = document.createElement("canvas")
+			read.width = w
+			read.height = h
+			const ctx = read.getContext("2d", { willReadFrequently: true })!
+			ctx.drawImage(img, 0, 0)
+			const px = ctx.getImageData(0, 0, w, h)
+			const gray = new Uint8ClampedArray(w * h)
+			for (let i = 0; i < gray.length; i++) {
+				gray[i] = px.data[i * 4]
+				px.data[i * 4] = 0
+				px.data[i * 4 + 1] = 0
+				px.data[i * 4 + 2] = 0
+				px.data[i * 4 + 3] = gray[i]
+			}
+			const mask = { image: await createImageBitmap(px), gray, w, h }
+			entry!.data = mask
+			notify()
+			return mask
+		})()
+		promise.catch(() => masks.delete(url))
+		entry = { promise }
+		masks.set(url, entry)
+	}
+	return entry.promise
+}
+
+/** An already-decoded mask, or undefined. */
+export const cachedMapMask = (url: string | null | undefined): MapMask | undefined =>
+	url ? masks.get(url)?.data : undefined
+
+/** Warm a mask ahead of need. */
+export function prefetchMapMask(url: string | null | undefined) {
+	if (url && !masks.has(url)) loadMapMask(url).catch(() => {})
+}

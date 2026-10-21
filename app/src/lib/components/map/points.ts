@@ -26,8 +26,8 @@ export type MapPoint = {
 	parent: string | null
 	/** nearest first */
 	ancestors: string[]
-	/** an inset exists for it */
-	inset: boolean
+	/** a detail patch exists for it (the finest LOD layer) */
+	detail: boolean
 }
 
 type Feature = {
@@ -45,7 +45,7 @@ type Feature = {
 		parent?: string | null
 		ancestors?: string[]
 		shared?: { x: number; y: number; r: number }
-		inset?: string | null
+		detail?: string | null
 	}
 	geometry: { type: string; coordinates: unknown }
 }
@@ -76,7 +76,7 @@ export function getMapPoints(): MapPoint[] {
 			elevation: p.elevation_m ?? null,
 			parent: p.parent ?? null,
 			ancestors: p.ancestors ?? [],
-			inset: !!p.inset,
+			detail: !!p.detail,
 		})
 	}
 	cache = out

@@ -45,7 +45,8 @@ export const styleGroupsClosedAtom = atom<ReadonlySet<string>>(new Set<string>()
 /** Lexicon view: flavor groups opened by hand (closed by default: thirteen rows to scan). */
 export const lexiconGroupsOpenAtom = atom<ReadonlySet<string>>(new Set<string>())
 
-export type ExplorerHover = { kind: EntityKind; slug: string }
+/** `source: "map"` when the hover comes from a map marker rather than an Explorer row */
+export type ExplorerHover = { kind: EntityKind; slug: string; source?: "map" }
 
 /**
  * The entity row under the pointer or keyboard focus. The year ruler previews its vintages;

@@ -15,6 +15,7 @@ import { memo, useMemo } from "react"
 import { motion } from "motion/react"
 import { STORAGE_PLACES, storagePlace, HUMIDITY } from "@/lib/storage"
 import type { ExplorerSession, StorageHumidity } from "@/lib/types/session"
+import { usePin, type PinWrite } from "./camera"
 import { CREAM, EASE, projectShared, type Point } from "./geo"
 import { PxGroup } from "./Marks"
 
@@ -202,7 +203,7 @@ export const StorageMarks = memo(function StorageMarks({
 	)
 })
 
-/** `// 广州 Guangzhou · aged 6` beside each place (HTML overlay, placed by the camera's CSS variables). */
+/** `// 广州 Guangzhou · aged 6` beside each place (HTML overlay, pinned to the camera). */
 export function StorageLabels({ nodes }: { nodes: StorageNode[] }) {
 	// places on one point (Kunming and white2tea's storage) share a label, one line each
 	const groups = useMemo(() => {
@@ -215,27 +216,34 @@ export function StorageLabels({ nodes }: { nodes: StorageNode[] }) {
 	}, [nodes])
 	return (
 		<>
-			{groups.map((group, i) => {
-				const [x, y] = group[0].at
-				return (
-					<motion.span
-						key={group[0].key}
-						className="absolute left-0 top-0 flex flex-col gap-0.5 map-label text-[9.5px] leading-none text-white/35 whitespace-nowrap"
-						style={{
-							transform: `translate3d(calc(var(--k) * ${x}px + var(--ox) * 1px + 7px), calc(var(--k) * ${y}px + var(--oy) * 1px + 7px), 0)`,
-						}}
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ duration: 0.35, ease: EASE, delay: 0.4 + i * 0.05 }}
-					>
-						{group.map((n) => (
-							<span key={n.key}>
-								{`// ${n.hanzi ? `${n.hanzi} ` : ""}${n.title} · aged ${n.sessions.length}`}
-							</span>
-						))}
-					</motion.span>
-				)
-			})}
+			{groups.map((group, i) => (
+				<StorageLabel key={group[0].key} group={group} i={i} />
+			))}
 		</>
+	)
+}
+
+/** a label hangs below and right of its dot */
+const besideDot: PinWrite = (s, sx, sy) => {
+	s.transform = `translate3d(${sx + 7}px, ${sy + 7}px, 0)`
+}
+
+function StorageLabel({ group, i }: { group: StorageNode[]; i: number }) {
+	const [x, y] = group[0].at
+	const pin = usePin(x, y, besideDot)
+	return (
+		<motion.span
+			ref={pin}
+			className="absolute left-0 top-0 flex flex-col gap-0.5 map-label text-[9.5px] leading-none text-white/35 whitespace-nowrap"
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			transition={{ duration: 0.35, ease: EASE, delay: 0.4 + i * 0.05 }}
+		>
+			{group.map((n) => (
+				<span key={n.key}>
+					{`// ${n.hanzi ? `${n.hanzi} ` : ""}${n.title} · aged ${n.sessions.length}`}
+				</span>
+			))}
+		</motion.span>
 	)
 }

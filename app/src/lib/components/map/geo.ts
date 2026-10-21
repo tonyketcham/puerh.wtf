@@ -3,12 +3,14 @@
  * public/maps, the committed manifest, and the little arithmetic the renderers need.
  *
  * There is no runtime geo library. Everything is already projected at build time (scripts/geo):
- * shared frames sit in one conic equal-area projection, insets in their own north-up azimuthal
- * square. The only projection done here is `projectShared`, the same conic as a few lines of
- * trig, for points the pipeline doesn't know (vendor cities for the supply-lines layer).
+ * shared frames, the detail cells and labels all sit in one north-up Web Mercator
+ * ("shared units", plan §4.7.1). The only projection done here is `projectShared` /
+ * `unprojectShared` (projection.ts, a few lines of trig checked against d3 by geo:test), for
+ * points the pipeline doesn't know (vendor cities for the supply-lines layer) and cursor readouts.
  */
 import manifest from "@/generated/maps-manifest.json"
 import { liftLiquor, type RGB } from "@/lib/liquor"
+import { createMercator, type MercatorParams } from "./projection"
 
 // ---------------------------------------------------------------------------
 // JSON shapes (scripts/geo/build.mjs)
@@ -18,18 +20,29 @@ import { liftLiquor, type RGB } from "@/lib/liquor"
 export type Box = [number, number, number, number]
 export type Point = [number, number]
 
-/** One contour band: the closed outline of the ground at or above `elev` (fill-rule evenodd). */
-export type Band = { elev: number; index: boolean; d: string }
+/**
+ * One contour band: the closed outline of the ground at or above `elev` (fill-rule evenodd).
+ * `thin` (intermediates only): where its stretches give way when contours bunch (contourThin.ts).
+ */
+export type Band = { elev: number; index: boolean; d: string; thin?: string }
 
 export type NamedPath = { name?: string | null; name_zh?: string | null; d: string }
 
+/** Reference layers (Natural Earth 10 m), clipped to the frame or cell (plan §4.7.3). */
 export type MapContext = {
+	/** land fill (fill-rule evenodd); its edges along the clip rectangle are straight */
+	land: string
 	coast: string
-	/** province outlines (never national borders) */
+	/** national borders (Natural Earth's default view; no disputed or indefinite lines) */
+	borders: string
+	/** province lines (China, Taiwan, Japan) */
 	admin: string
 	rivers: NamedPath[]
 	lakes: NamedPath[]
 }
+
+/** An elevation label on an index contour: angle in degrees, (-90, 90], for rotate(angle). */
+export type ContourLabel = { elev: number; x: number; y: number; angle: number }
 
 /** A shared frame: locator · china-east · japan · yunnan · six-mountains (one projection). */
 export type FrameJson = {
@@ -43,36 +56,66 @@ export type FrameJson = {
 	indexInterval: number
 	members: string[]
 	bands: Band[]
+	contourLabels: ContourLabel[]
 	context: MapContext
 }
 
-/** A per-origin inset: a north-up azimuthal square of `sideKm`, the origin at [0, 0]. */
-export type InsetJson = {
+/**
+ * One detail cell (plan §4.7.2): the footprint of a terrarium tile (`tile`, z10 or a z11 quarter of
+ * one), contoured at the same interval as every other cell, so lines run on across cells. Paths
+ * run a little past `viewBox` (the cell's exact rect): clip to it when drawing.
+ */
+export type CellJson = {
 	id: string
-	kind: "inset"
-	space: "local"
-	projection: { type: string; rotate: [number, number]; scale: number; translate: Point }
+	kind: "cell"
+	space: "shared"
+	tile: [number, number, number]
+	/** the detail region (connected cells) it belongs to */
+	region: string
 	bbox: [number, number, number, number]
 	viewBox: Box
-	sideKm: number
-	unitsPerKm: number
+	/** the terrain-tile zoom it was contoured from */
 	zoom: number
 	interval: number
 	indexInterval: number
-	origin: {
-		precision: string
-		confidence: string | null
-		point: Point
-		/** radius_km in local units */
-		radius: number
-		elevation_m: [number, number] | null
-	}
-	/** where the square sits in the shared projection (for panning between insets) */
-	shared: { point: Point; viewBox: Box }
-	elevations: number[]
 	bands: Band[]
+	contourLabels: ContourLabel[]
 	context: MapContext
 }
+
+/** public/maps/labels.json (plan §4.7.4), all positions in shared units */
+export type LabelKind =
+	| "country"
+	| "sea"
+	| "province"
+	| "city"
+	| "town"
+	| "origin"
+	| "lake"
+	| "river"
+
+export type MapLabel = {
+	id: string
+	kind: LabelKind
+	name: string
+	name_zh: string | null
+	x: number
+	y: number
+	/** the lowest zoom tier (LABEL_TIERS) it may show at; lower = more important */
+	rank: number
+	/** degrees, (-90, 90], for rotate(angle) about (x, y); rivers only */
+	angle?: number
+}
+
+/** Tier `rank` is active while the camera shows ≤ maxUnitsPerPx shared units per CSS px. */
+export type LabelTier = {
+	rank: number
+	name: string
+	maxUnitsPerPx: number | null
+	viewKm: number
+}
+
+export type LabelsJson = { version: string; tiers: LabelTier[]; labels: MapLabel[] }
 
 /** "Unknown Pleasures" ridgelines over the six-mountains frame, north row first. */
 export type RidgesJson = {
@@ -91,30 +134,171 @@ export type RidgesJson = {
 
 export type FrameId = "locator" | "china-east" | "japan" | "yunnan" | "six-mountains"
 
-export type FrameMeta = { id: FrameId; url: string; viewBox: Box; zoom: number }
+/**
+ * An organic edge (plan §4.7.2): an 8-bit grayscale PNG (white shows the layer) stretched over
+ * `rect` in shared units, `size` px.
+ */
+export type MaskMeta = { url: string; rect: Box; size: [number, number] }
+
+export type FrameMeta = {
+	id: FrameId
+	url: string
+	viewBox: Box
+	zoom: number
+	/** contour interval (m) */
+	interval: number
+	/** the organic edge it gives way through (null: its whole box, feathered) */
+	mask: MaskMeta | null
+}
+
+type RawMask = { url: string; rect: number[]; size: number[] } | null
+
+const maskOf = (m: RawMask | undefined): MaskMeta | null =>
+	m ? { url: m.url, rect: m.rect as Box, size: m.size as [number, number] } : null
 
 /** coarse → fine, the order layers stack in */
 export const FRAMES: readonly FrameMeta[] = (
-	manifest.frames as { id: string; url: string; viewBox: number[]; zoom: number }[]
+	manifest.frames as {
+		id: string
+		url: string
+		viewBox: number[]
+		zoom: number
+		interval: number
+		mask: RawMask
+	}[]
 )
-	.map((f) => ({ id: f.id as FrameId, url: f.url, viewBox: f.viewBox as Box, zoom: f.zoom }))
+	.map((f) => ({
+		id: f.id as FrameId,
+		url: f.url,
+		viewBox: f.viewBox as Box,
+		zoom: f.zoom,
+		interval: f.interval,
+		mask: maskOf(f.mask),
+	}))
 	.sort((a, b) => b.viewBox[2] - a.viewBox[2])
 
 export const frameMeta = (id: FrameId) => FRAMES.find((f) => f.id === id)!
 
-const INSET_URLS = new Map(
-	(manifest.insets as { id: string; url: string }[]).map((i) => [i.id, i.url] as const)
-)
+const rawDetail = manifest.detail as {
+	zoom: number
+	dataZoom: number
+	interval: number
+	indexInterval: number
+	cellUrl: string
+	regions: { id: string; rect: number[]; mask: RawMask; members: string[] }[]
+	cells: { id: string; region: string; rect: number[] }[]
+}
 
-/** The inset JSON for an origin, or null when it isn't precise enough to have one. */
-export const insetUrl = (slug: string | null | undefined) => (slug && INSET_URLS.get(slug)) || null
+/** One detail cell as the manifest lists it (its JSON loads when it comes into view). */
+export type CellMeta = { id: string; region: string; url: string; rect: Box }
+
+/** A connected group of detail cells and the organic edge they share. */
+export type RegionMeta = {
+	id: string
+	rect: Box
+	mask: MaskMeta
+	/** the origins whose coverage made it */
+	members: string[]
+	cells: CellMeta[]
+}
+
+/** Every detail cell, by region, then row */
+export const CELLS: readonly CellMeta[] = rawDetail.cells.map((c) => ({
+	id: c.id,
+	region: c.region,
+	url: rawDetail.cellUrl.replace("{id}", c.id),
+	rect: c.rect as Box,
+}))
+
+export const REGIONS: readonly RegionMeta[] = rawDetail.regions.map((r) => ({
+	id: r.id,
+	rect: r.rect as Box,
+	mask: maskOf(r.mask)!,
+	members: r.members,
+	cells: CELLS.filter((c) => c.region === r.id),
+}))
+
+/** Detail contour interval (m), the same in every cell */
+export const DETAIL_INTERVAL = rawDetail.interval
+
+/** The side of a cell at its coarsest (one tile at the detail zoom), in shared units */
+export const CELL_SIDE = (2 * Math.PI * manifest.projection.scale) / 2 ** rawDetail.zoom
+
+/**
+ * What the maps of one origin need before any terrain arrives (the per-origin index): where it
+ * is, the square the camera frames it by, and the band elevations around it (the session's
+ * highlighted line is the nearest of these).
+ */
+export type OriginDetail = {
+	id: string
+	/** the detail region its cells belong to */
+	region: string | null
+	/** shared units */
+	point: Point
+	/** the framing square's side (km) and in shared units, and the box itself */
+	sideKm: number
+	side: number
+	box: Box
+	/** shared units per km at the origin's latitude */
+	unitsPerKm: number
+	/** radius_km in shared units */
+	radius: number
+	precision: string
+	confidence: string | null
+	elevation_m: [number, number] | null
+	/** detail band elevations (m) in the cells around it, ascending */
+	elevations: number[]
+}
+
+/** Every origin with detail coverage, by slug order */
+export const DETAILS: readonly OriginDetail[] = (
+	manifest.details as {
+		id: string
+		region: string | null
+		point: number[]
+		sideKm: number
+		unitsPerKm: number
+		radius: number
+		precision: string
+		confidence: string | null
+		elevation_m: number[] | null
+		elevations: number[]
+	}[]
+).map((d) => {
+	const side = d.sideKm * d.unitsPerKm
+	const [x, y] = d.point
+	return {
+		id: d.id,
+		region: d.region,
+		point: d.point as Point,
+		sideKm: d.sideKm,
+		side,
+		box: [x - side / 2, y - side / 2, side, side] as Box,
+		unitsPerKm: d.unitsPerKm,
+		radius: d.radius,
+		precision: d.precision,
+		confidence: d.confidence,
+		elevation_m: d.elevation_m as [number, number] | null,
+		elevations: d.elevations,
+	}
+})
+
+export const LABELS_URL = manifest.labels?.url ?? null
+export const LABEL_TIERS: readonly LabelTier[] = (manifest.labels?.tiers ?? []) as LabelTier[]
 
 export const RIDGES_URL = manifest.ridges?.url ?? null
 export const HANZI_FONT_URL = manifest.font?.url ?? null
 export const MAP_ATTRIBUTION: readonly string[] = manifest.attribution
 
-/** Shared-projection units per kilometre (scale ÷ earth radius; equal-area, so true to ~2%). */
-export const UNITS_PER_KM = manifest.projection.scale / 6371.0088
+/** The shared Web Mercator (projection.ts); geo:test checks it against the pipeline's d3. */
+export const SHARED = createMercator(manifest.projection as unknown as MercatorParams)
+
+/**
+ * Shared units per km at the projection's centre latitude (25°N). Mercator's scale grows with
+ * latitude (≈ +2% at 22°N, −10% at 35°N): prefer `SHARED.unitsPerKm(lat)` or
+ * `SHARED.unitsPerKmAtY(y)` for a scale bar.
+ */
+export const UNITS_PER_KM = SHARED.unitsPerKm(manifest.projection.center[1])
 
 export const boxContains = ([x, y, w, h]: Box, [px, py]: Point) =>
 	px >= x && px <= x + w && py >= y && py <= y + h
@@ -136,31 +320,11 @@ export const inYunnan = (p: Point) => boxContains(frameMeta("yunnan").viewBox, p
 // The shared projection, for points the pipeline never saw
 // ---------------------------------------------------------------------------
 
-const RAD = Math.PI / 180
-const P = manifest.projection as unknown as {
-	parallels: [number, number]
-	rotate: [number, number]
-	center: [number, number]
-	scale: number
-	translate: Point
-}
-const SIN0 = Math.sin(P.parallels[0] * RAD)
-const N = (SIN0 + Math.sin(P.parallels[1] * RAD)) / 2
-const C = 1 + SIN0 * (2 * N - SIN0)
-const R0 = Math.sqrt(C) / N
-function conicRaw(lambda: number, phi: number): Point {
-	const r = Math.sqrt(C - 2 * N * Math.sin(phi)) / N
-	return [r * Math.sin(lambda * N), R0 - r * Math.cos(lambda * N)]
-}
-const CENTER = conicRaw(P.center[0] * RAD, P.center[1] * RAD)
+/** lon/lat → shared units; identical to the pipeline's d3 geoMercator. */
+export const projectShared = (lon: number, lat: number): Point => SHARED.forward(lon, lat)
 
-/** lon/lat → shared units; identical to d3's geoConicEqualArea with the manifest's parameters. */
-export function projectShared(lon: number, lat: number): Point {
-	let l = lon + P.rotate[0]
-	l = ((((l + 180) % 360) + 360) % 360) - 180
-	const [x, y] = conicRaw(l * RAD, lat * RAD)
-	return [P.translate[0] + P.scale * (x - CENTER[0]), P.translate[1] - P.scale * (y - CENTER[1])]
-}
+/** shared units → [lon, lat] */
+export const unprojectShared = (x: number, y: number): Point => SHARED.invert(x, y)
 
 // ---------------------------------------------------------------------------
 // Boxes
@@ -217,7 +381,12 @@ export function convexHull(points: Point[]): Point[] {
 
 /** Map ground and the cream the line work is drawn in (plan §4.1). */
 export const GROUND = "#121012"
+/** Land is the ground; the sea sits a shade deeper and a touch cooler (plan §4.7.3). */
+export const LAND = GROUND
+export const SEA = "#0b0b0e"
 export const CREAM = "#fff2ca"
+/** Rivers, lakes, coast and water labels */
+export const WATER = "rgb(160 188 214)"
 export const EASE = [0.22, 1, 0.36, 1] as const
 /** UI chrome spring (plan §3) */
 export const SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
@@ -240,12 +409,6 @@ export const fmtMeters = (m: number) => `${Math.round(m).toLocaleString("en-US")
 /** A round scale-bar length (km) whose bar lands near `targetPx`. */
 export function niceKm(pxPerKm: number, targetPx = 56): number {
 	const raw = targetPx / pxPerKm
-	const steps = [0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000]
+	const steps = [0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000]
 	return steps.reduce((best, s) => (Math.abs(s - raw) < Math.abs(best - raw) ? s : best), steps[0])
 }
-
-/** lon/lat of an inset's center (the azimuthal projection is rotated onto it). */
-export const insetLonLat = (inset: InsetJson): Point => [
-	-inset.projection.rotate[0],
-	-inset.projection.rotate[1],
-]

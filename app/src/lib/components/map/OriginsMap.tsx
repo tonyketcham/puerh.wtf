@@ -1,6 +1,5 @@
 "use client"
 
-import "./map.css"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
 	memo,
@@ -10,8 +9,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
-	type MouseEvent as ReactMouseEvent,
-	type PointerEvent as ReactPointerEvent,
+	type ReactNode,
 } from "react"
 import { useAtomValue, useSetAtom, useStore } from "jotai"
 import {
@@ -35,8 +33,6 @@ import { sessionColor, sessionsOf, type RelationIndex } from "@/lib/relations"
 import { commandBarAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import type { ExplorerSession } from "@/lib/types/session"
 import { cn } from "@/lib/utils"
-import { useCamera } from "./camera"
-import FrameLayers, { activeFrame, Graticule } from "./FrameLayers"
 import {
 	boundsOf,
 	convexHull,
@@ -45,27 +41,35 @@ import {
 	FRAMES,
 	frameMeta,
 	MAP_ATTRIBUTION,
-	niceKm,
 	ringInk,
 	SPRING,
-	UNITS_PER_KM,
 	type Box,
 	type FrameJson,
+	type MapLabel,
 	type Point,
 } from "./geo"
-import { cachedMapJson } from "./mapData"
+import { useMover, usePin, type PinWrite } from "./camera"
+import type { Obstacle } from "./MapLabels"
 import { mapLayersAtom } from "./mapState"
 import { AreaMark, CenterDot, PxGroup, Rings, UnknownGlyph } from "./Marks"
 import type { MapPoint } from "./points"
 import RidgeLayer, { ridgePlacement, useRidges } from "./RidgeLayer"
 import { StorageLabels, StorageMarks, useStorageLayer } from "./StorageLayer"
 import { SupplyArcs, SupplyTags, useSupplyVendors, type SupplyPair } from "./SupplyLines"
+import { activeFrame } from "./TerrainLayers"
+import TerrainMap, { useTerrainMap } from "./TerrainMap"
 
 /**
- * - index: /origins (plan §3.3, §4.5): ridgeline hero that flattens on scroll, camera,
- *   keyboard, Explorer cross-highlight, filter sync, layer toggles
- * - hero:  an origin page's map for a node without an inset (a county, a province, a
- *   country): framed on its descendants, no hero, no camera controls
+ * The origins on the terrain (plan §3.3, §4.5, §4.7), drawn as overlays on a TerrainMap: one
+ * liquor ring per session at each origin, precision areas, dotted blend hulls, and the storage
+ * and supply-line layers. The terrain, its atlas labels and furniture, and the pan / zoom
+ * gestures are TerrainMap's.
+ *
+ * - index: /origins: ridgeline hero that flattens on scroll, the camera driven by rings, keys
+ *   (← → origins, ↵ open, esc out, f filter to view) and ?at=, Explorer cross-highlight, filter
+ *   sync, layer toggles
+ * - hero:  an origin page's map for a node without a detail patch (a county, a province, a
+ *   country): framed on its descendants; pans and zooms like any embedded map
  */
 export type OriginsMapMode = "index" | "hero"
 
@@ -91,6 +95,7 @@ export default function OriginsMap({
 	points,
 	mode = "index",
 	fit,
+	caption,
 	className,
 	recordingKey,
 }: {
@@ -98,6 +103,8 @@ export default function OriginsMap({
 	mode?: OriginsMapMode
 	/** hero: the origins to frame */
 	fit?: string[]
+	/** hero: the comment line, top left */
+	caption?: ReactNode
 	className?: string
 	recordingKey?: string
 }) {
@@ -112,9 +119,9 @@ export default function OriginsMap({
 	const query = q.toLowerCase().trim()
 	const interactive = mode === "index"
 
-	const rootRef = useRef<HTMLDivElement>(null)
-	const svgRef = useRef<SVGSVGElement>(null)
-	const camera = useCamera(rootRef, svgRef)
+	const ctl = useTerrainMap()
+	const { camera, rootRef } = ctl
+	const mover = useMover(camera)
 
 	// -------------------------------------------------------------------------
 	// Data
@@ -164,6 +171,10 @@ export default function OriginsMap({
 		for (const m of markers) if (m.sessions.some((s) => slugs.has(s._slug))) origins.add(m.p.slug)
 		return { sessions: slugs, origins }
 	}, [hover, index, markers])
+	// a leader ties an Explorer row to its one ring; never for hovers on the map itself, and
+	// never a fan of them when a parent row lights all its children
+	const leaderSlug =
+		hover && hover.source !== "map" && lit?.origins.size === 1 ? [...lit.origins][0] : null
 
 	// blends: a session with several placed origins draws a dotted hull around them
 	const hulls = useMemo(() => {
@@ -236,7 +247,7 @@ export default function OriginsMap({
 		measure()
 		window.addEventListener("resize", measure)
 		return () => window.removeEventListener("resize", measure)
-	}, [mode, stickAt])
+	}, [mode, stickAt, rootRef])
 	const scrolled = useTransform([scrollY, stickAt], ([y, at]: number[]) =>
 		Math.max(0, Math.min(1, 1 - (y - at) / FLATTEN_PX))
 	)
@@ -322,6 +333,8 @@ export default function OriginsMap({
 		const at = new URLSearchParams(window.location.search).get("at")
 		const m = at ? bySlug.get(at) : undefined
 		if (m) {
+			// a deep link to an origin skips the ridge hero (it frames the six mountains, not this)
+			release()
 			setFocus(m.p.slug)
 			go(focusBox(m), "set")
 		} else go(frameMeta("six-mountains").viewBox, "set")
@@ -452,19 +465,18 @@ export default function OriginsMap({
 	}, [camera, go, release])
 
 	const zoomBy = useCallback(
-		(f: number, at?: Point) => {
+		(f: number) => {
 			release()
-			const [vx, vy, vw, vh] = camera.view()
-			const [ax, ay] = at ?? [vx + vw / 2, vy + vh / 2]
-			const w = Math.min(FRAMES[0].viewBox[2] * 1.3, Math.max(60, vw * f))
-			const h = (vh / vw) * w
-			// keep the anchor under the same screen spot
-			const nx = ax - ((ax - vx) / vw) * w
-			const ny = ay - ((ay - vy) / vh) * h
-			go([nx, ny, w, h])
+			preset.current = null
+			camera.zoomAt(f, undefined, { animate: true, reduce })
 		},
-		[camera, go, release]
+		[camera, release, reduce]
 	)
+	/** the reader moved the camera themselves: the hero steps aside, framing lets go */
+	const onUserMove = useCallback(() => {
+		release()
+		preset.current = null
+	}, [release])
 
 	// "f": filter the Explorer to the origins in view (again: put the old filter back)
 	const viewFilter = useRef<string[] | null>(null)
@@ -531,84 +543,7 @@ export default function OriginsMap({
 		}
 		window.addEventListener("keydown", onKey)
 		return () => window.removeEventListener("keydown", onKey)
-	}, [interactive, store, byLon, focus, focusOn, open, zoomOut, toggleViewFilter, zoomBy])
-
-	// drag to pan, ⌘/ctrl-scroll (or pinch) to zoom, double-click to zoom in
-	const drag = useRef<{
-		id: number
-		x: number
-		y: number
-		cx: number
-		cy: number
-		moved: boolean
-	} | null>(null)
-	const onPointerDown = (e: ReactPointerEvent<SVGSVGElement>) => {
-		if (!interactive || e.button !== 0) return
-		camera.stop()
-		drag.current = {
-			id: e.pointerId,
-			x: e.clientX,
-			y: e.clientY,
-			cx: camera.cx.get(),
-			cy: camera.cy.get(),
-			moved: false,
-		}
-	}
-	const onPointerMove = (e: ReactPointerEvent<SVGSVGElement>) => {
-		const d = drag.current
-		if (!d || d.id !== e.pointerId) return
-		const dx = e.clientX - d.x
-		const dy = e.clientY - d.y
-		if (!d.moved && Math.hypot(dx, dy) < 3) return
-		if (!d.moved) {
-			d.moved = true
-			e.currentTarget.setPointerCapture(e.pointerId)
-			release()
-			preset.current = null
-		}
-		const u = camera.upp()
-		camera.cx.set(d.cx - dx * u)
-		camera.cy.set(d.cy - dy * u)
-	}
-	const onPointerUp = (e: ReactPointerEvent<SVGSVGElement>) => {
-		if (drag.current?.id === e.pointerId) drag.current = null
-	}
-	const toMap = useCallback(
-		(clientX: number, clientY: number): Point => {
-			const r = svgRef.current!.getBoundingClientRect()
-			const [vx, vy] = camera.view()
-			const u = camera.upp()
-			return [vx + (clientX - r.left) * u, vy + (clientY - r.top) * u]
-		},
-		[camera]
-	)
-	const onDoubleClick = (e: ReactMouseEvent<SVGSVGElement>) => {
-		if (!interactive) return
-		zoomBy(0.5, toMap(e.clientX, e.clientY))
-	}
-	useEffect(() => {
-		const el = rootRef.current
-		if (!el || !interactive) return
-		const onWheel = (e: WheelEvent) => {
-			if (!e.ctrlKey && !e.metaKey) return
-			e.preventDefault()
-			release()
-			preset.current = null
-			camera.stop()
-			const [ax, ay] = toMap(e.clientX, e.clientY)
-			const [vx, vy, vw, vh] = camera.view()
-			const f = Math.exp(Math.max(-0.5, Math.min(0.5, e.deltaY * 0.01)))
-			const w = Math.min(FRAMES[0].viewBox[2] * 1.3, Math.max(60, vw * f))
-			const h = (vh / vw) * w
-			const nx = ax - ((ax - vx) / vw) * w
-			const ny = ay - ((ay - vy) / vh) * h
-			camera.cx.set(nx + w / 2)
-			camera.cy.set(ny + h / 2)
-			camera.lw.set(Math.log(w))
-		}
-		el.addEventListener("wheel", onWheel, { passive: false })
-		return () => el.removeEventListener("wheel", onWheel)
-	}, [camera, interactive, toMap, release])
+	}, [interactive, store, byLon, focus, focusOn, open, zoomOut, toggleViewFilter, zoomBy, rootRef])
 
 	// -------------------------------------------------------------------------
 	// Labels: the biggest origins that fit, plus whatever is focused or lit
@@ -672,36 +607,59 @@ export default function OriginsMap({
 	}, [settled, markers, focus])
 
 	const sheet = settled ? activeFrame(settled.view) : null
-	const sheetData = sheet ? cachedMapJson<FrameJson>(sheet.url) : undefined
-	const pxPerKm = settled ? (settled.W / settled.view[2]) * UNITS_PER_KM : 0
-	const km = pxPerKm ? niceKm(pxPerKm, 72) : 0
 	const focused = focus ? bySlug.get(focus) : undefined
 
+	// the atlas labels leave the origins to the rings, and keep clear of rings and their labels
+	const skipLabel = useCallback((l: MapLabel) => l.kind === "origin", [])
+	const obstacles = useMemo<Obstacle[]>(
+		() =>
+			markers.map((m) => {
+				const side = labelled.get(m.p.slug)
+				const w = side ? labelText(m).length * 6.1 + 12 : 0
+				const r = m.R + 4
+				return {
+					x: m.p.x,
+					y: m.p.y,
+					r,
+					box: side === "l" ? [-r - w, -r, r, r] : [-r, -r, r + w, r],
+				}
+			}),
+		[markers, labelled]
+	)
+
 	return (
-		<div
-			ref={rootRef}
-			className={cn("relative overflow-hidden isolate bg-[#121012] select-none", className)}
-			data-recording-key={recordingKey}
-			data-origins-map={mode}
-		>
-			<svg
-				ref={svgRef}
-				className={cn(
-					"absolute inset-0 block w-full h-full touch-none",
-					interactive && "cursor-grab active:cursor-grabbing"
-				)}
-				preserveAspectRatio="xMidYMid slice"
-				role="img"
-				aria-label="Map of the origins: contours, rivers and one ring per session"
-				onPointerDown={onPointerDown}
-				onPointerMove={onPointerMove}
-				onPointerUp={onPointerUp}
-				onPointerCancel={onPointerUp}
-				onDoubleClick={onDoubleClick}
-			>
-				<motion.g style={{ opacity: mapDim }}>
-					<FrameLayers camera={camera} layers={layers} />
-					<Graticule />
+		<TerrainMap
+			variant={interactive ? "page" : "hero"}
+			controller={ctl}
+			home={mode === "hero" ? fitBox : null}
+			contours={layers.contours}
+			rivers={layers.rivers}
+			skipLabel={skipLabel}
+			obstacles={obstacles}
+			dim={mapDim}
+			fade={overlayOpacity}
+			expandable={false}
+			keyboard={!interactive}
+			onUserMove={onUserMove}
+			caption={caption}
+			label="Map of the origins: contours, rivers and one ring per session"
+			className={cn("bg-[#121012]", className)}
+			recordingKey={recordingKey}
+			dataAttrs={{ "data-origins-map": mode }}
+			footer={
+				interactive ? (
+					<>
+						<span className="hidden truncate whitespace-nowrap text-white/30 2xl:inline">
+							← → origins · ↵ open · esc out · f filter to view
+						</span>
+						<span className="text-right text-white/25 truncate" title={MAP_ATTRIBUTION.join("\n")}>
+							terrain: AWS Terrain Tiles · Natural Earth
+						</span>
+					</>
+				) : null
+			}
+			marks={
+				<>
 					{layers.storage && (
 						<StorageMarks
 							nodes={storage.nodes}
@@ -721,63 +679,67 @@ export default function OriginsMap({
 						revealed={revealed}
 						reduce={reduce}
 					/>
-				</motion.g>
-				{ridges && mode === "index" && (
+				</>
+			}
+			top={
+				ridges && mode === "index" ? (
 					<RidgeLayer ridges={ridges} relief={relief} reduce={reduce} />
-				)}
-			</svg>
-
-			{/* rings, labels and leaders: HTML over the map, placed by the camera's CSS variables */}
+				) : null
+			}
+		>
+			{/* rings, labels and leaders: HTML over the map, pinned to the camera (camera.ts) */}
 			<motion.div
 				className="absolute inset-0 overflow-hidden pointer-events-none"
 				style={{ opacity: overlayOpacity }}
 			>
-				{layers.storage && <StorageLabels nodes={storage.nodes} />}
-				{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
-				{revealed &&
-					markers.map((m) => (
-						<OriginMarker
-							key={m.p.slug}
-							m={m}
-							focused={focus === m.p.slug}
-							labelled={
-								labelled.has(m.p.slug) ||
-								focus === m.p.slug ||
-								(hover?.kind === "origin" && hover.slug === m.p.slug)
-							}
-							side={labelled.get(m.p.slug) ?? "r"}
-							lit={lit}
-							passes={passes}
-							yearRank={yearRank}
-							reduce={reduce}
-							events={overlayEvents}
-							onActivate={activate}
-							labelEls={labelEls}
-						/>
-					))}
-				{unknownCount > 0 &&
-					// only where it can't crowd: zoomed in to about a province
-					!!settled &&
-					settled.view[2] < 3000 &&
-					unknown.map((p) => (
-						<span
-							key={p.slug}
-							className="absolute left-0 top-0 map-label text-[10px] leading-none text-white/35 whitespace-nowrap"
-							style={place(p.x, p.y, 0, 0)}
-						>
-							<span className="absolute left-3 -translate-y-1/2">
-								{`// ${p.hanzi ?? ""} somewhere · ${unknownCount} unplaced`}
+				{/* a pan moves this box, not each pin */}
+				<div ref={mover} className="absolute inset-0">
+					{layers.storage && <StorageLabels nodes={storage.nodes} />}
+					{layers.supply && <SupplyTags vendors={vendors} camera={camera} />}
+					{revealed &&
+						markers.map((m) => (
+							<OriginMarker
+								key={m.p.slug}
+								m={m}
+								focused={focus === m.p.slug}
+								labelled={
+									labelled.has(m.p.slug) ||
+									focus === m.p.slug ||
+									(hover?.kind === "origin" && hover.slug === m.p.slug)
+								}
+								side={labelled.get(m.p.slug) ?? "r"}
+								lit={lit}
+								leader={leaderSlug === m.p.slug}
+								passes={passes}
+								yearRank={yearRank}
+								reduce={reduce}
+								events={overlayEvents}
+								onActivate={activate}
+								labelEls={labelEls}
+							/>
+						))}
+					{unknownCount > 0 &&
+						// only where it can't crowd: zoomed in to about a province
+						!!settled &&
+						settled.view[2] < 3000 &&
+						unknown.map((p) => (
+							<span
+								key={p.slug}
+								ref={(el) => (el ? camera.pin(el, p.x, p.y) : undefined)}
+								className="absolute left-0 top-0 map-label text-[10px] leading-none text-white/35 whitespace-nowrap"
+							>
+								<span className="absolute left-3 -translate-y-1/2">
+									{`// ${p.hanzi ?? ""} somewhere · ${unknownCount} unplaced`}
+								</span>
 							</span>
-						</span>
-					))}
+						))}
+				</div>
 			</motion.div>
 
 			{interactive && (
 				<MapChrome
 					sheet={sheet?.id ?? null}
-					interval={sheetData?.interval ?? null}
-					km={km}
-					pxPerKm={pxPerKm}
+					interval={sheet?.interval ?? null}
 					focused={focused ?? null}
 					filteredToView={filteredToView}
 					onZoomIn={() => zoomBy(0.5)}
@@ -792,12 +754,7 @@ export default function OriginsMap({
 					relief={relief}
 				/>
 			)}
-			{!interactive && km > 0 && (
-				<div className="absolute left-3 bottom-2.5 text-[9.5px] text-white/40 pointer-events-none">
-					<ScaleBar km={km} px={km * pxPerKm} />
-				</div>
-			)}
-		</div>
+		</TerrainMap>
 	)
 }
 
@@ -826,12 +783,15 @@ function buildMarkers(points: MapPoint[], index: RelationIndex): Marker[] {
 const labelText = (m: Marker) =>
 	`// ${m.p.hanzi ? `${m.p.hanzi} ` : ""}${m.p.title} · ${m.sessions.length}`
 
-/** CSS position of a shared-space point in the overlay (see camera.ts). */
-function place(x: number, y: number, dx: number, dy: number) {
-	return {
-		transform: `translate3d(calc(var(--k) * ${x}px + var(--ox) * 1px + ${dx}px), calc(var(--k) * ${y}px + var(--oy) * 1px + ${dy}px), 0)`,
+/**
+ * A leader's length: from the map's left edge to just short of its ring (written every frame, so
+ * it reaches the edge through a pan too)
+ */
+const leaderTo =
+	(R: number): PinWrite =>
+	(s, sx) => {
+		s.width = `${sx - R - 6}px`
 	}
-}
 
 // ---------------------------------------------------------------------------
 // SVG marks: areas, hulls, untasted points
@@ -927,6 +887,7 @@ function OriginMarker({
 	labelled,
 	side,
 	lit,
+	leader,
 	passes,
 	yearRank,
 	reduce,
@@ -939,6 +900,8 @@ function OriginMarker({
 	labelled: boolean
 	side: "r" | "l"
 	lit: { sessions: Set<string>; origins: Set<string> } | null
+	/** draw a leader from the map's left edge (the Explorer side) to this ring */
+	leader: boolean
 	passes: Map<string, boolean>
 	yearRank: Map<number, number>
 	reduce: boolean
@@ -962,19 +925,28 @@ function OriginMarker({
 	const size = (m.R + 12) * 2
 	const hit = m.R + 6
 	const href = entityHref("origin", slug) ?? "#"
-	// a leader from the map's left edge, when the Explorer (not this ring) points here
-	const leader = isLit && !pointer
+	const pin = usePin(m.p.x, m.p.y)
+	const setTrigger = handlers.ref
+	const ref = useCallback(
+		(el: HTMLAnchorElement | null) => {
+			setTrigger(el)
+			pin(el)
+		},
+		[setTrigger, pin]
+	)
+	const leaderWrite = useMemo(() => leaderTo(m.R), [m.R])
+	const leaderPin = usePin(m.p.x, m.p.y, leaderWrite, true)
 
 	return (
 		<motion.a
 			href={href}
 			{...handlers}
+			ref={ref}
 			aria-label={`${m.p.title}: ${m.sessions.length} ${
 				m.sessions.length === 1 ? "session" : "sessions"
 			}`}
 			className="absolute left-0 top-0 rounded-full outline-none group focus-visible:ring-1 focus-visible:ring-white/50"
 			style={{
-				...place(m.p.x, m.p.y, 0, 0),
 				// a real box around the rings (hit area, peek anchor); content hangs off its center
 				width: hit * 2,
 				height: hit * 2,
@@ -985,7 +957,7 @@ function OriginMarker({
 			onPointerEnter={(e) => {
 				handlers.onPointerEnter(e)
 				setPointer(true)
-				setHover({ kind: "origin", slug })
+				setHover({ kind: "origin", slug, source: "map" })
 			}}
 			onPointerLeave={(e) => {
 				handlers.onPointerLeave(e)
@@ -994,7 +966,7 @@ function OriginMarker({
 			}}
 			onFocus={(e) => {
 				handlers.onFocus(e)
-				setHover({ kind: "origin", slug })
+				setHover({ kind: "origin", slug, source: "map" })
 			}}
 			onBlur={(e) => {
 				handlers.onBlur(e)
@@ -1011,12 +983,10 @@ function OriginMarker({
 			<span className="absolute left-1/2 top-1/2">
 				{leader && (
 					<motion.span
+						ref={leaderPin}
 						aria-hidden
 						className="absolute top-0 h-px origin-right bg-[#fff2ca]/35 pointer-events-none"
-						style={{
-							right: m.R + 6,
-							width: `calc(var(--k) * ${m.p.x}px + var(--ox) * 1px - ${m.R + 6}px)`,
-						}}
+						style={{ right: m.R + 6 }}
 						initial={{ scaleX: 0 }}
 						animate={{ scaleX: 1 }}
 						transition={{ duration: reduce ? 0 : 0.35, ease: EASE }}
@@ -1123,8 +1093,6 @@ function OriginMarker({
 function MapChrome({
 	sheet,
 	interval,
-	km,
-	pxPerKm,
 	focused,
 	filteredToView,
 	onZoomIn,
@@ -1136,8 +1104,6 @@ function MapChrome({
 }: {
 	sheet: string | null
 	interval: number | null
-	km: number
-	pxPerKm: number
 	focused: Marker | null
 	filteredToView: boolean
 	onZoomIn: () => void
@@ -1166,7 +1132,8 @@ function MapChrome({
 			</motion.div>
 
 			<motion.div
-				className="absolute left-4 top-3.5 flex items-center gap-2 text-[10.5px] text-white/45 pointer-events-none"
+				data-map-reserve=""
+				className="absolute left-4 top-3.5 z-10 flex items-center gap-2 text-[10.5px] text-white/45 pointer-events-none"
 				style={{ opacity: sheetOpacity }}
 			>
 				<AnimatePresence mode="popLayout" initial={false}>
@@ -1213,7 +1180,9 @@ function MapChrome({
 			</motion.div>
 
 			<motion.div
-				className="absolute right-3 top-3 flex items-center gap-1"
+				data-map-reserve=""
+				data-map-ui=""
+				className="absolute right-3 top-3 z-10 flex items-center gap-1"
 				style={{ opacity: chromeOpacity }}
 			>
 				{filteredToView && (
@@ -1236,18 +1205,6 @@ function MapChrome({
 					<Scan size={12} strokeWidth={2} />
 				</ChromeButton>
 			</motion.div>
-
-			<div className="absolute inset-x-3 bottom-2.5 flex items-end justify-between gap-4 pointer-events-none text-[9.5px] leading-none text-white/40">
-				<span className="flex items-center gap-4">
-					{km > 0 && <ScaleBar km={km} px={km * pxPerKm} />}
-					<span className="hidden truncate whitespace-nowrap text-white/30 2xl:inline">
-						← → origins · ↵ open · esc out · f filter to view · ⌘/ctrl scroll zoom
-					</span>
-				</span>
-				<span className="text-right text-white/25 truncate" title={MAP_ATTRIBUTION.join("\n")}>
-					terrain: AWS Terrain Tiles · Natural Earth
-				</span>
-			</div>
 		</>
 	)
 }
@@ -1271,33 +1228,5 @@ function ChromeButton({
 		>
 			{children}
 		</button>
-	)
-}
-
-function ScaleBar({ km, px }: { km: number; px: number }) {
-	const w = Math.round(px)
-	return (
-		<span className="flex items-center gap-1.5">
-			<svg width={w + 2} height={7} aria-hidden className="overflow-visible">
-				<path
-					d={`M1 1V6H${w + 1}V1`}
-					fill="none"
-					stroke={CREAM}
-					strokeOpacity={0.45}
-					strokeWidth={1}
-					vectorEffect="non-scaling-stroke"
-				/>
-				<path
-					d={`M${Math.round(w / 2) + 1} 3.5V6`}
-					stroke={CREAM}
-					strokeOpacity={0.3}
-					strokeWidth={1}
-					vectorEffect="non-scaling-stroke"
-				/>
-			</svg>
-			<span className="tabular-nums whitespace-nowrap">
-				{km < 1 ? `${km * 1000} m` : `${km.toLocaleString("en-US")} km`}
-			</span>
-		</span>
 	)
 }

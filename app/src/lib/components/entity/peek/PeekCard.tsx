@@ -18,7 +18,7 @@ import { readFilters } from "@/lib/filters"
 import { lexiconHref, lexiconPageOf } from "@/lib/lexicon"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
 import { entityHref } from "@/lib/entities"
-import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
+import OriginMap, { hasDetail } from "@/lib/components/map/OriginMap"
 import { NOTE_STAGES, NOTE_STAGE_META } from "@/lib/noteStages"
 import {
 	isPageKind,
@@ -275,11 +275,12 @@ function OriginBody({ model, detail, peek, row }: BodyProps) {
 }
 
 /**
- * The origin's map strip (plan §3.1, §4.5): the precomputed contour inset
- * (`/maps/inset/[slug].json`, fetched on first open) with contours drawing on 12 ms per band,
- * the §4.1 precision marker and one ring per session in its liquor. A click grows it into the
- * origin page's hero. Origins too coarse for an inset (provinces, countries) keep the surveyed
- * point alone: the marker, the rings and the coordinate as a comment.
+ * The origin's map strip (plan §3.1, §4.5, §4.7): a preview of the terrain map on the origin's
+ * detail patch (`/maps/detail/[slug].json`, fetched on first open) with contours drawing on 12 ms
+ * per band, borders and atlas labels, the §4.1 precision marker and one ring per session in its
+ * liquor. No gestures here: a click grows it into the origin page's hero, which pans and zooms.
+ * Origins too coarse for a patch (provinces, countries) keep the surveyed point alone: the
+ * marker, the rings and the coordinate as a comment.
  */
 function OriginInset({
 	model,
@@ -313,13 +314,13 @@ function OriginInset({
 		</div>
 	) : null
 
-	if (placed && hasInset([{ slug }])) {
+	if (placed && hasDetail([{ slug }])) {
 		return (
 			<div
 				data-slot="origin-map-inset"
 				className="relative overflow-hidden rounded-[5px] ring-1 ring-inset ring-white/[0.07]"
 			>
-				<InsetMap
+				<OriginMap
 					origins={[{ slug, title: model.title, hanzi: model.node?.hanzi ?? null }]}
 					rings={rings}
 					gardens={detail?.elevation ?? null}
@@ -331,7 +332,7 @@ function OriginInset({
 					recordingKey="peek-origin-inset"
 				>
 					{caption}
-				</InsetMap>
+				</OriginMap>
 			</div>
 		)
 	}

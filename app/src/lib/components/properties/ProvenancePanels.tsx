@@ -9,7 +9,7 @@ import Hatch from "@/lib/components/entity/Hatch"
 import OriginTrail, { originNoteLabel } from "@/lib/components/entity/OriginTrail"
 import { relationIndexAtom, sessionAtom } from "@/lib/store/sessionAtom"
 import { ratingRank, sessionColor, type RelationIndex } from "@/lib/relations"
-import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
+import OriginMap, { hasDetail } from "@/lib/components/map/OriginMap"
 import { entityHref } from "@/lib/entities"
 import { LIQUOR_FALLBACK } from "@/lib/liquor"
 import { formatRating } from "@/lib/sessionSort"
@@ -234,11 +234,12 @@ function Provenance({ session, index, row }: SectionProps) {
 }
 
 /**
- * The contour inset of where this tea grew (plan §3.4, §4.5): contours draw on low → high,
- * the line at the session's recorded elevation is re-stroked in its liquor and labelled, the
- * point carries its precision marker and the session's ring. Arrowing through the Explorer
- * pans between origins (InsetMap keeps one instance across sessions); a click grows the map
- * into the origin page's hero. Nothing when no placed origin has an inset.
+ * The terrain where this tea grew (plan §3.4, §4.5, §4.7): contours draw on low → high, the
+ * line at the session's recorded elevation is re-stroked in its liquor and labelled, the point
+ * carries its precision marker and the session's ring. The map pans and zooms out to the region
+ * (and expands to full screen); arrowing through the Explorer flies between origins (OriginMap
+ * keeps one instance across sessions); its caption grows the map into the origin page's hero.
+ * Nothing when no placed origin has a detail patch.
  */
 function OriginInset({
 	session,
@@ -254,17 +255,17 @@ function OriginInset({
 		() => origins.map((o) => ({ slug: o._slug, title: o.title, hanzi: o.hanzi ?? null })),
 		[origins]
 	)
-	if (!hasInset(mapped)) return null
+	if (!hasDetail(mapped)) return null
 	const listed = index.bySlug.get(session._slug)
 	const color = listed ? sessionColor(listed) : LIQUOR_FALLBACK.hex
-	const primary = mapped.find((o) => hasInset([o])) ?? mapped[0]
+	const primary = mapped.find((o) => hasDetail([o])) ?? mapped[0]
 	return (
 		<motion.div
 			initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.45, ease: EASE, delay: 0.05 }}
 		>
-			<InsetMap
+			<OriginMap
 				origins={[primary, ...mapped.filter((o) => o !== primary)]}
 				rings={[color]}
 				elevation={session.elevation ?? null}

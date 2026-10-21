@@ -3,11 +3,12 @@
 import { Suspense, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react"
 import Hatch from "@/lib/components/entity/Hatch"
-import InsetMap, { hasInset } from "@/lib/components/map/InsetMap"
+import OriginMap, { hasDetail } from "@/lib/components/map/OriginMap"
 import OriginsMap from "@/lib/components/map/OriginsMap"
 import type { MapPoint } from "@/lib/components/map/points"
 import { entityKeys } from "@/lib/relations"
 import { cn } from "@/lib/utils/cn"
+import { ContourFadeContext, type ContourFade } from "@/lib/components/map/contourFade"
 import type { EntityPageData } from "./data"
 import DotMap, { type DotMapPoint } from "./DotMap"
 import VesselHero from "@/lib/components/entity/vessel/VesselHero"
@@ -87,9 +88,13 @@ function useHeroRelief() {
 				rotateX,
 				transformPerspective: 900,
 				transformOrigin: "50% 100%",
-				"--minor-contours": minor,
 		  } as unknown as CSSProperties)
-	return [ref, style, !reduce] as const
+	// the fade reaches the map through context (map/contourFade.ts), not a CSS variable here
+	const fade = useMemo<ContourFade | null>(
+		() => (reduce ? null : { minor, floor: MINOR_FLOOR }),
+		[reduce, minor]
+	)
+	return [ref, style, fade] as const
 }
 
 function OriginHero({
@@ -104,8 +109,8 @@ function OriginHero({
 	const geo = data.geo
 	const placed = !!geo && data.originKind !== "unknown"
 	const rings = model.stats.liquor.slice(0, 14)
-	const inset = placed && hasInset([{ slug: data.slug }])
-	const [reliefRef, reliefStyle, reliefFade] = useHeroRelief()
+	const inset = placed && hasDetail([{ slug: data.slug }])
+	const [reliefRef, reliefStyle, contourFade] = useHeroRelief()
 	// a node too coarse for an inset (a county, a province, a country): frame its points
 	const fit = useMemo(
 		() => (inset || !placed ? [] : framePoints(mapPoints, data.slug)),
@@ -120,6 +125,11 @@ function OriginHero({
 				inset ? "" : fit.length > 1 || fit[0] !== data.slug ? ` · ${fit.length} places within` : ""
 		  }`
 		: "// terra incognita: no surveyed point"
+	const caption = (
+		<span className="block px-1 py-0.5 -ml-0.5 rounded-[3px] bg-[#121012]/80 text-[10.5px] leading-snug text-white/45 map-label pointer-events-none truncate">
+			{comment}
+		</span>
+	)
 
 	return (
 		<div
@@ -131,10 +141,11 @@ function OriginHero({
 				ref={reliefRef}
 				className="relative h-64"
 				style={reliefStyle}
-				data-contour-fade={reliefFade ? "" : undefined}
+				data-contour-fade={contourFade ? "" : undefined}
 			>
+				<ContourFadeContext.Provider value={contourFade}>
 				{inset ? (
-					<InsetMap
+					<OriginMap
 						origins={[{ slug: data.slug, title: data.title, hanzi: data.hanzi }]}
 						rings={rings}
 						gardens={geo!.elevation_m ?? null}
@@ -142,6 +153,7 @@ function OriginHero({
 						variant="hero"
 						drawKey={data.slug}
 						heroSlug={data.slug}
+						caption={caption}
 						className="absolute inset-0"
 						recordingKey="origin-hero-map"
 					/>
@@ -152,6 +164,7 @@ function OriginHero({
 								points={mapPoints}
 								mode="hero"
 								fit={fit}
+								caption={caption}
 								className="absolute inset-0"
 								recordingKey="origin-hero-map"
 							/>
@@ -163,11 +176,10 @@ function OriginHero({
 						<span className="absolute text-2xl -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 text-[#fff2ca]/40">
 							?
 						</span>
+						<p className="absolute left-3 top-2.5">{caption}</p>
 					</>
 				)}
-				<p className="absolute left-3 top-2.5 px-1 py-0.5 rounded-[3px] bg-[#121012]/80 text-[10.5px] text-white/45 map-label pointer-events-none">
-					{comment}
-				</p>
+				</ContourFadeContext.Provider>
 			</motion.div>
 
 			<dl className="grid grid-cols-1 @sm/editor:grid-cols-2 @xl/editor:flex @xl/editor:flex-col justify-center gap-x-6 gap-y-3 px-5 py-4 border-t @xl/editor:border-t-0 @xl/editor:border-l border-white/[0.06] text-xs">

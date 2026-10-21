@@ -11,7 +11,7 @@
  * Areas are geographic (user units, they grow as you zoom); dots and rings are screen-constant
  * (drawn in px inside a .map-px group, which undoes the camera's scale).
  */
-import { memo, useId, type ReactNode } from "react"
+import { createContext, memo, useContext, useId, type ReactNode } from "react"
 import { motion } from "motion/react"
 import { CREAM, EASE, ringInk } from "./geo"
 
@@ -142,8 +142,23 @@ export const AreaMark = memo(function AreaMark({
 })
 
 /**
+ * How present ring i of n is: 1 at the center, falling on an ease-out curve ((1 − t)², steep
+ * near the middle, flattening into a faint tail) so the rings read as a zone whose edge
+ * dissolves into the contours.
+ */
+const ringFall = (i: number, n: number) => (n > 1 ? (1 - i / (n - 1)) ** 2 : 1)
+
+/**
+ * The marks are drawn already: a map opening out of another (the full-screen view) shows its rings
+ * as they were, rather than drawing them on again (a pathLength animation, a frame of main-thread
+ * work each, as the grow ends)
+ */
+export const MarksDrawn = createContext(false)
+
+/**
  * Concentric liquor rings, one per session, inner = first. Px units; place inside PxGroup.
- * They draw on in order (oldest vintage first when the caller sorts that way).
+ * They draw on in order (oldest vintage first when the caller sorts that way), and fade
+ * outward (ringFall); a lit ring keeps the ramp on a higher floor.
  */
 export const Rings = memo(function Rings({
 	colors,
@@ -175,10 +190,17 @@ export const Rings = memo(function Rings({
 	/** per ring: true → brighter and a touch heavier (hovered elsewhere) */
 	lit?: boolean[]
 }) {
+	const drawn = useContext(MarksDrawn)
 	return (
 		<g>
 			{colors.map((c, i) => {
 				const at = delays?.[i] ?? delay + i * stagger
+				const fall = ringFall(i, colors.length)
+				const opacity = dimmed?.[i]
+					? 0.16 * (0.4 + 0.6 * fall)
+					: lit?.[i]
+					? 0.4 + 0.6 * fall
+					: 0.12 + 0.8 * fall
 				return (
 					<motion.circle
 						key={`${String(drawKey)}-${i}`}
@@ -190,10 +212,10 @@ export const Rings = memo(function Rings({
 						strokeWidth={lit?.[i] ? width + 0.6 : width}
 						vectorEffect={NS}
 						style={{ rotate: -90 }}
-						initial={reduce ? { opacity: 0 } : { pathLength: 0, opacity: 0 }}
+						initial={drawn ? false : reduce ? { opacity: 0 } : { pathLength: 0, opacity: 0 }}
 						animate={{
 							pathLength: 1,
-							opacity: dimmed?.[i] ? 0.16 : lit?.[i] ? 1 : 0.92,
+							opacity,
 						}}
 						transition={{
 							pathLength: { duration: 0.45, ease: EASE, delay: reduce ? 0 : at },
