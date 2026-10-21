@@ -15,6 +15,7 @@ import { currentLiquorAtom, hoveredNoteStageAtom } from "@/lib/store/sessionAtom
 import { liftLiquor, rgbCss } from "@/lib/liquor"
 import { buildStageImageMap } from "@/lib/noteStages"
 import CubeCaption, { createCubeCaptionStore } from "./CubeCaption"
+import styles from "./SessionCarousel.module.css"
 
 type ImageItem = {
 	image: string
@@ -235,9 +236,8 @@ export default function SessionCarousel({
 				data-flow-shape
 				data-flow-rotate={cssRotation}
 				className={cn(
-					"p-2 drop-shadow-2xl drop-shadow-heicha-600/40 w-72",
-					"bg-[radial-gradient(circle_1.5px_at_1.5px_1.5px,_rgba(255,255,255,0.2)_1.5px,_transparent_0)]",
-					"bg-[size:16px_16px]"
+					"relative p-2 drop-shadow-2xl drop-shadow-heicha-600/40 w-72",
+					styles.dotField
 				)}
 				style={{
 					rotate: cssRotation,
