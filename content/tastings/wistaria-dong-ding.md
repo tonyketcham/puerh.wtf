@@ -47,7 +47,7 @@ notes:
   taste: dehydrated red fruits, baked goods, spiced wood
   empty_cup: cinnamon bark, cask wood
   cha_qi: :)
-rating: 50
+rating: 91
 brewing:
   temperature: 205
   material_amount: 6.03
