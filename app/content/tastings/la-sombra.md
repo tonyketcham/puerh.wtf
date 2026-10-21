@@ -10,48 +10,48 @@ cultivar:
 production_year: 2020
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-excerpt: in progress
+excerpt: 'Zesty fruit-skin soup with herbs, soft astringency, and minty lift'
 date: 2021-02-26T17:08:41.640Z
 flavor_axes:
   cream:
     start: 2
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 6
-    finish: 0
+    finish: null
   spices:
     start: 6
-    finish: 0
+    finish: null
   earth:
     start: 2
-    finish: 0
+    finish: null
   nuts_roast:
     start: 4
-    finish: 0
+    finish: null
   wood:
     start: 1
-    finish: 0
+    finish: null
   vegetal:
     start: 5
-    finish: 0
+    finish: null
   floral:
     start: 6
-    finish: 0
+    finish: null
   fruits:
     start: 7
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: peach, banana, strawberry, red grape, cinnamon, cloves, plumeria
-  wet_leaf_nose: chamomile, springtime, apricot, grape candy, grape leaf, cedar wood
-  mouthfeel: in progress
-  taste: in progress
-  finish: in progress
-  empty_cup: in progress
-  cha_qi: in progress
-rating: 50
+  dry_leaf_nose: 'peach, banana, strawberry, red grape, cinnamon, cloves, plumeria'
+  wet_leaf_nose: 'chamomile, springtime, apricot, grape candy, grape leaf, cedar wood'
+  mouthfeel: null
+  taste: null
+  finish: null
+  empty_cup: null
+  cha_qi: null
+rating: -1
 brewing:
   temperature: 204
   material_amount: 5.69
@@ -59,6 +59,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Infusions
 
