@@ -11,8 +11,8 @@ production_year: 2018
 aging_conditions: 3 years dry/natural in Guangzhou
 vendor:
   - 81d86379-bf51-47ed-8d2f-6997e057ced7
-purchase_link: https://white2tea.com/products/2018-splendid
-excerpt: a punchy fruity, floral sheng that tricks your expectations
+purchase_link: 'https://white2tea.com/products/2018-splendid'
+excerpt: 'a punchy fruity, floral sheng that tricks your expectations'
 date: 2021-07-22T13:52:58.136Z
 flavor_axes:
   cream:
@@ -46,11 +46,11 @@ flavor_axes:
     start: 6
     finish: 8
 notes:
-  dry_leaf_nose: molasses, corn bread, celery, soy sauce
+  dry_leaf_nose: 'molasses, corn bread, celery, soy sauce'
   wet_leaf_nose: blueberry pancakes 100%
   mouthfeel: slick and soft hug
-  taste: plum, muscatel grape, sage, orchid, ripe mango, dragon fruit
-  cha_qi: positive headspace, very agreeable, no angst
+  taste: 'plum, muscatel grape, sage, orchid, ripe mango, dragon fruit'
+  cha_qi: 'positive headspace, very agreeable, no angst'
   finish: a bed of sweetness that can become dry at times
   empty_cup: fruit leather
 tags:
@@ -66,6 +66,13 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+storage:
+  - place: guangzhou
+    from: 2018
+    to: 2021
+    approx: true
 ---
 ### Infusions
 
