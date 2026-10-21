@@ -2,7 +2,7 @@
 id: 7cf532ac-b38f-4d6c-bdf4-f2d05f4b1330
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: Chou Shi King of Duck Shit Dan Cong
+title: Chou Shi King of Duck Shit Dan Cong
 style:
   - d65e8670-3097-4ee5-93d6-fb7b2fe41ee3
 cultivar:
