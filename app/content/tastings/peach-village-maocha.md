@@ -11,7 +11,7 @@ cultivar:
 production_year: 2019
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: A high-quality, tropical sheng worth trying
+excerpt: 'A high-quality, tropical sheng worth trying'
 date: 2021-12-07T15:31:38.706Z
 flavor_axes:
   cream:
@@ -45,12 +45,12 @@ flavor_axes:
     start: 7
     finish: 8
 notes:
-  dry_leaf_nose: cranberry, mike n ikes, ripe peach, sugar cane
-  wet_leaf_nose: papaya, guava, citric acid, condensed milk, lavender
-  taste: soy milk, peach/orange sherbet, mint, ginger flowers, orchid
-  mouthfeel: rounded, well-lubricating, juicy
-  finish: mint, herbs, milk, river rocks, tropical fruit
-  cha_qi: cold, intense mind and body feeling
+  dry_leaf_nose: 'cranberry, mike n ikes, ripe peach, sugar cane'
+  wet_leaf_nose: 'papaya, guava, citric acid, condensed milk, lavender'
+  taste: 'soy milk, peach/orange sherbet, mint, ginger flowers, orchid'
+  mouthfeel: 'rounded, well-lubricating, juicy'
+  finish: 'mint, herbs, milk, river rocks, tropical fruit'
+  cha_qi: 'cold, intense mind and body feeling'
   empty_cup: rain water
 tags:
   - f08f890f-a6a2-480a-99db-8bf0b36fd1ef
@@ -63,6 +63,8 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
 ---
 ### Synopsis
 
