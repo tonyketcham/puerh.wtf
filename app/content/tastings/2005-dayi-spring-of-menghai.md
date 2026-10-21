@@ -10,53 +10,53 @@ cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 origin:
   - db44b2c0-1481-477c-af92-b554e56c5d26
-season: Spring
 production_year: 2005
 aging_conditions: ~15 years dry Hong Kong
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-purchase_link: https://www.liquidproust.com/listing/1042741007/2005-spring-of-menghai-dayi-25g
-excerpt: An oily, smooth, and spicy aged sheng with a bourbon-like feel
+purchase_link: >-
+  https://www.liquidproust.com/listing/1042741007/2005-spring-of-menghai-dayi-25g
+excerpt: 'An oily, smooth, and spicy aged sheng with a bourbon-like feel'
 date: 2021-10-06T19:05:59.197Z
 flavor_axes:
   cream:
     start: 2
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 5
-    finish: 0
+    finish: null
   spices:
     start: 8
-    finish: 0
+    finish: null
   earth:
     start: 4
-    finish: 0
+    finish: null
   nuts_roast:
     start: 5
-    finish: 0
+    finish: null
   wood:
     start: 6
-    finish: 0
+    finish: null
   vegetal:
     start: 2
-    finish: 0
+    finish: null
   floral:
     start: 4
-    finish: 0
+    finish: null
   fruits:
     start: 2
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: camp fire, fall, strawberry, cacao nibs
-  wet_leaf_nose: pinesol, spicy wood on fire, raspberry
+  dry_leaf_nose: 'camp fire, fall, strawberry, cacao nibs'
+  wet_leaf_nose: 'pinesol, spicy wood on fire, raspberry'
   mouthfeel: oily with medium thickness
-  cha_qi: calm couch-lock, creatively motivating
-  empty_cup: grain, wood pulp
-  finish: menthol, herbs, soft astringency
-  taste: cloves, oak, bourbon, overripe banana
+  cha_qi: 'calm couch-lock, creatively motivating'
+  empty_cup: 'grain, wood pulp'
+  finish: 'menthol, herbs, soft astringency'
+  taste: 'cloves, oak, bourbon, overripe banana'
 tags:
   - bce623b4-e571-462a-b95b-988beb6dce4c
   - 8529f0b1-5b7e-4c06-8e92-8f1ddd127e47
@@ -69,6 +69,17 @@ brewing:
   vessel: Sakura Gaiwan
   first_infusion_duration: 10
   infusion_increment: 10
+vessel:
+  - 67a53a81-53a0-4f56-9b37-ce0d23752509
+season_note: Spring
+harvest:
+  season: spring
+storage:
+  - place: hong-kong
+    from: 2006
+    to: 2021
+    humidity: dry
+    approx: true
 ---
 ### Infusions
 
