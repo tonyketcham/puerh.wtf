@@ -2,59 +2,61 @@
 id: 5b7a3339-9c93-474e-b3a4-842f700a1fc9
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-title: "YQH: 2004 Tejipin"
+title: 'YQH: 2004 Tejipin'
 style:
   - 0ce2be99-ac41-40e5-b68d-92609daaf809
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
 production_year: 2004
-aging_conditions: 14 years dry storage in Taiwain, then 2 years dry storage in Ohio
+aging_conditions: '14 years dry storage in Taiwain, then 2 years dry storage in Ohio'
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
-excerpt: in progress
+excerpt: >-
+  Smooth, lubricating aged sheng with graham cracker and Mediterranean spice
+  notes
 date: 2021-05-14T14:53:10.898Z
 flavor_axes:
   cream:
     start: 5
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 4
-    finish: 0
+    finish: null
   spices:
     start: 7
-    finish: 0
+    finish: null
   earth:
     start: 4
-    finish: 0
+    finish: null
   nuts_roast:
     start: 6
-    finish: 0
+    finish: null
   wood:
     start: 5
-    finish: 0
+    finish: null
   vegetal:
     start: 2
-    finish: 0
+    finish: null
   floral:
     start: 5
-    finish: 0
+    finish: null
   fruits:
     start: 5
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: light chocolate, leather, graham cracker, vanilla
-  wet_leaf_nose: gasoline, barley, cascara, varnish, bread dough
-  mouthfeel: in progress
-  taste: in progress
-  finish: in progress
-  empty_cup: in progress
-  cha_qi: in progress
+  dry_leaf_nose: 'light chocolate, leather, graham cracker, vanilla'
+  wet_leaf_nose: 'gasoline, barley, cascara, varnish, bread dough'
+  mouthfeel: null
+  taste: null
+  finish: null
+  empty_cup: null
+  cha_qi: null
 tags:
   - ec7956dd-39db-40a0-b8d6-326811515c9d
-rating: 50
+rating: -1
 brewing:
   temperature: 200
   material_amount: 5.5
@@ -62,6 +64,19 @@ brewing:
   vessel: Cat Gaiwan
   first_infusion_duration: 12
   infusion_increment: 10
+vessel:
+  - eac754ef-15b2-4235-a2f5-f4ad4ab7507b
+storage:
+  - place: taiwan
+    from: 2005
+    to: 2019
+    humidity: dry
+    approx: true
+  - place: ohio
+    from: 2019
+    to: 2021
+    humidity: dry
+    approx: true
 ---
 ### Infusions
 
