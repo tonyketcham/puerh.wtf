@@ -78,7 +78,7 @@ type Client = {
 let client: Client | null | undefined
 const failures = new Set<() => void>()
 
-/** Called if the worker never starts (its script fails to load): draw on the page instead. */
+/** Called if any worker fails: retire the pool and draw on the page instead. */
 export function onTerrainWorkerFail(fn: () => void) {
 	failures.add(fn)
 	return () => {
@@ -149,8 +149,9 @@ export function terrainWorker(fontList?: string): Client | null {
 		return (client = null)
 	}
 	const K = workers.length
-	/** how many workers hold each url */
-	const loaded = new Map<string, number>()
+	/** workers that hold each url (a retry may acknowledge the same cached worker twice) */
+	const loaded = new Map<string, Set<Worker>>()
+	const ready = (url: string) => loaded.get(url)?.size === K
 	const waiting = new Map<string, { then: () => void; fail?: () => void }[]>()
 	const sentMasks = new WeakSet<ImageBitmap>()
 	const maskUrls = new Set<string>()
@@ -172,26 +173,38 @@ export function terrainWorker(fontList?: string): Client | null {
 		})
 	}
 
-	let alive = false
+	let failed = false
 	const onError = () => {
-		if (alive) return
+		if (failed) return
+		failed = true
 		client = null
 		workers.forEach((w) => w.terminate())
+		for (const f of inFlight.values())
+			for (const b of f.bands) b.bitmaps.forEach((bitmap) => bitmap.close())
+		inFlight.clear()
+		queued.clear()
+		onFrames.clear()
+		waiting.clear()
+		loaded.clear()
 		failures.forEach((fn) => fn())
 	}
-	const onMessage = (e: MessageEvent<WorkerOut>) => {
-		alive = true
+	const onMessage = (worker: Worker, e: MessageEvent<WorkerOut>) => {
 		const m = e.data
+		if (failed) {
+			if (m.type === "frame") m.bitmaps.forEach((bitmap) => bitmap.close())
+			return
+		}
 		if (m.type === "loaded" || m.type === "failed") {
 			if (m.type === "failed") {
 				const fns = waiting.get(m.url) ?? []
 				waiting.delete(m.url)
-				loaded.delete(m.url)
+				loaded.get(m.url)?.delete(worker)
 				return fns.forEach((f) => f.fail?.())
 			}
-			const n = (loaded.get(m.url) ?? 0) + 1
-			loaded.set(m.url, n)
-			if (n < K) return
+			const holders = loaded.get(m.url) ?? new Set<Worker>()
+			holders.add(worker)
+			loaded.set(m.url, holders)
+			if (!ready(m.url)) return
 			const fns = waiting.get(m.url) ?? []
 			waiting.delete(m.url)
 			return fns.forEach((f) => f.then())
@@ -212,19 +225,21 @@ export function terrainWorker(fontList?: string): Client | null {
 	}
 	workers.forEach((w) => {
 		w.addEventListener("error", onError)
-		w.addEventListener("message", onMessage)
+		w.addEventListener("message", (e) => onMessage(w, e))
 	})
 
 	if (fontList) postAll({ type: "fonts", faces: facesOf(fontList) })
 
 	client = {
-		ready: (url) => (loaded.get(url) ?? 0) >= K,
+		ready,
 		load(url, then, fail) {
-			if ((loaded.get(url) ?? 0) >= K) return then()
+			if (ready(url)) return then()
 			const list = waiting.get(url)
 			if (list) return void list.push({ then, fail })
 			waiting.set(url, [{ then, fail }])
-			postAll({ type: "load", url })
+			workers.forEach((w) => {
+				if (!loaded.get(url)?.has(w)) w.postMessage({ type: "load", url })
+			})
 		},
 		mask(url, image) {
 			if (maskUrls.has(url) || sentMasks.has(image)) return

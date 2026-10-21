@@ -398,7 +398,7 @@ export default function OriginsMap({
 		else url.searchParams.delete("at")
 		const next = `${url.pathname}${url.search}${url.hash}`
 		if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`)
-			window.history.replaceState(null, "", next)
+			window.history.replaceState(window.history.state, "", next)
 	}, [focus, interactive])
 
 	const labelEls = useRef(new Map<string, HTMLElement>())

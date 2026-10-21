@@ -297,7 +297,7 @@ function Legend({
 									if (!el) return
 									e.preventDefault()
 									el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
-									history.replaceState(null, "", `#${b.group}`)
+									history.replaceState(history.state, "", `#${b.group}`)
 								}}
 								title={`${meta.label}: ${meta.blurb}`}
 								className={cn(
