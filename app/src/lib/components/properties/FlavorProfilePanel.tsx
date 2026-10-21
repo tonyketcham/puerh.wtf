@@ -1,5 +1,7 @@
 "use client"
 
+import { hasFinishProfile } from "@/lib/sessionScores"
+
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react"
@@ -46,6 +48,7 @@ export default function FlavorProfilePanel() {
 	const store = useStore()
 	const reduce = useReducedMotion() ?? false
 	const flavorAxes = useAtomValue(flavorAxesAtom)
+	const hasFinish = hasFinishProfile(flavorAxes)
 	const slug = useAtomValue(sessionSlugAtom)
 	const liquor = useAtomValue(currentLiquorAtom)
 	const phaseValue = useAtomValue(flavorPhaseAtom)
@@ -223,13 +226,15 @@ export default function FlavorProfilePanel() {
 				hasBottomBorder
 				hasPadding={false}
 				rightSlot={
-					<PhaseScrubber
-						phase={flavorPhaseMotion}
-						value={phaseValue}
-						color={accent}
-						onScrubStart={onScrubStart}
-						onScrubEnd={onScrubEnd}
-					/>
+					hasFinish ? (
+						<PhaseScrubber
+							phase={flavorPhaseMotion}
+							value={phaseValue}
+							color={accent}
+							onScrubStart={onScrubStart}
+							onScrubEnd={onScrubEnd}
+						/>
+					) : undefined
 				}
 			>
 				<div className="relative group/radar">

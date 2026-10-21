@@ -1,5 +1,7 @@
 "use client"
 
+import { isRated } from "@/lib/sessionScores"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { memo, useState, type CSSProperties, type DragEvent } from "react"
@@ -164,7 +166,7 @@ function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 					{node.production_year ?? ""}
 				</span>
 				<AnimatePresence initial={false}>
-					{showRating && isSession && typeof node.rating === "number" && (
+					{showRating && isSession && isRated(node.rating) && (
 						<motion.span
 							key="rating"
 							className="text-[11px] leading-tight tabular-nums text-white/40 group-hover:text-white/70"

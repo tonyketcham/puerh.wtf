@@ -1,3 +1,4 @@
+import { isRated } from "@/lib/sessionScores"
 /**
  * The home page's log: recent sessions grouped by the month they were drunk, each month laid out
  * as a 6-column shelf whose slot sizes come from the sessions themselves, plus the margin notes
@@ -54,7 +55,8 @@ export function shelfSpans(sessions: readonly ExplorerSession[]): LogSpan[] {
 		spans.push(span)
 		used = (used + span) % 6
 	}
-	if (used && spans.length) spans[spans.length - 1] = (spans[spans.length - 1] + 6 - used) as LogSpan
+	if (used && spans.length)
+		spans[spans.length - 1] = (spans[spans.length - 1] + 6 - used) as LogSpan
 	return spans
 }
 
@@ -98,7 +100,10 @@ function since(days: number): string {
  * A margin note for a session, from everything logged before it (`older`, newest first):
  * the same tea again, or a kind of tea that hasn't come up in a while.
  */
-export function sessionNote(session: ExplorerSession, older: readonly ExplorerSession[]): string | null {
+export function sessionNote(
+	session: ExplorerSession,
+	older: readonly ExplorerSession[]
+): string | null {
 	const title = normTitle(session.title)
 	const again = title && older.find((o) => normTitle(o.title) === title)
 	if (again) return `again · last steeped ${stamp(again.date)}`
@@ -155,7 +160,7 @@ export function buildSessionLog(sessions: readonly ExplorerSession[], limit: num
 			shelf[i].variant = variantFor(span)
 		})
 		const list = month.slots.map((slot) => slot.session)
-		const ratings = list.map((s) => s.rating).filter((r): r is number => typeof r === "number")
+		const ratings = list.map((s) => s.rating).filter(isRated)
 		month.count = list.length
 		month.avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null
 		month.liquors = list.map(sessionColor)

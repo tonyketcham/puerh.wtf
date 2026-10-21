@@ -1,3 +1,4 @@
+import { flavorMidpoint, isRated } from "@/lib/sessionScores"
 /**
  * What a peek card knows about its target, all from the client-side relation index (no fetch):
  * the entity node, its ancestors, the sessions behind it and their stats.
@@ -61,7 +62,7 @@ export function dominantAxes(stats: EntityStats, count = 3): FlavorAxis[] {
 	const centroid = stats.centroid
 	if (!centroid) return []
 	return [...FLAVOR_AXES]
-		.map((axis) => ({ axis, v: (centroid[axis].start + centroid[axis].finish) / 2 }))
+		.map((axis) => ({ axis, v: flavorMidpoint(centroid, axis) }))
 		.filter((a) => a.v >= 1)
 		.sort((a, b) => b.v - a.v)
 		.slice(0, count)
@@ -80,7 +81,9 @@ export function featuredSessions(
 	const others = sessions.filter((s) => s._slug !== currentSlug)
 	const pool = others.length ? others : [...sessions]
 	const ranked = [...pool].sort(
-		(a, b) => (b.rating ?? -1) - (a.rating ?? -1) || a.title.localeCompare(b.title)
+		(a, b) =>
+			(isRated(b.rating) ? b.rating : -1) - (isRated(a.rating) ? a.rating : -1) ||
+			a.title.localeCompare(b.title)
 	)
 	return { shown: ranked.slice(0, limit), more: Math.max(0, pool.length - limit) }
 }

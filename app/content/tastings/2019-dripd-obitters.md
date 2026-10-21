@@ -14,34 +14,34 @@ date: 2020-12-11T20:35:04.062Z
 flavor_axes:
   cream:
     start: 5
-    finish: 0
+    finish: null
   umami:
     start: 4
-    finish: 0
+    finish: null
   stone:
     start: 4
-    finish: 0
+    finish: null
   spices:
     start: 5
-    finish: 0
+    finish: null
   earth:
     start: 7
-    finish: 0
+    finish: null
   nuts_roast:
     start: 6
-    finish: 0
+    finish: null
   wood:
     start: 7
-    finish: 0
+    finish: null
   vegetal:
     start: 3
-    finish: 0
+    finish: null
   floral:
     start: 4
-    finish: 0
+    finish: null
   fruits:
     start: 5
-    finish: 0
+    finish: null
 notes:
   dry_leaf_nose: old ass musty wood, petrichor, dank antique store, 4H art show in a barn
   wet_leaf_nose: funky aged woods and moss, dried corn husks, farm storehouse,

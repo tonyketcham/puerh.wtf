@@ -1,5 +1,7 @@
 "use client"
 
+import { hasFinishProfile } from "@/lib/sessionScores"
+
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { AnimatePresence, motion, useReducedMotion, useTransform } from "motion/react"
@@ -63,7 +65,8 @@ export default function StatusBar() {
 
 	const brewParts = [
 		temp && `${temp.c}°C / ${temp.f}°F`,
-		(grams || ml) && [grams && `${trimNum(grams)}g`, ml && `${trimNum(ml)}ml`].filter(Boolean).join(" / "),
+		(grams || ml) &&
+			[grams && `${trimNum(grams)}g`, ml && `${trimNum(ml)}ml`].filter(Boolean).join(" / "),
 		leafRatio,
 		!vessel && vesselNote,
 	].filter(Boolean) as string[]
@@ -133,7 +136,10 @@ export default function StatusBar() {
 							)}
 
 							{vessel && (
-								<Segment title={vesselNote ? `Brewed in: ${vesselNote}` : "Vessel"} className="min-w-0 pl-1.5">
+								<Segment
+									title={vesselNote ? `Brewed in: ${vesselNote}` : "Vessel"}
+									className="min-w-0 pl-1.5"
+								>
 									<EntityRef
 										kind="vessel"
 										slug={vessel._slug}
@@ -157,7 +163,7 @@ export default function StatusBar() {
 									{date}
 								</Segment>
 							)}
-							<PhaseSegment />
+							{hasFinishProfile(session.flavor_axes) && <PhaseSegment />}
 							<LiquorSegment hex={liquor.hex} measured={liquor.measured} />
 							<Segment
 								as="button"
@@ -219,8 +225,17 @@ function Sep() {
 function SteepIcon() {
 	// a tiny gaiwan: lid, bowl, saucer
 	return (
-		<svg aria-hidden viewBox="0 0 12 12" className="size-3 shrink-0" fill="none" stroke="currentColor">
-			<path d="M4.5 2.5h3M3 4.5h6M2.5 4.5c0 2.4 1.6 4 3.5 4s3.5-1.6 3.5-4M3.5 10h5" strokeLinecap="round" />
+		<svg
+			aria-hidden
+			viewBox="0 0 12 12"
+			className="size-3 shrink-0"
+			fill="none"
+			stroke="currentColor"
+		>
+			<path
+				d="M4.5 2.5h3M3 4.5h6M2.5 4.5c0 2.4 1.6 4 3.5 4s3.5-1.6 3.5-4M3.5 10h5"
+				strokeLinecap="round"
+			/>
 		</svg>
 	)
 }
@@ -271,7 +286,11 @@ function LiquorSegment({ hex, measured }: { hex: string; measured: boolean }) {
 	return (
 		<Segment
 			as="button"
-			title={measured ? "Liquor color, measured from the cup photo · click to copy" : "Liquor color (no cup photo; amber fallback) · click to copy"}
+			title={
+				measured
+					? "Liquor color, measured from the cup photo · click to copy"
+					: "Liquor color (no cup photo; amber fallback) · click to copy"
+			}
 			onClick={() => {
 				navigator.clipboard?.writeText(hex).then(
 					() => setCopied(true),

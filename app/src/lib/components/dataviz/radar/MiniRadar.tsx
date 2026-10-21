@@ -1,9 +1,12 @@
+import { hasFinishProfile } from "@/lib/sessionScores"
 import { FLAVOR_AXES, type SessionFlavorAxes } from "@/lib/types/session"
 import { CENTER, RADIUS, polar, polygonPoints, seriesFor, type RadarAxisData } from "./geometry"
 
 /** the radar's own square, without the room RadarChart keeps for axis labels */
 const PAD = 6
-const BOX = `${CENTER - RADIUS - PAD} ${CENTER - RADIUS - PAD} ${(RADIUS + PAD) * 2} ${(RADIUS + PAD) * 2}`
+const BOX = `${CENTER - RADIUS - PAD} ${CENTER - RADIUS - PAD} ${(RADIUS + PAD) * 2} ${
+	(RADIUS + PAD) * 2
+}`
 const RINGS = [5, 10].map((v) => polygonPoints(FLAVOR_AXES.map(() => v)))
 
 /**
@@ -22,6 +25,7 @@ export default function MiniRadar({
 	className?: string
 }) {
 	const { s, f } = seriesFor([...FLAVOR_AXES], data as unknown as RadarAxisData)
+	const hasFinish = hasFinishProfile(data)
 	const start = polygonPoints(s)
 	const finish = polygonPoints(f)
 
@@ -58,16 +62,22 @@ export default function MiniRadar({
 				strokeWidth={1.25}
 				strokeLinejoin="round"
 				vectorEffect="non-scaling-stroke"
-				className="transition-[fill-opacity,stroke-opacity,stroke-dasharray] duration-500 ease-out fill-current [fill-opacity:0.28] group-hover:[fill-opacity:0] group-hover:[stroke-opacity:0.45] group-hover:[stroke-dasharray:2_2] group-has-[:focus-visible]:[fill-opacity:0] group-has-[:focus-visible]:[stroke-dasharray:2_2]"
+				className={
+					hasFinish
+						? "transition-[fill-opacity,stroke-opacity,stroke-dasharray] duration-500 ease-out fill-current [fill-opacity:0.28] group-hover:[fill-opacity:0] group-hover:[stroke-opacity:0.45] group-hover:[stroke-dasharray:2_2] group-has-[:focus-visible]:[fill-opacity:0] group-has-[:focus-visible]:[stroke-dasharray:2_2]"
+						: "fill-current [fill-opacity:0.28]"
+				}
 			/>
-			<polygon
-				points={finish}
-				stroke="currentColor"
-				strokeWidth={1.25}
-				strokeLinejoin="round"
-				vectorEffect="non-scaling-stroke"
-				className="transition-[fill-opacity,stroke-opacity,stroke-dasharray] duration-500 ease-out fill-current [fill-opacity:0] [stroke-opacity:0.45] [stroke-dasharray:2_2] group-hover:[fill-opacity:0.28] group-hover:[stroke-opacity:1] group-hover:[stroke-dasharray:none] group-has-[:focus-visible]:[fill-opacity:0.28] group-has-[:focus-visible]:[stroke-opacity:1] group-has-[:focus-visible]:[stroke-dasharray:none]"
-			/>
+			{hasFinish && (
+				<polygon
+					points={finish}
+					stroke="currentColor"
+					strokeWidth={1.25}
+					strokeLinejoin="round"
+					vectorEffect="non-scaling-stroke"
+					className="transition-[fill-opacity,stroke-opacity,stroke-dasharray] duration-500 ease-out fill-current [fill-opacity:0] [stroke-opacity:0.45] [stroke-dasharray:2_2] group-hover:[fill-opacity:0.28] group-hover:[stroke-opacity:1] group-hover:[stroke-dasharray:none] group-has-[:focus-visible]:[fill-opacity:0.28] group-has-[:focus-visible]:[stroke-opacity:1] group-has-[:focus-visible]:[stroke-dasharray:none]"
+				/>
+			)}
 		</svg>
 	)
 }

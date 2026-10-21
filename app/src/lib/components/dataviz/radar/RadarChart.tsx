@@ -1,5 +1,7 @@
 "use client"
 
+import { hasFinishProfile } from "@/lib/sessionScores"
+
 import {
 	AnimatePresence,
 	animate,
@@ -96,6 +98,7 @@ export default function RadarChart({
 	const count = axes.length
 
 	const target = useMemo(() => seriesFor(axes, data), [axes, data])
+	const hasFinish = hasFinishProfile(data)
 	const targetSig = `${target.s.join(",")}|${target.f.join(",")}`
 	const hasChange = target.s.some((s, i) => Math.abs(s - target.f[i]) >= 0.25)
 
@@ -479,6 +482,7 @@ export default function RadarChart({
 							count={count}
 							start={target.s[safeActive]}
 							finish={target.f[safeActive]}
+							hasFinish={hasFinish}
 							color={color}
 							compareColor={shown ? compareColor : null}
 							phase={p}
@@ -526,9 +530,11 @@ export default function RadarChart({
 							}}
 							tabIndex={rovingIndex === i ? 0 : -1}
 							role="img"
-							aria-label={`${formatAxisLabel(axis)}: start ${s}, finish ${f} (${formatDelta(
-								f - s
-							)})`}
+							aria-label={
+								hasFinish
+									? `${formatAxisLabel(axis)}: start ${s}, finish ${f} (${formatDelta(f - s)})`
+									: `${formatAxisLabel(axis)}: ${s}`
+							}
 							onPointerEnter={() => setHoverAxis(i)}
 							onPointerLeave={() => setHoverAxis((h) => (h === i ? null : h))}
 							onFocus={() => {
@@ -662,6 +668,7 @@ function AxisInspector({
 	count,
 	start,
 	finish,
+	hasFinish,
 	color,
 	compareColor,
 	phase,
@@ -674,6 +681,7 @@ function AxisInspector({
 	count: number
 	start: number
 	finish: number
+	hasFinish: boolean
 	color: string
 	compareColor: string | null
 	phase: MotionValue<number>
@@ -770,9 +778,9 @@ function AxisInspector({
 				transition={spring}
 				style={{ fill: color }}
 			>
-				{formatDelta(finish - start)}
+				{hasFinish ? formatDelta(finish - start) : start}
 				<tspan fill="#9CA3AF" fontSize="9.5" dx="4">
-					{otherAt ? "s→f" : "start→finish"}
+					{hasFinish ? (otherAt ? "s→f" : "start→finish") : "recorded"}
 				</tspan>
 			</motion.text>
 			{otherAt && compareColor && (

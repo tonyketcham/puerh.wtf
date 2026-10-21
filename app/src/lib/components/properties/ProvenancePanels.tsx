@@ -1,5 +1,7 @@
 "use client"
 
+import { isRated } from "@/lib/sessionScores"
+
 import { Fragment, Suspense, useMemo, useState, type ReactNode } from "react"
 import { useAtomValue } from "jotai"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -451,7 +453,7 @@ function Record({ session, index, row }: SectionProps) {
 	const rank = useMemo(() => ratingRank(index, session._slug), [index, session._slug])
 	const authors = session.author || []
 	const tags = session.tags || []
-	const rating = typeof session.rating === "number" ? session.rating : null
+	const rating = isRated(session.rating) ? session.rating : null
 
 	return (
 		<PanelSection title="Record">

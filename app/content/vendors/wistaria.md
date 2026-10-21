@@ -4,7 +4,10 @@ title: Wistaria
 location: Daan District
 municipality: Taipei
 country: Taiwan
-description: A renowned boutique tea vendor from Taiwan, aiming to create
-  productions reminiscent and worthy of standing alongside the 'Masterpiece Era'
-  of puer production in the 1950's.
+description: >-
+  A renowned boutique tea vendor from Taiwan, aiming to create productions
+  reminiscent and worthy of standing alongside the 'Masterpiece Era' of puer
+  production in the 1950's.
+links:
+  website: 'https://www.wistariateahouse.com/en/'
 ---

@@ -214,7 +214,6 @@ export function matchesFilters(
 	if (!query) return true
 	const haystack = [
 		s.title,
-		s.tea_name || "",
 		String(s.production_year || ""),
 		...(s.vendor || []).map((v) => v.title),
 		...(s.cultivar || []).map((c) => c.title),

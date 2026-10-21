@@ -28,6 +28,16 @@ export type StoragePlace = {
 const place = (p: StoragePlace) => p
 
 export const STORAGE_PLACES: Readonly<Record<string, StoragePlace>> = {
+	guangxi: place({
+		key: "guangxi",
+		title: "Guangxi",
+		hanzi: "广西",
+		lon: 108.8,
+		lat: 23.8,
+		precision: "region",
+		origin: "guangxi",
+	}),
+	ohio: place({ key: "ohio", title: "Ohio", lon: null, lat: null, precision: "region" }),
 	guangzhou: place({
 		key: "guangzhou",
 		title: "Guangzhou",

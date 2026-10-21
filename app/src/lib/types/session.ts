@@ -18,7 +18,6 @@ export type BaseSession = {
 export type SessionPreview = BaseSession & {
 	_collection: NonNullable<GqlSession["_collection"]>
 	title: NonNullable<GqlSession["title"]>
-	tea_name?: GqlSession["tea_name"]
 	date: NonNullable<GqlSession["date"]>
 	production_year: GqlSession["production_year"]
 	excerpt: NonNullable<GqlSession["excerpt"]>
@@ -48,7 +47,7 @@ export type SessionPreview = BaseSession & {
 }
 
 /** The shape of a brewing vessel (content/vessels). */
-export type VesselKind = "gaiwan" | "teapot" | "shiboridashi" | "chawan"
+export type VesselKind = "gaiwan" | "teapot" | "shiboridashi" | "chawan" | "beaker"
 
 /** A brewing vessel as sessions reference it. */
 export type SessionVessel = {
@@ -162,7 +161,7 @@ export type SessionFull = SessionPreviewWithFeatureImage & {
 	_content: Content
 }
 
-export type SessionNotes = Omit<NonNullObject<NonNullable<GqlSessionNotes>>, "__typename">
+export type SessionNotes = Omit<NonNullable<GqlSessionNotes>, "__typename">
 
 /** Stage keys of the tasting notes. */
 export type NoteStage = keyof SessionNotes
@@ -212,5 +211,6 @@ export const FLAVOR_AXES: readonly FlavorAxis[] = [
  */
 export type FlavorAxesTransition = {
 	start: number
-	finish: number
+	/** null or omitted means the finish was not scored. */
+	finish?: number | null
 }

@@ -1,3 +1,4 @@
+import { isRated } from "@/lib/sessionScores"
 import Link from "next/link"
 import type { CSSProperties, ReactNode } from "react"
 import type { ExplorerSession, SessionPreviewWithFeatureImage } from "../types/session"
@@ -82,7 +83,7 @@ function cardModel(session: CardSession) {
 		teaStyle: session.style?.[0] ?? null,
 		origin: originLabel(session),
 		leafAge: formatVintageAge(vintageAgeAtSession(session.production_year, session.date)),
-		rating: typeof session.rating === "number" ? session.rating : null,
+		rating: isRated(session.rating) ? session.rating : null,
 		flavor: session.flavor_axes ?? null,
 		brew: [
 			temp && `${temp.c}°C`,
@@ -463,7 +464,7 @@ function Radar({ m, className }: { m: Model; className: string }) {
 }
 
 function Rating({ rating }: { rating: number | null }) {
-	if (rating == null) return null
+	if (!isRated(rating)) return null
 	return (
 		<span className="text-[10px] leading-none tabular-nums text-white/25">
 			<span className="text-sm text-white/80">{Math.round(rating)}</span>/100
