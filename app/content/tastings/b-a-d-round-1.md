@@ -2,60 +2,58 @@
 id: 88e42561-971f-4922-a9a8-f1010dee55bb
 author:
   - 4fe43719-eedf-4559-80c0-e778f8cf39c5
-tea_name: B.A.D. (Round 1)
 style:
   - 65819530-dd2c-4df0-9906-baf9e34e6d39
 cultivar:
   - 976cb22c-fe00-40e5-8949-f0f3a791ce26
-season: Spring
 production_year: 2018
 picking: Young leaves
-aging_conditions: Taiwan, unusually aged & lightly fermented in sealed bags
+aging_conditions: 'Taiwan, unusually aged & lightly fermented in sealed bags'
 vendor:
   - 84de34f8-3878-4daf-aa6e-d4925338fbfb
-purchase_link: https://meileaf.com/tea/bad/
-excerpt: " "
+purchase_link: 'https://meileaf.com/tea/bad/'
+excerpt: 'Raw honey, cedar, brandy, and a lasting red fruit-skin finish'
 date: 2020-11-21T22:23:52.351Z
 flavor_axes:
   cream:
     start: 0
-    finish: 0
+    finish: null
   umami:
     start: 0
-    finish: 0
+    finish: null
   stone:
     start: 0
-    finish: 0
+    finish: null
   spices:
     start: 0
-    finish: 0
+    finish: null
   earth:
     start: 0
-    finish: 0
+    finish: null
   nuts_roast:
     start: 0
-    finish: 0
+    finish: null
   wood:
     start: 6
-    finish: 0
+    finish: null
   vegetal:
     start: 0
-    finish: 0
+    finish: null
   floral:
     start: 0
-    finish: 0
+    finish: null
   fruits:
     start: 0
-    finish: 0
+    finish: null
 notes:
-  dry_leaf_nose: coriander, cardamom, cumin seed, plums, raw honey
-  wet_leaf_nose: funk, clean hotel room, Christmas spices, dark raisins, dried cranberries
-  empty_cup: pound cake, dark chocolate covered fruits
+  dry_leaf_nose: 'coriander, cardamom, cumin seed, plums, raw honey'
+  wet_leaf_nose: 'funk, clean hotel room, Christmas spices, dark raisins, dried cranberries'
+  empty_cup: 'pound cake, dark chocolate covered fruits'
   mouthfeel: silky and a bit oily
-  finish: a lasting red fruit skin, some tannicity, raisins, tobacco
-  taste: raw honey, cedar, brandy
-  cha_qi: Slightly altered, kind of on edge
-rating: 50
+  finish: 'a lasting red fruit skin, some tannicity, raisins, tobacco'
+  taste: 'raw honey, cedar, brandy'
+  cha_qi: 'Slightly altered, kind of on edge'
+rating: -1
 brewing:
   temperature: 200
   material_amount: 4
@@ -64,6 +62,12 @@ brewing:
   first_infusion_duration: 20
   infusion_increment: 5
 images: []
+title: B.A.D. (Round 1)
+season_note: Spring
+harvest:
+  season: spring
+storage:
+  - place: taiwan
 ---
 The dry leaf has a coriander and cardamom center surrounded by plums, raw honey, deep red stone fruits.
 
