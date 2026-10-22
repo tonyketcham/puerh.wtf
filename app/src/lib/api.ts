@@ -129,7 +129,6 @@ export async function getExplorerSessions(options?: {
 				_collection
 				id
 				title
-				tea_name
 				date
 				production_year
 				excerpt

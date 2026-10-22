@@ -1,5 +1,7 @@
 "use client"
 
+import { isRated } from "@/lib/sessionScores"
+
 import Link from "next/link"
 import { useMemo, useState, type ReactNode } from "react"
 import { useAtomValue, useSetAtom } from "jotai"
@@ -783,7 +785,7 @@ function Sessions({ model, peek, row }: { model: PeekModel; peek: PeekController
 							<span className="min-w-0 truncate">{s.title}</span>
 							{isCurrent && <span className="shrink-0 text-white/30">· this</span>}
 							<span className="flex-1" />
-							{typeof s.rating === "number" && (
+							{isRated(s.rating) && (
 								<span className="tabular-nums shrink-0 text-white/35 transition-opacity group-hover/row:opacity-0 group-focus-within/row:opacity-0">
 									{formatRating(Math.round(s.rating * 10) / 10)}
 								</span>

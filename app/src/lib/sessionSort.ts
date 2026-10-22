@@ -1,3 +1,4 @@
+import { isRated } from "@/lib/sessionScores"
 /**
  * Explorer sort orders for the session list. Pure: safe in server code and tests.
  * Every order is newest/best first and falls back to the session date, so ties stay stable.
@@ -27,7 +28,11 @@ type Sortable = Pick<ExplorerSession, "date" | "production_year" | "rating">
 /** Comparator for a sort order (descending; unknown values last). */
 export function compareSessions(sort: SessionSort) {
 	return (a: Sortable, b: Sortable) => {
-		if (sort === "rating") return num(b.rating) - num(a.rating) || time(b) - time(a)
+		if (sort === "rating")
+			return (
+				num(isRated(b.rating) ? b.rating : null) - num(isRated(a.rating) ? a.rating : null) ||
+				time(b) - time(a)
+			)
 		if (sort === "vintage")
 			return num(Number(b.production_year)) - num(Number(a.production_year)) || time(b) - time(a)
 		return time(b) - time(a)

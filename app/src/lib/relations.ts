@@ -1,3 +1,4 @@
+import { isRated } from "@/lib/sessionScores"
 /**
  * Relation index: every entity a session points at, and every session behind every entity
  * (plan §2.4). Built on the client from the Explorer's session list (getExplorerSessions(),
@@ -328,8 +329,16 @@ export function sessionColor(session: ExplorerSession): string {
 export function flavorCentroid(sessions: readonly ExplorerSession[]): SessionFlavorAxes | null {
 	const profiles = sessions.map((s) => s.flavor_axes).filter((f): f is SessionFlavorAxes => !!f)
 	if (!profiles.length) return null
-	const mean = (axis: FlavorAxis, end: "start" | "finish") =>
-		profiles.reduce((sum, p) => sum + (Number(p[axis]?.[end]) || 0), 0) / profiles.length
+	const mean = (axis: FlavorAxis, end: "start" | "finish") => {
+		const values = profiles
+			.map((p) => p[axis]?.[end])
+			.filter((v): v is number => typeof v === "number" && Number.isFinite(v))
+		return values.length
+			? values.reduce((sum, v) => sum + v, 0) / values.length
+			: end === "finish"
+			? null
+			: 0
+	}
 	return Object.fromEntries(
 		FLAVOR_AXES.map((axis) => [axis, { start: mean(axis, "start"), finish: mean(axis, "finish") }])
 	) as SessionFlavorAxes
@@ -340,9 +349,7 @@ export function computeStats(sessions: readonly ExplorerSession[]): EntityStats 
 	const years = sessions
 		.map((s) => Math.trunc(Number(s.production_year)))
 		.filter((y) => Number.isFinite(y) && y > 0)
-	const ratings = sessions
-		.map((s) => s.rating)
-		.filter((r): r is number => typeof r === "number" && Number.isFinite(r))
+	const ratings = sessions.map((s) => s.rating).filter(isRated)
 	return {
 		count: sessions.length,
 		years: years.length ? [Math.min(...years), Math.max(...years)] : null,
@@ -370,8 +377,8 @@ export function ratingRank(
 	slug: string
 ): { rank: number; of: number } | null {
 	const rating = index.bySlug.get(slug)?.rating
-	if (typeof rating !== "number") return null
-	const rated = index.sessions.filter((s) => typeof s.rating === "number")
+	if (!isRated(rating)) return null
+	const rated = index.sessions.filter((s) => isRated(s.rating))
 	return { rank: 1 + rated.filter((s) => (s.rating as number) > rating).length, of: rated.length }
 }
 

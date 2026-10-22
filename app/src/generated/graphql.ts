@@ -356,7 +356,6 @@ export type Session = {
   style?: Maybe<Array<Maybe<Style>>>;
   /** All Tagses that are referenced by this Session */
   tags?: Maybe<Array<Maybe<Tags>>>;
-  tea_name?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   /** All Vendors that are referenced by this Session */
   vendor?: Maybe<Array<Maybe<Vendor>>>;

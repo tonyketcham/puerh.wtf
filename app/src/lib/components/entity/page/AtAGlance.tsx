@@ -1,5 +1,7 @@
 "use client"
 
+import { flavorMidpoint } from "@/lib/sessionScores"
+
 import Link from "next/link"
 import { useMemo, type ReactNode } from "react"
 import { motion, useReducedMotion } from "motion/react"
@@ -319,7 +321,7 @@ function axisDeltas(
 	ref: SessionFlavorAxes | null
 ): { axis: FlavorAxis; delta: number }[] {
 	if (!own || !ref) return []
-	const mid = (f: SessionFlavorAxes, a: FlavorAxis) => (f[a].start + f[a].finish) / 2
+	const mid = (f: SessionFlavorAxes, a: FlavorAxis) => flavorMidpoint(f, a)
 	return FLAVOR_AXES.map((axis) => ({ axis, delta: mid(own, axis) - mid(ref, axis) }))
 		.filter((d) => Math.abs(d.delta) >= 0.3)
 		.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))

@@ -1,5 +1,7 @@
 "use client"
 
+import { hasFinishProfile } from "@/lib/sessionScores"
+
 import { Suspense, useCallback, useMemo, type ReactNode } from "react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -129,7 +131,7 @@ function CentroidPanel({ model }: { model: EntityModel }) {
 		<PanelSection
 			title="Flavor centroid"
 			rightSlot={
-				model.stats.centroid ? (
+				hasFinishProfile(model.stats.centroid) ? (
 					<PhaseScrubber
 						phase={flavorPhaseMotion}
 						value={phase}

@@ -1,9 +1,10 @@
+import { hasFinishProfile } from "@/lib/sessionScores"
 /**
  * Pure geometry + color helpers for the flavor radar.
  */
 import type { LiquorColor } from "@/lib/liquor"
 
-export type RadarAxisData = Record<string, { start: number; finish: number }>
+export type RadarAxisData = Record<string, { start: number; finish?: number | null }>
 
 /** Per-axis start / finish arrays, aligned to an axes list. */
 export type RadarSeries = { s: number[]; f: number[] }
@@ -26,9 +27,11 @@ export function lerpArray(a: number[], b: number[], t: number): number[] {
 }
 
 export function seriesFor(axes: string[], data: RadarAxisData | null | undefined): RadarSeries {
+	const s = axes.map((a) => data?.[a]?.start ?? 0)
 	return {
-		s: axes.map((a) => data?.[a]?.start ?? 0),
-		f: axes.map((a) => data?.[a]?.finish ?? 0),
+		s,
+		// A missing finish is one static profile, never a collapse toward zero.
+		f: hasFinishProfile(data) ? axes.map((a, i) => data?.[a]?.finish ?? s[i]) : [...s],
 	}
 }
 

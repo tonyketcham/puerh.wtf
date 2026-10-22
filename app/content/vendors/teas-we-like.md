@@ -4,7 +4,7 @@ title: Teas We Like
 image: /images/uploads/teas-we-like-logo.jpeg
 links:
   website: https://teaswelike.com/
-  instagram: https:/instagram.com/teaswelike/
+  instagram: https://instagram.com/teaswelike/
 country: Taiwan
 description: A board of avid tea drinkers curating great teas, mostly
   surrounding aged puer. They also source & sell antique yixing teapots.

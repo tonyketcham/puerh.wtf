@@ -1,6 +1,6 @@
 {
 	"version": "3.2.0",
-	"inputHash": "6d713607c357b8886dcb57f17517e9e278e377eec4d9adcb303d1a93289c6f61",
+	"inputHash": "ab49152d63488f9dd6874c49b8cb81f211d84b6a19bc7a42224cdc7c8426131e",
 	"attribution": ["Terrain: AWS Terrain Tiles (Mapzen terrarium; SRTM, GMTED, ETOPO1, 3DEP)","Reference layers and labels: Natural Earth 10m (public domain)","Hanzi labels: Noto Sans SC (SIL Open Font License 1.1)"],
 	"projection": {"type":"mercator","rotate":[-102,0],"center":[0,25],"scale":30000,"translate":[0,0],"controlPoints":[[96,18,-3141.593,3942.512],[100.5,21.5,-785.398,1994.997],[101.469,21.981,-278.031,1723.86],[102,25,0,0],[104,30,1047.198,-2952.924],[110,22.5,4188.79,1430.268],[118.03,27.759,8393.288,-1612.752],[120.7,23.475,9791.297,875.714],[135.987,34.864,17795.552,-5971.979],[141.5,40,20682.152,-9361.03]]},
 	"camera": {"maxView":[25132.7,15708],"overview":[-2670.4,-8885,23247.8,12504.3]},

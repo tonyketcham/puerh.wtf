@@ -130,7 +130,6 @@ export function buildIndex(
 			category: cat ? { title: cat.title, color: cat.color } : null,
 			liquor: getLiquorColor(s._slug),
 			meta: [
-				s.tea_name,
 				...(s.vendor ?? []).map((v) => v.title),
 				...(s.style ?? []).flatMap((st) => [st.title, st.category?.title]),
 				...(s.tags ?? []).map((t) => t?.title),

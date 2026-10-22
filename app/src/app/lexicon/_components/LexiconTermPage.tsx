@@ -32,6 +32,7 @@ import { NOTE_STAGES, NOTE_STAGE_META } from "@/lib/noteStages"
 import { peekFilter } from "@/lib/peek"
 import { entityKeys, sessionColor, type RelationIndex } from "@/lib/relations"
 import { formatRating } from "@/lib/sessionSort"
+import { isRated } from "@/lib/sessionScores"
 import { descriptorAtom } from "@/lib/store/sessionAtom"
 import type { NoteStage } from "@/lib/types/session"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
@@ -475,7 +476,7 @@ function Mentions({ model, entry }: { model: WordModel; entry: LexiconEntry }) {
 										</span>
 										<span className="tabular-nums text-white/25">{matches.length}</span>
 										<span aria-hidden className="flex-1 h-px bg-white/[0.04]" />
-										{typeof s.rating === "number" && (
+										{isRated(s.rating) && (
 											<span className="tabular-nums shrink-0 text-white/35">
 												{formatRating(Math.round(s.rating * 10) / 10)}
 											</span>
