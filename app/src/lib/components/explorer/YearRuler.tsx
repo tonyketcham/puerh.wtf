@@ -92,7 +92,7 @@ function toRuns(selected: number[], vintages: number[]): [number, number][] {
  * - Handles are sliders: ←/→ step between vintages, PgUp/PgDn ×5, Home/End, Esc/Backspace clears.
  * - Writes only through onYearsChange (the shared years facet). Selecting every vintage = no filter.
  */
-export default function YearRuler({
+function YearRuler({
 	sessions,
 	filteredSessions,
 	activeYears,
@@ -789,3 +789,6 @@ const VintageTick = memo(function VintageTick({
 		</div>
 	)
 })
+
+// the Explorer re-renders on every tab switch; nothing here depends on the view
+export default memo(YearRuler)

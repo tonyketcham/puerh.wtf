@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { X as CloseIcon } from "lucide-react"
 
@@ -25,7 +26,7 @@ const TOKEN_SPRING = { type: "spring", stiffness: 520, damping: 36, mass: 0.7 } 
  * Active filters as small removable tokens (shared Jotai filter state, so anything set from the
  * command bar shows up here). Tokens pop in/out and the rest reflow with layout springs.
  */
-export default function FilterTokens({ tokens, onClearAll }: FilterTokensProps) {
+function FilterTokens({ tokens, onClearAll }: FilterTokensProps) {
 	const reduce = useReducedMotion()
 	const transition = reduce ? { duration: 0 } : TOKEN_SPRING
 
@@ -96,3 +97,6 @@ export default function FilterTokens({ tokens, onClearAll }: FilterTokensProps) 
 		</AnimatePresence>
 	)
 }
+
+// the Explorer re-renders on every tab switch; nothing here depends on the view
+export default memo(FilterTokens)

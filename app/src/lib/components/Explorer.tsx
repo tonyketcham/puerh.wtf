@@ -6,10 +6,19 @@ import type { ExplorerSession } from "../types/session"
 import type { Vendor } from "../types/vendor"
 import type { Category } from "../types/category"
 import Panel from "./containers/Panel"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import {
+	Activity,
+	useCallback,
+	useDeferredValue,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react"
 import { usePathname } from "next/navigation"
-import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "motion/react"
-import { useAtom } from "jotai"
+import { LayoutGroup, MotionConfig, useReducedMotion } from "motion/react"
+import { useAtom, useStore } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
 import {
 	EMPTY_FACETS,
@@ -38,6 +47,7 @@ import OriginsView from "@/lib/components/explorer/OriginsView"
 import VendorsView from "@/lib/components/explorer/VendorsView"
 import StylesView from "@/lib/components/explorer/StylesView"
 import LexiconView from "@/lib/components/explorer/LexiconView"
+import { PaneRevealContext } from "@/lib/components/explorer/paneReveal"
 import {
 	EXPLORER_VIEWS,
 	explorerHoverAtom,
@@ -96,16 +106,83 @@ const FACET_KIND: Record<FacetKey, string> = {
 	vessels: "vessel",
 }
 
-/** The facet an entity view leaves out of its own counts, so its list keeps every option. */
-const VIEW_FACET: Record<ExplorerView, FacetKey | null> = {
-	sessions: null,
-	origins: "origins",
-	vendors: "vendors",
-	styles: "styles",
-	lexicon: null,
-}
+/**
+ * The views' slide: Motion's spring from before (stiffness 520, damping 38), fitted with a
+ * cubic-bezier (within 0.5px of it over the 14px travel, overshoot included). A cubic-bezier
+ * rather than a sampled linear() curve because WebKit only hands an element's transform and
+ * opacity animations to the compositor when every one of them uses an easing Core Animation
+ * can run; with linear() both stayed on the main thread and froze whenever a switch kept it
+ * busy (the recording held a half-faded overlap for ~7 frames, then snapped).
+ */
+const VIEW_SLIDE = { duration: 400, easing: "cubic-bezier(0.33, 0.69, 0.07, 1.11)" } as const
+const VIEW_SHIFT = 14
+/** Motion's default ease for a tween */
+const FADE_EASE = "cubic-bezier(0.25, 0.1, 0.35, 1)"
 
-const VIEW_SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
+/**
+ * Slide the incoming pane in and the outgoing one out as Web Animations on transform and
+ * opacity only, so they run on the compositor however busy the main thread is. Each starts
+ * from wherever the pane is now, so a switch mid-slide turns it around without a jump.
+ *
+ * The animations are created paused, so the frame that reveals the pane already shows their
+ * first keyframe, and only start two frames later: revealing a pane re-runs its effects, and
+ * a clock started at commit spent that work's frames before anything was painted (the first
+ * frame the recording showed was already half way through the fade).
+ */
+function slidePane(
+	el: HTMLElement,
+	to: "in" | "out",
+	direction: number,
+	reduce: boolean,
+	running: Map<HTMLElement, Animation[]>
+) {
+	const prior = running.get(el) ?? []
+	// caught mid-slide (or still held at its start): carry on from where it is. Otherwise from
+	// rest, ignoring any fill a finished exit left on a pane that has since been hidden.
+	const midflight = prior.some((a) => a.playState === "running" || a.playState === "paused")
+	const style = midflight ? getComputedStyle(el) : null
+	for (const a of prior) a.cancel()
+	const shift = `translateX(${direction * (to === "in" ? VIEW_SHIFT : -VIEW_SHIFT)}px)`
+	const from =
+		to === "in"
+			? { transform: style?.transform ?? shift, opacity: Number(style?.opacity ?? 0) }
+			: { transform: style?.transform ?? "none", opacity: Number(style?.opacity ?? 1) }
+	const animations = [
+		el.animate(
+			{ opacity: [from.opacity, to === "in" ? 1 : 0] },
+			{ duration: reduce ? 120 : 160, easing: FADE_EASE, fill: "both" }
+		),
+	]
+	if (!reduce)
+		animations.push(
+			el.animate(
+				{ transform: [from.transform, to === "in" ? "none" : shift] },
+				{ ...VIEW_SLIDE, fill: "both" }
+			)
+		)
+	for (const a of animations) a.pause()
+	el.style.willChange = "transform, opacity"
+	running.set(el, animations)
+	requestAnimationFrame(() =>
+		requestAnimationFrame(() => {
+			if (running.get(el) === animations) for (const a of animations) a.play()
+		})
+	)
+	const done = Promise.all(animations.map((a) => a.finished))
+	done.then(
+		() => {
+			if (running.get(el) !== animations) return
+			el.style.willChange = ""
+			// an arrived pane drops its fill; a departed one keeps it until Activity hides it
+			if (to === "in") {
+				for (const a of animations) a.cancel()
+				running.delete(el)
+			}
+		},
+		() => {}
+	)
+	return done
+}
 
 /**
  * Below xl the Explorer is a modal drawer: a navigation puts it away, Escape closes it, focus
@@ -190,15 +267,18 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				: sessionsExceptYears,
 		[sessionsExceptYears, selectedYearSet]
 	)
-	// The open entity view counts sessions passing every filter but its own
-	const viewFacet = VIEW_FACET[view]
-	const viewPool = useMemo(
-		() =>
-			viewFacet && facets[viewFacet].length
-				? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: [viewFacet] }))
-				: filteredSessions,
-		[viewFacet, sessions, facets, query, filteredSessions]
-	)
+	// Each entity view counts sessions passing every filter but its own. Every view stays
+	// mounted (see the panes below), so each keeps its own pool: switching views recomputes
+	// nothing, and a filter only refilters the views whose facet it touches.
+	const poolExcept = (facet: FacetKey) =>
+		facets[facet].length
+			? sessions.filter((s) => matchesFilters(s, facets, query, { ignore: [facet] }))
+			: filteredSessions
+	/* eslint-disable react-hooks/exhaustive-deps -- poolExcept reads exactly these */
+	const originsPool = useMemo(() => poolExcept("origins"), [sessions, facets, query, filteredSessions])
+	const vendorsPool = useMemo(() => poolExcept("vendors"), [sessions, facets, query, filteredSessions])
+	const stylesPool = useMemo(() => poolExcept("styles"), [sessions, facets, query, filteredSessions])
+	/* eslint-enable react-hooks/exhaustive-deps */
 	// display order (sessions arrive newest first, so date needs no sort)
 	const orderedSessions = useMemo(
 		() => (sort === "date" ? sessions : sortSessions(sessions, sort)),
@@ -346,15 +426,56 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 
 	// views slide toward the side of the rail they were picked from
 	const [direction, setDirection] = useState(0)
+	const store = useStore()
 	const changeView = useCallback(
 		(next: ExplorerView) => {
-			setDirection(Math.sign(EXPLORER_VIEWS.indexOf(next) - EXPLORER_VIEWS.indexOf(view)))
+			const current = store.get(explorerViewAtom)
+			setDirection(Math.sign(EXPLORER_VIEWS.indexOf(next) - EXPLORER_VIEWS.indexOf(current)))
 			setView(next)
-			// the hovered row is about to unmount without a pointerleave
+			// the hovered row is about to be hidden without a pointerleave
 			setHover(null)
 		},
-		[view, setView, setHover]
+		[store, setView, setHover]
 	)
+
+	/*
+	 * The rail answers a tap at once (it reads `view`); the panes follow `shown`, a deferred copy
+	 * React may render after the pill has started to move and abandon if another tab is tapped
+	 * first. Every view stays mounted in an <Activity>: hidden ones keep their rows and state,
+	 * pre-render at idle priority and pause their effects, so a switch reveals a pane rather
+	 * than building one. The outgoing pane stays visible (out of flow, inert) for its exit.
+	 */
+	const shown = useDeferredValue(view)
+	const [settledView, setSettledView] = useState(shown)
+	const [leaving, setLeaving] = useState<ExplorerView | null>(null)
+	const [reveals, setReveals] = useState<Partial<Record<ExplorerView, number>>>({})
+	if (settledView !== shown) {
+		setSettledView(shown)
+		setReveals((r) => ({ ...r, [shown]: (r[shown] ?? 0) + 1 }))
+		// direction 0: the remembered view arriving after hydration, which only appears
+		setLeaving(direction === 0 ? null : settledView)
+	}
+	const paneRefs = useRef<Partial<Record<ExplorerView, HTMLDivElement | null>>>({})
+	const animations = useRef(new Map<HTMLElement, Animation[]>())
+	const slidFrom = useRef(shown)
+	useLayoutEffect(() => {
+		const from = slidFrom.current
+		if (from === shown) return
+		slidFrom.current = shown
+		const incoming = paneRefs.current[shown]
+		if (incoming) {
+			if (direction === 0) {
+				for (const a of animations.current.get(incoming) ?? []) a.cancel()
+				animations.current.delete(incoming)
+			} else slidePane(incoming, "in", direction, !!reduce, animations.current)
+		}
+		const outgoing = paneRefs.current[from]
+		if (!outgoing || direction === 0) return
+		slidePane(outgoing, "out", direction, !!reduce, animations.current).then(
+			() => setLeaving((l) => (l === from ? null : l)),
+			() => {}
+		)
+	}, [shown, direction, reduce])
 
 	// a lexicon word's "find all references": pin it and show the sessions that list it
 	const findReferences = useCallback(
@@ -365,13 +486,44 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 		[setDescriptor, changeView]
 	)
 
+	const onYearsChange = useCallback(
+		(years: string[]) => setFacets((f) => ({ ...f, years })),
+		[setFacets]
+	)
+	const togglePin = useCallback(
+		() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d)),
+		[setDescriptor]
+	)
+	const clearDescriptor = useCallback(() => setDescriptor(null), [setDescriptor])
+
 	const viewProps = {
 		index,
-		pool: viewPool,
 		filters,
 		narrowed: filtered,
 		pathname: stripSlash(pathname ?? ""),
 		onToggleFilter,
+	}
+	const renderView = (v: ExplorerView) => {
+		switch (v) {
+			case "sessions":
+				return (
+					<FileTree
+						referenceSlugs={references?.visible ?? null}
+						order={sort}
+						data={sessionTreeData}
+					/>
+				)
+			case "origins":
+				return <OriginsView {...viewProps} pool={originsPool} />
+			case "vendors":
+				return <VendorsView {...viewProps} pool={vendorsPool} vendors={vendors} />
+			case "styles":
+				return <StylesView {...viewProps} pool={stylesPool} categories={categories} />
+			case "lexicon":
+				return (
+					<LexiconView {...viewProps} pool={filteredSessions} onFindReferences={findReferences} />
+				)
+		}
 	}
 
 	return (
@@ -436,8 +588,8 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 								sessions={sessions}
 								filteredSessions={sessionsExceptYears}
 								activeYears={facets.years}
-								onYearsChange={(years) => setFacets((f) => ({ ...f, years }))}
-								previewYears={view === "sessions" ? null : previewYears}
+								onYearsChange={onYearsChange}
+								previewYears={shown === "sessions" ? null : previewYears}
 							/>
 							<FilterTokens tokens={tokens} onClearAll={clearAll} />
 							{/* only a pinned descriptor earns the bar (it shifts the tree); a hover preview
@@ -446,59 +598,44 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 								descriptor={descriptor?.pinned ? descriptor : null}
 								total={references?.total ?? 0}
 								hidden={references ? references.total - references.visible.length : 0}
-								onTogglePin={() => setDescriptor((d) => (d ? { ...d, pinned: !d.pinned } : d))}
-								onClear={() => setDescriptor(null)}
+								onTogglePin={togglePin}
+								onClear={clearDescriptor}
 							/>
-							<div
-								id={EXPLORER_PANEL_ID}
-								role="tabpanel"
-								aria-labelledby={explorerTabId(view)}
-								className="relative"
-							>
-								<AnimatePresence mode="popLayout" initial={false} custom={direction}>
-									<motion.div
-										key={view}
-										custom={direction}
-										variants={{
-											enter: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * 14 }),
-											center: { opacity: 1, x: 0 },
-											exit: (d: number) => (reduce ? { opacity: 0 } : { opacity: 0, x: d * -14 }),
-										}}
-										initial="enter"
-										animate="center"
-										exit="exit"
-										transition={
-											// direction 0: the remembered view arriving after hydration, not a pick
-											direction === 0
-												? { duration: 0 }
-												: reduce
-												? { duration: 0.12 }
-												: {
-														...VIEW_SPRING,
-														opacity: { duration: 0.16 },
-												  }
-										}
-									>
-										{view === "sessions" && (
-											<FileTree
-												referenceSlugs={references?.visible ?? null}
-												order={sort}
-												data={sessionTreeData}
-											/>
-										)}
-										{/* entity rows run a little wider than the padding: names need the room */}
-										{view !== "sessions" && (
-											<div className="-mx-2">
-												{view === "origins" && <OriginsView {...viewProps} />}
-												{view === "vendors" && <VendorsView {...viewProps} vendors={vendors} />}
-												{view === "styles" && <StylesView {...viewProps} categories={categories} />}
-												{view === "lexicon" && (
-													<LexiconView {...viewProps} onFindReferences={findReferences} />
-												)}
-											</div>
-										)}
-									</motion.div>
-								</AnimatePresence>
+							{/* only the shown pane is the tabpanel; a pane on its way out is inert and out of flow */}
+							<div className="relative">
+								{EXPLORER_VIEWS.map((v) => {
+									const current = v === shown
+									const departing = !current && v === leaving
+									return (
+										<Activity key={v} mode={current || departing ? "visible" : "hidden"}>
+											{/* marks replay their entrance on each reveal (see paneReveal) */}
+											<PaneRevealContext value={reveals[v] ?? 0}>
+												{/* each view scopes its current-row highlight, so it never flies between views */}
+												<LayoutGroup id={`explorer-${v}`}>
+													<div
+														ref={(el) => {
+															paneRefs.current[v] = el
+														}}
+														id={current ? EXPLORER_PANEL_ID : undefined}
+														role={current ? "tabpanel" : undefined}
+														aria-labelledby={current ? explorerTabId(v) : undefined}
+														aria-hidden={departing || undefined}
+														inert={departing || undefined}
+														data-explorer-pane={v}
+														className={cn(departing && "absolute inset-x-0 top-0 pointer-events-none")}
+													>
+														{/* entity rows run a little wider than the padding: names need the room */}
+														{v === "sessions" ? (
+															renderView(v)
+														) : (
+															<div className="-mx-2">{renderView(v)}</div>
+														)}
+													</div>
+												</LayoutGroup>
+											</PaneRevealContext>
+										</Activity>
+									)
+								})}
 							</div>
 						</div>
 					</div>

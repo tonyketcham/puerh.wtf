@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, type KeyboardEvent } from "react"
+import { useRef, useState, type KeyboardEvent } from "react"
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
 import { BookA, Files, Layers, Mountain, Store, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -36,6 +36,14 @@ export default function ActivityRail({
 	const reduce = useReducedMotion()
 	const refs = useRef<Partial<Record<ExplorerView, HTMLButtonElement | null>>>({})
 	const transition = reduce ? { duration: 0 } : SPRING
+	// Only the tabs gaining or losing the label change size; the rest just shift over, so they
+	// take the cheaper position-only layout animation (no size measure or scale correction).
+	const [current, setCurrent] = useState(value)
+	const [previous, setPrevious] = useState(value)
+	if (current !== value) {
+		setPrevious(current)
+		setCurrent(value)
+	}
 
 	const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
 		const i = EXPLORER_VIEWS.indexOf(value)
@@ -74,7 +82,7 @@ export default function ActivityRail({
 							ref={(el) => {
 								refs.current[view] = el
 							}}
-							layout
+							layout={active || view === previous ? true : "position"}
 							transition={transition}
 							type="button"
 							role="tab"
@@ -89,6 +97,10 @@ export default function ActivityRail({
 							data-view={view}
 							className={cn(
 								"relative flex items-center h-7 px-1.5 gap-1.5 rounded-[9px] shrink-0",
+								// a label on its way out pops out of flow and fades while its tab narrows; clip
+								// it to the tab so it can't trail past the neighbor or the rail's right edge
+								// (leaving room for the focus ring and the pill's underline glow below)
+								"[clip-path:inset(-2px_-2px_-8px_-2px)]",
 								"outline-none focus-visible:ring-1 focus-visible:ring-white/40",
 								"transition-colors duration-150",
 								active ? "text-white/90" : "text-white/40 hover:text-white/75"
