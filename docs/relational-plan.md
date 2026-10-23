@@ -133,7 +133,7 @@ Notes on the table:
 | D11 | `aging_conditions` is free text with places + years ("Menghai for 7.5 years, Guangzhou for 7 years") | later: structured `storage: [{ place, from, to, humidity }]` (§3.5) |
 | D12 | 32 image refs on 8 sessions are `res.cloudinary.com`; 1 vendor logo too | migrate into `/images/uploads` (outside this plan) |
 | D13 | Liquor colors cover only 26/70 sessions (38 have images) | fall back to the category color for map rings; extend sampling when photos are added |
-| D14 | Mori-machi Dark: vendor = Liquid Proust but `purchase_link` = denstea.com | confirm the vendor |
+| D14 | ~~Mori-machi Dark: vendor = Liquid Proust but `purchase_link` = denstea.com~~ **Resolved 2026-10-23:** bought from Liquid Proust, who sourced it from Den's Tea (owner) | optional `sourced_from` Vendor ref on sessions; Den's Tea added |
 | D15 | `2020-moon-bear-white` has production_year 2021 | confirm |
 
 ---
@@ -729,7 +729,6 @@ The owner approved every recommendation in this plan, §0 through §5 as written
 
 Still open (facts only the owner has; they don't block any phase):
 
-- D14: the vendor for Mori-machi Dark (Liquid Proust vs Den's Tea)
 - D15: Moon Bear White's production year (2020 or 2021)
 - A village-level point for Suan Zao Shu (township or vendor map)
 

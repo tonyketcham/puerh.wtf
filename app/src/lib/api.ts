@@ -96,6 +96,11 @@ export async function getSessions(options?: {
           title
           image
         }
+        sourced_from {
+          _slug
+          title
+          image
+        }
         ${
 					withImages
 						? `
@@ -146,6 +151,11 @@ export async function getExplorerSessions(options?: {
 				}
 				vendor {
 					_collection
+					_slug
+					title
+					image
+				}
+				sourced_from {
 					_slug
 					title
 					image
@@ -284,6 +294,11 @@ export async function getSession(slug: string): Promise<SessionFull> {
 					}
 				}
 				vendor {
+					_slug
+					title
+					image
+				}
+				sourced_from {
 					_slug
 					title
 					image

@@ -57,6 +57,7 @@ export default function EntityPage({
 	notes,
 	points = [],
 	mapPoints,
+	supplied = [],
 }: {
 	data: EntityPageData
 	/** server-rendered SessionCards by session slug */
@@ -69,6 +70,8 @@ export default function EntityPage({
 	points?: DotMapPoint[]
 	/** origin pages: placed origins for the hero map */
 	mapPoints?: MapPoint[]
+	/** vendor pages: server-rendered cards of teas this vendor supplied to another vendor */
+	supplied?: { slug: string; card: ReactNode }[]
 }) {
 	const index = useAtomValue(relationIndexAtom)
 	const model = useMemo(
@@ -121,6 +124,22 @@ export default function EntityPage({
 				>
 					<SessionsList model={model} index={index} title={data.title} cards={cards} />
 				</Section>
+
+				{supplied.length > 0 && (
+					<Section
+						id="supplied"
+						label="Supplied to others"
+						count={supplied.length}
+						aside={<span className="text-[11px] text-white/25">sold on by another vendor</span>}
+						recordingKey="entity-supplied"
+					>
+						<div className="grid grid-cols-1 gap-2.5 items-start">
+							{supplied.map(({ slug, card }) => (
+								<div key={slug}>{card}</div>
+							))}
+						</div>
+					</Section>
+				)}
 
 				<Section id="related" label="Related" recordingKey="entity-related">
 					<Related model={model} index={index} data={data} />
