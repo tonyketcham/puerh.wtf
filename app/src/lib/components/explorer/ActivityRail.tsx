@@ -97,6 +97,10 @@ export default function ActivityRail({
 							data-view={view}
 							className={cn(
 								"relative flex items-center h-7 px-1.5 gap-1.5 rounded-[9px] shrink-0",
+								// a label on its way out pops out of flow and fades while its tab narrows; clip
+								// it to the tab so it can't trail past the neighbor or the rail's right edge
+								// (leaving room for the focus ring and the pill's underline glow below)
+								"[clip-path:inset(-2px_-2px_-8px_-2px)]",
 								"outline-none focus-visible:ring-1 focus-visible:ring-white/40",
 								"transition-colors duration-150",
 								active ? "text-white/90" : "text-white/40 hover:text-white/75"
