@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import type { OriginKind } from "@/lib/types/origin"
+import { usePaneReveal } from "./paneReveal"
 
 /**
  * Small data marks for the Explorer's entity views. Each one is the miniature of how that
@@ -41,6 +42,8 @@ export function OriginMark({
 	dim?: boolean
 }) {
 	const reduce = useReducedMotion()
+	// a fresh key per reveal replays the entrance each time the view is switched to
+	const reveal = usePaneReveal()
 	const rings = colors.slice(0, RING_RADII.length)
 	const extra = colors.length > RING_RADII.length
 	const start = delayOf(index)
@@ -66,7 +69,7 @@ export function OriginMark({
 			<Center kind={kind} />
 			{rings.map((color, i) => (
 				<motion.circle
-					key={i}
+					key={`${reveal}:${i}`}
 					cx={8}
 					cy={8}
 					r={RING_RADII[i]}
@@ -162,6 +165,8 @@ export function MixBar({
 	width?: number
 }) {
 	const reduce = useReducedMotion()
+	// a fresh key per reveal replays the entrance each time the view is switched to
+	const reveal = usePaneReveal()
 	const total = segments.reduce((n, s) => n + s.count, 0)
 	if (!total) return <span aria-hidden className="shrink-0" style={{ width }} />
 	const start = delayOf(index)
@@ -174,7 +179,7 @@ export function MixBar({
 		>
 			{segments.map((s, i) => (
 				<motion.span
-					key={s.key}
+					key={`${reveal}:${s.key}`}
 					className="h-full origin-left first:rounded-l-full last:rounded-r-full"
 					style={{ width: `${(s.count / total) * 100}%`, background: s.color }}
 					initial={reduce ? { opacity: 0 } : { scaleX: 0 }}
@@ -197,13 +202,15 @@ export function MixBar({
 /** Up to four overlapping cups in the sessions' liquor colors; they pop in left to right. */
 export function CupStrip({ colors, index = 0 }: { colors: readonly string[]; index?: number }) {
 	const reduce = useReducedMotion()
+	// a fresh key per reveal replays the entrance each time the view is switched to
+	const reveal = usePaneReveal()
 	const cups = colors.slice(0, 4)
 	const start = delayOf(index)
 	return (
 		<span aria-hidden className="flex items-center shrink-0 -space-x-[3px]">
 			{cups.map((color, i) => (
 				<motion.span
-					key={i}
+					key={`${reveal}:${i}`}
 					className="block size-[7px] rounded-full ring-1 ring-[#151315]"
 					style={{ background: color }}
 					initial={reduce ? { opacity: 0 } : { scale: 0, opacity: 0 }}

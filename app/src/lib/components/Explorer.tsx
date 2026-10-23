@@ -47,6 +47,7 @@ import OriginsView from "@/lib/components/explorer/OriginsView"
 import VendorsView from "@/lib/components/explorer/VendorsView"
 import StylesView from "@/lib/components/explorer/StylesView"
 import LexiconView from "@/lib/components/explorer/LexiconView"
+import { PaneRevealContext } from "@/lib/components/explorer/paneReveal"
 import {
 	EXPLORER_VIEWS,
 	explorerHoverAtom,
@@ -60,7 +61,6 @@ import { EXPLORER_DRAWER_ID } from "@/lib/components/explorer/ExplorerToggle"
 import { useMediaQuery } from "@/lib/utils/useMediaQuery"
 import { useFocusTrap } from "@/lib/utils/useFocusTrap"
 import { cn } from "@/lib/utils/cn"
-import { springEasing } from "@/lib/utils/springEasing"
 import { X } from "lucide-react"
 
 export interface ExplorerProps {
@@ -106,16 +106,28 @@ const FACET_KIND: Record<FacetKey, string> = {
 	vessels: "vessel",
 }
 
-/** the views' slide: Motion's spring from before, baked for the compositor (see slidePane) */
-const VIEW_SPRING = { stiffness: 520, damping: 38 } as const
+/**
+ * The views' slide: Motion's spring from before (stiffness 520, damping 38), fitted with a
+ * cubic-bezier (within 0.5px of it over the 14px travel, overshoot included). A cubic-bezier
+ * rather than a sampled linear() curve because WebKit only hands an element's transform and
+ * opacity animations to the compositor when every one of them uses an easing Core Animation
+ * can run; with linear() both stayed on the main thread and froze whenever a switch kept it
+ * busy (the recording held a half-faded overlap for ~7 frames, then snapped).
+ */
+const VIEW_SLIDE = { duration: 400, easing: "cubic-bezier(0.33, 0.69, 0.07, 1.11)" } as const
 const VIEW_SHIFT = 14
 /** Motion's default ease for a tween */
 const FADE_EASE = "cubic-bezier(0.25, 0.1, 0.35, 1)"
 
 /**
  * Slide the incoming pane in and the outgoing one out as Web Animations on transform and
- * opacity only, so the spring runs on the compositor however busy the main thread is. Each
- * starts from wherever the pane is now, so a switch mid-slide turns it around without a jump.
+ * opacity only, so they run on the compositor however busy the main thread is. Each starts
+ * from wherever the pane is now, so a switch mid-slide turns it around without a jump.
+ *
+ * The animations are created paused, so the frame that reveals the pane already shows their
+ * first keyframe, and only start two frames later: revealing a pane re-runs its effects, and
+ * a clock started at commit spent that work's frames before anything was painted (the first
+ * frame the recording showed was already half way through the fade).
  */
 function slidePane(
 	el: HTMLElement,
@@ -125,9 +137,9 @@ function slidePane(
 	running: Map<HTMLElement, Animation[]>
 ) {
 	const prior = running.get(el) ?? []
-	// caught mid-slide: carry on from where it is. Otherwise from rest, ignoring any fill a
-	// finished exit left on a pane that has since been hidden.
-	const midflight = prior.some((a) => a.playState === "running")
+	// caught mid-slide (or still held at its start): carry on from where it is. Otherwise from
+	// rest, ignoring any fill a finished exit left on a pane that has since been hidden.
+	const midflight = prior.some((a) => a.playState === "running" || a.playState === "paused")
 	const style = midflight ? getComputedStyle(el) : null
 	for (const a of prior) a.cancel()
 	const shift = `translateX(${direction * (to === "in" ? VIEW_SHIFT : -VIEW_SHIFT)}px)`
@@ -135,7 +147,6 @@ function slidePane(
 		to === "in"
 			? { transform: style?.transform ?? shift, opacity: Number(style?.opacity ?? 0) }
 			: { transform: style?.transform ?? "none", opacity: Number(style?.opacity ?? 1) }
-	const spring = springEasing(VIEW_SPRING)
 	const animations = [
 		el.animate(
 			{ opacity: [from.opacity, to === "in" ? 1 : 0] },
@@ -146,11 +157,17 @@ function slidePane(
 		animations.push(
 			el.animate(
 				{ transform: [from.transform, to === "in" ? "none" : shift] },
-				{ duration: spring.duration, easing: spring.easing, fill: "both" }
+				{ ...VIEW_SLIDE, fill: "both" }
 			)
 		)
+	for (const a of animations) a.pause()
 	el.style.willChange = "transform, opacity"
 	running.set(el, animations)
+	requestAnimationFrame(() =>
+		requestAnimationFrame(() => {
+			if (running.get(el) === animations) for (const a of animations) a.play()
+		})
+	)
 	const done = Promise.all(animations.map((a) => a.finished))
 	done.then(
 		() => {
@@ -431,8 +448,10 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	const shown = useDeferredValue(view)
 	const [settledView, setSettledView] = useState(shown)
 	const [leaving, setLeaving] = useState<ExplorerView | null>(null)
+	const [reveals, setReveals] = useState<Partial<Record<ExplorerView, number>>>({})
 	if (settledView !== shown) {
 		setSettledView(shown)
+		setReveals((r) => ({ ...r, [shown]: (r[shown] ?? 0) + 1 }))
 		// direction 0: the remembered view arriving after hydration, which only appears
 		setLeaving(direction === 0 ? null : settledView)
 	}
@@ -589,28 +608,31 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 									const departing = !current && v === leaving
 									return (
 										<Activity key={v} mode={current || departing ? "visible" : "hidden"}>
-											{/* each view scopes its current-row highlight, so it never flies between views */}
-											<LayoutGroup id={`explorer-${v}`}>
-												<div
-													ref={(el) => {
-														paneRefs.current[v] = el
-													}}
-													id={current ? EXPLORER_PANEL_ID : undefined}
-													role={current ? "tabpanel" : undefined}
-													aria-labelledby={current ? explorerTabId(v) : undefined}
-													aria-hidden={departing || undefined}
-													inert={departing || undefined}
-													data-explorer-pane={v}
-													className={cn(departing && "absolute inset-x-0 top-0 pointer-events-none")}
-												>
-													{/* entity rows run a little wider than the padding: names need the room */}
-													{v === "sessions" ? (
-														renderView(v)
-													) : (
-														<div className="-mx-2">{renderView(v)}</div>
-													)}
-												</div>
-											</LayoutGroup>
+											{/* marks replay their entrance on each reveal (see paneReveal) */}
+											<PaneRevealContext value={reveals[v] ?? 0}>
+												{/* each view scopes its current-row highlight, so it never flies between views */}
+												<LayoutGroup id={`explorer-${v}`}>
+													<div
+														ref={(el) => {
+															paneRefs.current[v] = el
+														}}
+														id={current ? EXPLORER_PANEL_ID : undefined}
+														role={current ? "tabpanel" : undefined}
+														aria-labelledby={current ? explorerTabId(v) : undefined}
+														aria-hidden={departing || undefined}
+														inert={departing || undefined}
+														data-explorer-pane={v}
+														className={cn(departing && "absolute inset-x-0 top-0 pointer-events-none")}
+													>
+														{/* entity rows run a little wider than the padding: names need the room */}
+														{v === "sessions" ? (
+															renderView(v)
+														) : (
+															<div className="-mx-2">{renderView(v)}</div>
+														)}
+													</div>
+												</LayoutGroup>
+											</PaneRevealContext>
 										</Activity>
 									)
 								})}
