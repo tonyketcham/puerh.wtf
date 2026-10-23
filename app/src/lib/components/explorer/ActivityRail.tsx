@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, type KeyboardEvent } from "react"
+import { useRef, useState, type KeyboardEvent } from "react"
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
 import { BookA, Files, Layers, Mountain, Store, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -36,6 +36,14 @@ export default function ActivityRail({
 	const reduce = useReducedMotion()
 	const refs = useRef<Partial<Record<ExplorerView, HTMLButtonElement | null>>>({})
 	const transition = reduce ? { duration: 0 } : SPRING
+	// Only the tabs gaining or losing the label change size; the rest just shift over, so they
+	// take the cheaper position-only layout animation (no size measure or scale correction).
+	const [current, setCurrent] = useState(value)
+	const [previous, setPrevious] = useState(value)
+	if (current !== value) {
+		setPrevious(current)
+		setCurrent(value)
+	}
 
 	const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
 		const i = EXPLORER_VIEWS.indexOf(value)
@@ -74,7 +82,7 @@ export default function ActivityRail({
 							ref={(el) => {
 								refs.current[view] = el
 							}}
-							layout
+							layout={active || view === previous ? true : "position"}
 							transition={transition}
 							type="button"
 							role="tab"
