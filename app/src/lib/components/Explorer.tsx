@@ -563,7 +563,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				<SiteHeader className="max-xl:hidden" />
 
 				{/* The actual sidebar panel. Make this interactive. */}
-				<Panel className="flex-1 contain-size">
+				<Panel className="flex-1 contain-size explorer-panel" verticalOnly>
 					<div className="relative">
 						{/* header: the activity rail (a tablist), concentric with the panel: its 15px inner radius
 						    less this 6px inset gives the tabs their 9px radius */}
