@@ -363,7 +363,7 @@ function Source({ session, index, row }: SectionProps) {
 						</Prop>
 					)}
 					{suppliers.length > 0 && (
-						<Prop label="sourced from" row={row}>
+						<Prop label="supplier" row={row}>
 							<VendorRefs vendors={suppliers} index={index} recordingKey="source-supplier" />
 						</Prop>
 					)}
