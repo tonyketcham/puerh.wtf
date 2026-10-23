@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Pin, X as CloseIcon } from "lucide-react"
 import type { DescriptorSelection } from "@/lib/store/sessionAtom"
@@ -18,7 +19,7 @@ interface DescriptorReferencesProps {
  * "Find references" header: ‘caramel’ · 7 sessions. Matching rows in the tree get a liquor dot,
  * the rest dim. Pinning keeps the descriptor across session navigation.
  */
-export default function DescriptorReferences({
+function DescriptorReferences({
 	descriptor,
 	total,
 	hidden,
@@ -104,3 +105,6 @@ export default function DescriptorReferences({
 		</AnimatePresence>
 	)
 }
+
+// the Explorer re-renders on every tab switch; nothing here depends on the view
+export default memo(DescriptorReferences)
