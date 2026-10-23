@@ -107,15 +107,11 @@
   The Explorer only ever scrolls down. SimpleBar turns on a horizontal axis (inline overflow-x)
   whenever anything pokes a few px past the edge, such as a view sliding in on its 14px spring
   or a long row, and on a phone a sideways swipe then drags the whole tree off the panel's
-  left edge. Pin the x axis and keep the swipe's overscroll from chaining to the page or to the
-  browser's back gesture.
+  left edge. The Panel's `verticalOnly` pins the x axis; this keeps the swipe's overscroll from
+  chaining to the page or to the browser's back gesture.
 */
 .explorer-panel .simplebar-content-wrapper {
-	overflow-x: hidden !important;
 	overscroll-behavior: contain;
-}
-.explorer-panel .simplebar-track.simplebar-horizontal {
-	display: none;
 }
 
 /*

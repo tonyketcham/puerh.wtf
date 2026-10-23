@@ -7,9 +7,18 @@ interface PanelProps {
 	header?: React.ReactNode
 	id?: string
 	backdropClassName?: string
+	/** Scroll down only: SimpleBar never turns on a horizontal axis, however far a child pokes out */
+	verticalOnly?: boolean
 }
 
-export default function Panel({ children, className, header, id, backdropClassName }: PanelProps) {
+export default function Panel({
+	children,
+	className,
+	header,
+	id,
+	backdropClassName,
+	verticalOnly,
+}: PanelProps) {
 	return (
 		<div
 			id={id}
@@ -36,6 +45,9 @@ export default function Panel({ children, className, header, id, backdropClassNa
 						style={{
 							containerType: "size",
 							height: "100cqh",
+							// SimpleBar reads overflow-x: hidden off its root, then hides the x track and the
+							// wrapper's x overflow itself
+							...(verticalOnly && { overflowX: "hidden" }),
 						}}
 					>
 						{children}
