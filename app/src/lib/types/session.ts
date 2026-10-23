@@ -36,6 +36,14 @@ export type SessionPreview = BaseSession & {
 				image: string
 		  }[]
 		| null
+	/** the vendor's own supplier, when the vendor resold someone else's tea */
+	sourced_from?:
+		| {
+				_slug: string
+				title: string
+				image: string
+		  }[]
+		| null
 	cultivar?: Cultivar[]
 	tags?: SessionTag[] | null
 	origin?: OriginRef[] | null
