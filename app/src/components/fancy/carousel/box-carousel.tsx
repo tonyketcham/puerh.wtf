@@ -1,5 +1,6 @@
 "use client"
 
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import React, {
 	forwardRef,
 	memo,
@@ -121,7 +122,8 @@ const MediaRenderer = memo(
 			}
 
 			return (
-				<img
+				<ResponsiveImage
+				sizes="(min-width: 1024px) 480px, 90vw"
 					src={item.type === "video" ? item.poster : item.src}
 					alt={item.alt || ""}
 					draggable={false}

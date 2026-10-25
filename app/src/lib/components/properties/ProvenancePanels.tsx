@@ -1,5 +1,6 @@
 "use client"
 
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import { Fragment, Suspense, useMemo, useState, type ReactNode } from "react"
 import { useAtomValue } from "jotai"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -428,8 +429,8 @@ function VendorLogo({ src, title }: { src?: string | null; title: string }) {
 			className="grid overflow-hidden rounded-full place-items-center size-5 shrink-0 ring-1 ring-white/15 bg-white/[0.04] text-[10px] leading-none text-white/55"
 		>
 			{show ? (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img
+				<ResponsiveImage
+				sizes="20px"
 					src={src}
 					alt=""
 					loading="lazy"

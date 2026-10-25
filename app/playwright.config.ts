@@ -22,7 +22,7 @@ const config: PlaywrightTestConfig = {
 	outputDir: "test-results/dev",
 	reporter: [["list"], ["html", { outputFolder: "playwright-report/dev", open: "never" }]],
 	webServer: {
-		command: `pnpm exec flatbread start -p ${flatbreadPort} -- next dev --turbopack -p ${port}`,
+		command: `pnpm authoring:assets && pnpm exec flatbread start -p ${flatbreadPort} -X npx "next dev --turbopack -p ${port}"`,
 		port,
 		reuseExistingServer: process.env.PW_REUSE_SERVER === "1",
 		env: { FLATBREAD_URL: `http://localhost:${flatbreadPort}/graphql` },

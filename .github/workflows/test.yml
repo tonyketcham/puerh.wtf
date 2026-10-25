@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test authoring service
+        run: pnpm --filter puerh.wtf cms:test
+
       - name: Install Playwright Browsers
         run: pnpm --filter puerh.wtf exec playwright install --with-deps
 
