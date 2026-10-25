@@ -1253,3 +1253,60 @@ test("successful inline creation retains the relationship when concurrent typing
 	}, id)
 	expect(stored.vendor).toEqual([stored.child])
 })
+
+test("push and interim publication notices clear unrelated Undo while archived drafts remain recoverable", async ({
+	page,
+}) => {
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("vendors")
+	await page.getByRole("textbox", { name: /^Name/ }).fill("The edition to publish")
+	await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+	const archive = async (title: string) => {
+		await page.getByLabel("New record", { exact: true }).selectOption("tags")
+		await page.getByRole("textbox", { name: /^Name/ }).fill(title)
+		await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+		await page
+			.locator(".cms-record-row")
+			.filter({ has: page.getByRole("checkbox", { name: "Include " + title, exact: true }) })
+			.getByRole("button", { name: "Discard draft", exact: true })
+			.click()
+		await expect(page.locator("div.cms-notice")).toContainText("Draft set aside")
+		await expect(page.getByRole("button", { name: "Undo", exact: true })).toBeVisible()
+	}
+	await archive("Archived before push")
+	await page.getByRole("button", { name: "Commit & push 1 record", exact: true }).click()
+	await expect(page.locator("div.cms-notice")).toContainText("Pushed 1 records")
+	await expect(page.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("Archived before push")
+	await archive("Archived before publication")
+	await page.getByRole("button", { name: "Review publication", exact: true }).click()
+	await expect(page.getByRole("button", { name: /Publish PR #101/ })).toBeEnabled()
+	let publishing = false,
+		release!: () => void
+	const refreshGate = new Promise<void>((resolve) => (release = resolve))
+	await page.route("**/api/cms*", async (route) => {
+		const query = new URL(route.request().url()).searchParams
+		if (query.get("action") === "publish") publishing = true
+		if (
+			publishing &&
+			query.get("action") === "catalog" &&
+			(!query.get("branch") || query.get("branch") === "main")
+		)
+			await refreshGate
+		return route.fallback()
+	})
+	try {
+		await page.getByRole("button", { name: /Publish PR #101/ }).click()
+		await expect(page.locator("div.cms-notice")).toContainText("merged. Refreshing its base")
+		await expect(page.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+	} finally {
+		release()
+	}
+	await expect(page.locator("div.cms-notice")).toContainText("Remaining local edits are preserved")
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("Archived before publication")
+})

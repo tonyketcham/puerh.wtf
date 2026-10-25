@@ -668,6 +668,7 @@ export function useCms() {
 			previewId: operation.captured.some((draft) => draft.id === s.previewId) ? null : s.previewId,
 			lastPR: pr,
 			busy: false,
+			undoRecoveryId: null,
 			notice:
 				"Pushed " +
 				operation.captured.length +
@@ -895,6 +896,7 @@ export function useCms() {
 			),
 			lastPR: current.lastPR?.number === number ? null : current.lastPR,
 			source: current.source === mergedBranch ? defaultBranch : current.source,
+			undoRecoveryId: null,
 			notice:
 				"PR #" +
 				number +
