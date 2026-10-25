@@ -33,9 +33,15 @@ pnpm test
 ```
 
 Playwright needs its browser once per machine: `npx playwright install chromium` (from `app/`).
-Tests reuse a dev server already on :3000, which may be another checkout's. Set `PW_PORT` to
-start this checkout's own server on that port instead (`PW_PORT=3200 pnpm test`; in PowerShell,
-`$env:PW_PORT=3200; pnpm test`). Flatbread then runs on `PW_PORT + 2000`, or `PW_FLATBREAD_PORT`.
+Tests start this checkout's own dev server on :3000 and Flatbread on :5057. Occupied ports
+fail instead of reusing another checkout. Set `PW_PORT` to choose another pair
+(`PW_PORT=3200 pnpm test`; in PowerShell, `$env:PW_PORT=3200; pnpm test`). Flatbread then
+runs on `PW_PORT + 2000`, or `PW_FLATBREAD_PORT`. Use `PW_REUSE_SERVER=1` only after verifying
+the existing server's checkout.
+
+From `app/`, `pnpm test:dev` runs the development lane and `pnpm test:export` tests an
+existing `out/` build. The export suite needs a build with `PUERH_TEST_FIXTURES=1` to include
+the radar and Explorer fixtures. See [testing instructions](app/tests/README.md) for both lanes.
 
 ## Rough Stack
 

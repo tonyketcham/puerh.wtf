@@ -15,7 +15,12 @@ import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
 import { EMPTY_ENTITY_DETAILS, type EntityDetails } from "@/lib/entityDetails"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
 import { originSearchText } from "@/lib/origins"
-import { ancestorsOf, buildRelationIndex, type EntityNode } from "@/lib/relations"
+import {
+	ancestorsOf,
+	buildRelationIndex,
+	type EntityNode,
+	type RelationIndex,
+} from "@/lib/relations"
 import { NOTE_STAGES } from "@/lib/types/session"
 import { fuzzyFields, fuzzyMatch } from "./fuzzy"
 import type { RecentEntry } from "./recents"
@@ -107,7 +112,8 @@ export function buildIndex(
 	sessions: ExplorerSession[],
 	vendors: Vendor[],
 	categories: Category[],
-	details: EntityDetails = EMPTY_ENTITY_DETAILS
+	details: EntityDetails = EMPTY_ENTITY_DETAILS,
+	rel: RelationIndex = buildRelationIndex(sessions)
 ): CommandIndex {
 	const teas: TeaEntry[] = sessions.map((s) => {
 		const cat = s.style?.[0]?.category
@@ -166,7 +172,6 @@ export function buildIndex(
 	flavors.sort((a, b) => b.count - a.count || a.term.localeCompare(b.term))
 
 	// Entities come from the relation index (counts roll up through the origin and style trees)
-	const rel = buildRelationIndex(sessions)
 	const byCount = (a: FacetEntry, b: FacetEntry) =>
 		b.count - a.count || a.label.localeCompare(b.label)
 
