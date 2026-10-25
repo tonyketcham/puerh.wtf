@@ -10,7 +10,7 @@ import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
 import CommandBar from "@/lib/components/command/CommandBar"
 import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
 import ScrollReset from "@/lib/components/ScrollReset"
-import { getEntityDetails } from "@/lib/entityDetails"
+import { getEntityDetails } from "@/lib/entityDetails.server"
 
 const inter = Inter({
 	subsets: ["latin"],
