@@ -27,6 +27,8 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 # vue
 /vue
