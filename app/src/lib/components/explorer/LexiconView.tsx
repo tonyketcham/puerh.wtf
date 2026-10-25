@@ -6,8 +6,8 @@ import { memo, useCallback, useMemo, type KeyboardEvent } from "react"
 import { motion } from "motion/react"
 import { useAtom } from "jotai"
 import { ListTree } from "lucide-react"
-import LexiconWord from "@/app/lexicon/_components/LexiconWord"
-import { wordColor } from "@/app/lexicon/_components/model"
+import LexiconWord from "@/lib/components/lexicon/LexiconWord"
+import { wordColor } from "@/lib/components/lexicon/model"
 import {
 	LEXICON_GROUP_META,
 	LEXICON_GROUPS,
