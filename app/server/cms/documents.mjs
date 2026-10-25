@@ -13,6 +13,7 @@ const relations = {
 		cultivar: "cultivars",
 		origin: "origins",
 		vendor: "vendors",
+		sourced_from: "vendors",
 		tags: "tags",
 		vessel: "vessels",
 	},
