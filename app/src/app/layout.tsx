@@ -11,7 +11,7 @@ import CommandBar from "@/lib/components/command/CommandBar"
 import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
 import AuthoringMount from "@/lib/authoring/AuthoringMount"
 import ScrollReset from "@/lib/components/ScrollReset"
-import { getEntityDetails } from "@/lib/entityDetails"
+import { getEntityDetails } from "@/lib/entityDetails.server"
 
 const inter = Inter({
 	subsets: ["latin"],
