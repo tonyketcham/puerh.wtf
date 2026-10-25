@@ -101,7 +101,9 @@ export function entityKeys(
 		case "style":
 			return unique((session.style || []).map((st) => st._slug || st.id).filter(Boolean))
 		case "category":
-			return unique((session.style || []).map((st) => st.category?._slug).filter(Boolean))
+			return unique(
+				(session.style || []).map((st) => st.category?._slug).filter((key): key is string => !!key)
+			)
 		case "cultivar":
 			return unique((session.cultivar || []).map((c) => c._slug).filter(Boolean))
 		case "vessel":

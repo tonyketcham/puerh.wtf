@@ -12,7 +12,7 @@ import type { Category } from "@/lib/types/category"
 import { ENTITY_FACET, isEntityFiltered, type FacetKey, type FilterState } from "@/lib/filters"
 import { descriptorRegex, extractDescriptors } from "@/lib/descriptors"
 import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
-import type { EntityDetails } from "@/lib/entityDetails"
+import { EMPTY_ENTITY_DETAILS, type EntityDetails } from "@/lib/entityDetails"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
 import { originSearchText } from "@/lib/origins"
 import { ancestorsOf, buildRelationIndex, type EntityNode } from "@/lib/relations"
@@ -30,7 +30,7 @@ export type TeaEntry = {
 	title: string
 	year: string | null
 	vendor: string | null
-	category: { title: string; color: string } | null
+	category: { title: string; color?: string } | null
 	liquor: LiquorColor
 	/** secondary search text (vendor, styles, tags, origin) */
 	meta: string
@@ -83,16 +83,6 @@ export type CommandIndex = {
 const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : null
 
-// (a local empty value: entityDetails.ts is server code, only its types come along)
-const NO_DETAILS: EntityDetails = {
-	origin: {},
-	vendor: {},
-	style: {},
-	category: {},
-	cultivar: {},
-	vessel: {},
-}
-
 const bare = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "")
 
 /** Same name, ignoring case and tone marks ("yiwu" names Yìwǔ). */
@@ -117,7 +107,7 @@ export function buildIndex(
 	sessions: ExplorerSession[],
 	vendors: Vendor[],
 	categories: Category[],
-	details: EntityDetails = NO_DETAILS
+	details: EntityDetails = EMPTY_ENTITY_DETAILS
 ): CommandIndex {
 	const teas: TeaEntry[] = sessions.map((s) => {
 		const cat = s.style?.[0]?.category
@@ -127,7 +117,7 @@ export function buildIndex(
 			title: s.title,
 			year: yearOf(s),
 			vendor: s.vendor?.[0]?.title ?? null,
-			category: cat ? { title: cat.title, color: cat.color } : null,
+			category: cat ? { title: cat.title, color: cat.color ?? undefined } : null,
 			liquor: getLiquorColor(s._slug),
 			meta: [
 				s.tea_name,
@@ -192,7 +182,7 @@ export function buildIndex(
 			if (!n?.all.length) return null
 			const styles = rel.children.category.get(c._slug)?.length ?? 0
 			return entry("category", n, {
-				color: c.color,
+				color: c.color ?? undefined,
 				sub: `category · ${styles} ${styles === 1 ? "style" : "styles"}`,
 			})
 		})
@@ -314,7 +304,7 @@ export function parsePrefix(query: string): { scope: ScopeKind; rest: string } |
 // Items + groups
 // ---------------------------------------------------------------------------
 
-export type CommandId = "brew" | "compare" | "random" | "clear" | "home" | IndexId
+export type CommandId = "cms-enable" | "cms-disable" | "cms-working" | "cms-new" | "cms-edit" | "cms-session" | "brew" | "compare" | "random" | "clear" | "home" | IndexId
 
 /** The index pages a command opens (plan §2.3): the Explorer's views at full size. */
 export type IndexId = "origins" | "vendors" | "styles" | "cultivars" | "teaware" | "lexicon"
@@ -423,6 +413,7 @@ export type CommandDef = {
 }
 
 export type SearchContext = {
+	authoringEnabled?: boolean
 	sessionSlug: string | null
 	filters: FilterState
 	activeFilterCount: number
@@ -478,6 +469,13 @@ export function commandDefs(ctx: SearchContext): CommandDef[] {
 			aliases: "clear reset filters unfilter remove all",
 		})
 	}
+	defs.push(...(ctx.authoringEnabled ? [
+		{ id: "cms-working" as const, label: "Working changes", hint: "select records, read, and commit", aliases: "cms drafts commit publish changes editorial" },
+		{ id: "cms-new" as const, label: "New session", hint: "a local record of the leaf and water", aliases: "record new write session voice dictate log" },
+		{ id: "cms-session" as const, label: "Log a session here", hint: "carry this page’s relationship into a draft", aliases: "context vendor origin style brew record" },
+		{ id: "cms-edit" as const, label: "Edit this record", hint: "keep the page’s context", aliases: "edit content page record modify" },
+		{ id: "cms-disable" as const, label: "Disable editing", hint: "return to reading; keep local drafts", aliases: "disable cms editing reader" },
+	] : [{ id: "cms-enable" as const, label: "Enable editing", hint: "sign in with GitHub repository access", aliases: "cms author edit enable github login write record" }]))
 	return defs
 }
 

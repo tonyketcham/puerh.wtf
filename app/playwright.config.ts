@@ -18,9 +18,10 @@ const port = customPort ?? 3000
 const flatbreadPort = Number(process.env.PW_FLATBREAD_PORT || port + 2000)
 
 const config: PlaywrightTestConfig = {
+	testDir: "./tests",
 	webServer: customPort
 		? {
-				command: `pnpm exec flatbread start -p ${flatbreadPort} -- next dev --turbopack -p ${port}`,
+				command: `pnpm authoring:assets && pnpm exec flatbread start -p ${flatbreadPort} -X npx "next dev --turbopack -p ${port}"`,
 				port,
 				reuseExistingServer: false,
 				env: { FLATBREAD_URL: `http://localhost:${flatbreadPort}/graphql` },

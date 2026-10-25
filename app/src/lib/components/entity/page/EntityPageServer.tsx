@@ -74,7 +74,12 @@ export default async function EntityPageServer({ kind, slug }: { kind: PageKind;
 	const hasLead = LEAD_KINDS.includes(kind) && !!data.description
 	const lead = hasLead ? <Markdown source={data.description!.split(/\n\s*\n/)[0]} /> : undefined
 	const rest = hasLead ? paragraphCount(data.description) > 1 : !!data.description
-	const notes = rest ? <Markdown source={data.description} skipFirst={hasLead} /> : undefined
+	const notes = rest || data.contentHtml ? (
+		<div className="space-y-6">
+			{rest && <Markdown source={data.description} skipFirst={hasLead} />}
+			{data.contentHtml && <div className="prose prose-invert max-w-none" data-entity-body dangerouslySetInnerHTML={{ __html: data.contentHtml }} />}
+		</div>
+	) : undefined
 
 	// origins: the hero map frames the placed points within a node too coarse for an inset
 	const mapPoints = kind === "origin" ? getMapPoints() : undefined

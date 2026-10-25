@@ -1,3 +1,4 @@
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import Link from "next/link"
 import type { CSSProperties, ReactNode } from "react"
 import type { ExplorerSession, SessionPreviewWithFeatureImage } from "../types/session"
@@ -126,7 +127,7 @@ export default function SessionCard({
 			style={style}
 			tape={{
 				seed: session.id,
-				color: m.teaStyle?.category?.color,
+				color: m.teaStyle?.category?.color ?? undefined,
 				age: Math.round(age * 1000) / 1000,
 				curl: Math.round(curl * 1000) / 1000,
 			}}
@@ -323,7 +324,8 @@ function Photo({ m, className }: { m: Model; className?: string }) {
 	return (
 		<div className={cn("relative overflow-hidden border-white/[0.07]", className)}>
 			{m.photo ? (
-				<img
+				<ResponsiveImage
+				sizes="(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
 					src={m.photo.image}
 					alt={m.photo.alt}
 					className="object-cover w-full h-full image-zoom"
@@ -378,7 +380,7 @@ function Meta({ m, children }: { m: Model; children?: ReactNode }) {
 					<span
 						aria-hidden
 						className="w-[3px] h-2.5 rounded-[1px]"
-						style={{ backgroundColor: teaStyle.category?.color || teaStyle.color }}
+						style={{ backgroundColor: teaStyle.category?.color || teaStyle.color || undefined }}
 					/>
 					{teaStyle.category?.title ?? teaStyle.title}
 				</span>

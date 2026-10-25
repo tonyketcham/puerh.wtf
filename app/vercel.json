@@ -3,5 +3,10 @@
 	"framework": null,
 	"buildCommand": "pnpm build",
 	"installCommand": "pnpm install --frozen-lockfile",
-	"outputDirectory": "out"
+	"outputDirectory": "out",
+	"functions": {
+		"api/cms.ts": {
+			"maxDuration": 60
+		}
+	}
 }

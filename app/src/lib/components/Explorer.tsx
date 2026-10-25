@@ -1,5 +1,6 @@
 "use client"
 
+import AuthoringNav from "@/lib/authoring/AuthoringNav"
 import SiteHeader from "./SiteHeader"
 import FileTree from "./filetree/FileTree"
 import type { ExplorerSession } from "../types/session"
@@ -334,7 +335,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			tags: new Map<string, { label: string }>(),
 			vessels: new Map<string, { label: string }>(),
 		}
-		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color ?? undefined })
 		for (const st of index.nodes.style.values())
 			map.styles.set(st.slug, { label: st.title, color: st.color ?? undefined })
 		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
@@ -563,7 +564,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 				<SiteHeader className="max-xl:hidden" />
 
 				{/* The actual sidebar panel. Make this interactive. */}
-				<Panel className="flex-1 contain-size">
+				<Panel className="flex-1 contain-size explorer-panel" verticalOnly>
 					<div className="relative">
 						{/* header: the activity rail (a tablist), concentric with the panel: its 15px inner radius
 						    less this 6px inset gives the tabs their 9px radius */}
@@ -584,6 +585,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 							</div>
 						</div>
 						<div className="p-4">
+							<AuthoringNav view={view} />
 							<YearRuler
 								sessions={sessions}
 								filteredSessions={sessionsExceptYears}
