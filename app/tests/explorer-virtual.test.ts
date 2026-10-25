@@ -105,14 +105,35 @@ test("a word returns to its unmounted parent and scrolling preserves keyboard fo
 	await page.getByRole("tab", { name: "Lexicon", exact: true }).click()
 	const list = page.locator("#explorer-view-panel [data-virtual-list]")
 	const group = list.locator('[data-lexicon-row="group"][data-group="fruits"]')
+	await expect(group).toBeVisible()
 	await group.focus()
 	await page.keyboard.press("ArrowRight")
 	await expect(group).toHaveAttribute("aria-expanded", "true")
+	const groupIndex = Number(await group.locator("..").getAttribute("data-virtual-index"))
+	const words = Number((await group.getAttribute("aria-label"))?.match(/^fruits, (\d+) words?$/)?.[1])
+	expect(words).toBeGreaterThan(0)
+	const wordAt = (index: number) =>
+		list.locator(
+			`[data-virtual-index="${index}"] [data-lexicon-row="word"][data-group="fruits"]`
+		)
+	const focusedIndex = () =>
+		page.evaluate(() =>
+			Number(
+				document.activeElement?.closest<HTMLElement>("[data-virtual-index]")?.dataset.virtualIndex
+			)
+		)
 	await page.keyboard.press("ArrowRight")
-	await expect.poll(() => page.locator(":focus").getAttribute("data-lexicon-row")).toBe("word")
+	await expect(wordAt(groupIndex + 1)).toBeFocused()
 	await page.keyboard.press("PageDown")
-	for (let i = 0; i < 8; i++) await page.keyboard.press("ArrowDown")
-	await expect.poll(() => page.locator(":focus").getAttribute("data-lexicon-row")).toBe("word")
+	await expect.poll(focusedIndex).toBeGreaterThan(groupIndex + 1)
+	const pageDownIndex = await focusedIndex()
+	await expect(wordAt(pageDownIndex)).toBeFocused()
+	// Reach the last word of the actual group, awaiting each asynchronous focus handoff.
+	// A fixed burst of keys can repeatedly navigate from the previous mounted row.
+	for (let index = pageDownIndex + 1; index <= groupIndex + words; index++) {
+		await page.keyboard.press("ArrowDown")
+		await expect(wordAt(index)).toBeFocused()
+	}
 	await expect(group).toHaveCount(0)
 	await page.keyboard.press("ArrowLeft")
 	await expect(group).toBeFocused()

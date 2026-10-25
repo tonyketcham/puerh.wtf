@@ -11,7 +11,7 @@ import {
 	type Transition,
 } from "motion/react"
 import { Search as SearchIcon } from "lucide-react"
-import { commandBarAtom, explorerSessionsAtom } from "@/lib/store/sessionAtom"
+import { commandBarAtom, explorerSessionsAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import { activeFilterCountAtom } from "@/lib/store/filterState"
 import type { ExplorerSession } from "@/lib/types/session"
 import type { Vendor } from "@/lib/types/vendor"
@@ -58,6 +58,7 @@ export default function CommandBar({ sessions, vendors, categories, details }: C
 	const open = state.open
 	const hydrated = useAtomValue(explorerSessionsAtom)
 	const source = hydrated.length ? hydrated : sessions
+	const sharedIndex = useAtomValue(relationIndexAtom)
 	const reduceMotion = !!useReducedMotion()
 	const platform = usePlatform()
 	const filterCount = useAtomValue(activeFilterCountAtom)
@@ -77,8 +78,17 @@ export default function CommandBar({ sessions, vendors, categories, details }: C
 		return () => window.clearTimeout(id)
 	}, [])
 	const index = useMemo(
-		() => (armed || open ? buildIndex(source, vendors, categories, details) : null),
-		[armed, open, source, vendors, categories, details]
+		() =>
+			armed || open
+				? buildIndex(
+						source,
+						vendors,
+						categories,
+						details,
+						sharedIndex.sessions === source ? sharedIndex : undefined
+					)
+				: null,
+		[armed, open, source, vendors, categories, details, sharedIndex]
 	)
 
 	const close = useCallback(() => setState((s) => ({ ...s, open: false })), [setState])
