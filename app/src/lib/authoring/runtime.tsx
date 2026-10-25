@@ -13,9 +13,15 @@ import {
 	type CmsSession,
 	type CmsPullRequest,
 } from "./client"
+import { validateDocument, RELATION_FIELDS } from "./schema"
 import { createDocument, serializeDocument } from "./documents"
 import {
 	createDraft,
+	listDraftRecoveries,
+	recoverableDraftChange,
+	undoDraftChange,
+	saveRelatedDraft,
+	type DraftRecovery,
 	isDraftDirty,
 	listDrafts,
 	saveDraft,
@@ -50,6 +56,9 @@ export interface CmsState {
 	errors: Record<string, string>
 	error: string
 	notice: string
+	busyLabel: string
+	localRecoveries: DraftRecovery[]
+	undoRecoveryId: string | null
 	busy: boolean
 	lastPR: CmsPullRequest | null
 	pendingOperation: PendingPush | null
@@ -70,6 +79,9 @@ export const cmsAtom = atom<CmsState>({
 	error: "",
 	notice: "",
 	busy: false,
+	busyLabel: "",
+	localRecoveries: [],
+	undoRecoveryId: null,
 	lastPR: null,
 	pendingOperation: null,
 	pendingWriteId: null,
@@ -136,7 +148,12 @@ export function useCms() {
 	const state = useAtomValue(cmsAtom),
 		store = useStore(),
 		router = useRouter()
-	const update = (patch: Partial<CmsState>) => store.set(cmsAtom, (s) => ({ ...s, ...patch }))
+	const update = (patch: Partial<CmsState>) =>
+		store.set(cmsAtom, (s) => ({
+			...s,
+			...(patch.notice !== undefined ? { undoRecoveryId: null } : {}),
+			...patch,
+		}))
 	const reportFailure = (error: unknown) => {
 		const message =
 			error instanceof Error
@@ -261,6 +278,255 @@ export function useCms() {
 			reportFailure(error)
 		}
 	}
+
+	const createRelatedDraft = async (
+		collection: Collection,
+		seed: Record<string, unknown>,
+		parentId: string,
+		field: string,
+		multiple = false
+	): Promise<CmsDraft | null> => {
+		const snapshot = store.get(cmsAtom),
+			ns = namespace(snapshot),
+			parent = snapshot.drafts.find((d) => d.id === parentId)
+		if (snapshot.phase !== "ready" || !parent) return null
+		try {
+			if (RELATION_FIELDS[parent.document.collection]?.[field] !== collection)
+				throw new Error("This relationship does not accept that record type.")
+			const cat = snapshot.catalogs[parent.branch] || snapshot.catalogs[snapshot.source]
+			if (!cat) throw new Error("Open the parent edition before adding a related record.")
+			const doc = createDocument(collection, seed),
+				docs = [...cat.documents, ...snapshot.drafts.map((d) => d.document), doc]
+			const issues = validateDocument(doc, docs)
+			if (issues.length) throw new Error(issues.map((issue) => issue.message).join(" "))
+			const child = { ...createDraft(doc, cat.head, parent.branch, parent.prNumber), base: null }
+			await pending.get(writeKey(ns, parent.id))
+			const latest = store.get(cmsAtom).drafts.find((d) => d.id === parent.id)
+			if (!latest || !sameNamespace(store.get(cmsAtom), ns)) return null
+			const value = multiple
+				? [
+						...new Set([
+							...(Array.isArray(latest.document.data[field])
+								? (latest.document.data[field] as string[])
+								: []),
+							doc.id,
+						]),
+				  ]
+				: doc.id
+			const next = {
+				...latest,
+				document: serializeDocument(latest.document, { [field]: value }),
+				revision: latest.revision + 1,
+				updatedAt: Date.now(),
+			}
+
+			const key = writeKey(ns, parent.id),
+				job = saveRelatedDraft(child, next, latest.revision, ns, latest.document.raw)
+			pending.set(key, job)
+			// The parent must not expose a reference to a child before their atomic write succeeds.
+			// Typing can continue against its current fields and will queue behind this transaction.
+			store.set(cmsAtom, (current) => ({
+				...current,
+				saving: [...new Set([...current.saving, parent.id, child.id])],
+			}))
+			try {
+				await job
+			} catch (error) {
+				if (sameNamespace(store.get(cmsAtom), ns))
+					store.set(cmsAtom, (current) => ({
+						...current,
+						saving: current.saving.filter(
+							(id) => id !== child.id && (id !== parent.id || pending.get(key) !== job)
+						),
+					}))
+				throw error
+			}
+			if (!sameNamespace(store.get(cmsAtom), ns)) return null
+			const currentParent = store.get(cmsAtom).drafts.find((d) => d.id === parent.id)
+			if (!currentParent) return child
+			const currentValue = multiple
+				? [
+						...new Set([
+							...(Array.isArray(currentParent.document.data[field])
+								? (currentParent.document.data[field] as string[])
+								: []),
+							doc.id,
+						]),
+				  ]
+				: doc.id
+			const merged =
+				currentParent.revision === latest.revision &&
+				currentParent.document.raw === latest.document.raw
+					? next
+					: {
+							...currentParent,
+							document: serializeDocument(currentParent.document, { [field]: currentValue }),
+							revision: Math.max(currentParent.revision, next.revision) + 1,
+							updatedAt: Date.now(),
+					  }
+			store.set(cmsAtom, (current) => ({
+				...current,
+				drafts: [...current.drafts.filter((d) => d.id !== child.id), child],
+				saving: current.saving.filter((id) => id !== child.id),
+			}))
+			if (merged === next)
+				store.set(cmsAtom, (current) => ({
+					...current,
+					drafts: current.drafts.map((d) => (d.id === parent.id ? next : d)),
+					saving: current.saving.filter((id) => id !== parent.id || pending.get(key) !== job),
+				}))
+			else await persist(merged, { namespace: ns, expectedRevision: currentParent.revision })
+			if (sameNamespace(store.get(cmsAtom), ns))
+				update({
+					notice:
+						"Added " + String(doc.data.title) + " to this draft. Both are saved on this device.",
+				})
+			return child
+		} catch (error) {
+			reportFailure(error)
+			return null
+		}
+	}
+	const changeLocalDraft = async (id: string, action: "discard" | "revert"): Promise<boolean> => {
+		const snapshot = store.get(cmsAtom)
+		if (snapshot.pendingOperation || snapshot.busy) return false
+		const ns = namespace(snapshot)
+		update({
+			busy: true,
+			busyLabel: action === "revert" ? "Reverting local edits…" : "Setting draft aside…",
+			error: "",
+		})
+		try {
+			await pending.get(writeKey(ns, id))
+			const latest = store.get(cmsAtom).drafts.find((d) => d.id === id)
+			if (!latest || !sameNamespace(store.get(cmsAtom), ns)) {
+				update({ busy: false })
+				return false
+			}
+			const replacement =
+				action === "revert" && latest.base
+					? {
+							...latest,
+							document: latest.base,
+							assets: [],
+							deleted: false,
+							revision: latest.revision + 1,
+							updatedAt: Date.now(),
+					  }
+					: null
+
+			const key = writeKey(ns, id),
+				job = recoverableDraftChange(latest, replacement, ns)
+			pending.set(key, job)
+			store.set(cmsAtom, (current) => ({
+				...current,
+				drafts: replacement
+					? current.drafts.map((d) => (d.id === id ? replacement : d))
+					: current.drafts.filter((d) => d.id !== id),
+				selected: current.selected.filter((key) => key !== id),
+				previewId: current.previewId === id ? null : current.previewId,
+			}))
+			let recovery: DraftRecovery
+			try {
+				recovery = await job
+			} catch (error) {
+				if (sameNamespace(store.get(cmsAtom), ns))
+					store.set(cmsAtom, (current) => ({
+						...current,
+						drafts: replacement
+							? current.drafts.map((d) =>
+									d.id === id && d.revision === replacement.revision ? latest : d
+							  )
+							: current.drafts.some((d) => d.id === id)
+							? current.drafts
+							: [...current.drafts, latest],
+					}))
+				throw error
+			}
+			if (sameNamespace(store.get(cmsAtom), ns))
+				store.set(cmsAtom, (current) => ({
+					...current,
+					localRecoveries: [recovery, ...current.localRecoveries],
+					undoRecoveryId: recovery.id,
+					busy: false,
+					notice:
+						action === "revert"
+							? "Local edits reverted. You can restore them from Draft recovery."
+							: "Draft set aside. You can restore it from Draft recovery.",
+					error: "",
+				}))
+			return true
+		} catch (error) {
+			reportFailure(error)
+			return false
+		}
+	}
+	const undoLocalChange = async (id?: string) => {
+		const snapshot = store.get(cmsAtom),
+			recovery = id
+				? snapshot.localRecoveries.find((item) => item.id === id)
+				: snapshot.localRecoveries[0]
+		if (!recovery || snapshot.busy || snapshot.pendingOperation) return
+		update({ busy: true, busyLabel: "Restoring your draft…", error: "" })
+		try {
+			const ns = namespace(snapshot),
+				key = writeKey(ns, recovery.draft.id)
+			await pending.get(key)?.catch(() => {})
+			const previous = store.get(cmsAtom).drafts.find((d) => d.id === recovery.draft.id)
+			const expected = recovery.replacement
+			if (
+				expected
+					? !previous ||
+					  previous.revision !== expected.revision ||
+					  previous.document.raw !== expected.document.raw
+					: !!previous
+			)
+				throw new Error(
+					"Newer work exists for this record. It was kept; the older draft remains in recovery."
+				)
+			const restored = {
+				...recovery.draft,
+				revision: Math.max(recovery.draft.revision, recovery.replacement?.revision || 0) + 1,
+				updatedAt: Date.now(),
+			}
+			const job = undoDraftChange(recovery, ns)
+			pending.set(key, job)
+			store.set(cmsAtom, (current) => ({
+				...current,
+				drafts: [...current.drafts.filter((d) => d.id !== restored.id), restored],
+			}))
+			try {
+				await job
+			} catch (error) {
+				if (sameNamespace(store.get(cmsAtom), ns))
+					store.set(cmsAtom, (current) => ({
+						...current,
+						drafts: current.drafts.flatMap((d) =>
+							d.id === restored.id && d.revision === restored.revision
+								? previous
+									? [previous]
+									: []
+								: [d]
+						),
+					}))
+				throw error
+			}
+			if (sameNamespace(store.get(cmsAtom), ns))
+				store.set(cmsAtom, (current) => ({
+					...current,
+					localRecoveries: current.localRecoveries.filter((item) => item.id !== recovery.id),
+					undoRecoveryId: null,
+					busy: false,
+					previewId: restored.id,
+					notice:
+						"Restored " + String(restored.document.data.title || "your draft") + " on this device.",
+					error: "",
+				}))
+		} catch (error) {
+			reportFailure(error)
+		}
+	}
+
 	const editDocument = async (doc: CmsDocument) => {
 		try {
 			const s = store.get(cmsAtom)
@@ -285,7 +551,7 @@ export function useCms() {
 		}
 	}
 	const setSource = async (branch: string) => {
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Opening edition…", error: "" })
 		try {
 			const cat = await fetchCatalog(branch)
 			store.set(cmsAtom, (s) => ({
@@ -402,6 +668,7 @@ export function useCms() {
 			previewId: operation.captured.some((draft) => draft.id === s.previewId) ? null : s.previewId,
 			lastPR: pr,
 			busy: false,
+			undoRecoveryId: null,
 			notice:
 				"Pushed " +
 				operation.captured.length +
@@ -444,7 +711,7 @@ export function useCms() {
 		const s = store.get(cmsAtom)
 		if (s.busy || s.phase !== "ready") return
 		const ns = namespace(s)
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Opening edition…", error: "" })
 		try {
 			const operation = await getPendingPush(ns)
 			if (!operation?.rejection)
@@ -473,7 +740,7 @@ export function useCms() {
 		const s = store.get(cmsAtom)
 		if (s.busy || s.phase !== "ready") return
 		const ns = namespace(s)
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Confirming your saved update…", error: "" })
 		try {
 			const operation = s.pendingOperation || (await getPendingPush(ns))
 			if (!operation) {
@@ -524,7 +791,7 @@ export function useCms() {
 			return
 		}
 		const ns = namespace(s)
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Committing your selected records…", error: "" })
 		try {
 			await Promise.all(plan.included.map((draft) => pending.get(writeKey(ns, draft.id))))
 			if (plan.included.some((draft) => store.get(cmsAtom).errors[draft.id]))
@@ -629,6 +896,7 @@ export function useCms() {
 			),
 			lastPR: current.lastPR?.number === number ? null : current.lastPR,
 			source: current.source === mergedBranch ? defaultBranch : current.source,
+			undoRecoveryId: null,
 			notice:
 				"PR #" +
 				number +
@@ -732,7 +1000,7 @@ export function useCms() {
 	const signOut = async () => {
 		const s = store.get(cmsAtom)
 		if (s.busy || s.phase !== "ready") return
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Opening edition…", error: "" })
 		try {
 			const ns = namespace(s),
 				prefix = writeKey(ns, "")
@@ -760,6 +1028,11 @@ export function useCms() {
 				catalogs: {},
 				selected: [],
 				pendingOperation: null,
+				localRecoveries: [],
+				undoRecoveryId: null,
+				lastPR: null,
+				notice: "",
+				error: "",
 			}))
 		} catch (error) {
 			reportFailure(error)
@@ -768,7 +1041,12 @@ export function useCms() {
 	const recovery = async () => {
 		try {
 			const s = store.get(cmsAtom)
-			const json = await exportDraftSnapshot(s.drafts, namespace(s), s.pendingOperation),
+			const json = await exportDraftSnapshot(
+					s.drafts,
+					namespace(s),
+					s.pendingOperation,
+					s.localRecoveries
+				),
 				href = URL.createObjectURL(new Blob([json], { type: "application/json" }))
 			const link = document.createElement("a")
 			link.href = href
@@ -779,26 +1057,58 @@ export function useCms() {
 			reportFailure(error)
 		}
 	}
+
 	const restore = async (file: File) => {
 		try {
-			await importDrafts(await file.text(), namespace(store.get(cmsAtom)))
+			const ns = namespace(store.get(cmsAtom))
+			await importDrafts(await file.text(), ns)
+			const [drafts, pendingOperation, localRecoveries] = await Promise.all([
+				listDrafts(ns),
+				getPendingPush(ns),
+				listDraftRecoveries(ns),
+			])
+			if (!sameNamespace(store.get(cmsAtom), ns)) return
 			update({
-				drafts: await listDrafts(namespace(store.get(cmsAtom))),
-				pendingOperation: await getPendingPush(namespace(store.get(cmsAtom))),
+				drafts,
+				pendingOperation,
+				localRecoveries,
+				undoRecoveryId: null,
 				notice:
-					"Draft backup restored on this device. Any pending push still requires explicit confirmation.",
+					"Draft backup restored on this device, including discarded and reverted drafts. Any pending push still requires explicit confirmation.",
 			})
 		} catch (error) {
 			reportFailure(error)
 		}
 	}
+
 	return {
 		state,
 		update,
+		updatePullRequest: (number: number, patch: Partial<CmsPullRequest>) =>
+			store.set(cmsAtom, (current) => ({
+				...current,
+				catalogs: Object.fromEntries(
+					Object.entries(current.catalogs).map(([key, catalog]) => [
+						key,
+						{
+							...catalog,
+							pullRequests: catalog.pullRequests.map((pr) =>
+								pr.number === number ? { ...pr, ...patch } : pr
+							),
+						},
+					])
+				),
+				lastPR:
+					current.lastPR?.number === number ? { ...current.lastPR, ...patch } : current.lastPR,
+			})),
 		refreshCatalog,
 		reconcileLocal,
 		editDraft,
 		newDraft,
+		createRelatedDraft,
+		discardDraft: (id: string) => changeLocalDraft(id, "discard"),
+		revertDraft: (id: string) => changeLocalDraft(id, "revert"),
+		undoLocalChange,
 		editDocument,
 		select,
 		review,
@@ -827,9 +1137,7 @@ export default function CmsRuntime() {
 	const [loadAttempt, setLoadAttempt] = useState(0)
 	useEffect(() => {
 		const clearPendingWrite = () =>
-			store.set(cmsAtom, (s) =>
-				s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }
-			)
+			store.set(cmsAtom, (s) => (s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }))
 		window.addEventListener("popstate", clearPendingWrite)
 		return () => window.removeEventListener("popstate", clearPendingWrite)
 	}, [store])
@@ -837,9 +1145,7 @@ export default function CmsRuntime() {
 		const changed = committedPathname.current !== pathname
 		committedPathname.current = pathname
 		if (state.phase !== "ready" || (changed && pathname !== "/write/" && pathname !== "/write"))
-			store.set(cmsAtom, (s) =>
-				s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }
-			)
+			store.set(cmsAtom, (s) => (s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }))
 	}, [pathname, state.phase, store])
 	useEffect(() => {
 		let alive = true
@@ -848,26 +1154,60 @@ export default function CmsRuntime() {
 				const session = await cmsRequest<CmsSession>("session")
 				if (!alive) return
 				if (!session.authenticated) {
-					store.set(cmsAtom, (s) => ({ ...s, session, phase: "signed-out" }))
+					store.set(cmsAtom, (s) => ({
+						...s,
+						session,
+						phase: "signed-out",
+						localRecoveries: [],
+						undoRecoveryId: null,
+						catalogs: {},
+						lastPR: null,
+						selected: [],
+						previewId: null,
+						notice: "",
+						error: "",
+					}))
 					return
 				}
 				const ns = {
 					repository: session.repository.owner + "/" + session.repository.name,
 					account: session.user!.login,
 				}
+				if (!sameNamespace(store.get(cmsAtom), ns))
+					store.set(cmsAtom, (current) => ({
+						...current,
+						session,
+						phase: "loading",
+						source: session.repository.defaultBranch,
+						drafts: [],
+						catalogs: {},
+						selected: [],
+						previewId: null,
+						saving: [],
+						errors: {},
+						notice: "",
+						error: "",
+						lastPR: null,
+						pendingOperation: null,
+						pendingWriteId: null,
+						localRecoveries: [],
+						undoRecoveryId: null,
+					}))
 				const [local, remote] = await Promise.allSettled([
-					Promise.all([listDrafts(ns), getPendingPush(ns)]),
+					Promise.all([listDrafts(ns), getPendingPush(ns), listDraftRecoveries(ns)]),
 					fetchCatalog(),
 				])
 				if (!alive) return
 				if (local.status === "rejected") throw local.reason
-				const [drafts, pendingOperation] = local.value
+				const [drafts, pendingOperation, localRecoveries] = local.value
 				if (remote.status === "rejected") {
 					store.set(cmsAtom, (current) => ({
 						...current,
 						session,
 						drafts,
 						pendingOperation,
+						localRecoveries,
+						undoRecoveryId: null,
 						phase: "error",
 						busy: false,
 						error:
@@ -909,6 +1249,7 @@ export default function CmsRuntime() {
 					catalogs: { [catalog.branch]: catalog },
 					drafts,
 					pendingOperation,
+					localRecoveries,
 					busy: false,
 				}
 				try {
@@ -953,7 +1294,7 @@ export default function CmsRuntime() {
 							}))
 					: [],
 		}))
-		if (state.session?.authenticated)
+		if (state.phase === "ready" && state.session?.authenticated)
 			try {
 				localStorage.setItem(
 					reviewStorage(state),
@@ -1014,6 +1355,11 @@ export default function CmsRuntime() {
 						catalogs: {},
 						selected: [],
 						pendingOperation: null,
+						localRecoveries: [],
+						undoRecoveryId: null,
+						lastPR: null,
+						notice: "",
+						error: "",
 					}))
 				})
 				.catch((error) => cms.reportFailure(error))
@@ -1028,7 +1374,10 @@ export default function CmsRuntime() {
 		const doc = contextDocument(state, request.pathname || pathname)
 		if (request.action === "edit") {
 			if (doc) void cms.editDocument(doc)
-			else cms.update({ notice: "Choose a record in Working changes or start a new session." })
+			else {
+				cms.update({ notice: "Choose a record below, or start a new session." })
+				router.push("/working-changes/")
+			}
 			return
 		}
 		if (request.action === "session") {
@@ -1059,8 +1408,20 @@ export default function CmsRuntime() {
 					: undefined
 			)
 		}
-	}, [bridge.request, state.phase, state, pathname, cms, store])
-	if (state.phase === "ready") return null
+	}, [bridge.request, state.phase, state, pathname, cms, store, router])
+	if (state.phase === "ready")
+		return (state.notice || state.error) &&
+			!["/write", "/working-changes"].includes(pathname.replace(/\/$/, "")) ? (
+			<aside className="cms-auth-notice cms-global-notice" role={state.error ? "alert" : "status"}>
+				<p>{state.error || state.notice}</p>
+				{!!state.undoRecoveryId && (
+					<button onClick={() => void cms.undoLocalChange(state.undoRecoveryId!)}>Undo</button>
+				)}
+				<button aria-label="Dismiss notice" onClick={() => cms.update({ notice: "", error: "" })}>
+					×
+				</button>
+			</aside>
+		) : null
 	const returnTo = pathname + (typeof window !== "undefined" ? window.location.search : "")
 	return (
 		<aside className="cms-auth-notice" role="status">

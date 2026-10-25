@@ -1,6 +1,7 @@
 "use client"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { fetchPreviewMedia } from "./client"
+import { previewDocuments } from "./journal-data"
 import {
 	asPreviewAsset,
 	createLocalPreviewAssetCache,
@@ -15,11 +16,21 @@ export function usePreviewAssets(
 	branch?: string,
 	head?: string,
 	beforeBranch = branch,
-	beforeHead = head
+	beforeHead = head,
+	context: { documents?: readonly CmsDocument[]; beforeDocuments?: readonly CmsDocument[] } = {}
 ) {
 	// Serialize only path/context/dimensions. Body, descriptions and document object identity do not change requests.
 	const planIdentity = JSON.stringify(
-		previewAssetRequests(document, before, branch, head, beforeBranch, beforeHead)
+		previewAssetRequests(
+			document,
+			before,
+			branch,
+			head,
+			beforeBranch,
+			beforeHead,
+			previewDocuments(document, context.documents),
+			previewDocuments(before, context.beforeDocuments)
+		)
 	)
 	const paths = useMemo(
 		() => JSON.parse(planIdentity) as ReturnType<typeof previewAssetRequests>,

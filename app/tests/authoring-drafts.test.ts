@@ -557,3 +557,273 @@ test("version 2 recovery carries pending identity and captured image bytes while
 		legacyPending: null,
 	})
 })
+
+test("discard and revert remain recoverable after reload with media, without replacing newer work", async ({
+	page,
+}) => {
+	await page.evaluate(async () => {
+		const { api, docs } = (window as any).draftFixture,
+			ns = { repository: "repo", account: "alice" }
+		const document = docs.parseDocument({
+			path: "app/content/vendors/tea.md",
+			sha: "sha",
+			content: "---\nid: tea\ntitle: Tea\n---\n",
+		})
+		const draft = {
+			...api.createDraft(document, "head", "main"),
+			document: docs.serializeDocument(document, { title: "My wording" }),
+			revision: 2,
+			assets: [
+				{
+					id: "photo",
+					filename: "photo.webp",
+					path: "app/public/images/uploads/authoring/hash/480.webp",
+					mime: "image/webp",
+					width: 480,
+					height: 320,
+					blob: new Blob(["kept photo"], { type: "image/webp" }),
+				},
+			],
+		}
+		await api.saveDraft(draft, ns)
+		await api.recoverableDraftChange(draft, null, ns)
+	})
+	await load(page)
+	const restored = await page.evaluate(async () => {
+		const { api } = (window as any).draftFixture,
+			ns = { repository: "repo", account: "alice" }
+		const active = await api.listDrafts(ns),
+			recoveries = await api.listDraftRecoveries(ns)
+		const other = await api.listDraftRecoveries({ repository: "repo", account: "bob" })
+		const draft = await api.undoDraftChange(recoveries[0], ns)
+		const replacement = { ...draft, document: draft.base, assets: [], revision: draft.revision + 1 }
+		const recovery = await api.recoverableDraftChange(draft, replacement, ns)
+		const newer = {
+			...replacement,
+			document: { ...draft.document },
+			revision: replacement.revision + 1,
+		}
+		await api.saveDraft(newer, ns)
+		let refused = false
+		try {
+			await api.undoDraftChange(recovery, ns)
+		} catch {
+			refused = true
+		}
+		return {
+			before: active.length,
+			archives: recoveries.length,
+			other: other.length,
+			title: draft.document.data.title,
+			photo: await draft.assets[0].blob.text(),
+			refused,
+			newer: (await api.listDrafts(ns))[0].revision,
+			stillRecoverable: (await api.listDraftRecoveries(ns)).length,
+		}
+	})
+	expect(restored).toEqual({
+		before: 0,
+		archives: 1,
+		other: 0,
+		title: "My wording",
+		photo: "kept photo",
+		refused: true,
+		newer: 5,
+		stillRecoverable: 1,
+	})
+})
+
+test("discard refuses a stale tab and never changes a pending push", async ({ page }) => {
+	const result = await page.evaluate(async () => {
+		const { api, docs } = (window as any).draftFixture,
+			ns = { repository: "repo", account: "alice" }
+		const document = docs.parseDocument({
+				path: "app/content/vendors/tea.md",
+				sha: "sha",
+				content: "---\nid: tea\ntitle: Tea\n---\n",
+			}),
+			draft = api.createDraft(document, "head", "main")
+		await api.saveDraft(draft, ns)
+		const newer = {
+			...draft,
+			revision: 2,
+			document: docs.serializeDocument(document, { title: "Newer" }),
+		}
+		await api.saveDraft(newer, ns)
+		let stale = false
+		try {
+			await api.recoverableDraftChange(draft, null, ns)
+		} catch {
+			stale = true
+		}
+		const db = await new Promise<IDBDatabase>((resolve, reject) => {
+			const open = indexedDB.open("puerh-authoring", 3)
+			open.onsuccess = () => resolve(open.result)
+			open.onerror = () => reject(open.error)
+		})
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction("operations", "readwrite")
+			tx.objectStore("operations").put({ key: "repo\u0000alice", operation: { id: "pending" } })
+			tx.oncomplete = () => resolve()
+			tx.onerror = () => reject(tx.error)
+		})
+		let pending = false
+		try {
+			await api.recoverableDraftChange(newer, null, ns)
+		} catch {
+			pending = true
+		}
+		return {
+			stale,
+			pending,
+			title: (await api.listDrafts(ns))[0].document.data.title,
+			recoveries: (await api.listDraftRecoveries(ns)).length,
+		}
+	})
+	expect(result).toEqual({ stale: true, pending: true, title: "Newer", recoveries: 0 })
+})
+
+test("inline related records and their parent reference save atomically or keep the newer parent", async ({
+	page,
+}) => {
+	const result = await page.evaluate(async () => {
+		const { api, docs } = (window as any).draftFixture,
+			ns = { repository: "repo", account: "alice" }
+		const doc = (id: string) =>
+			docs.parseDocument({
+				path: "app/content/vendors/" + id + ".md",
+				sha: "sha",
+				content: "---\nid: " + id + "\ntitle: " + id + "\n---\n",
+			})
+		const parent = api.createDraft(doc("parent"), "head", "main"),
+			child = { ...api.createDraft(doc("child"), "head", "main"), base: null }
+		await api.saveDraft(parent, ns)
+		const next = {
+			...parent,
+			document: docs.serializeDocument(parent.document, { vendor: "child" }),
+			revision: 2,
+		}
+		await api.saveRelatedDraft(child, next, 1, ns)
+		const conflictChild = { ...api.createDraft(doc("conflict"), "head", "main"), base: null }
+		let refused = false
+		try {
+			await api.saveRelatedDraft(conflictChild, { ...next, revision: 3 }, 1, ns)
+		} catch {
+			refused = true
+		}
+		const drafts = await api.listDrafts(ns)
+		return {
+			refused,
+			count: drafts.length,
+			relation: drafts.find((draft: any) => draft.id === "parent").document.data.vendor,
+			hasConflicting: drafts.some((draft: any) => draft.id === "conflict"),
+		}
+	})
+	expect(result).toEqual({ refused: true, count: 2, relation: "child", hasConflicting: false })
+})
+
+test("backup carries discarded and reverted archives with image variants and retains safe restore guards", async ({
+	page,
+}) => {
+	const result = await page.evaluate(async () => {
+		const { api, docs } = (window as any).draftFixture,
+			ns = { repository: "repo", account: "alice" }
+		const source = (id: string) =>
+			docs.parseDocument({
+				path: "app/content/vendors/" + id + ".md",
+				sha: "sha",
+				content: "---\nid: " + id + "\ntitle: " + id + "\n---\n",
+			})
+		const asset = {
+			id: "photo",
+			filename: "640.webp",
+			path: "app/public/images/uploads/authoring/hash/640.webp",
+			mime: "image/webp",
+			width: 640,
+			height: 480,
+			blob: new Blob(["archive original"], { type: "image/webp" }),
+			variants: [
+				{
+					path: "app/public/images/uploads/authoring/hash/320.webp",
+					mime: "image/webp",
+					width: 320,
+					height: 240,
+					blob: new Blob(["archive variant"], { type: "image/webp" }),
+				},
+			],
+		}
+		const discarded = { ...api.createDraft(source("discarded"), "head", "main"), assets: [asset] }
+		await api.saveDraft(discarded, ns)
+		await api.recoverableDraftChange(discarded, null, ns)
+		const original = source("reverted"),
+			reverted = {
+				...api.createDraft(original, "head", "main"),
+				document: docs.serializeDocument(original, undefined, "Archived wording."),
+				revision: 2,
+				assets: [asset],
+			}
+		await api.saveDraft(reverted, ns)
+		await api.recoverableDraftChange(
+			reverted,
+			{ ...reverted, document: original, revision: 3, assets: [] },
+			ns
+		)
+		const json = await api.exportDrafts(ns),
+			backup = JSON.parse(json)
+		const db = await new Promise<IDBDatabase>((resolve, reject) => {
+			const request = indexedDB.open("puerh-authoring", 3)
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction(["drafts", "recovery"], "readwrite")
+			tx.objectStore("drafts").clear()
+			tx.objectStore("recovery").clear()
+			tx.oncomplete = () => resolve()
+			tx.onerror = () => reject(tx.error)
+		})
+		await api.importDrafts(json, ns)
+		const recoveries = await api.listDraftRecoveries(ns),
+			discard = recoveries.find((item: any) => item.action === "discard"),
+			revert = recoveries.find((item: any) => item.action === "revert")
+		const restored = await api.undoDraftChange(discard, ns)
+		const current = (await api.listDrafts(ns)).find((draft: any) => draft.id === "reverted")
+		await api.saveDraft(
+			{
+				...current,
+				document: docs.serializeDocument(current.document, undefined, "Newer wording."),
+				revision: current.revision + 1,
+			},
+			ns
+		)
+		let refused = false
+		try {
+			await api.undoDraftChange(revert, ns)
+		} catch {
+			refused = true
+		}
+		return {
+			version: backup.version,
+			archiveCount: backup.recoveries.length,
+			activeCount: backup.drafts.length,
+			restoredOriginal: await restored.assets[0].blob.text(),
+			restoredVariant: await restored.assets[0].variants[0].blob.text(),
+			archivedVariant: await revert.draft.assets[0].variants[0].blob.text(),
+			refused,
+			newerBody: (await api.listDrafts(ns)).find((draft: any) => draft.id === "reverted").document
+				.body,
+			remaining: (await api.listDraftRecoveries(ns)).length,
+		}
+	})
+	expect(result).toEqual({
+		version: 2,
+		archiveCount: 2,
+		activeCount: 1,
+		restoredOriginal: "archive original",
+		restoredVariant: "archive variant",
+		archivedVariant: "archive variant",
+		refused: true,
+		newerBody: "Newer wording.",
+		remaining: 1,
+	})
+})

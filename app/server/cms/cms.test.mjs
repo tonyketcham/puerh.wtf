@@ -182,7 +182,35 @@ class FakeGitHub {
 			if (method === "PATCH") Object.assign(pr, body)
 			return this.response(this.current(pr))
 		}
-		if (path.startsWith("/compare/")) return this.response({ status: "ahead" })
+		if (/^\/pulls\/\d+\/update-branch$/.test(path)) {
+			const pr = this.pulls[Number(path.split("/")[2]) - 1]
+			if (this.updateConflict || body.expected_head_sha !== this.refs[pr.head.ref])
+				return this.response({ message: "Head changed" }, 422)
+			this.makeCommit(pr.head.ref, {}, "Merge latest production")
+			this.comparisonState = "ahead"
+			return this.response({ message: "Updating", url: pr.html_url }, 202)
+		}
+		if (/^\/commits\/[^/]+\/check-runs$/.test(path))
+			return this.response({
+				total_count: 1,
+				check_runs: [
+					{
+						name: "build",
+						status: this.checkState === "PENDING" ? "in_progress" : "completed",
+						conclusion:
+							this.checkState === "SUCCESS"
+								? "success"
+								: this.checkState === "FAILURE"
+								? "failure"
+								: null,
+						details_url: "https://github.com/check/build",
+					},
+				],
+			})
+		if (/^\/commits\/[^/]+\/status$/.test(path))
+			return this.response({ total_count: 0, statuses: [] })
+		if (path.startsWith("/compare/"))
+			return this.response({ status: this.comparisonState || "ahead" })
 		if (u.pathname === "/graphql") {
 			if (body.query.includes("CmsBlobs")) {
 				const repository = {}
@@ -243,6 +271,7 @@ class FakeGitHub {
 									requiresStatusChecks: true,
 									requiresStrictStatusChecks: this.strict,
 									requiredStatusCheckContexts: ["build"],
+									requiredApprovingReviewCount: this.requiredApprovals || 0,
 								},
 							},
 						},
@@ -1026,4 +1055,111 @@ test("closed owned targets reject before committing but recovered writes never b
 	const recovered = await call(handler, "push", { method: "POST", body: original })
 	assert.equal(recovered.value.error.code, "pull_request_closed")
 	assert.equal(recovered.value.error.details?.operationStatus, undefined)
+})
+
+test("publication readiness is read-only, exact-edition scoped, and reports real checks and zero approval policy", async () => {
+	const { github, handler } = setup(),
+		baseHead = github.refs.main
+	const pushed = await call(handler, "push", { method: "POST", body: pushBody(github) })
+	const body = { number: 1, head: pushed.value.head, baseHead }
+	github.checkState = "PENDING"
+	const before = github.calls.length
+	const status = await call(handler, "publication-status", { method: "POST", body })
+	assert.equal(status.status, 200, status.text)
+	assert.equal(status.value.requiredApprovals, 0)
+	assert.equal(status.value.reviewState, "NONE")
+	assert.equal(status.value.draft, true)
+	assert.equal(status.value.checkState, "PENDING")
+	assert.deepEqual(status.value.checks, [
+		{ name: "build", state: "pending", url: "https://github.com/check/build", required: true },
+	])
+	assert(
+		!github.calls
+			.slice(before)
+			.some((call) => call.method === "PUT" || call.body?.query?.includes("CmsReady"))
+	)
+	assert.equal(github.pulls[0].draft, true)
+	github.checkState = "FAILURE"
+	const failed = await call(handler, "publication-status", { method: "POST", body })
+	assert.equal(failed.value.checks[0].state, "failure")
+	const stale = await call(handler, "publication-status", {
+		method: "POST",
+		body: { ...body, head: hash("stale") },
+	})
+	assert.equal(stale.value.error.code, "head_conflict")
+})
+
+test("edition update uses only GitHub's expected-head merge and requires renewed exact review", async () => {
+	const { github, handler } = setup(),
+		baseHead = github.refs.main
+	const pushed = await call(handler, "push", { method: "POST", body: pushBody(github) })
+	const body = { number: 1, head: pushed.value.head, baseHead }
+	github.comparisonState = "behind"
+	const status = await call(handler, "publication-status", { method: "POST", body })
+	assert.equal(status.value.requiresUpdate, true)
+	const update = await call(handler, "update-edition", { method: "POST", body })
+	assert.equal(update.status, 200, update.text)
+	assert.equal(update.value.updating, true)
+	const mutation = github.calls.find(
+		(call) => call.method === "PUT" && call.path.endsWith("/update-branch")
+	)
+	assert.deepEqual(mutation.body, { expected_head_sha: body.head })
+	assert(!github.calls.some((call) => call.method === "PUT" && call.path.endsWith("/merge")))
+	assert.equal(github.pulls[0].draft, true)
+	const old = await call(handler, "publish", { method: "POST", body })
+	assert.equal(old.value.error.code, "head_conflict")
+	const refreshed = { ...body, head: github.refs[pushed.value.branch] }
+	const next = await call(handler, "publication-status", { method: "POST", body: refreshed })
+	assert.equal(next.value.requiresUpdate, false)
+	const current = await call(handler, "update-edition", { method: "POST", body: refreshed })
+	assert.equal(current.value.error.code, "edition_current")
+})
+
+test("edition update fails closed for authentication, CSRF, ownership, scope, protection and GitHub conflict", async () => {
+	for (const action of ["publication-status", "update-edition"]) {
+		const { github, handler } = setup(),
+			baseHead = github.refs.main
+		const pushed = await call(handler, "push", { method: "POST", body: pushBody(github) })
+		const body = { number: 1, head: pushed.value.head, baseHead }
+		github.comparisonState = "behind"
+		const noAuth = await call(handler, action, { method: "POST", body, headers: {} })
+		assert.equal(noAuth.status, 401)
+		const csrf = await call(handler, action, {
+			method: "POST",
+			body,
+			headers: sessionHeaders({ "x-csrf-token": "wrong" }),
+		})
+		assert.equal(csrf.status, 403)
+		github.permission = "read"
+		const permission = await call(handler, action, { method: "POST", body })
+		assert.equal(permission.status, 403)
+		github.permission = "write"
+		github.pulls[0].user = { id: 999, login: "other" }
+		const owner = await call(handler, action, { method: "POST", body })
+		assert.equal(owner.value.error.code, "pull_request_scope")
+		github.pulls[0].user = USER
+		const head = github.makeCommit(
+			pushed.value.branch,
+			{ "app/src/unsafe.ts": "code" },
+			"Unsafe scope"
+		)
+		const scope = await call(handler, action, { method: "POST", body: { ...body, head } })
+		assert.equal(scope.value.error.code, "pull_request_scope")
+		assert(!github.calls.some((call) => call.method === "PUT"))
+	}
+	const { github, handler } = setup(),
+		baseHead = github.refs.main
+	const pushed = await call(handler, "push", { method: "POST", body: pushBody(github) })
+	const body = { number: 1, head: pushed.value.head, baseHead }
+	github.comparisonState = "behind"
+	github.strict = false
+	const protection = await call(handler, "update-edition", { method: "POST", body })
+	assert.equal(protection.value.error.code, "publish_protection")
+	assert(!github.calls.some((call) => call.method === "PUT"))
+	github.strict = true
+	github.updateConflict = true
+	const conflict = await call(handler, "update-edition", { method: "POST", body })
+	assert.equal(conflict.value.error.code, "github_conflict")
+	assert.equal(github.refs[pushed.value.branch], body.head)
+	assert(!github.calls.some((call) => call.path.endsWith("/merge")))
 })

@@ -1,1 +1,22 @@
-{}
+{
+  "/images/uploads/authoring/dd76384947be60530fd4c7010873d95a6ce8ff3b91336799eac557e81d613cb0/1600.webp": [
+    {
+      "src": "/images/uploads/authoring/dd76384947be60530fd4c7010873d95a6ce8ff3b91336799eac557e81d613cb0/480.webp",
+      "mime": "image/webp",
+      "width": 480,
+      "height": 320
+    },
+    {
+      "src": "/images/uploads/authoring/dd76384947be60530fd4c7010873d95a6ce8ff3b91336799eac557e81d613cb0/960.webp",
+      "mime": "image/webp",
+      "width": 960,
+      "height": 640
+    },
+    {
+      "src": "/images/uploads/authoring/dd76384947be60530fd4c7010873d95a6ce8ff3b91336799eac557e81d613cb0/1600.webp",
+      "mime": "image/webp",
+      "width": 1600,
+      "height": 1067
+    }
+  ]
+}

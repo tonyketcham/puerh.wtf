@@ -42,7 +42,21 @@ async function githubFixture(
 	}[] = []
 	const pushes: Record<string, unknown>[] = [],
 		images: Record<string, string> = {}
+	const identity = { login: "cms-editor" },
+		service = { catalogError: false }
 	const receipts = new Map<string, unknown>()
+	const publicationRequests: {
+		action: string
+		body: { number: number; head: string; baseHead: string }
+	}[] = []
+	const readiness = {
+		checkState: "SUCCESS",
+		requiresUpdate: false,
+		requiredApprovals: 0,
+		reviewState: "NONE",
+		mergeState: "CLEAN",
+		protectionReady: true,
+	}
 	const mediaRequests: { branch: string; head: string; path: string; status: number }[] = []
 	const publicImageRequests: { path: string; status: number }[] = []
 	const catalogRequests: string[] = []
@@ -94,11 +108,19 @@ async function githubFixture(
 			return ok({
 				configured: true,
 				authenticated,
-				...(authenticated ? { user: { login: "cms-editor" } } : {}),
+				...(authenticated ? { user: { login: identity.login } } : {}),
 				repository: { owner: "tonyketcham", name: "puerh.wtf", defaultBranch: "main" },
 				csrfToken: "fixture-csrf",
 			})
 		if (action === "catalog") {
+			if (service.catalogError)
+				return route.fulfill({
+					status: 503,
+					contentType: "application/json",
+					body: JSON.stringify({
+						error: { code: "unavailable", message: "Repository is temporarily unavailable." },
+					}),
+				})
 			catalogRequests.push(url.searchParams.get("branch") || "main")
 			const catalog = catalogs.get(url.searchParams.get("branch") || "main")
 			return ok({ ...catalog, pullRequests: prs })
@@ -188,10 +210,67 @@ async function githubFixture(
 			if (options.loseFirstPush && pushes.length === 1) return route.abort("failed")
 			return ok(receipt)
 		}
+
+		if (action === "publication-status" || action === "update-edition") {
+			expect(request.method()).toBe("POST")
+			expect(request.headers()["x-csrf-token"]).toBe("fixture-csrf")
+			const data = request.postDataJSON(),
+				pr = prs.find((p) => p.number === data.number)!
+			publicationRequests.push({ action, body: data })
+			if (!pr || data.head !== pr.head || data.baseHead !== catalogs.get("main")!.head)
+				return route.fulfill({
+					status: 409,
+					contentType: "application/json",
+					body: JSON.stringify({
+						error: {
+							code: "head_conflict",
+							message: "This edition changed. Reopen its review to read the latest version.",
+						},
+					}),
+				})
+			if (action === "update-edition") {
+				expect(readiness.requiresUpdate).toBe(true)
+				const old = catalogs.get(pr.branch)!,
+					head = (++sequence).toString(16).padStart(40, "0")
+				catalogs.set(pr.branch, { ...old, head })
+				pr.head = head
+				readiness.requiresUpdate = false
+				readiness.checkState = "PENDING"
+				readiness.mergeState = "BLOCKED"
+				return ok({ number: pr.number, updating: true, url: pr.url })
+			}
+			return ok({
+				number: pr.number,
+				head: pr.head,
+				baseHead: catalogs.get("main")!.head,
+				draft: pr.draft,
+				...readiness,
+				checks: [
+					{
+						name: "Build journal",
+						state:
+							readiness.checkState === "SUCCESS"
+								? "success"
+								: readiness.checkState === "FAILURE"
+								? "failure"
+								: "pending",
+						url: "https://github.com/tonyketcham/puerh.wtf/actions/runs/123",
+						required: true,
+					},
+				],
+				checksTruncated: false,
+				url: pr.url,
+			})
+		}
 		if (action === "publish") {
 			const data = request.postDataJSON()
 			const pr = prs.find((p) => p.number === data.number)!
+			publicationRequests.push({ action: "publish", body: data })
 			expect(data.head).toBe(pr.head)
+			expect(data.baseHead).toBe(catalogs.get("main")!.head)
+			expect(readiness.requiresUpdate).toBe(false)
+			expect(readiness.checkState).toBe("SUCCESS")
+			pr.draft = false
 			catalogs.set("main", { ...catalogs.get(pr.branch)!, branch: "main" })
 			prs.splice(prs.indexOf(pr), 1)
 			return ok({ merged: true, sha: pr.head })
@@ -211,6 +290,16 @@ async function githubFixture(
 	})
 	return {
 		records,
+		identity,
+		service,
+		prs,
+		readiness,
+		publicationRequests,
+		advanceProduction() {
+			const main = catalogs.get("main")!
+			catalogs.set("main", { ...main, head: (++sequence).toString(16).padStart(40, "0") })
+			readiness.requiresUpdate = true
+		},
 		catalogs,
 		pushes,
 		mediaRequests,
@@ -321,10 +410,12 @@ for (const mobile of [false, true])
 		)
 		const sessionId = new URL(page.url()).searchParams.get("id")!
 		await page.getByRole("button", { name: "New vendor", exact: true }).click()
-		await expect(page).not.toHaveURL(new RegExp(sessionId))
+		await expect(page).toHaveURL(new RegExp(sessionId))
 		await page.getByRole("textbox", { name: /^Name/ }).fill("Evening Tea Shop")
-		const vendorId = new URL(page.url()).searchParams.get("id")!
-		await page.getByRole("button", { name: /Use this vendor and return/ }).click()
+		await page.getByRole("button", { name: "Create & use vendor", exact: true }).click()
+		await expect(
+			page.getByRole("button", { name: "Remove Evening Tea Shop", exact: true })
+		).toBeVisible()
 		await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(/First steep/)
 		await page
 			.locator('input[type="file"][accept^="image/"]')
@@ -333,6 +424,10 @@ for (const mobile of [false, true])
 		await page
 			.getByLabel("Image description", { exact: true })
 			.fill("Amber tea in a small porcelain cup.")
+		await page.getByText("Preview shelf cover", { exact: true }).click()
+		const shelfCover = page.locator("[data-cover-preview] img")
+		await expect(shelfCover).toHaveAttribute("src", /^blob:/)
+		await expect(shelfCover).toHaveAttribute("alt", "Amber tea in a small porcelain cup.")
 		expect(fixture.pushes).toHaveLength(0)
 		await page.reload()
 		await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
@@ -349,7 +444,7 @@ for (const mobile of [false, true])
 		await expect(
 			page.getByRole("checkbox", { name: "Include An unfinished vendor" })
 		).not.toBeChecked()
-		await expect(page.locator(".cms-reading")).toContainText("Evening Tea Shop")
+		await expect(page.locator("[data-journal-preview]")).toContainText("Evening Tea Shop")
 		await page.getByRole("button", { name: "Connections", exact: true }).click()
 		await page.reload()
 		await expect(page.getByRole("button", { name: "Connections", exact: true })).toHaveAttribute(
@@ -388,14 +483,29 @@ for (const mobile of [false, true])
 		expect(fixture.pushes[1].target).toHaveProperty("pullRequestNumber", 101)
 		expect(fixture.pushes[1].assets).toHaveLength(0)
 		await page.getByRole("button", { name: "Review publication", exact: true }).click()
-		await expect(page.locator("#cms-publication")).toContainText("2 cumulative records")
-		await page
-			.locator("#cms-publication")
-			.getByRole("button", { name: "Publish PR #101 · 2 records", exact: true })
-			.click()
+		await expect(page.locator("#cms-publication")).toContainText(
+			"2 records · versions saved to GitHub"
+		)
+		await page.getByRole("button", { name: "Publish PR #101 · 2 records", exact: true }).click()
 		await expect(page.locator(".cms-notice")).toContainText("merged")
-		await page.goto("/write/?id=" + vendorId)
+		const vendor = (fixture.pushes[0].documents as { path: string; content: string }[])
+			.map((record) => parseDocument({ ...record, sha: null }))
+			.find((record) => record.data.title === "Evening Tea Shop")!
+		await page.goto("/write/?id=" + vendor.id)
 		await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("Evening Tea Shop")
+		const publicReadsBeforeRelatedPreview = fixture.publicImageReads
+		await page.getByRole("button", { name: "Read", exact: true }).click()
+		const relatedPhoto = page
+			.locator("[data-journal-preview] a")
+			.filter({ hasText: "An evening tea session" })
+			.locator("img")
+		await expect(relatedPhoto).toHaveAttribute("src", /^blob:/)
+		await expect
+			.poll(() =>
+				relatedPhoto.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)
+			)
+			.toBe(true)
+		expect(fixture.publicImageReads).toBe(publicReadsBeforeRelatedPreview)
 		expect(errors).toEqual([])
 	})
 
@@ -435,7 +545,7 @@ test("lost push response resumes exact request after reload and preserves newer 
 	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
 		"Newer notes written after the interrupted push."
 	)
-	await expect(page.getByText("Draft PR #101", { exact: true })).toBeVisible()
+	await expect(page.getByText("Unpublished · PR #101", { exact: true })).toBeVisible()
 })
 
 test("remote content conflict is reconciled in reading view before an explicit new push", async ({
@@ -467,10 +577,10 @@ test("remote content conflict is reconciled in reading view before an explicit n
 	await page.getByRole("button", { name: "Commit & push 1 record", exact: true }).click()
 	await page.getByRole("button", { name: "Reconcile this record", exact: true }).click()
 	await page.getByRole("radio", { name: "Keep my local edit", exact: true }).check()
-	await expect(page.locator(".cms-reconciliation .cms-reading")).toContainText(
+	await expect(page.locator(".cms-reconciliation [data-journal-preview]")).toContainText(
 		"Remote description retained."
 	)
-	await expect(page.locator(".cms-reconciliation .cms-reading")).toContainText(
+	await expect(page.locator(".cms-reconciliation [data-journal-preview]")).toContainText(
 		"My local editorial wording."
 	)
 	await page.getByRole("button", { name: "Apply reconciled draft", exact: true }).click()
@@ -531,7 +641,7 @@ test("fresh-device PR editor reads private images, reloads its branch catalog an
 	await page.getByLabel("Find content", { exact: true }).fill(title)
 	await page.locator(".cms-library-list button").filter({ hasText: title }).click()
 	await expect(page).toHaveURL(new RegExp("id=" + id))
-	const image = page.locator(".cms-media-editor .cms-image-entry img")
+	const image = page.locator(".cms-photo-panel .cms-image-entry img")
 	await expect
 		.poll(() =>
 			image.evaluate(
@@ -685,7 +795,7 @@ for (const entry of ["contextual", "library"] as const)
 					await expect(
 						page.locator("main").getByRole("heading", { name: "white2tea", exact: true })
 					).toBeVisible()
-					await page.getByRole("button", { name: "Edit this record", exact: true }).click()
+					await page.getByRole("button", { name: "Edit this vendor", exact: true }).click()
 				} else {
 					await page.getByRole("link", { name: "← Working changes", exact: true }).click()
 					await page.getByText("Browse repository content", { exact: true }).click()
@@ -699,7 +809,7 @@ for (const entry of ["contextual", "library"] as const)
 				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + vendor.id + "(?:&|$)"))
 				expect(new URL(page.url()).searchParams.get("id")).not.toBe(tagId)
 				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("white2tea")
-				await expect(page.locator(".cms-write .cms-eyebrow")).toHaveText("Vendor · Pushed edition")
+				await expect(page.locator(".cms-write .cms-eyebrow")).toHaveText("Vendor")
 				await page.getByRole("link", { name: "← Working changes", exact: true }).click()
 				await expect(
 					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
@@ -737,3 +847,466 @@ for (const entry of ["contextual", "library"] as const)
 				expect(errors).toEqual([])
 			}
 		)
+
+function savedPublication(fixture: Awaited<ReturnType<typeof githubFixture>>) {
+	const source = fixture.records.find((record) => record.path.endsWith("/white2tea.md"))!
+	const document = parseDocument(source),
+		edited = serializeDocument(document, undefined, document.body + "\nA revised editorial note.\n")
+	const branch = "cms/authoring/7/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+		head = "2".repeat(40)
+	fixture.catalogs.set(branch, {
+		branch,
+		head,
+		records: fixture.records.map((record) =>
+			record.path === source.path
+				? { ...record, content: edited.raw, sha: sha(edited.raw) }
+				: record
+		),
+	})
+	const pr = {
+		number: 101,
+		branch,
+		head,
+		base: "main",
+		title: "Update white2tea",
+		url: "https://github.com/tonyketcham/puerh.wtf/pull/101",
+		draft: true,
+	}
+	fixture.prs.push(pr)
+	return pr
+}
+
+test("publication review shows pending and failed checks without a competing commit action", async ({
+	page,
+}) => {
+	const fixture = await githubFixture(page),
+		pr = savedPublication(fixture)
+	fixture.readiness.checkState = "PENDING"
+	fixture.readiness.mergeState = "BLOCKED"
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByRole("button", { name: "Review publication", exact: true }).click()
+	const panel = page.locator("#cms-publication"),
+		status = page.getByRole("region", { name: "Publication readiness" }),
+		footer = page.locator(".cms-commit-bar")
+	await expect(panel).toContainText("A revised editorial note.")
+	await expect(status).toContainText("No human review is required by this repository.")
+	await expect(status).toContainText("Build journal")
+	await expect(status).toContainText("In progress")
+	await expect(status.getByRole("link", { name: "Build journal", exact: true })).toHaveAttribute(
+		"href",
+		/actions\/runs\/123$/
+	)
+	await expect(
+		footer.getByRole("button", { name: "Publish PR #101 · 1 records", exact: true })
+	).toBeDisabled()
+	await expect(footer.getByRole("button", { name: /Commit & push/ })).toHaveCount(0)
+	await expect(footer).not.toContainText("Confirming push")
+	expect(fixture.prs[0].draft).toBe(true)
+	expect(fixture.publicationRequests.map((request) => request.action)).toEqual([
+		"publication-status",
+	])
+	fixture.readiness.checkState = "FAILURE"
+	await status.getByRole("button", { name: "Refresh checks", exact: true }).click()
+	await expect(status).toContainText("Needs attention")
+	await expect(footer.getByRole("button", { name: /Publish PR/ })).toBeDisabled()
+	fixture.readiness.checkState = "SUCCESS"
+	fixture.readiness.mergeState = "CLEAN"
+	await status.getByRole("button", { name: "Refresh checks", exact: true }).click()
+	await expect(status).toContainText("Passed")
+	await expect(footer.getByRole("button", { name: /Publish PR/ })).toBeEnabled()
+	await footer.getByRole("button", { name: /Publish PR/ }).click()
+	await expect(page.locator(".cms-notice")).toContainText("merged")
+	expect(fixture.publicationRequests.at(-1)).toEqual({
+		action: "publish",
+		body: { number: pr.number, head: pr.head, baseHead: "1".repeat(40) },
+	})
+})
+
+test("outdated publication updates in app and requires rereading the new edition before publish", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 })
+	const fixture = await githubFixture(page),
+		pr = savedPublication(fixture),
+		oldHead = pr.head
+	fixture.advanceProduction()
+	const baseHead = fixture.catalogs.get("main")!.head
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByRole("button", { name: "Review publication", exact: true }).click()
+	const status = page.getByRole("region", { name: "Publication readiness" }),
+		footer = page.locator(".cms-commit-bar")
+	await expect(status).toContainText("Published content has moved forward.")
+	await expect(footer.getByRole("button", { name: /Publish PR/ })).toBeDisabled()
+	await status
+		.getByRole("button", { name: "Update edition from latest production", exact: true })
+		.click()
+	await expect(page.locator("#cms-publication .cms-error")).toContainText("Reopen this review")
+	expect(
+		fixture.publicationRequests.find((request) => request.action === "update-edition")
+	).toEqual({ action: "update-edition", body: { number: pr.number, head: oldHead, baseHead } })
+	expect(pr.head).not.toBe(oldHead)
+	await expect(footer.getByRole("button", { name: /Publish PR/ })).toBeDisabled()
+	await status
+		.getByRole("button", { name: "Reopen review from latest edition", exact: true })
+		.click()
+	await expect(status).toContainText("includes the latest published content")
+	await expect(status).toContainText("In progress")
+	const latest = fixture.publicationRequests
+		.filter((request) => request.action === "publication-status")
+		.at(-1)!
+	expect(latest.body).toEqual({ number: pr.number, head: pr.head, baseHead })
+	fixture.readiness.checkState = "SUCCESS"
+	fixture.readiness.mergeState = "CLEAN"
+	await status.getByRole("button", { name: "Refresh checks", exact: true }).click()
+	await expect(footer.getByRole("button", { name: /Publish PR/ })).toBeEnabled()
+	await footer.getByRole("button", { name: /Publish PR/ }).click()
+	await expect(page.locator(".cms-notice")).toContainText("merged")
+	expect(fixture.publicationRequests.at(-1)).toEqual({
+		action: "publish",
+		body: { number: pr.number, head: pr.head, baseHead },
+	})
+	expect(fixture.pushes).toHaveLength(0)
+})
+
+for (const boundary of ["sign out", "disable editing"] as const)
+	test(
+		"recovered drafts stay private after " + boundary + " and another account's catalog fails",
+		async ({ page }) => {
+			const fixture = await githubFixture(page)
+			await page.goto("/")
+			await openEditor(page)
+			await command(page, "Working changes")
+			await page.getByLabel("New record", { exact: true }).selectOption("tags")
+			await page.getByRole("textbox", { name: /^Name/ }).fill("Private account A draft")
+			await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+			await page.getByRole("button", { name: "Discard draft", exact: true }).click()
+			await expect(page.locator(".cms-notice")).toContainText("Draft set aside")
+			await page.getByText("Draft recovery", { exact: true }).click()
+			await expect(page.locator(".cms-recovered-drafts")).toContainText("Private account A draft")
+			if (boundary === "sign out")
+				await page.getByRole("button", { name: "Sign out of GitHub", exact: true }).click()
+			else await command(page, "Disable editing")
+			await expect(page.locator(".cms-explorer-tools")).toHaveCount(0)
+			fixture.identity.login = "editor-b"
+			fixture.service.catalogError = true
+			await command(page, "Enable editing")
+			await expect(page.locator(".cms-auth-notice")).toContainText(
+				"Repository access could not load"
+			)
+			await expect(page.locator(".cms-recovered-drafts")).toHaveCount(0)
+			await expect(page.locator("[data-cms-working]")).not.toContainText("Private account A draft")
+			await expect(
+				page.locator("[data-cms-working]").getByRole("button", { name: "Undo", exact: true })
+			).toHaveCount(0)
+			// Return to A with the catalog still unavailable: its durable recovery must remain available.
+			fixture.identity.login = "cms-editor"
+			await page.reload()
+			await expect(page.locator(".cms-auth-notice")).toContainText(
+				"Repository access could not load"
+			)
+			await page.getByText("Draft recovery", { exact: true }).click()
+			await expect(page.locator(".cms-recovered-drafts")).toContainText("Private account A draft")
+		}
+	)
+
+test("mobile whole-record checkboxes keep the selection list in place while titles open previews", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 390, height: 844 })
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	for (const name of ["First local vendor", "Second local vendor"]) {
+		await page.getByLabel("New record", { exact: true }).selectOption("vendors")
+		await page.getByRole("textbox", { name: /^Name/ }).fill(name)
+		await page.getByLabel("Notes", { exact: true }).fill("An editorial note for " + name + ".")
+		await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+	}
+	await page.getByRole("button", { name: "Clear selection", exact: true }).click()
+	await page.evaluate(() => window.scrollTo(0, 0))
+	for (const name of ["First local vendor", "Second local vendor"]) {
+		const before = await page.evaluate(() => window.scrollY)
+		await page.getByRole("checkbox", { name: "Include " + name, exact: true }).check()
+		const movement = await page.evaluate(
+			(before) =>
+				new Promise<number>((resolve) => {
+					let frames = 0,
+						max = 0
+					const frame = () => {
+						max = Math.max(max, Math.abs(window.scrollY - before))
+						if (++frames < 20) requestAnimationFrame(frame)
+						else resolve(max)
+					}
+					requestAnimationFrame(frame)
+				}),
+			before
+		)
+		expect(movement).toBeLessThanOrEqual(2)
+	}
+	await expect(page.locator(".cms-commit-bar")).toContainText("2 selected")
+	await page
+		.locator(".cms-selection")
+		.getByRole("button", { name: "First local vendor", exact: true })
+		.click()
+	await expect
+		.poll(async () =>
+			page.locator("#cms-editorial-preview").evaluate((el) => el.getBoundingClientRect().top)
+		)
+		.toBeLessThan(160)
+	await expect(page.locator("#cms-editorial-preview")).toBeFocused()
+})
+
+test("failed inline creation preserves notes typed during the atomic write without a dangling relationship", async ({
+	page,
+}) => {
+	await page.addInitScript(() => {
+		const original = IDBObjectStore.prototype.put
+		IDBObjectStore.prototype.put = function (value: unknown, ...rest: unknown[]) {
+			const entry = value as { draft?: { base?: unknown; document?: { collection?: string } } }
+			if (
+				(window as any).__failInline &&
+				this.name === "drafts" &&
+				entry.draft?.document?.collection === "vendors" &&
+				entry.draft.base === null
+			) {
+				;(window as any).__failInline = false
+				const textarea =
+					document.querySelector<HTMLTextAreaElement>('textarea[aria-label="Notes"]') ||
+					document.querySelector<HTMLTextAreaElement>("textarea.cms-body")
+				if (!textarea) throw new Error("The session notes textarea was unavailable.")
+				Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(
+					textarea,
+					"New notes typed while the related save was pending."
+				)
+				textarea.dispatchEvent(new Event("input", { bubbles: true }))
+				throw new DOMException("Test-only atomic related save failure", "QuotaExceededError")
+			}
+			return original.apply(this, [value, ...rest] as Parameters<IDBObjectStore["put"]>)
+		}
+	})
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("tastings")
+	await page.getByRole("textbox", { name: /^Tea name/ }).fill("Atomic notes preservation")
+	await page.getByLabel("Notes", { exact: true }).fill("Earlier notes.")
+	await expect(page.getByRole("status").filter({ hasText: "Saved on this device" })).toBeVisible()
+	const id = new URL(page.url()).searchParams.get("id")!
+	await page.getByRole("button", { name: "New vendor", exact: true }).click()
+	await page
+		.getByRole("group", { name: "New vendor", exact: true })
+		.getByRole("textbox", { name: /^Name/ })
+		.fill("Failed new vendor")
+	await page.evaluate(() => ((window as any).__failInline = true))
+	await page.getByRole("button", { name: "Create & use vendor", exact: true }).click()
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
+		"New notes typed while the related save was pending."
+	)
+	await expect(page.getByRole("status").filter({ hasText: "Saved on this device" })).toBeVisible()
+	await page.reload()
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
+		"New notes typed while the related save was pending."
+	)
+	const stored = await page.evaluate(async (id) => {
+		const db = await new Promise<IDBDatabase>((resolve, reject) => {
+			const request = indexedDB.open("puerh-authoring", 3)
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		const records = await new Promise<any[]>((resolve, reject) => {
+			const request = db.transaction("drafts", "readonly").objectStore("drafts").getAll()
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		return {
+			vendor: records.find((entry) => entry.draft.id === id).draft.document.data.vendor || [],
+			children: records.filter((entry) => entry.draft.document.collection === "vendors").length,
+		}
+	}, id)
+	expect(stored).toEqual({ vendor: [], children: 0 })
+})
+
+test("export and import round-trip the discarded drafts visible in recovery", async ({ page }) => {
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("tags")
+	await page.getByRole("textbox", { name: /^Name/ }).fill("A recoverable backup tag")
+	await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+	await page.getByRole("button", { name: "Discard draft", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Draft set aside")
+	await page.getByText("Draft recovery", { exact: true }).click()
+	const downloadPromise = page.waitForEvent("download")
+	await page.getByRole("button", { name: "Export local drafts", exact: true }).click()
+	const download = await downloadPromise,
+		backup = await readFile((await download.path())!, "utf8")
+	expect(JSON.parse(backup).recoveries[0].draft.document.data.title).toBe(
+		"A recoverable backup tag"
+	)
+	await page.evaluate(async () => {
+		const db = await new Promise<IDBDatabase>((resolve, reject) => {
+			const request = indexedDB.open("puerh-authoring", 3)
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction(["drafts", "recovery"], "readwrite")
+			tx.objectStore("drafts").clear()
+			tx.objectStore("recovery").clear()
+			tx.oncomplete = () => resolve()
+			tx.onerror = () => reject(tx.error)
+		})
+	})
+	await page.reload()
+	await expect(page.getByRole("heading", { name: "Working changes", exact: true })).toBeVisible()
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toHaveCount(0)
+	await page.getByLabel("Import draft backup", { exact: true }).setInputFiles({
+		name: "local-drafts.json",
+		mimeType: "application/json",
+		buffer: Buffer.from(backup),
+	})
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("A recoverable backup tag")
+	await page.getByRole("button", { name: "Restore draft", exact: true }).click()
+	await expect(
+		page.getByRole("checkbox", { name: "Include A recoverable backup tag", exact: true })
+	).toBeVisible()
+})
+
+test("successful inline creation retains the relationship when concurrent typing returns to the original notes", async ({
+	page,
+}) => {
+	await page.addInitScript(() => {
+		const original = IDBObjectStore.prototype.put
+		IDBObjectStore.prototype.put = function (value: unknown, ...rest: unknown[]) {
+			const entry = value as { draft?: { base?: unknown; document?: { collection?: string } } }
+			if (
+				(window as any).__completeInline &&
+				this.name === "drafts" &&
+				entry.draft?.document?.collection === "vendors" &&
+				entry.draft.base === null
+			) {
+				;(window as any).__completeInline = false
+				const textarea = document.querySelector<HTMLTextAreaElement>("textarea.cms-body")!
+				const before = textarea.value,
+					set = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!
+				for (const text of ["Temporary newer notes.", before]) {
+					set.call(textarea, text)
+					textarea.dispatchEvent(new Event("input", { bubbles: true }))
+				}
+			}
+			return original.apply(this, [value, ...rest] as Parameters<IDBObjectStore["put"]>)
+		}
+	})
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("tastings")
+	await page.getByRole("textbox", { name: /^Tea name/ }).fill("Successful atomic relation")
+	await page
+		.getByLabel("Notes", { exact: true })
+		.fill("Original notes before successful related creation.")
+	await expect(page.getByText("Saved on this device", { exact: true })).toBeVisible()
+	const id = new URL(page.url()).searchParams.get("id")!
+	await page.getByRole("button", { name: "New vendor", exact: true }).click()
+	await page
+		.getByRole("group", { name: "New vendor", exact: true })
+		.getByRole("textbox", { name: /^Name/ })
+		.fill("A successful new vendor")
+	await page.evaluate(() => ((window as any).__completeInline = true))
+	await page.getByRole("button", { name: "Create & use vendor", exact: true }).click()
+	await expect(
+		page.getByRole("button", { name: "Remove A successful new vendor", exact: true })
+	).toBeVisible()
+	await expect(page.getByText("Saved on this device", { exact: true })).toBeVisible()
+	await page.reload()
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
+		"Original notes before successful related creation."
+	)
+	await expect(
+		page.getByRole("button", { name: "Remove A successful new vendor", exact: true })
+	).toBeVisible()
+	const stored = await page.evaluate(async (id) => {
+		const db = await new Promise<IDBDatabase>((resolve, reject) => {
+			const request = indexedDB.open("puerh-authoring", 3)
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		const records = await new Promise<any[]>((resolve, reject) => {
+			const request = db.transaction("drafts", "readonly").objectStore("drafts").getAll()
+			request.onsuccess = () => resolve(request.result)
+			request.onerror = () => reject(request.error)
+		})
+		const child = records.find((entry) => entry.draft.document.collection === "vendors").draft
+		return {
+			vendor: records.find((entry) => entry.draft.id === id).draft.document.data.vendor,
+			child: child.id,
+		}
+	}, id)
+	expect(stored.vendor).toEqual([stored.child])
+})
+
+test("push and interim publication notices clear unrelated Undo while archived drafts remain recoverable", async ({
+	page,
+}) => {
+	await githubFixture(page)
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("vendors")
+	await page.getByRole("textbox", { name: /^Name/ }).fill("The edition to publish")
+	await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+	const archive = async (title: string) => {
+		await page.getByLabel("New record", { exact: true }).selectOption("tags")
+		await page.getByRole("textbox", { name: /^Name/ }).fill(title)
+		await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+		await page
+			.locator(".cms-record-row")
+			.filter({ has: page.getByRole("checkbox", { name: "Include " + title, exact: true }) })
+			.getByRole("button", { name: "Discard draft", exact: true })
+			.click()
+		await expect(page.locator("div.cms-notice")).toContainText("Draft set aside")
+		await expect(page.getByRole("button", { name: "Undo", exact: true })).toBeVisible()
+	}
+	await archive("Archived before push")
+	await page.getByRole("button", { name: "Commit & push 1 record", exact: true }).click()
+	await expect(page.locator("div.cms-notice")).toContainText("Pushed 1 records")
+	await expect(page.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("Archived before push")
+	await archive("Archived before publication")
+	await page.getByRole("button", { name: "Review publication", exact: true }).click()
+	await expect(page.getByRole("button", { name: /Publish PR #101/ })).toBeEnabled()
+	let publishing = false,
+		release!: () => void
+	const refreshGate = new Promise<void>((resolve) => (release = resolve))
+	await page.route("**/api/cms*", async (route) => {
+		const query = new URL(route.request().url()).searchParams
+		if (query.get("action") === "publish") publishing = true
+		if (
+			publishing &&
+			query.get("action") === "catalog" &&
+			(!query.get("branch") || query.get("branch") === "main")
+		)
+			await refreshGate
+		return route.fallback()
+	})
+	try {
+		await page.getByRole("button", { name: /Publish PR #101/ }).click()
+		await expect(page.locator("div.cms-notice")).toContainText("merged. Refreshing its base")
+		await expect(page.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+	} finally {
+		release()
+	}
+	await expect(page.locator("div.cms-notice")).toContainText("Remaining local edits are preserved")
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("Archived before publication")
+})

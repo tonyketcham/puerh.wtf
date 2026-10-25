@@ -13,6 +13,7 @@ export interface DictationControlProps {
 	onChange(value: string): void
 	textareaRef?: RefObject<HTMLTextAreaElement | null>
 	label?: string
+	active?: boolean
 }
 
 function recognitionConstructor(): RecognitionConstructor | null {
@@ -30,11 +31,14 @@ export default function DictationControl({
 	onChange,
 	textareaRef,
 	label = "notes",
+	active = true,
 }: DictationControlProps) {
 	const [supported, setSupported] = useState<boolean | null>(null)
 	const [status, setStatus] = useState<DictationStatus>("idle")
 	const [interim, setInterim] = useState("")
 	const [error, setError] = useState("")
+	const [deviceHelp, setDeviceHelp] = useState(false)
+	const deviceHelpId = useId()
 	const descriptionId = useId()
 	const interimId = useId()
 	const latest = useRef({ value, onChange, textareaRef })
@@ -83,6 +87,13 @@ export default function DictationControl({
 			lastTextarea.current = textarea
 		}
 	}, [textareaRef])
+	useEffect(() => {
+		if (!active) {
+			dispose()
+			setStatus("idle")
+			setInterim("")
+		}
+	}, [active])
 
 	function start() {
 		const Constructor = recognitionConstructor()
@@ -130,12 +141,12 @@ export default function DictationControl({
 	const listening = status !== "idle"
 	return (
 		<div className="space-y-2" data-dictation-control>
-			<div className="flex flex-wrap items-center gap-2">
+			<div className="cms-dictation-row flex flex-wrap items-center gap-2">
 				{supported !== false && (
 					<button
 						type="button"
 						onClick={() => (listening ? session.current?.stop() : start())}
-						disabled={supported === null || status === "stopping"}
+						disabled={!active || supported === null || status === "stopping"}
 						aria-pressed={listening}
 						aria-describedby={descriptionId}
 						aria-controls={interimId}
@@ -151,30 +162,52 @@ export default function DictationControl({
 							: "Dictate " + label}
 					</button>
 				)}
-				<button
-					type="button"
-					onClick={() => latest.current.textareaRef?.current?.focus()}
-					className="min-h-11 rounded-md px-3 py-2 text-xs text-white/45 hover:text-white/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
-				>
-					Use keyboard dictation
-				</button>
+				<details className="cms-voice-options">
+					<summary>Voice options</summary>
+					<div>
+						<p id={descriptionId} className="max-w-prose text-[11px] leading-relaxed text-white/60">
+							{supported === false
+								? "Browser dictation is unavailable here. Your device’s keyboard dictation can still enter text directly into your notes."
+								: "Your browser may send audio to its speech service. Only finalized words enter your saved draft. You can also use your device’s keyboard dictation."}
+						</p>
+						<button
+							type="button"
+							onClick={() => {
+								setDeviceHelp(true)
+								latest.current.textareaRef?.current?.focus()
+							}}
+							aria-expanded={deviceHelp}
+							aria-controls={deviceHelpId}
+							className="min-h-11 rounded-md px-3 py-2 text-xs text-white/75"
+						>
+							Use keyboard dictation
+						</button>
+						{deviceHelp && (
+							<p
+								id={deviceHelpId}
+								className="max-w-prose text-[11px] leading-relaxed text-white/65"
+							>
+								Your notes are focused. On Windows, press Win + H. On Mac, use your configured
+								Dictation shortcut (often the microphone key). On a phone or tablet, tap the
+								microphone on your keyboard.
+							</p>
+						)}
+					</div>
+				</details>
 			</div>
-			<p id={descriptionId} className="max-w-prose text-[11px] leading-relaxed text-white/45">
-				{supported === false
-					? "Browser dictation is unavailable. Focus the text field and use your keyboard’s microphone or device dictation."
-					: "Your browser may send audio to its speech service. Only finalized words enter your draft. Keyboard dictation is also available."}
-			</p>
-			<p id={interimId} role="status" aria-live="polite" className="text-xs text-amber-200/80">
-				{interim
-					? "Hearing: " + interim
-					: status === "starting"
-					? "Waiting for microphone permission…"
-					: status === "stopping"
-					? "Finishing dictation…"
-					: listening
-					? "Microphone active. Speak when ready."
-					: ""}
-			</p>
+			{(listening || interim) && (
+				<p id={interimId} role="status" aria-live="polite" className="text-xs text-amber-200/80">
+					{interim
+						? "Hearing: " + interim
+						: status === "starting"
+						? "Waiting for microphone permission…"
+						: status === "stopping"
+						? "Finishing dictation…"
+						: listening
+						? "Microphone active. Speak when ready."
+						: ""}
+				</p>
+			)}
 			{error && (
 				<p role="alert" className="text-xs text-red-200">
 					{error}

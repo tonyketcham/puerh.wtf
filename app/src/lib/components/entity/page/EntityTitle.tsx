@@ -24,6 +24,7 @@ const POUR = { type: "spring", stiffness: 70, damping: 18, mass: 1 } as const
  */
 export default function EntityTitle({
 	kind,
+	preview = false,
 	slug,
 	title,
 	stops,
@@ -31,6 +32,7 @@ export default function EntityTitle({
 	recordingKey,
 }: {
 	kind: MorphKind
+	preview?: boolean
 	slug: string
 	title: string
 	/** liquor colors, oldest first; empty → the white title alone */
@@ -44,8 +46,8 @@ export default function EntityTitle({
 
 	// in the DOM: release the borrowed source name and let the morph take its new snapshot
 	useLayoutEffect(() => {
-		titleMounted(kind, slug)
-	}, [kind, slug])
+		if (!preview) titleMounted(kind, slug)
+	}, [kind, slug, preview])
 
 	const gradient = useMemo(() => {
 		if (!stops.length) return null

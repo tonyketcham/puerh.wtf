@@ -1,62 +1,64 @@
+@reference "../../app.css";
 .cms-workspace {
-	--cms-accent: #edc446;
-	color: rgb(238 232 237);
+	--cms-accent: var(--liquor-text, #d9a441);
+	color: #f6efe0;
 	max-width: 86rem;
 	margin: 1rem auto 0;
 	min-width: 0;
 	padding-bottom: 1rem;
 }
-.cms-workspace h1,
+.cms-workspace h1:not(:where(.cms-journal *)),
 .cms-state-message h1 {
-	font-family: var(--font-inter), sans-serif;
+	font-family: var(--font-fira-code), monospace;
 	font-size: clamp(2rem, 4vw, 3.2rem);
 	font-weight: 500;
 	letter-spacing: -0.045em;
 	line-height: 1.15;
 	margin: 0 0 0.8rem;
 }
-.cms-workspace h2 {
+.cms-workspace h2:not(:where(.cms-journal *)) {
 	font-size: 1rem;
 	font-weight: 500;
 }
-.cms-workspace h3 {
+.cms-workspace h3:not(:where(.cms-journal *)) {
 	font-size: 0.9rem;
 	font-weight: 500;
 }
-.cms-workspace button,
-.cms-workspace select,
+.cms-workspace button:not(:where(.cms-journal *)),
+.cms-workspace select:not(:where(.cms-journal *)),
 .cms-auth-notice button,
 .cms-auth-notice a {
 	font-family: var(--font-fira-code), monospace;
 	font-size: 0.72rem;
 }
-.cms-workspace button,
-.cms-workspace select,
+.cms-workspace button:not(:where(.cms-journal *)),
+.cms-workspace select:not(:where(.cms-journal *)),
 .cms-workspace .cms-upload,
 .cms-auth-notice button,
 .cms-auth-notice a {
-	border: 1px solid #ffffff1c;
-	border-radius: 7px;
+	@apply shadow-key;
+	border: 1px solid rgb(246 239 224 / 0.06);
+	border-radius: 10px;
 	padding: 0.65rem 0.85rem;
-	background: #ffffff04;
+	background: rgb(246 239 224 / 0.045);
 	min-height: 42px;
 	cursor: pointer;
 	transition: background 0.15s, border-color 0.15s;
 }
-.cms-workspace button:hover:not(:disabled),
+.cms-workspace button:not(:where(.cms-journal *)):hover:not(:disabled),
 .cms-workspace .cms-upload:hover {
 	border-color: #ffffff40;
 	background: #ffffff0a;
 }
-.cms-workspace button:disabled {
+.cms-workspace button:not(:where(.cms-journal *)):disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
-.cms-workspace button:focus-visible,
+.cms-workspace button:not(:where(.cms-journal *)):focus-visible,
 .cms-workspace a:focus-visible,
-.cms-workspace input:focus-visible,
-.cms-workspace textarea:focus-visible,
-.cms-workspace select:focus-visible {
+.cms-workspace input:not(:where(.cms-journal *)):focus-visible,
+.cms-workspace textarea:not(:where(.cms-journal *)):focus-visible,
+.cms-workspace select:not(:where(.cms-journal *)):focus-visible {
 	outline: 2px solid var(--cms-accent);
 	outline-offset: 3px;
 }
@@ -66,7 +68,7 @@
 	background: #edc4460b;
 }
 .cms-workspace .cms-quiet {
-	color: #b5a7b4;
+	color: rgb(246 239 224 / 0.55);
 	border-color: transparent;
 	background: transparent;
 }
@@ -79,7 +81,7 @@
 }
 .cms-muted,
 .cms-destination {
-	color: #a99ca7;
+	color: rgb(246 239 224 / 0.52);
 	font-size: 0.75rem;
 	line-height: 1.7;
 }
@@ -204,7 +206,7 @@
 	padding: 0.5rem 0.65rem;
 	font-size: 0.65rem;
 }
-.cms-workspace [aria-pressed="true"] {
+.cms-workspace [aria-pressed="true"]:not(:where(.cms-journal *)) {
 	color: var(--cms-accent);
 	border-color: #edc44648;
 	background: #edc44609;
@@ -217,15 +219,15 @@
 	margin: 1rem 0;
 }
 .cms-reading {
-	border: 1px solid #ffffff16;
-	border-radius: 10px;
+	border: 0;
+	border-radius: 15px;
 	padding: clamp(1.2rem, 3vw, 2.5rem);
-	background: #ffffff02;
+	background: var(--surface-face);
 	min-width: 0;
 	overflow-wrap: anywhere;
 }
 .cms-reading h2 {
-	font-family: var(--font-inter), sans-serif;
+	font-family: var(--font-fira-code), monospace;
 	font-size: clamp(1.7rem, 3vw, 2.4rem);
 	font-weight: 450;
 	line-height: 1.2;
@@ -276,8 +278,8 @@
 	margin-bottom: 1.5rem;
 }
 .cms-prose {
-	color: #d0c6ce;
-	font-family: var(--font-inter), sans-serif;
+	color: rgb(246 239 224 / 0.76);
+	font-family: var(--font-fira-code), monospace;
 	font-size: 1rem;
 	line-height: 1.95;
 }
@@ -634,7 +636,7 @@
 .cms-image-entry input {
 	margin-top: 0.5rem;
 	margin-bottom: 1rem;
-	font-family: var(--font-inter), sans-serif;
+	font-family: var(--font-fira-code), monospace;
 }
 .cms-change-line {
 	color: #ccb977;
@@ -802,7 +804,7 @@
 	.cms-new {
 		padding-top: 0;
 	}
-	.cms-workspace h1 {
+	.cms-workspace h1:not(:where(.cms-journal *)) {
 		font-size: 2rem;
 	}
 	.cms-body {
@@ -827,5 +829,152 @@
 	.cms-workspace * {
 		transition: none !important;
 		scroll-behavior: auto !important;
+	}
+}
+
+/* Authoring uses the same warm ink, physical keys and recessed wells as the visitor journal. */
+.cms-workspace button:not(:where(.cms-journal *)):active:not(:disabled) {
+	@apply shadow-well;
+}
+.cms-workspace
+	:is(input:not([type="checkbox"]):not([type="range"]):not([type="color"]), textarea, select) {
+	@apply shadow-well;
+	border-color: rgb(246 239 224 / 0.08);
+	background: rgb(0 0 0 / 0.12);
+	color: inherit;
+}
+.cms-workspace :is(button, input, textarea, select):not(:where(.cms-journal *)) {
+	font-family: var(--font-fira-code), monospace;
+}
+.cms-workspace .cms-quiet {
+	box-shadow: none;
+}
+.cms-workspace .cms-journal {
+	container-type: inline-size;
+	container-name: editor;
+	padding: clamp(1rem, 2.5vw, 2rem);
+	min-width: 0;
+	background: none;
+	border: 0;
+}
+.cms-journal-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 2rem;
+}
+.cms-journal-story {
+	min-width: 0;
+}
+.cms-workspace .cms-journal-title {
+	font-family: var(--font-rock-3d);
+	font-size: clamp(2.75rem, 7cqi, 5.5rem);
+	font-weight: 400;
+	line-height: 1.2;
+	letter-spacing: 0;
+	margin: 0 0 2rem;
+	color: var(--liquor-text, #f6efe0);
+}
+.cms-journal [data-session-article] {
+	font-family: var(--font-fira-code), monospace;
+	font-size: 15px;
+	line-height: 1.85;
+}
+.cms-journal [data-session-article] :is(h1, h2, h3) {
+	font-family: inherit;
+	font-size: 1.25rem;
+	font-weight: 600;
+	letter-spacing: normal;
+	text-transform: none;
+	color: rgb(246 239 224 / 0.95);
+}
+.cms-journal-properties {
+	min-width: 0;
+	overflow: hidden;
+	align-self: start;
+}
+.cms-workspace .cms-journal-properties h2 {
+	margin: 0;
+	font-family: var(--font-fira-code), monospace;
+	font-size: 0.75rem;
+	line-height: 1.5;
+}
+.cms-journal-brew {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1.5rem;
+	padding: 0.7rem 1rem;
+	border-radius: 9px;
+	font-size: 0.7rem;
+	margin-top: 1.5rem;
+}
+.cms-journal-brew > span:first-child {
+	color: rgb(246 239 224 / 0.45);
+}
+.cms-journal-entity :is([data-entity-root]) {
+	container-type: inline-size;
+	container-name: editor;
+}
+.cms-journal-entity [data-entity-root] h1 {
+	font-family: var(--font-rock-3d);
+	font-size: clamp(2.7rem, 7cqi, 5rem);
+	line-height: 1.2;
+	font-weight: 400;
+}
+
+.cms-editorial-review header {
+	border-bottom: 1px solid rgb(246 239 224 / 0.08);
+	padding-bottom: 1rem;
+}
+.cms-editorial-review .cms-reading-facts:empty {
+	display: none;
+}
+.cms-revised-passage {
+	padding-left: 1rem;
+	border-left: 2px solid var(--cms-accent);
+}
+.cms-prose mark {
+	background: rgb(217 164 65 / 0.18);
+	color: #f6efe0;
+	border-radius: 3px;
+	padding: 0.08em 0.02em;
+	box-decoration-break: clone;
+}
+.cms-review-photos {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+	gap: 1.25rem;
+}
+.cms-review-photos .cms-picture img {
+	width: 100%;
+	max-height: 380px;
+	object-fit: contain;
+}
+.cms-notice {
+	align-items: flex-start;
+}
+@container editor (min-width: 740px) {
+	.cms-journal-layout {
+		grid-template-columns: minmax(0, 1fr) 260px;
+	}
+}
+@media (max-width: 700px) {
+	.cms-notice {
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+	.cms-journal {
+		padding: 0.75rem 0 !important;
+	}
+	.cms-review-photos {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (pointer: coarse), (max-width: 700px) {
+	.cms-journal button:is([aria-label="Previous photo"], [aria-label="Next photo"]) {
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		flex-shrink: 0;
 	}
 }

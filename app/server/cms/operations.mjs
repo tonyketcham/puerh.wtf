@@ -366,14 +366,17 @@ export async function pushChangeSet(github, config, { repo, user }, body) {
 		})),
 	}
 }
-const PROTECTION_QUERY = `query CmsProtection($owner: String!, $name: String!, $ref: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: $ref) { branchProtectionRule { isAdminEnforced requiresStatusChecks requiresStrictStatusChecks requiredStatusCheckContexts } } } }`
-async function verifyStrictProtection(github, config, repo) {
+const PROTECTION_QUERY = `query CmsProtection($owner: String!, $name: String!, $ref: String!) { repository(owner: $owner, name: $name) { ref(qualifiedName: $ref) { branchProtectionRule { isAdminEnforced requiresStatusChecks requiresStrictStatusChecks requiredStatusCheckContexts requiredApprovingReviewCount } } } }`
+async function protectionRule(github, config, repo) {
 	const result = await github.graphql(PROTECTION_QUERY, {
 		owner: config.owner,
 		name: config.name,
 		ref: `refs/heads/${repo.default_branch}`,
 	})
-	const rule = result.repository?.ref?.branchProtectionRule
+	return result.repository?.ref?.branchProtectionRule
+}
+async function verifyStrictProtection(github, config, repo) {
+	const rule = await protectionRule(github, config, repo)
 	assert(
 		rule?.isAdminEnforced &&
 			rule.requiresStatusChecks &&
@@ -384,7 +387,7 @@ async function verifyStrictProtection(github, config, repo) {
 		"Publishing requires branch protection with up-to-date required checks enforced for administrators. Configure those repository rules before publishing in the app."
 	)
 }
-export async function publishPull(github, config, { repo, user }, body) {
+async function reviewedPull(github, config, { repo, user }, body) {
 	assert(
 		body &&
 			Number.isSafeInteger(body.number) &&
@@ -436,6 +439,11 @@ export async function publishPull(github, config, { repo, user }, body) {
 	)
 	validateDocuments(documents, baseCatalog.records, headCatalog.tree, [], 500)
 	const comparison = await github.rest("GET", `${prefix}/compare/${body.baseHead}...${body.head}`)
+	return { pr, prefix, comparison, headCatalog, baseCatalog }
+}
+export async function publishPull(github, config, context, body) {
+	const { repo } = context
+	let { pr, prefix, comparison } = await reviewedPull(github, config, context, body)
 	assert(
 		["ahead", "identical"].includes(comparison.status),
 		409,
@@ -483,4 +491,107 @@ export async function publishPull(github, config, { repo, user }, body) {
 		"GitHub did not merge this PR. Its repository rules remain authoritative."
 	)
 	return { merged: true, number: body.number, sha: merged.sha, url: pr.html_url, status: "merged" }
+}
+
+/** Read-only readiness for the exact reviewed content; no draft/ready mutation. */
+export async function publicationStatus(github, config, context, body) {
+	const { pr, comparison } = await reviewedPull(github, config, context, body)
+	const [result, rule, checkRuns, statuses] = await Promise.all([
+		github.graphql(READINESS_QUERY, {
+			owner: config.owner,
+			name: config.name,
+			number: body.number,
+		}),
+		protectionRule(github, config, context.repo),
+		github.rest(
+			"GET",
+			repositoryPath(config) + "/commits/" + body.head + "/check-runs?per_page=100"
+		),
+		github.rest("GET", repositoryPath(config) + "/commits/" + body.head + "/status?per_page=100"),
+	])
+	const readiness = result.repository?.pullRequest
+	assert(
+		readiness && readiness.headRefOid === body.head && readiness.baseRefOid === body.baseHead,
+		409,
+		"head_conflict",
+		"This edition changed. Reopen its review to read the latest version."
+	)
+	const protectionReady = Boolean(
+		rule?.isAdminEnforced &&
+			rule.requiresStatusChecks &&
+			rule.requiresStrictStatusChecks &&
+			rule.requiredStatusCheckContexts?.length
+	)
+	const required = new Set(rule?.requiredStatusCheckContexts || [])
+	const checks = [
+		...(checkRuns.check_runs || []).map((check) => ({
+			name: check.name,
+			state:
+				check.status !== "completed"
+					? "pending"
+					: ["success", "neutral", "skipped"].includes(check.conclusion)
+					? "success"
+					: "failure",
+			url: check.details_url || check.html_url,
+			required: required.has(check.name),
+		})),
+		...(statuses.statuses || []).map((check) => ({
+			name: check.context,
+			state:
+				check.state === "success"
+					? "success"
+					: ["pending", "expected"].includes(check.state)
+					? "pending"
+					: "failure",
+			url: check.target_url,
+			required: required.has(check.context),
+		})),
+	]
+	for (const name of required)
+		if (!checks.some((check) => check.name === name))
+			checks.push({ name, state: "pending", required: true })
+	const reviewState = readiness.reviewDecision || "NONE",
+		checkState = readiness.commits?.nodes?.[0]?.commit?.statusCheckRollup?.state || "PENDING"
+	return {
+		number: body.number,
+		head: body.head,
+		baseHead: body.baseHead,
+		draft: pr.draft,
+		requiresUpdate: !["ahead", "identical"].includes(comparison.status),
+		protectionReady,
+		requiredApprovals: rule?.requiredApprovingReviewCount ?? null,
+		reviewState,
+		mergeState: readiness.mergeStateStatus,
+		checkState,
+		checks,
+		checksTruncated: checkRuns.total_count > 100 || statuses.total_count > 100,
+		url: pr.html_url,
+	}
+}
+/** A normal, expected-head guarded update merge. GitHub owns conflicts and protection. */
+export async function updateEdition(github, config, context, body) {
+	const { pr, prefix, comparison } = await reviewedPull(github, config, context, body)
+	assert(
+		!["ahead", "identical"].includes(comparison.status),
+		409,
+		"edition_current",
+		"This edition already includes the latest published content. Refresh its checks."
+	)
+	await verifyStrictProtection(github, config, context.repo)
+	assert(
+		(await branchHead(github, config, context.repo.default_branch)) === body.baseHead,
+		409,
+		"head_conflict",
+		"Published content changed again. Reopen the edition before updating it."
+	)
+	await github.rest("PUT", prefix + "/pulls/" + body.number + "/update-branch", {
+		expected_head_sha: body.head,
+	})
+	return {
+		number: body.number,
+		updating: true,
+		url: pr.html_url,
+		message:
+			"Updating this edition with the latest published content. Review it again when GitHub has finished.",
+	}
 }

@@ -113,3 +113,24 @@ export async function fetchPreviewMedia(
 		throw new Error("The authoring service returned an unsupported image format.")
 	return blob
 }
+
+export interface CmsPublicationStatus {
+	number: number
+	head: string
+	baseHead: string
+	draft: boolean
+	requiresUpdate: boolean
+	protectionReady: boolean
+	requiredApprovals: number | null
+	reviewState: string
+	mergeState: string
+	checkState: string
+	checks: {
+		name: string
+		state: "pending" | "success" | "failure"
+		url?: string
+		required: boolean
+	}[]
+	checksTruncated: boolean
+	url: string
+}

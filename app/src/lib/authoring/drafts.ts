@@ -11,7 +11,8 @@ export { createDraft, isDraftDirty }
 
 const DATABASE = "puerh-authoring"
 const STORE = "drafts"
-const VERSION = 2
+const VERSION = 3
+const RECOVERY = "recovery"
 const OPERATIONS = "operations"
 
 export class DraftStorageError extends Error {
@@ -46,6 +47,8 @@ function open(): Promise<IDBDatabase> {
 			request.onupgradeneeded = () => {
 				if (!request.result.objectStoreNames.contains(STORE))
 					request.result.createObjectStore(STORE, { keyPath: "key" })
+				if (!request.result.objectStoreNames.contains(RECOVERY))
+					request.result.createObjectStore(RECOVERY, { keyPath: "key" })
 				if (!request.result.objectStoreNames.contains(OPERATIONS))
 					request.result.createObjectStore(OPERATIONS, { keyPath: "key" })
 			}
@@ -210,6 +213,10 @@ type AssetBackup = Omit<CmsAsset, "blob" | "variants"> & {
 }
 type DraftBackup = Omit<CmsDraft, "assets"> & { assets: AssetBackup[] }
 type OperationBackup = Omit<PendingPush, "captured"> & { captured: DraftBackup[] }
+type RecoveryBackup = Omit<DraftRecovery, "draft" | "replacement"> & {
+	draft: DraftBackup
+	replacement: DraftBackup | null
+}
 async function encodeDrafts(drafts: readonly CmsDraft[]): Promise<DraftBackup[]> {
 	for (const draft of drafts) assertDraft(draft)
 	return Promise.all(
@@ -248,20 +255,39 @@ function decodeDrafts(drafts: DraftBackup[]): CmsDraft[] {
 export async function exportDraftSnapshot(
 	current: readonly CmsDraft[],
 	namespace: DraftNamespace,
-	pendingOperation: PendingPush | null = null
+	pendingOperation: PendingPush | null = null,
+	recoveries: readonly DraftRecovery[] = []
 ): Promise<string> {
 	scope(namespace)
-	const snapshot = structuredClone({ drafts: current, pendingOperation })
+	const snapshot = structuredClone({ drafts: current, pendingOperation, recoveries })
 	const drafts = await encodeDrafts(snapshot.drafts)
 	const operation = snapshot.pendingOperation
 	const pending: OperationBackup | null = operation
 		? { ...operation, captured: await encodeDrafts(operation.captured) }
 		: null
-	return JSON.stringify({ version: 2, namespace, drafts, pendingOperation: pending }, null, 2)
+	const archives: RecoveryBackup[] = await Promise.all(
+		snapshot.recoveries.map(async (recovery) => {
+			assertRecovery(recovery)
+			return {
+				...recovery,
+				draft: (await encodeDrafts([recovery.draft]))[0],
+				replacement: recovery.replacement ? (await encodeDrafts([recovery.replacement]))[0] : null,
+			}
+		})
+	)
+	return JSON.stringify(
+		{ version: 2, namespace, drafts, pendingOperation: pending, recoveries: archives },
+		null,
+		2
+	)
 }
 export async function exportDrafts(namespace: DraftNamespace): Promise<string> {
-	const [drafts, operation] = await Promise.all([listDrafts(namespace), getPendingPush(namespace)])
-	return exportDraftSnapshot(drafts, namespace, operation)
+	const [drafts, operation, recoveries] = await Promise.all([
+		listDrafts(namespace),
+		getPendingPush(namespace),
+		listDraftRecoveries(namespace),
+	])
+	return exportDraftSnapshot(drafts, namespace, operation, recoveries)
 }
 /** Recovery preserves an unresolved operation identity and never bypasses namespace/revision checks. */
 export async function importDrafts(json: string, namespace: DraftNamespace): Promise<CmsDraft[]> {
@@ -271,6 +297,7 @@ export async function importDrafts(json: string, namespace: DraftNamespace): Pro
 		namespace: DraftNamespace
 		drafts: DraftBackup[]
 		pendingOperation?: OperationBackup | null
+		recoveries?: RecoveryBackup[]
 	}
 	try {
 		backup = JSON.parse(json)
@@ -286,6 +313,14 @@ export async function importDrafts(json: string, namespace: DraftNamespace): Pro
 			"This recovery file belongs to another repository/account or version.",
 			"invalid-backup"
 		)
+	if (backup.recoveries !== undefined && !Array.isArray(backup.recoveries))
+		throw new DraftStorageError("The recovery archive list is invalid.", "invalid-backup")
+	const recoveries: DraftRecovery[] = (backup.recoveries || []).map((recovery) => ({
+		...recovery,
+		draft: decodeDrafts([recovery.draft])[0],
+		replacement: recovery.replacement ? decodeDrafts([recovery.replacement])[0] : null,
+	}))
+	for (const recovery of recoveries) assertRecovery(recovery)
 	const drafts = decodeDrafts(backup.drafts)
 	for (const draft of drafts) assertDraft(draft)
 	const pending =
@@ -316,6 +351,7 @@ export async function importDrafts(json: string, namespace: DraftNamespace): Pro
 	// A partial storage failure rejects; the imported operation is never sent automatically.
 	for (const draft of drafts) await saveDraft(draft, namespace)
 	if (pending) await savePendingPush(pending, namespace)
+	await importRecoveries(recoveries, namespace)
 	return drafts
 }
 
@@ -450,6 +486,249 @@ export function clearPendingPush(id: string, namespace: DraftNamespace): Promise
 							tx.error?.message ||
 								"The confirmed push could not be acknowledged locally. Resume it to retry."
 						)
+				)
+		})
+	})
+}
+
+/** Discarded and reverted drafts stay recoverable on this device, including image bytes. */
+export interface DraftRecovery {
+	id: string
+	draft: CmsDraft
+	action: "discard" | "revert"
+	replacement: CmsDraft | null
+	createdAt: number
+}
+
+function assertRecovery(recovery: DraftRecovery) {
+	if (
+		!recovery ||
+		typeof recovery.id !== "string" ||
+		!recovery.id ||
+		recovery.id.length > 100 ||
+		recovery.id.includes("\u0000") ||
+		!Number.isFinite(recovery.createdAt) ||
+		!["discard", "revert"].includes(recovery.action) ||
+		(recovery.action === "discard" ? recovery.replacement !== null : !recovery.replacement)
+	)
+		throw new DraftStorageError("The discarded draft recovery is invalid.", "invalid-backup")
+	assertDraft(recovery.draft)
+	if (recovery.replacement) {
+		assertDraft(recovery.replacement)
+		if (
+			recovery.replacement.id !== recovery.draft.id ||
+			recovery.replacement.document.path !== recovery.draft.document.path ||
+			recovery.replacement.revision <= recovery.draft.revision
+		)
+			throw new DraftStorageError(
+				"The reverted draft does not match its recovery guard.",
+				"invalid-backup"
+			)
+	}
+}
+/** Archives are immutable: importing an older backup can add, never replace, a recovery. */
+function importRecoveries(recoveries: DraftRecovery[], namespace: DraftNamespace): Promise<void> {
+	const name = scope(namespace),
+		snapshots = structuredClone(recoveries)
+	return enqueue(async () => {
+		const db = await open()
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction(RECOVERY, "readwrite"),
+				store = tx.objectStore(RECOVERY)
+			for (const recovery of snapshots) {
+				const key = name + "\u0000" + recovery.id,
+					read = store.get(key)
+				read.onsuccess = () => {
+					if (!read.result) store.put({ key, namespace: name, recovery })
+				}
+			}
+			tx.oncomplete = () => resolve()
+			tx.onabort = tx.onerror = () =>
+				reject(
+					new DraftStorageError("Could not restore discarded drafts. Keep your backup and retry.")
+				)
+		})
+	})
+}
+export async function listDraftRecoveries(namespace: DraftNamespace): Promise<DraftRecovery[]> {
+	const name = scope(namespace)
+	await writeQueue
+	const db = await open()
+	return new Promise((resolve, reject) => {
+		const request = db.transaction(RECOVERY, "readonly").objectStore(RECOVERY).getAll()
+		request.onsuccess = () =>
+			resolve(
+				request.result
+					.filter((entry: { namespace: string }) => entry.namespace === name)
+					.map((entry: { recovery: DraftRecovery }) => entry.recovery)
+					.sort((a: DraftRecovery, b: DraftRecovery) => b.createdAt - a.createdAt)
+			)
+		request.onerror = () => reject(new DraftStorageError("Could not open recoverable drafts."))
+	})
+}
+/** Compare source and revision inside the transaction; never remove another tab's work. */
+export function recoverableDraftChange(
+	draft: CmsDraft,
+	replacement: CmsDraft | null,
+	namespace: DraftNamespace
+): Promise<DraftRecovery> {
+	const name = scope(namespace),
+		captured = structuredClone(draft),
+		next = replacement && structuredClone(replacement)
+	if (next) assertDraft(next)
+	const recovery: DraftRecovery = {
+		id: crypto.randomUUID(),
+		draft: captured,
+		action: next ? "revert" : "discard",
+		replacement: next,
+		createdAt: Date.now(),
+	}
+	return enqueue(async () => {
+		const db = await open()
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction([STORE, RECOVERY, OPERATIONS], "readwrite"),
+				store = tx.objectStore(STORE)
+			let failure: unknown
+			const operation = tx.objectStore(OPERATIONS).get(name)
+			operation.onsuccess = () => {
+				if (operation.result) {
+					failure = new DraftStorageError("Resolve the pending push before setting a draft aside.")
+					tx.abort()
+					return
+				}
+				const current = store.get(name + "\u0000" + captured.id)
+				current.onsuccess = () => {
+					const value = current.result?.draft as CmsDraft | undefined
+					if (
+						!value ||
+						value.revision !== captured.revision ||
+						value.document.raw !== captured.document.raw
+					) {
+						failure = new DraftStorageError(
+							"A newer local edit was kept. Reload the draft before trying again."
+						)
+						tx.abort()
+						return
+					}
+					tx.objectStore(RECOVERY).put({
+						key: name + "\u0000" + recovery.id,
+						namespace: name,
+						recovery,
+					})
+					if (next) store.put({ key: name + "\u0000" + next.id, namespace: name, draft: next })
+					else store.delete(name + "\u0000" + captured.id)
+				}
+			}
+			tx.oncomplete = () => resolve()
+			tx.onabort = tx.onerror = () =>
+				reject(
+					failure ||
+						new DraftStorageError("Your draft could not be set aside. It remains on this device.")
+				)
+		})
+		return recovery
+	})
+}
+export function undoDraftChange(
+	recovery: DraftRecovery,
+	namespace: DraftNamespace
+): Promise<CmsDraft> {
+	const name = scope(namespace)
+	return enqueue(async () => {
+		const db = await open()
+		const restored = {
+			...recovery.draft,
+			revision: Math.max(recovery.draft.revision, recovery.replacement?.revision || 0) + 1,
+			updatedAt: Date.now(),
+		}
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction([STORE, RECOVERY, OPERATIONS], "readwrite"),
+				store = tx.objectStore(STORE)
+			let failure: unknown
+			const operation = tx.objectStore(OPERATIONS).get(name)
+			operation.onsuccess = () => {
+				if (operation.result) {
+					failure = new DraftStorageError("Resolve the pending push before restoring a draft.")
+					tx.abort()
+					return
+				}
+				const archived = tx.objectStore(RECOVERY).get(name + "\u0000" + recovery.id)
+				archived.onsuccess = () => {
+					if (!archived.result) {
+						failure = new DraftStorageError("This draft has already been restored.")
+						tx.abort()
+						return
+					}
+					const current = store.get(name + "\u0000" + restored.id)
+					current.onsuccess = () => {
+						const value = current.result?.draft as CmsDraft | undefined,
+							expected = recovery.replacement
+						if (
+							expected
+								? !value ||
+								  value.revision !== expected.revision ||
+								  value.document.raw !== expected.document.raw
+								: !!value
+						) {
+							failure = new DraftStorageError(
+								"Newer work exists for this record. It was kept; the older draft remains in recovery."
+							)
+							tx.abort()
+							return
+						}
+						store.put({ key: name + "\u0000" + restored.id, namespace: name, draft: restored })
+						tx.objectStore(RECOVERY).delete(name + "\u0000" + recovery.id)
+					}
+				}
+			}
+			tx.oncomplete = () => resolve()
+			tx.onabort = tx.onerror = () =>
+				reject(failure || new DraftStorageError("Could not restore this draft."))
+		})
+		return restored
+	})
+}
+/** Related creation and its parent reference become durable together, or neither does. */
+export function saveRelatedDraft(
+	child: CmsDraft,
+	parent: CmsDraft,
+	expectedRevision: number,
+	namespace: DraftNamespace,
+	expectedRaw?: string
+): Promise<void> {
+	const name = scope(namespace),
+		snapshots = structuredClone([child, parent])
+	snapshots.forEach(assertDraft)
+	return enqueue(async () => {
+		const db = await open()
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction(STORE, "readwrite"),
+				store = tx.objectStore(STORE)
+			let failure: unknown
+			const read = store.get(name + "\u0000" + parent.id)
+			read.onsuccess = () => {
+				try {
+					const previous = read.result?.draft as CmsDraft | undefined
+					if (
+						!previous ||
+						previous.revision !== expectedRevision ||
+						(expectedRaw !== undefined && previous.document.raw !== expectedRaw)
+					)
+						throw new DraftStorageError(
+							"The session changed in another tab. Its newer work was kept."
+						)
+					for (const draft of snapshots)
+						store.put({ key: name + "\u0000" + draft.id, namespace: name, draft })
+				} catch (error) {
+					failure = error
+					tx.abort()
+				}
+			}
+			tx.oncomplete = () => resolve()
+			tx.onabort = tx.onerror = () =>
+				reject(
+					failure ||
+						new DraftStorageError("The related record could not be saved. Nothing was added.")
 				)
 		})
 	})

@@ -53,6 +53,7 @@ export const INDEX_OF: Record<PageKind, { label: string; href: string; kind: Pag
  */
 export default function EntityPage({
 	data,
+	preview = false,
 	cards,
 	lead,
 	notes,
@@ -60,6 +61,7 @@ export default function EntityPage({
 	mapPoints,
 }: {
 	data: EntityPageData
+	preview?: boolean
 	/** server-rendered SessionCards by session slug */
 	cards: Record<string, ReactNode>
 	/** the description's first paragraph, for heroes that set it as prose */
@@ -90,12 +92,13 @@ export default function EntityPage({
 			data-entity-slug={data.slug}
 			style={{ "--entity-accent": model.accentText } as CSSProperties}
 		>
-			<SetEntityPage data={data} />
+			{!preview && <SetEntityPage data={data} />}
 
 			<header className="space-y-4">
 				<Crumbs data={data} model={model} />
 
 				<EntityTitle
+					preview={preview}
 					kind={data.kind}
 					slug={data.slug}
 					title={data.title}

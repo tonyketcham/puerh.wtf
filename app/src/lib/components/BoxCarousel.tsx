@@ -43,6 +43,7 @@ interface CarouselItem {
 	 * (Optional) Alternative text for images
 	 */
 	alt?: string
+	variants?: readonly import("./ResponsiveImage").ResponsiveVariant[]
 	/**
 	 * (Optional) Poster image for videos (displayed before playback)
 	 */
@@ -126,6 +127,7 @@ const MediaRenderer = memo(
 				sizes="(min-width: 1024px) 480px, 90vw"
 					src={item.type === "video" ? item.poster : item.src}
 					alt={item.alt || ""}
+					variants={item.variants}
 					draggable={false}
 					// a face swapping photos mid-turn must never block a frame on a decode
 					decoding="async"
