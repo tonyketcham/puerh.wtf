@@ -4,7 +4,7 @@ import {
 	FLAVOR_AXES,
 	type ExplorerSession,
 	type SessionFull,
-	type SessionPreviewWithFeatureImage,
+	type SessionRoute,
 } from "./types/session"
 import type { Vendor } from "./types/vendor"
 import type { Category } from "./types/category"
@@ -66,53 +66,18 @@ const BREWING_FIELDS = `
 	infusion_increment
 `
 
-export async function getSessions(options?: {
-	order?: "ASC" | "DESC"
-	sortBy?: string
-	limit?: number
-	withImages?: boolean
-}): Promise<SessionPreviewWithFeatureImage[]> {
-	const { order = "DESC", sortBy = "date", limit, withImages } = options || {}
-
+/** Only the fields needed to enumerate static session routes. */
+export async function getSessionRoutes(): Promise<SessionRoute[]> {
 	const query = gql`
-    query AllSessions($order: Order, $sortBy: String, $limit: Int) {
-      allSessions(order: $order, sortBy: $sortBy, limit: $limit) {
-        _slug
-        _collection
-        id
-        title
-        date
-        production_year
-        excerpt
-        style {
-          category {
-            _slug
-            title
-            color
-          }
-        }
-        vendor {
-          _slug
-          title
-          image
-        }
-        ${
-					withImages
-						? `
-        images {
-          alt
-          image
-        }`
-						: ""
-				}
-      }
-    }
-  `
-
-	const { allSessions }: { allSessions: SessionPreviewWithFeatureImage[] } =
-		await flatbread.request(query, { order, sortBy, limit })
-
-	return allSessions
+		query SessionRoutes {
+			allSessions(order: DESC, sortBy: "date") {
+				_slug
+				date
+			}
+		}
+	`
+	const { allSessions } = await flatbread.request<{ allSessions: SessionRoute[] | null }>(query)
+	return allSessions ?? []
 }
 
 export async function getExplorerSessions(options?: {
@@ -188,13 +153,16 @@ export async function getExplorerSessions(options?: {
 		}
 	`
 
-	const { allSessions }: { allSessions: ExplorerSession[] } = await flatbread.request(query, {
-		order,
-		sortBy,
-		limit,
-	})
+	const { allSessions } = await flatbread.request<{ allSessions: ExplorerSession[] | null }>(
+		query,
+		{
+			order,
+			sortBy,
+			limit,
+		}
+	)
 
-	return allSessions
+	return allSessions ?? []
 }
 
 export async function getVendors(): Promise<Vendor[]> {
@@ -210,8 +178,8 @@ export async function getVendors(): Promise<Vendor[]> {
 		}
 	`
 
-	const { allVendors }: { allVendors: Vendor[] } = await flatbread.request(query)
-	return allVendors
+	const { allVendors } = await flatbread.request<{ allVendors: Vendor[] | null }>(query)
+	return allVendors ?? []
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -227,11 +195,11 @@ export async function getCategories(): Promise<Category[]> {
 		}
 	`
 
-	const { allCategories }: { allCategories: Category[] } = await flatbread.request(query)
-	return allCategories
+	const { allCategories } = await flatbread.request<{ allCategories: Category[] | null }>(query)
+	return allCategories ?? []
 }
 
-export async function getSession(slug: string): Promise<SessionFull> {
+export async function getSession(slug: string): Promise<SessionFull | null> {
 	// First, find the session by slug to get its id
 	const findQuery = gql`
 		query FindSession($slug: String!) {
@@ -242,13 +210,16 @@ export async function getSession(slug: string): Promise<SessionFull> {
 		}
 	`
 
-	const { allSessions } = await flatbread.request(findQuery, { slug })
-
-	if (!allSessions || allSessions.length === 0) {
-		throw new Error(`Session with slug "${slug}" not found`)
+	const { allSessions } = await flatbread.request<{
+		allSessions: Array<{ id: string | null } | null> | null
+	}>(findQuery, { slug })
+	if (!allSessions?.length) return null
+	const match = allSessions[0]
+	if (typeof match?.id !== "string" || !match.id.trim()) {
+		throw new Error(`Session lookup for "${slug}" returned a record without a valid id`)
 	}
 
-	const sessionId = allSessions[0].id
+	const sessionId = match.id
 
 	// Now get the full session details using the id
 	const query = gql`
@@ -333,7 +304,9 @@ export async function getSession(slug: string): Promise<SessionFull> {
 		}
 	`
 
-	const { Session } = await flatbread.request(query, { id: sessionId })
+	const { Session } = await flatbread.request<{ Session: SessionFull | null }>(query, {
+		id: sessionId,
+	})
 	return Session
 }
 
@@ -357,9 +330,10 @@ export async function getOrigins(): Promise<Origin[]> {
 		}
 	`
 
-	const { allOrigins }: { allOrigins: Origin[] } = await flatbread.request(query)
-	assertOriginDepth(allOrigins)
-	return allOrigins
+	const { allOrigins } = await flatbread.request<{ allOrigins: Origin[] | null }>(query)
+	const origins = allOrigins ?? []
+	assertOriginDepth(origins)
+	return origins
 }
 
 /**
@@ -381,108 +355,4 @@ function assertOriginDepth(origins: Origin[]) {
 			)
 		}
 	}
-}
-
-export type VendorDetail = {
-	_slug: string
-	title: string
-	image?: string | null
-	country?: string | null
-	location?: string | null
-	municipality?: string | null
-	description?: string | null
-	links?: {
-		website?: string | null
-		instagram?: string | null
-		twitter?: string | null
-		facebook?: string | null
-		youtube?: string | null
-	} | null
-	_content?: { html?: string | null } | null
-}
-
-export async function getVendorBySlug(slug: string): Promise<VendorDetail> {
-	const findQuery = gql`
-		query FindVendor($slug: String!) {
-			allVendors(filter: { _slug: { eq: $slug } }) {
-				id
-				_slug
-			}
-		}
-	`
-
-	const { allVendors } = await flatbread.request(findQuery, { slug })
-	if (!allVendors || allVendors.length === 0) {
-		throw new Error(`Vendor with slug "${slug}" not found`)
-	}
-
-	const vendorId = allVendors[0].id
-	const query = gql`
-		query Vendor($id: String!) {
-			Vendor(id: $id) {
-				_slug
-				title
-				image
-				country
-				location
-				municipality
-				description
-				links {
-					website
-					instagram
-					twitter
-					facebook
-					youtube
-				}
-				_content {
-					html
-				}
-			}
-		}
-	`
-
-	const { Vendor: vendor } = await flatbread.request(query, { id: vendorId })
-	return vendor as VendorDetail
-}
-
-export type CategoryDetail = {
-	_slug: string
-	title: string
-	color?: string | null
-	description?: string | null
-	_content?: { html?: string | null } | null
-}
-
-export async function getCategoryBySlug(slug: string): Promise<CategoryDetail> {
-	const findQuery = gql`
-		query FindCategory($slug: String!) {
-			allCategories(filter: { _slug: { eq: $slug } }) {
-				id
-				_slug
-			}
-		}
-	`
-
-	const { allCategories } = await flatbread.request(findQuery, { slug })
-	if (!allCategories || allCategories.length === 0) {
-		throw new Error(`Category with slug "${slug}" not found`)
-	}
-
-	const categoryId = allCategories[0].id
-	const query = gql`
-		query Category($id: String!) {
-			Category(id: $id) {
-				_slug
-				title
-				color
-				description
-				_content {
-					html
-				}
-			}
-		}
-	`
-
-	const { Category: category } = await flatbread.request(query, { id: categoryId })
-	return category as CategoryDetail
 }
