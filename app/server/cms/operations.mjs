@@ -165,6 +165,9 @@ export async function pushChangeSet(github, config, { repo, user }, body) {
 		prefix = repositoryPath(config)
 	let currentHead = await optionalHead(github, config, branch),
 		operationHead = null
+	// An interrupted new-PR operation can retain its exact reviewed base on its own branch.
+	// Main may advance, but the branch/catalog and atomic expectedHeadOid must still match.
+	const resumingCreatedBranch = creating && currentHead === body.target.head
 	const proof = { target: body.target.head, targetSeen: false }
 	if (currentHead)
 		operationHead = await findOperation(
@@ -222,12 +225,13 @@ export async function pushChangeSet(github, config, { repo, user }, body) {
 				"Choose up to 40 allowed content records."
 			)
 			if (creating) {
-				assert(
-					(await branchHead(github, config, repo.default_branch)) === body.target.head,
-					409,
-					"head_conflict",
-					"The default branch changed. Review the new base before creating this draft PR."
-				)
+				if (!resumingCreatedBranch)
+					assert(
+						(await branchHead(github, config, repo.default_branch)) === body.target.head,
+						409,
+						"head_conflict",
+						"The default branch changed. Review the new base before creating this draft PR."
+					)
 				currentHead ||= body.target.head
 			}
 			assert(
@@ -276,7 +280,7 @@ export async function pushChangeSet(github, config, { repo, user }, body) {
 				})),
 				...changedAssets.map((asset) => ({ path: asset.path, contents: asset.base64 })),
 			]
-			if (creating) {
+			if (creating && !resumingCreatedBranch) {
 				assert(
 					(await branchHead(github, config, repo.default_branch)) === body.target.head,
 					409,
@@ -311,7 +315,7 @@ export async function pushChangeSet(github, config, { repo, user }, body) {
 		try {
 			const result = await github.graphql(COMMIT_MUTATION, {
 				input: {
-					branch: { repositoryNameWithOwner: config.repository, refName: branch },
+					branch: { repositoryNameWithOwner: config.repository, branchName: branch },
 					expectedHeadOid: body.target.head,
 					message: {
 						headline: metadata.title,
