@@ -1,5 +1,4 @@
 import { defineConfig, transformerMarkdown, sourceFilesystem } from "flatbread"
-import { createSvImgField } from "@flatbread/resolver-svimg"
 import { wrapMany } from "./plugins/flatbread/wrap.js"
 
 const elementsToWrap = ["h1", "h2", "h3", "h4", "h5", "h6", "li", "p"]
@@ -38,14 +37,7 @@ export default defineConfig({
 				// brewing.vessel stays as the free-text note
 				vessel: "Vessel",
 			},
-			overrides: [
-				createSvImgField("images[]image", {
-					// the field in your content that references your image
-					inputDir: "static", // the base directory of your source images
-					outputDir: "static/images/uploads/g", // where to store your optimized images (these should be committed)
-					srcGenerator: (path) => "/images/uploads/g/" + path,
-				}),
-			],
+			// Image URLs stay raw; build-time authoring variants feed the public picture component.
 		},
 		{
 			path: "content/authors",

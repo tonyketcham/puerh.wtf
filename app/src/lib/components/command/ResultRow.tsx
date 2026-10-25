@@ -32,6 +32,7 @@ import { facetOpens, glyphOf, type ArgCommand, type CommandId, type Item } from 
 export const PILL_SPRING = { type: "spring", stiffness: 600, damping: 44, mass: 0.7 } as const
 
 const COMMAND_ICON: Record<CommandId, typeof Timer> = {
+	"cms-enable": Store, "cms-disable": House, "cms-working": Layers, "cms-new": Coffee, "cms-edit": BookA, "cms-session": Timer,
 	brew: Timer,
 	compare: GitCompareArrows,
 	random: Dices,

@@ -304,7 +304,7 @@ export function parsePrefix(query: string): { scope: ScopeKind; rest: string } |
 // Items + groups
 // ---------------------------------------------------------------------------
 
-export type CommandId = "brew" | "compare" | "random" | "clear" | "home" | IndexId
+export type CommandId = "cms-enable" | "cms-disable" | "cms-working" | "cms-new" | "cms-edit" | "cms-session" | "brew" | "compare" | "random" | "clear" | "home" | IndexId
 
 /** The index pages a command opens (plan §2.3): the Explorer's views at full size. */
 export type IndexId = "origins" | "vendors" | "styles" | "cultivars" | "teaware" | "lexicon"
@@ -413,6 +413,7 @@ export type CommandDef = {
 }
 
 export type SearchContext = {
+	authoringEnabled?: boolean
 	sessionSlug: string | null
 	filters: FilterState
 	activeFilterCount: number
@@ -468,6 +469,13 @@ export function commandDefs(ctx: SearchContext): CommandDef[] {
 			aliases: "clear reset filters unfilter remove all",
 		})
 	}
+	defs.push(...(ctx.authoringEnabled ? [
+		{ id: "cms-working" as const, label: "Working changes", hint: "select records, read, and commit", aliases: "cms drafts commit publish changes editorial" },
+		{ id: "cms-new" as const, label: "New session", hint: "a local record of the leaf and water", aliases: "record new write session voice dictate log" },
+		{ id: "cms-session" as const, label: "Log a session here", hint: "carry this page’s relationship into a draft", aliases: "context vendor origin style brew record" },
+		{ id: "cms-edit" as const, label: "Edit this record", hint: "keep the page’s context", aliases: "edit content page record modify" },
+		{ id: "cms-disable" as const, label: "Disable editing", hint: "return to reading; keep local drafts", aliases: "disable cms editing reader" },
+	] : [{ id: "cms-enable" as const, label: "Enable editing", hint: "sign in with GitHub repository access", aliases: "cms author edit enable github login write record" }]))
 	return defs
 }
 

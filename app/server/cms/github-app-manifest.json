@@ -1,0 +1,17 @@
+{
+	"name": "puerh.wtf authoring",
+	"url": "https://puerh.wtf",
+	"description": "Repository-authorized, local-first editorial tools for the puerh.wtf tea notebook. Writes are limited by the service to this site's content and prepared images.",
+	"public": true,
+	"callback_urls": ["https://puerh.wtf/api/cms"],
+	"request_oauth_on_install": false,
+	"default_permissions": {
+		"metadata": "read",
+		"contents": "write",
+		"pull_requests": "write",
+		"checks": "read",
+		"statuses": "read",
+		"administration": "read"
+	},
+	"default_events": []
+}
