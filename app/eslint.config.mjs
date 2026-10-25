@@ -10,7 +10,6 @@ export default [
 			"package/**",
 			"playwright-report/**",
 			"test-results/**",
-			"vue/**",
 		],
 	},
 	...nextVitals,

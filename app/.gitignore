@@ -28,8 +28,6 @@
 # testing
 /coverage
 
-# vue
-/vue
 .flatbread-codegen-cache.json
 next-env.d.ts
 
