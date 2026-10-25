@@ -9,6 +9,7 @@ import { StoreProvider } from "@/lib/store/StoreProvider"
 import { HydrateExplorerSessions } from "@/lib/store/HydrateExplorerSessions"
 import CommandBar from "@/lib/components/command/CommandBar"
 import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
+import AuthoringMount from "@/lib/authoring/AuthoringMount"
 import ScrollReset from "@/lib/components/ScrollReset"
 import { getEntityDetails } from "@/lib/entityDetails"
 
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 			<body className={`${inter.variable} ${firaCode.variable} ${rock3d.variable}`}>
 				<StoreProvider>
 					<ScrollReset />
+					<AuthoringMount />
 					<HydrateExplorerSessions sessions={sessions} />
 					<div className="relative flex flex-row">
 						<Explorer sessions={sessions} vendors={vendors} categories={categories} />

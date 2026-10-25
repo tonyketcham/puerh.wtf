@@ -1,5 +1,6 @@
 "use client"
 
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import Link from "next/link"
 import { useMemo, useState, type ReactNode } from "react"
 import { useAtomValue, useSetAtom } from "jotai"
@@ -1125,8 +1126,8 @@ function Logo({ src, title }: { src?: string | null; title: string }) {
 			className="grid overflow-hidden rounded-full place-items-center size-9 shrink-0 ring-1 ring-white/15 bg-white/[0.04] text-sm leading-none text-white/55"
 		>
 			{show ? (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img
+				<ResponsiveImage
+				sizes="36px"
 					src={src}
 					alt=""
 					loading="lazy"

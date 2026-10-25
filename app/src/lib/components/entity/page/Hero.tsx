@@ -1,5 +1,6 @@
 "use client"
 
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import { Suspense, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react"
 import Hatch from "@/lib/components/entity/Hatch"
@@ -336,8 +337,8 @@ export function Logo({
 			)}
 		>
 			{show ? (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img
+				<ResponsiveImage
+				sizes="64px"
 					src={src}
 					alt=""
 					loading="lazy"

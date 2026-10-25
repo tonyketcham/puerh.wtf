@@ -12,7 +12,8 @@ import {
 } from "react"
 import { AnimatePresence, LayoutGroup, motion } from "motion/react"
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import { authoringBridgeAtom, requestAuthoringAtom } from "@/lib/authoring/bridge"
 import { ChevronRight, Search as SearchIcon, SquareTerminal } from "lucide-react"
 import { cn } from "@/lib/utils/cn"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
@@ -167,15 +168,19 @@ export default function Palette({
 	const timers = useRef<number[]>([])
 	const pillGroup = useId()
 
+	const authoring = useAtomValue(authoringBridgeAtom)
+	const requestAuthoring = useSetAtom(requestAuthoringAtom)
+	const authoringPathname = usePathname()
 	const filters = useAtomValue(filtersAtom)
 	const ctx: SearchContext = useMemo(
 		() => ({
+			authoringEnabled: authoring.enabled,
 			sessionSlug,
 			filters,
 			activeFilterCount: countActiveFilters(filters),
 			descriptor: descriptor?.term ?? null,
 		}),
-		[sessionSlug, filters, descriptor]
+		[sessionSlug, filters, descriptor, authoring.enabled]
 	)
 
 	const groups = useMemo(
@@ -393,6 +398,12 @@ export default function Palette({
 				}
 				case "command": {
 					const { command } = item
+					if (command.id.startsWith("cms-")) {
+						const action = command.id.slice(4) as "enable" | "disable" | "working" | "new" | "edit" | "session"
+						requestAuthoring({ action, pathname: authoringPathname, ...(action === "new" ? { collection: "tastings" as const } : {}) })
+						onClose()
+						return
+					}
 					if (command.arg) {
 						setQueryAndMode("", { kind: "arg", command: command.arg })
 						return
@@ -423,6 +434,8 @@ export default function Palette({
 			sessionSlug,
 			store,
 			requestSteep,
+			requestAuthoring,
+			authoringPathname,
 		]
 	)
 
