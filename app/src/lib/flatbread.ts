@@ -15,6 +15,7 @@
  *
  * In development every request goes straight through, so content edits show on reload.
  */
+import "server-only"
 import { GraphQLClient } from "graphql-request"
 
 const client = new GraphQLClient(process.env.FLATBREAD_URL || "http://localhost:5057/graphql", {
