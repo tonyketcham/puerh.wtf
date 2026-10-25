@@ -1,57 +1,47 @@
-# Vercel Deployment
+# Vercel deployment
 
-This repo deploys as two static Vercel projects from the same pnpm workspace.
+The pnpm workspace has two deployment roots.
 
-## Projects
+- **Frontend — `app/`:** `pnpm build` exports public pages to `out/`. Keep
+  `framework: null` and `outputDirectory: "out"` as checked in `app/vercel.json`.
+  The project-root `api/cms.ts` is a native Node function, packaged separately from the static
+  export. It delegates to `server/cms/`; it is not a Next App Router API route.
+- **Retained CMS fallback — `log/`:** `pnpm build` produces the standalone static CMS in
+  `dist/`, using `log/vercel.json`. Keep it available until the in-app editorial acceptance
+  checks are complete.
 
-| Project  | Root directory | Build command | Output directory |
-| -------- | -------------- | ------------- | ---------------- |
-| Frontend | `app`          | `pnpm build`  | `out`            |
-| Tea log  | `log`          | `pnpm build`  | `dist`           |
+Set the matching Root Directory on each Git-backed Vercel project. Root workspace
+`pnpm build` builds both packages; a project rooted at `app` runs the app package's command.
 
-Each package has its own `vercel.json` so the CLI and dashboard use the same build settings.
+## Link or deploy manually
 
-## CLI Setup
+From the repository root, inspect the signed-in account and link the existing projects:
 
-From the repository root:
-
-```bash
+```sh
 vercel whoami
-```
-
-Link this monorepo with repo-level linking:
-
-```bash
 vercel link --repo
-```
-
-Add the second project to the repo link if prompted or after the first link is created:
-
-```bash
 vercel link add
 ```
 
-When linking, create or select two Vercel projects and set their root directories to `app` and `log` in the Vercel dashboard.
+For a manual deployment, run `vercel` from the intended package directory. Use
+`vercel --prod` only for an approved production publication. Project linking and a successful
+Next export do not establish that the native function or production credentials work.
 
-To deploy manually from each project root:
+## In-app CMS
 
-```bash
-cd app
-vercel
-vercel --prod
+Follow [CMS setup and activation evidence](docs/in-app-cms-setup.md) for the registered GitHub
+App, server-only values, local development, native function packaging and remaining editorial
+push/publication checks. Keep that evidence distinct from mocked service/browser tests and
+from a merged commit whose production deployment is still pending.
 
-cd ../log
-vercel
-vercel --prod
-```
+`CMS_DEV_URL` supplies a development-only Next rewrite to a separate local CMS service.
+Production uses the native `api/cms.ts` entry and the checked-in function configuration;
+no production catch-all rewrite or separate CMS project is required.
 
-For Git-backed deploys, configure both Vercel projects to use this repository with the matching root directory.
+## Retained standalone CMS authentication
 
-## Tea Log Auth
-
-The tea log is a static Netlify CMS app using the GitHub backend. On Vercel it no longer uses Netlify Identity, so GitHub login needs an external OAuth proxy.
-
-Add these fields under `backend` in `log/public/admin/config.yml` after deploying the proxy:
+The `log/` app uses the GitHub backend and an external OAuth proxy. Its backend settings
+belong in `log/public/admin/config.yml`:
 
 ```yaml
 backend:
@@ -62,4 +52,6 @@ backend:
   auth_endpoint: auth
 ```
 
-The OAuth proxy needs a GitHub OAuth app whose callback URL points at the proxy callback route.
+The proxy requires its own matching GitHub OAuth callback. This fallback integration is
+separate from the dedicated in-app authoring GitHub App; retain it until the documented
+retirement checks pass.
