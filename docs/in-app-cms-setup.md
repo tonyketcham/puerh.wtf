@@ -1,6 +1,6 @@
 # Activate the in-app CMS
 
-Status: code and configuration are reviewable locally. This document does not claim that a GitHub App has been created, credentials configured, a Vercel deployment built, or live GitHub authorization/writes verified. Keep the existing `log/` CMS and its deployment available until the activation checks below pass.
+Status: the implementation is reviewable in PR #632. Hosted checks passed on `6b28d595` (98 Playwright/model tests, 29 backend tests, app/log builds, platform checks and both Vercel preview builds). The dedicated GitHub App is not yet registered or installed; credentials, protected deployment access and live GitHub authorization/writes remain unverified. Keep the existing `log/` CMS and its deployment available until the activation checks below pass.
 
 ## Deployment shape
 
@@ -24,7 +24,9 @@ The catalog is read in batches of immutable Git blob IDs, and a push performs se
 
 Review [the manifest](../app/server/cms/github-app-manifest.json). It requests Contents and Pull requests write access; Metadata, Checks, Commit statuses and Administration read access. Administration is read-only and is used to inspect publication protections. The service never changes repository settings or workflow files.
 
-Use the GitHub App settings form for the chosen owning account, copying the reviewed settings:
+[Open the prefilled GitHub App registration form](https://github.com/settings/apps/new?name=puerh.wtf+authoring&url=https%3A%2F%2Fpuerh.wtf&description=Repository-authorized%2C+local-first+editorial+tools+for+the+puerh.wtf+tea+notebook.+Writes+are+limited+by+the+service+to+this+site%27s+content+and+prepared+images.&callback_urls%5B%5D=https%3A%2F%2Fpuerh.wtf%2Fapi%2Fcms&request_oauth_on_install=false&public=true&webhook_active=false&metadata=read&contents=write&pull_requests=write&checks=read&statuses=read&administration=read) while signed in as `@tonyketcham`. The link contains only public settings derived from the checked-in manifest: the name, homepage, description, exact callback, requested permissions and visibility; it disables webhooks. GitHub may require account reauthentication before opening it. Review the form before submitting. Keep **Expire user authorization tokens** enabled and **Enable Device Flow** disabled; those switches are not included in the documented URL parameters. [GitHub registration URL parameters](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-using-url-parameters)
+
+The form remains editable; if the name is unavailable, add a unique suffix. Verify these settings:
 
 1. Choose a unique app name based on `puerh.wtf authoring` and homepage `https://puerh.wtf`.
 2. Set callback URL to `https://puerh.wtf/api/cms`, without query parameters. Leave user-authorization token expiration enabled and device flow disabled.
@@ -34,7 +36,7 @@ Use the GitHub App settings form for the chosen owning account, copying the revi
 6. Install it on the repository owner's account with **Only select repositories → puerh.wtf**. Install/authorize are distinct actions; editors then authorize from **Enable editing** in the site's command bar.
 7. Create a client secret and enter it directly in the intended secret stores. Do not paste credentials into chat, commit them, or put them in browser-facing variables.
 
-The manifest is also suitable as an input to a deliberate registration tool. This repository does not implement GitHub's manifest-registration code exchange. Do not POST the manifest blindly and send its registration code to `/api/cms`: that endpoint handles user OAuth codes, which are a different handshake. A future registration helper must bind its own state and complete the manifest conversion separately. [GitHub App manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
+Use the standard registration form above. GitHub's separate manifest POST/conversion flow generates additional credentials and requires a registration-code exchange that this repository does not implement. `/api/cms` handles user OAuth codes, not manifest-registration codes. No private key or webhook secret is needed for this service. [GitHub App manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
 
 For local development, use a separate development GitHub App or add the exact localhost callback deliberately. Its callback must match `CMS_ORIGIN + /api/cms`; do not point production credentials at arbitrary preview hosts. The current service uses authorization code flow with PKCE and state. It retains only an expiring user access token, so expired sessions reauthorize rather than refreshing silently. [GitHub user-token flow](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app)
 
@@ -142,4 +144,4 @@ Current local verification:
 - The final `pnpm run build --port 5215` static export passes for all 448 pages. A separate export with two temporary new-content fixtures also passed; Chrome decoded their responsive pictures at desktop/mobile widths and rendered session/vendor Markdown. Those fixtures were removed before the final build. Public fixture visits requested no CMS API, image codec or editor runtime.
 - Independent server validation passed for all 246 current source documents, and an unconfigured loopback HTTP smoke check returned honest configuration status.
 
-These checks do not establish live OAuth, a real GitHub write, hosted CI, Vercel function packaging, deployment or activation. Real account/deployment checks remain separate evidence.
+Hosted CI also passed on implementation revision `6b28d595`: [98 Playwright/model tests and 29 backend tests](https://github.com/tonyketcham/puerh.wtf/actions/runs/40150734811), app/log builds, all three platform checks and both Vercel preview builds. This does not establish live OAuth, a real GitHub write, protected-endpoint behavior, function packaging contents or activation. Real account/deployment checks remain separate evidence.
