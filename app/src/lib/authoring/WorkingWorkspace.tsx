@@ -319,7 +319,11 @@ export default function WorkingWorkspace() {
 										)}
 									</p>
 								))}
-								<Link href={"/write/?id=" + encodeURIComponent(d.id)} className="cms-edit-link">
+								<Link
+									href={"/write/?id=" + encodeURIComponent(d.id)}
+									className="cms-edit-link"
+									onNavigate={() => update({ pendingWriteId: d.id })}
+								>
 									Edit draft
 								</Link>
 								{state.errors[d.id] && <p className="cms-error">{state.errors[d.id]}</p>}

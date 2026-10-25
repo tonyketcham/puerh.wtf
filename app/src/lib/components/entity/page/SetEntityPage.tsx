@@ -2,7 +2,7 @@
 
 import { useLayoutEffect } from "react"
 import { useSetAtom } from "jotai"
-import type { EntityPageData } from "./data"
+import type { EntityPageData } from "@/lib/content/entities"
 import { entityPageAtom } from "./state"
 
 /**

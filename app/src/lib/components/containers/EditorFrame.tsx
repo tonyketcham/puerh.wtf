@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { SessionPropertiesPanel } from "@/lib/components/SessionProperties"
+import PropertiesPanel from "./PropertiesPanel"
 import { cn } from "@/lib/utils/cn"
 
 /**
@@ -32,7 +32,7 @@ export default function EditorFrame({
 				{children}
 			</div>
 
-			{panel && <SessionPropertiesPanel>{panel}</SessionPropertiesPanel>}
+			{panel && <PropertiesPanel>{panel}</PropertiesPanel>}
 		</div>
 	)
 }
