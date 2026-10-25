@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import CultivarIndex from "@/lib/components/entity/indexes/CultivarIndex"
-import { getEntityList } from "@/lib/components/entity/page/data"
+import { getEntityList } from "@/lib/content/entities.server"
 
 export const metadata: Metadata = {
 	title: "Cultivars · puerh.wtf",
