@@ -24,9 +24,26 @@ export default function WriteWorkspace() {
 		store = useStore(),
 		params = useSearchParams(),
 		router = useRouter()
-	const id = params.get("id"),
+	const urlId = params.get("id"),
+		pendingWriteId = state.pendingWriteId,
+		id = pendingWriteId ?? urlId,
 		draft = state.drafts.find((d) => d.id === id),
 		textarea = useRef<HTMLTextAreaElement>(null)
+	useLayoutEffect(() => {
+		if (state.phase !== "ready" || pendingWriteId === null) return
+		if (store.get(cmsAtom).pendingWriteId !== pendingWriteId) return
+		// A restored static route can replay its old canonical query during navigation.
+		// Keep the requested record until Next and the address bar agree on its identity.
+		const url = new URL(window.location.href)
+		if (url.searchParams.get("id") !== pendingWriteId || urlId !== pendingWriteId) {
+			url.searchParams.set("id", pendingWriteId)
+			window.history.replaceState(null, "", url.pathname + url.search + url.hash)
+		}
+		if (urlId === pendingWriteId)
+			store.set(cmsAtom, (current) =>
+				current.pendingWriteId === pendingWriteId ? { ...current, pendingWriteId: null } : current
+			)
+	}, [state.phase, pendingWriteId, urlId, store])
 	const latest = useRef(state)
 	useLayoutEffect(() => {
 		latest.current = state
