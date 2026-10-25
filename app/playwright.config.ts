@@ -18,6 +18,7 @@ const port = customPort ?? 3000
 const flatbreadPort = Number(process.env.PW_FLATBREAD_PORT || port + 2000)
 
 const config: PlaywrightTestConfig = {
+	testDir: "./tests",
 	webServer: customPort
 		? {
 				command: `pnpm authoring:assets && pnpm exec flatbread start -p ${flatbreadPort} -X npx "next dev --turbopack -p ${port}"`,
