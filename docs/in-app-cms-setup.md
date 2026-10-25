@@ -1,6 +1,6 @@
 # Activate the in-app CMS
 
-Status: the implementation is reviewable in PR #632. Hosted checks passed on `6b28d595` (98 Playwright/model tests, 29 backend tests, app/log builds, platform checks and both Vercel preview builds). The dedicated GitHub App is not yet registered or installed; credentials, protected deployment access and live GitHub authorization/writes remain unverified. Keep the existing `log/` CMS and its deployment available until the activation checks below pass.
+Status: [the implementation PR #632](https://github.com/tonyketcham/puerh.wtf/pull/632) is merged. The dedicated [puerh.wtf authoring App](https://github.com/apps/puerh-wtf-authoring) is registered and installed only on `tonyketcham/puerh.wtf`, and its server-only production credentials are configured. The deployed native session endpoint, OAuth sign-in, repository write authorization and catalog loading have been verified. Keep the existing `log/` CMS and its deployment available until the editorial push/publication checks below also pass.
 
 ## Deployment shape
 
@@ -29,14 +29,14 @@ Review [the manifest](../app/server/cms/github-app-manifest.json). It requests C
 The form remains editable; if the name is unavailable, add a unique suffix. Verify these settings:
 
 1. Choose a unique app name based on `puerh.wtf authoring` and homepage `https://puerh.wtf`.
-2. Set callback URL to `https://puerh.wtf/api/cms`, without query parameters. Leave user-authorization token expiration enabled and device flow disabled.
+2. Set callback URL to `https://puerh.wtf/api/cms`, without query parameters, and disable **Allow wildcard matching** for that callback. Verify this in the form even when using the prefilled link. Leave user-authorization token expiration enabled and device flow disabled.
 3. Disable Webhook Active. No webhook URL, subscribed events, webhook secret, or private key is used by this implementation. The manifest omits `hook_attributes` and has an empty event list.
 4. Apply the permissions listed in the manifest. Grant no Workflows permission and no Administration write permission.
 5. Make the app public so authorized repository collaborators can authorize it; publishing a Marketplace listing is unnecessary. Public visibility does not grant repository authority: the service fixes `tonyketcham/puerh.wtf` and checks each person's effective write permission on every protected request. [GitHub App visibility](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/making-a-github-app-public-or-private)
 6. Install it on the repository owner's account with **Only select repositories → puerh.wtf**. Install/authorize are distinct actions; editors then authorize from **Enable editing** in the site's command bar.
 7. Create a client secret and enter it directly in the intended secret stores. Do not paste credentials into chat, commit them, or put them in browser-facing variables.
 
-Use the standard registration form above. GitHub's separate manifest POST/conversion flow generates additional credentials and requires a registration-code exchange that this repository does not implement. `/api/cms` handles user OAuth codes, not manifest-registration codes. No private key or webhook secret is needed for this service. [GitHub App manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
+Use the standard registration form above. GitHub's separate manifest POST/conversion flow generates additional credentials and requires a registration-code exchange that this repository does not implement. `/api/cms` handles user OAuth codes, not manifest-registration codes. No private key or webhook secret is needed for this service. The registered App was successfully installed without generating a key; the registration-success banner suggesting key generation did not prevent installation. [GitHub App manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
 
 For local development, use a separate development GitHub App or add the exact localhost callback deliberately. Its callback must match `CMS_ORIGIN + /api/cms`; do not point production credentials at arbitrary preview hosts. The current service uses authorization code flow with PKCE and state. It retains only an expiring user access token, so expired sessions reauthorize rather than refreshing silently. [GitHub user-token flow](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app)
 
@@ -122,11 +122,13 @@ No AI provider or AI workflow is configured in this implementation. A future ima
 
 The service currently supports classic branch protection requiring at least one status check, strict up-to-date checks, and enforcement for administrators. It does not create those rules or bypass them. Required approvals and GitHub's clean merge state remain authoritative; missing readiness marks a draft ready for review but returns an actionable error before merging. Ruleset-only/merge-queue publication currently fails closed and remains available through GitHub until that path is implemented.
 
+For this sole-maintainer repository, `main` requires a pull request with **zero required human approvals**. The strict required checks are `app-build (20, ubuntu-latest)` and `test`, both bound to GitHub Actions app ID `15368`, with enforcement for administrators. This lets the maintainer publish their own editorial PR through the CMS while retaining the required CI checks. Force pushes and branch deletion remain disabled. These repository settings were configured during activation; the CMS service only reads them.
+
 A publish request binds the cumulative reviewed PR head and current base. It validates all changed paths/regular file modes/content, verifies base ancestry and successful checks, then performs a normal head-SHA-guarded squash merge. A merge does not establish that production has deployed: keep **Merged / deploying** distinct from **Live**.
 
 ## Activation evidence before replacing the old CMS
 
-These are the remaining verification steps after account/deployment actions are authorized:
+Account setup and the native endpoint/sign-in checks are complete. Use this acceptance checklist before retiring the old CMS; the real editorial push/publication steps remain in progress:
 
 1. Confirm the target Vercel project/team and Root Directory `app`. Inspect a local Vercel build/preview artifact and verify that `api/cms` is packaged with its server modules, shared schema and `yaml`, while public HTML remains static. Confirm `/api/cms?action=session` returns JSON/no-store rather than a static 404.
 2. Confirm the intended GitHub App, exact callback, selected repository installation, server-only values and expiring user-token setting. Verify a writer can sign in and a public-repository reader cannot gain authoring access. Test expiry/revocation, CSRF and wrong-origin rejection.
@@ -144,4 +146,4 @@ Current local verification:
 - The final `pnpm run build --port 5215` static export passes for all 448 pages. A separate export with two temporary new-content fixtures also passed; Chrome decoded their responsive pictures at desktop/mobile widths and rendered session/vendor Markdown. Those fixtures were removed before the final build. Public fixture visits requested no CMS API, image codec or editor runtime.
 - Independent server validation passed for all 246 current source documents, and an unconfigured loopback HTTP smoke check returned honest configuration status.
 
-Hosted CI also passed on implementation revision `6b28d595`: [98 Playwright/model tests and 29 backend tests](https://github.com/tonyketcham/puerh.wtf/actions/runs/40150734811), app/log builds, all three platform checks and both Vercel preview builds. This does not establish live OAuth, a real GitHub write, protected-endpoint behavior, function packaging contents or activation. Real account/deployment checks remain separate evidence.
+Hosted CI passed on deployed main revision `42102e61`: [98 Playwright/model tests and 29 backend tests](https://github.com/tonyketcham/puerh.wtf/actions/runs/40168717979), app/log builds, all three platform checks and both Vercel deployments. Separate production checks confirmed the native JSON/no-store session endpoint, successful GitHub App OAuth, effective repository write access and catalog loading. A first-sign-in activation regression was found during that live check and is covered by a red-to-green browser test; Keep reading cancellation and blocked activation storage also pass. A real content commit, automatic draft PR and guarded publication still require the remaining editorial acceptance flow.
