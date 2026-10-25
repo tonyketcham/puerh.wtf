@@ -17,7 +17,8 @@ import type { DotMapPoint } from "./DotMap"
 import type { MapPoint } from "@/lib/components/map/points"
 import EntityTitle from "./EntityTitle"
 import Hero from "./Hero"
-import { buildEntityModel, liquorStops, type EntityModel } from "./model"
+import { buildEntityModel, type EntityModel } from "./model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import Related from "./Related"
 import Section from "./Section"
 import SessionsList from "./SessionsList"
@@ -52,6 +53,7 @@ export const INDEX_OF: Record<PageKind, { label: string; href: string; kind: Pag
  */
 export default function EntityPage({
 	data,
+	preview = false,
 	cards,
 	lead,
 	notes,
@@ -60,6 +62,7 @@ export default function EntityPage({
 	supplied = [],
 }: {
 	data: EntityPageData
+	preview?: boolean
 	/** server-rendered SessionCards by session slug */
 	cards: Record<string, ReactNode>
 	/** the description's first paragraph, for heroes that set it as prose */
@@ -92,12 +95,13 @@ export default function EntityPage({
 			data-entity-slug={data.slug}
 			style={{ "--entity-accent": model.accentText } as CSSProperties}
 		>
-			<SetEntityPage data={data} />
+			{!preview && <SetEntityPage data={data} />}
 
 			<header className="space-y-4">
 				<Crumbs data={data} model={model} />
 
 				<EntityTitle
+					preview={preview}
 					kind={data.kind}
 					slug={data.slug}
 					title={data.title}
@@ -122,7 +126,17 @@ export default function EntityPage({
 					aside={<span className="text-[11px] text-white/25">find all references</span>}
 					recordingKey="entity-sessions"
 				>
-					<SessionsList model={model} index={index} title={data.title} cards={cards} />
+					<SessionsList
+						sessions={model.sessions}
+						grouping={
+							model.kind === "origin" || model.kind === "category"
+								? { kind: model.kind, slug: model.node?.slug ?? model.slug }
+								: undefined
+						}
+						index={index}
+						title={data.title}
+						cards={cards}
+					/>
 				</Section>
 
 				{supplied.length > 0 && (

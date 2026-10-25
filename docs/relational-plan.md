@@ -1,8 +1,12 @@
 # puerh.wtf: relational plan
 
-Research and design plan, not an implementation. It makes every entity a session points at explorable, and adds a line-drawn topographic origin map. Written 2026-10-18 against branch `feat/delight-mechanics` (commit `24a8858` plus uncommitted work).
+> Historical research and implementation record. The core Explorer, entity pages/peeks,
+> lexicon, teaware and terrain maps are implemented. The original research, proposed choices,
+> data counts and chronological implementation notes below are retained; they are not a
+> current task list. Use [the architecture map](architecture.md) for present ownership.
 
-**Status: approved by the owner on 2026-10-18, all recommendations included. The decisions are in §6.** Implementation starts with Phase 0.
+Originally written 2026-10-18 against `feat/delight-mechanics` (commit `24a8858` plus
+uncommitted work), and approved by the owner that day. The recorded decisions are in §6.
 
 ---
 

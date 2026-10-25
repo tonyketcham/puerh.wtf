@@ -20,7 +20,7 @@ import {
 	readCatalog,
 	listAuthoringPulls,
 } from "./github.mjs"
-import { pushChangeSet, publishPull } from "./operations.mjs"
+import { pushChangeSet, publishPull, publicationStatus, updateEdition } from "./operations.mjs"
 import { readMedia } from "./media.mjs"
 import { createHash } from "node:crypto"
 
@@ -96,7 +96,8 @@ export function createCmsHandler({
 			assert(
 				(["session", "login", "callback", "catalog", "media"].includes(action) &&
 					method === "GET") ||
-					(["logout", "push", "publish"].includes(action) && method === "POST"),
+					(["logout", "push", "publish", "publication-status", "update-edition"].includes(action) &&
+						method === "POST"),
 				405,
 				"method",
 				"This CMS action does not support the requested method."
@@ -266,6 +267,14 @@ export function createCmsHandler({
 			const body = await readBody(req)
 			if (action === "push")
 				return json(res, 200, await pushChangeSet(github, config, context, body))
+			if (action === "publication-status")
+				return json(res, 200, await publicationStatus(github, config, context, body))
+			if (action === "update-edition")
+				return json(res, 200, await updateEdition(github, config, context, body))
+			if (action === "publication-status")
+				return json(res, 200, await publicationStatus(github, config, context, body))
+			if (action === "update-edition")
+				return json(res, 200, await updateEdition(github, config, context, body))
 			if (action === "publish")
 				return json(res, 200, await publishPull(github, config, context, body))
 		} catch (error) {

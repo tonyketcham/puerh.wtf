@@ -37,8 +37,17 @@ const EASE = [0.22, 1, 0.36, 1] as const
 export default function ProvenancePanels() {
 	const session = useAtomValue(sessionAtom)
 	const index = useAtomValue(relationIndexAtom)
-	const reduce = useReducedMotion() ?? false
+	return session ? <ProvenancePanelsView session={session} index={index} /> : null
+}
 
+export function ProvenancePanelsView({
+	session,
+	index,
+}: {
+	session: SessionFull
+	index: RelationIndex
+}) {
+	const reduce = useReducedMotion() ?? false
 	const row: Variants = useMemo(
 		() =>
 			reduce
@@ -451,7 +460,7 @@ function VendorLogo({ src, title }: { src?: string | null; title: string }) {
 		>
 			{show ? (
 				<ResponsiveImage
-				sizes="20px"
+					sizes="20px"
 					src={src}
 					alt=""
 					loading="lazy"

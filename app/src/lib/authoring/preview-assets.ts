@@ -66,13 +66,15 @@ export function previewAssetRequests(
 	branch?: string,
 	head?: string,
 	beforeBranch = branch,
-	beforeHead = head
+	beforeHead = head,
+	documents: readonly CmsDocument[] = [],
+	beforeDocuments: readonly CmsDocument[] = []
 ) {
-	const current = previewAssetPaths([document]),
+	const current = previewAssetPaths([document, ...documents]),
 		seen = new Set(current.map((detail) => detail.path))
 	return [
 		...current.map((detail) => ({ ...detail, branch, head })),
-		...previewAssetPaths([before])
+		...previewAssetPaths([before, ...beforeDocuments])
 			.filter((detail) => !seen.has(detail.path))
 			.map((detail) => ({ ...detail, branch: beforeBranch, head: beforeHead })),
 	]

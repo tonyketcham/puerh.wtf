@@ -114,10 +114,35 @@ export async function buildAuthoringImageIndex({
 	return Object.fromEntries(Object.entries(index).sort(([a], [b]) => a.localeCompare(b)))
 }
 
+/** Captions remain independent of Flatbread's optional-field inference. */
+export async function buildPhotoCaptionIndex({ contentDir = path.join(appRoot, "content") } = {}) {
+	/** @type {Record<string, Array<{ image: string, caption: string } | null>>} */
+	const captions = {}
+	for (const file of await markdownFiles(contentDir)) {
+		const raw = await readFile(file, "utf8")
+		const frontmatter = raw.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)
+		if (!frontmatter) continue
+		const data = parseDocument(frontmatter[1]).toJS()
+		if (typeof data?.id !== "string" || !Array.isArray(data.images)) continue
+		const entries = data.images.map((image) =>
+			typeof image?.image === "string" && typeof image.caption === "string" && image.caption.trim()
+				? { image: image.image, caption: image.caption }
+				: null
+		)
+		if (entries.some(Boolean)) captions[data.id] = entries
+	}
+	return captions
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
 	const index = await buildAuthoringImageIndex()
+	const captions = await buildPhotoCaptionIndex()
 	const output = path.join(appRoot, "src/generated/authoring-images.json")
 	await mkdir(path.dirname(output), { recursive: true })
 	await writeFile(output, JSON.stringify(index, null, 2) + "\n")
+	await writeFile(
+		path.join(appRoot, "src/generated/authoring-captions.json"),
+		JSON.stringify(captions, null, 2) + "\n"
+	)
 	console.log("Indexed responsive variants for " + Object.keys(index).length + " authored images.")
 }

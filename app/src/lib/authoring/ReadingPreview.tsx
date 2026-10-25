@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import JournalPreview from "./JournalPreview"
+import { revisedPassages, remarkEditorialChanges } from "./editorial-diff"
 import type { CmsAsset, CmsDocument, CmsField } from "./types"
 import { SCHEMAS, documentRelations } from "./schema"
 import { assetPublicPath } from "./documents"
@@ -25,10 +27,18 @@ export function useAssetUrls(assets: readonly CmsAsset[] = EMPTY_ASSETS) {
 	}, [stableAssets])
 	return urls
 }
-export function Prose({ source }: { source: string }) {
+export function Prose({ source, previousSource }: { source: string; previousSource?: string }) {
 	return (
 		<div className="cms-prose">
-			<ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
+			<ReactMarkdown
+				remarkPlugins={
+					previousSource === undefined
+						? [remarkGfm]
+						: [remarkGfm, [remarkEditorialChanges, { before: previousSource, after: source }]]
+				}
+			>
+				{source}
+			</ReactMarkdown>
 		</div>
 	)
 }
@@ -63,6 +73,9 @@ export function ContentPicture({
 		</figure>
 	)
 }
+
+const passageText = (before: string, after: string) =>
+	before.replace(/\r\n/g, "\n").trimEnd() !== after.replace(/\r\n/g, "\n").trimEnd()
 
 const hasValue = (value: unknown): boolean => {
 	if (value == null || value === "") return false
@@ -181,6 +194,7 @@ function ReadingField({
 	changes: boolean
 }) {
 	const changed = changes && differs(value, before)
+	if (changes && !changed) return null
 	if (!hasValue(value) && !(changed && hasValue(before))) return null
 	const nested = field.type === "object" && field.fields
 	return (
@@ -239,9 +253,17 @@ export default function ReadingPreview({
 				<p>Select records to read the exact update. Unchecked work stays on this device.</p>
 			</div>
 		)
-	const data = doc.data,
-		schema = SCHEMAS[doc.collection],
-		refs = documentRelations(doc),
+	if (lens === "read") {
+		if (assets.some((asset) => !urls[assetPublicPath(asset.path)]))
+			return (
+				<p className="cms-muted" role="status">
+					Preparing the reading preview…
+				</p>
+			)
+		return <JournalPreview document={doc} documents={documents} urls={urls} />
+	}
+	const schema = SCHEMAS[doc.collection],
+		data = doc.data,
 		images = recordImages(doc)
 	const fields: readonly CmsField[] = [
 		...schema.fields,
@@ -249,44 +271,41 @@ export default function ReadingPreview({
 			? [{ name: "image_alt", label: "Image description", type: "text" as const }]
 			: []),
 	]
-	const changed = fields.filter((field) => differs(data[field.name], before?.data[field.name]))
-	const changes = lens === "changes",
-		mediaChanged = !!before && differs(images, recordImages(before))
+	const changed = fields.filter((f) => differs(data[f.name], before?.data[f.name]))
+	const bodyChanged = !!passageText(before?.body || "", doc.body),
+		mediaChanged = differs(images, before ? recordImages(before) : [])
+	const passages = revisedPassages(before?.body || "", doc.body)
 	return (
-		<article className="cms-reading" data-preview-id={doc.id}>
-			<p className="cms-eyebrow">
-				{schema.singular}
-				{!before ? " · New record" : ""}
-			</p>
-			<h2>{String(data.title || "Untitled " + schema.singular.toLowerCase())}</h2>
-			{changes && (
-				<p className="cms-change-line">
-					{before
-						? changed.length +
-						  " " +
-						  (changed.length === 1 ? "property changed" : "properties changed")
-						: "New record"}
-					{before?.body !== doc.body ? " · Notes revised" : ""}
+		<article className="cms-reading surface-card cms-editorial-review" data-preview-id={doc.id}>
+			<header>
+				<p className="cms-eyebrow">
+					{schema.singular}
+					{!before ? " · New record" : ""}
 				</p>
-			)}
-			{changes && before && differs(data.title, before.data.title) && (
-				<details className="cms-details">
-					<summary>Earlier name</summary>
-					<p>{String(before.data.title || "Untitled")}</p>
-				</details>
-			)}
+				<h2>{String(data.title || "Untitled " + schema.singular.toLowerCase())}</h2>
+				{lens === "changes" && (
+					<p className="cms-change-line">
+						{before
+							? changed.length +
+							  " " +
+							  (changed.length === 1 ? "property changed" : "properties changed")
+							: "New record"}
+						{bodyChanged ? " · Notes revised" : ""}
+					</p>
+				)}
+			</header>
 			{lens === "connections" ? (
 				<section>
 					<h3>Connections in this update</h3>
-					{refs.length ? (
+					{documentRelations(doc).length ? (
 						<dl className="cms-reading-facts">
 							{fields
-								.filter((field) => field.type === "relation" && hasValue(data[field.name]))
-								.map((field) => (
-									<div key={field.name}>
-										<dt>{field.label}</dt>
+								.filter((f) => f.type === "relation" && hasValue(data[f.name]))
+								.map((f) => (
+									<div key={f.name}>
+										<dt>{f.label}</dt>
 										<dd>
-											<ReadingValue field={field} value={data[field.name]} documents={documents} />
+											<ReadingValue field={f} value={data[f.name]} documents={documents} />
 										</dd>
 									</div>
 								))}
@@ -298,69 +317,85 @@ export default function ReadingPreview({
 			) : lens === "media" ? (
 				<section>
 					<h3>Included images</h3>
-					{images.length ? (
-						images.map((im, i) => (
-							<div key={i}>
+					<div className="cms-review-photos">
+						{images.map((im, i) => (
+							<div key={im.image + ":" + i}>
+								<p className="cms-eyebrow">
+									{i === 0 ? "Cover · " : "Photo "}
+									{i + 1}
+								</p>
 								<ContentPicture image={im} urls={urls} />
 								<p className="cms-muted">
 									{im.alt ? "Image description: " + im.alt : "No image description yet."}
 								</p>
 							</div>
-						))
-					) : (
-						<p className="cms-muted">No images in this record.</p>
-					)}
+						))}
+					</div>
+					{!images.length && <p className="cms-muted">No images in this record.</p>}
 				</section>
 			) : (
 				<>
-					{(images.length > 0 || (changes && mediaChanged)) && (
+					{bodyChanged && (
+						<section className="cms-revised-passage">
+							<h3>Notes &amp; story · {before ? "Revised passage" : "Added"}</h3>
+							{passages.after ? (
+								<Prose source={passages.after} previousSource={passages.before} />
+							) : (
+								<p className="cms-muted">This passage was removed.</p>
+							)}
+							{passages.before && (
+								<details className="cms-details">
+									<summary>Earlier wording</summary>
+									<Prose source={passages.before} />
+								</details>
+							)}
+						</section>
+					)}
+					{mediaChanged && (
 						<section>
-							<h3>Images{changes && mediaChanged ? " · Changed" : ""}</h3>
-							{images.map((im, i) => (
-								<div key={i}>
-									<ContentPicture image={im} urls={urls} />
-									<p className="cms-muted">
-										{im.alt ? "Image description: " + im.alt : "No image description yet."}
-									</p>
-								</div>
-							))}
-							{!images.length && <p className="cms-muted">Images removed.</p>}
-							{changes && mediaChanged && before && (
+							<h3>Images · Changed</h3>
+							<div className="cms-review-photos">
+								{images.map((im, i) => (
+									<div key={im.image + ":" + i}>
+										<ContentPicture image={im} urls={urls} />
+										<p className="cms-muted">{im.alt || "No image description yet."}</p>
+									</div>
+								))}
+							</div>
+							{!images.length && <p>Images removed.</p>}
+							{before && (
 								<details className="cms-details">
 									<summary>Earlier images and descriptions</summary>
-									{recordImages(before).map((im, i) => (
-										<div key={i}>
-											<ContentPicture image={im} urls={urls} />
-											<p className="cms-muted">{im.alt || "No earlier image description."}</p>
-										</div>
-									))}
+									<div className="cms-review-photos">
+										{recordImages(before).map((im, i) => (
+											<ContentPicture key={i} image={im} urls={urls} />
+										))}
+									</div>
 								</details>
 							)}
 						</section>
 					)}
 					<dl className="cms-reading-facts">
-						{fields
-							.filter((field) => !["title", "image", "images", "image_alt"].includes(field.name))
-							.map((field) => (
+						{changed
+							.filter((f) => !["images", "image", "image_alt", "image_variants"].includes(f.name))
+							.map((f) => (
 								<ReadingField
-									key={field.name}
-									field={field}
-									value={data[field.name]}
-									before={before?.data[field.name]}
+									key={f.name}
+									field={f}
+									value={data[f.name]}
+									before={before?.data[f.name]}
 									documents={documents}
-									changes={changes}
+									changes
 								/>
 							))}
 					</dl>
-					<section>
-						<h3>Notes &amp; story{changes && before?.body !== doc.body ? " · Changed" : ""}</h3>
-						{doc.body ? <Prose source={doc.body} /> : <p className="cms-muted">No notes.</p>}
-					</section>
-					{changes && before && before.body !== doc.body && (
-						<details className="cms-details">
-							<summary>Earlier wording</summary>
-							<Prose source={before.body || "No earlier notes."} />
-						</details>
+					{!bodyChanged && !changed.length && (
+						<p className="cms-muted">No changes in this record.</p>
+					)}
+					{before && (
+						<p className="cms-muted">
+							Unchanged content is omitted here. Read shows the complete edition.
+						</p>
 					)}
 				</>
 			)}

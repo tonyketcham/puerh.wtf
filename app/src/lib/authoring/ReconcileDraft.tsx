@@ -1,6 +1,8 @@
 "use client"
 import { useId, useMemo, useState } from "react"
 import Link from "next/link"
+import { useCms } from "./runtime"
+import { usePreviewAssets } from "./use-preview-assets"
 import ReadingPreview, { ContentPicture, Prose, useAssetUrls } from "./ReadingPreview"
 import {
 	editorialLabel,
@@ -215,11 +217,22 @@ function ReconciliationSession({ draft, remote, head, documents, onApply }: Reco
 		[applying, setApplying] = useState(false),
 		[error, setError] = useState("")
 	const prefix = useId(),
-		urls = useAssetUrls(draft.assets)
+		{ state } = useCms()
 	const result = useMemo(() => reconcileDraft(draft, remote, choices), [draft, remote, choices])
 	const previewDocuments = result.document
 		? documents.filter((document) => document.id !== draft.id).concat(result.document)
 		: documents
+	const media = usePreviewAssets(
+		result.document || undefined,
+		remote,
+		state.drafts,
+		draft.branch,
+		head,
+		draft.branch,
+		head,
+		{ documents: previewDocuments, beforeDocuments: documents }
+	)
+	const urls = useAssetUrls(media.assets)
 	return (
 		<section
 			className="cms-reconciliation"
@@ -260,13 +273,21 @@ function ReconciliationSession({ draft, remote, head, documents, onApply }: Reco
 							urls={urls}
 						/>
 					))}
-					{result.document && (
+					{media.error && (
+						<p className="cms-error" role="alert">
+							{media.error}{" "}
+							<button type="button" onClick={media.retry}>
+								Retry images
+							</button>
+						</p>
+					)}
+					{result.document && !media.loading && !media.error && (
 						<div style={{ marginTop: "1.5rem" }}>
 							<h3>Reconciled reading preview</h3>
 							<ReadingPreview
 								document={result.document}
 								documents={previewDocuments}
-								assets={draft.assets}
+								assets={media.assets}
 								before={remote}
 							/>
 						</div>

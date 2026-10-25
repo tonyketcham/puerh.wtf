@@ -1,3 +1,5 @@
+import { withPhotoCaptions, type PhotoCaption } from "./photo-captions"
+import photoCaptions from "@/generated/authoring-captions.json"
 import { gql } from "graphql-request"
 import * as flatbread from "./flatbread"
 import {
@@ -317,7 +319,14 @@ export async function getSession(slug: string): Promise<SessionFull | null> {
 	const { Session } = await flatbread.request<{ Session: SessionFull | null }>(query, {
 		id: sessionId,
 	})
-	return Session
+	if (!Session) return null
+	const captions = (photoCaptions as Record<string, PhotoCaption[]>)[Session.id]
+	return captions
+		? {
+				...Session,
+				images: withPhotoCaptions(Session.images, captions),
+		  }
+		: Session
 }
 
 export async function getOrigins(): Promise<Origin[]> {

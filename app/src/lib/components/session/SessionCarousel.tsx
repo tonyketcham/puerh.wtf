@@ -12,7 +12,7 @@ import BoxCarousel, {
 	type RotationDirection,
 } from "@/lib/components/BoxCarousel"
 import { currentLiquorAtom, hoveredNoteStageAtom } from "@/lib/store/sessionAtom"
-import { liftLiquor, rgbCss } from "@/lib/liquor"
+import { liftLiquor, rgbCss, type LiquorColor } from "@/lib/liquor"
 import { buildStageImageMap } from "@/lib/noteStages"
 import CubeCaption, { createCubeCaptionStore } from "./CubeCaption"
 import styles from "./SessionCarousel.module.css"
@@ -20,6 +20,8 @@ import styles from "./SessionCarousel.module.css"
 type ImageItem = {
 	image: string
 	alt: string
+	caption?: string
+	variants?: readonly import("@/lib/components/ResponsiveImage").ResponsiveVariant[]
 }
 
 /** How long the cube lingers on a note's photo after the pointer leaves the note */
@@ -34,6 +36,12 @@ const navButton = cn(
 // ---------------------------------------------------------------------------
 
 interface SessionCarouselProps {
+	/** Scale the visitor cube proportionally inside a boxed editorial preview. */
+	fitToContainer?: boolean
+
+	/** Boxed previews supply their own color and isolated note-stage store. */
+	liquorColor?: LiquorColor
+
 	images: ImageItem[]
 	direction?: RotationDirection
 	recordingKey?: string
@@ -72,6 +80,8 @@ interface SessionCarouselProps {
  */
 export default function SessionCarousel({
 	images,
+	liquorColor,
+	fitToContainer = false,
 	direction = "right",
 	recordingKey,
 	cssRotation = 12,
@@ -118,8 +128,8 @@ export default function SessionCarousel({
 	const height = useMemo(() => {
 		// 16:9 ratio with bounds similar to previous hero height
 		const computed = Math.round((width * 9) / 16)
-		return Math.max(320, Math.min(560, computed))
-	}, [width])
+		return fitToContainer ? Math.round((width * 320) / 288) : Math.max(320, Math.min(560, computed))
+	}, [width, fitToContainer])
 
 	const items: CarouselItem[] = useMemo(
 		() =>
@@ -128,12 +138,14 @@ export default function SessionCarousel({
 				type: "image",
 				src: img.image,
 				alt: img.alt,
+				variants: img.variants,
 			})),
 		[images]
 	)
 	/** Remount the cube when the photo set changes (session navigation) */
 	const itemsKey = useMemo(() => items.map((item) => item.src).join("|"), [items])
 	const alts = useMemo(() => items.map((item) => item.alt), [items])
+	const captions = useMemo(() => images.map((image) => image.caption), [images])
 
 	const stageMap = useMemo(() => buildStageImageMap(images), [images])
 
@@ -222,7 +234,8 @@ export default function SessionCarousel({
 		captionStore.set({ index: 0, direction: 1 })
 	}, [itemsKey, captionStore])
 
-	const liquor = useAtomValue(currentLiquorAtom)
+	const liveLiquor = useAtomValue(currentLiquorAtom)
+	const liquor = liquorColor ?? liveLiquor
 	const accent = useMemo(() => rgbCss(liftLiquor(liquor.rgb)), [liquor])
 
 	const handlePrevious = () => carouselRef.current?.prev()
@@ -241,6 +254,7 @@ export default function SessionCarousel({
 				)}
 				style={{
 					rotate: cssRotation,
+					width: fitToContainer ? "clamp(160px, 65cqi, 288px)" : undefined,
 					minHeight: height + 16, // Reserve height (height + padding)
 				}}
 				initial={{ scale: 0.92, opacity: 0 }}
@@ -301,6 +315,7 @@ export default function SessionCarousel({
 							store={captionStore}
 							stages={stageMap.stages}
 							alts={alts}
+							captions={captions}
 							accent={accent}
 						/>
 

@@ -9,7 +9,6 @@ import { sortSessions, type SessionSort } from "@/lib/sessionSort"
 import type { PageKind } from "@/lib/peek"
 import type { ExplorerSession } from "@/lib/types/session"
 import { cn } from "@/lib/utils/cn"
-import type { EntityModel } from "./model"
 
 const SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -21,6 +20,8 @@ type Group = {
 	sessions: ExplorerSession[]
 }
 
+type SessionGrouping = { kind: "origin" | "category"; slug: string }
+
 /**
  * ── Sessions ── as Find All References (plan §3.2): every session behind the entity as a
  * SessionCard, sortable by date / vintage / rating, and grouped by child where the entity is a
@@ -30,13 +31,15 @@ type Group = {
  * Cards are server-rendered (SessionCard computes ages at build time) and handed in by slug.
  */
 export default function SessionsList({
-	model,
+	sessions,
+	grouping,
 	index,
 	title,
 	cards,
 	recordingKey,
 }: {
-	model: EntityModel
+	sessions: ExplorerSession[]
+	grouping?: SessionGrouping
 	index: RelationIndex
 	title: string
 	cards: Record<string, ReactNode>
@@ -44,13 +47,18 @@ export default function SessionsList({
 }) {
 	const reduce = useReducedMotion() ?? false
 	const [sort, setSort] = useState<SessionSort>("date")
-	const groupable = model.kind === "origin" || model.kind === "category"
+	const kind = grouping?.kind
+	const slug = grouping?.slug
+	const groupable = kind !== undefined
 	const [grouped, setGrouped] = useState(true)
 
-	const sorted = useMemo(() => sortSessions(model.sessions, sort), [model.sessions, sort])
+	const sorted = useMemo(() => sortSessions(sessions, sort), [sessions, sort])
 	const groups = useMemo(
-		() => (groupable && grouped ? groupSessions(model, index, sorted) : null),
-		[groupable, grouped, model, index, sorted]
+		() =>
+			kind !== undefined && slug !== undefined && grouped
+				? groupSessions(kind, slug, index, sorted)
+				: null,
+		[kind, slug, grouped, index, sorted]
 	)
 	const showGroups = !!groups && groups.length > 1
 
@@ -60,8 +68,8 @@ export default function SessionsList({
 		setArriving(false)
 	}, [])
 	const order = useMemo(
-		() => new Map(model.sessions.map((s, i) => [s._slug, i] as const)),
-		[model.sessions]
+		() => new Map(sessions.map((s, i) => [s._slug, i] as const)),
+		[sessions]
 	)
 
 	const card = (s: ExplorerSession) => {
@@ -90,7 +98,7 @@ export default function SessionsList({
 		)
 	}
 
-	if (!model.sessions.length) {
+	if (!sessions.length) {
 		return (
 			<p className="text-sm text-white/45" data-recording-key={recordingKey}>
 				{"// no references to "}
@@ -104,7 +112,7 @@ export default function SessionsList({
 		<div className="space-y-4" data-recording-key={recordingKey}>
 			<div className="flex items-center gap-2 text-[11px] text-white/35">
 				<span>
-					{model.sessions.length} {model.sessions.length === 1 ? "reference" : "references"}
+					{sessions.length} {sessions.length === 1 ? "reference" : "references"}
 					{showGroups && ` in ${groups!.length} groups`}
 				</span>
 				<span className="flex-1" />
@@ -116,7 +124,7 @@ export default function SessionsList({
 						title={
 							grouped
 								? "Show one flat list"
-								: `Group by ${model.kind === "origin" ? "child origin" : "style"}`
+								: `Group by ${kind === "origin" ? "child origin" : "style"}`
 						}
 						className={cn(
 							"flex items-center gap-1 h-5 px-1.5 rounded-sm text-[10px] leading-none outline-none transition-colors",
@@ -252,12 +260,11 @@ function GroupGlyph({ grouped, reduce }: { grouped: boolean; reduce: boolean }) 
  * the list's sort order holds.
  */
 function groupSessions(
-	model: EntityModel,
+	kind: SessionGrouping["kind"],
+	slug: string,
 	index: RelationIndex,
 	sorted: ExplorerSession[]
 ): Group[] {
-	const kind = model.kind
-	const slug = model.node?.slug ?? model.slug
 	const childKind: PageKind = kind === "category" ? "style" : "origin"
 	const children = index.children[kind].get(slug) ?? []
 	const groups = new Map<string, Group>()

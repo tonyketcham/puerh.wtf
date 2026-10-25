@@ -30,8 +30,6 @@
 /test-results/
 /playwright-report/
 
-# vue
-/vue
 .flatbread-codegen-cache.json
 next-env.d.ts
 

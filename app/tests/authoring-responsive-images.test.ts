@@ -3,8 +3,9 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
 import sharp from "sharp"
+import { withPhotoCaptions } from "../src/lib/photo-captions"
 import { stringify } from "yaml"
-import { buildAuthoringImageIndex } from "../scripts/authoring-images.mjs"
+import { buildAuthoringImageIndex, buildPhotoCaptionIndex } from "../scripts/authoring-images.mjs"
 
 test("published session/vendor variant metadata builds a shared public map and validates actual bytes", async () => {
 	const root = await mkdtemp(path.join(os.tmpdir(), "cms-image-index-"))
@@ -58,6 +59,62 @@ test("published session/vendor variant metadata builds a shared public map and v
 			document({ images: [{ image, variants: [variants[0], variants[0], variants[1]] }] })
 		)
 		await expect(buildAuthoringImageIndex({ contentDir, publicDir })).rejects.toThrow(/unique/)
+	} finally {
+		await rm(root, { recursive: true, force: true })
+	}
+})
+
+test("visible photo captions stay record-specific and independent of image descriptions", async () => {
+	const root = await mkdtemp(path.join(os.tmpdir(), "cms-captions-"))
+	try {
+		await writeFile(
+			path.join(root, "one.md"),
+			"---\n" +
+				stringify({
+					id: "one",
+					images: [
+						{ image: "/shared.webp", alt: "Accessible description", caption: "A golden cup" },
+						{ image: "/blank.webp", caption: "" },
+						{
+							image: "/shared.webp",
+							alt: "Another accessible description",
+							caption: "Last leaves",
+						},
+					],
+				}) +
+				"---\n"
+		)
+		await writeFile(
+			path.join(root, "two.md"),
+			"---\n" +
+				stringify({
+					id: "two",
+					images: [{ image: "/shared.webp", caption: "A different thought" }],
+				}) +
+				"---\n"
+		)
+		const captions = await buildPhotoCaptionIndex({ contentDir: root })
+		expect(captions).toEqual({
+			one: [
+				{ image: "/shared.webp", caption: "A golden cup" },
+				null,
+				{ image: "/shared.webp", caption: "Last leaves" },
+			],
+			two: [{ image: "/shared.webp", caption: "A different thought" }],
+		})
+		const images = [
+			{ image: "/shared.webp", alt: "Accessible description" },
+			{ image: "/blank.webp", alt: "Blank caption" },
+			{ image: "/shared.webp", alt: "Another accessible description" },
+		]
+		expect(withPhotoCaptions(images, captions.one)).toEqual([
+			{ ...images[0], caption: "A golden cup" },
+			images[1],
+			{ ...images[2], caption: "Last leaves" },
+		])
+		expect(withPhotoCaptions([{ image: "/replaced.webp" }], captions.one)).toEqual([
+			{ image: "/replaced.webp" },
+		])
 	} finally {
 		await rm(root, { recursive: true, force: true })
 	}
