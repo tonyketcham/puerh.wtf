@@ -3,12 +3,13 @@ import { notFound } from "next/navigation"
 import SessionCard from "@/lib/components/SessionCard"
 import type { PageKind } from "@/lib/peek"
 import { entityKeys, related, sessionColor, sessionsOf } from "@/lib/relations"
-import { getEntityPage, getOriginPoints, getServerIndex } from "./data"
+import { getEntityPage, getOriginPoints, getServerIndex } from "@/lib/content/entities.server"
 import type { DotMapPoint } from "./DotMap"
 import EntityPage from "./EntityPage"
 import { getMapPoints } from "@/lib/components/map/points"
 import Markdown, { paragraphCount } from "./Markdown"
-import { blendColors, buildEntityModel, liftedColor } from "./model"
+import { buildEntityModel } from "./model"
+import { blendColors, liftedColor } from "@/lib/sessionAnalysis"
 
 /** Kinds whose hero sets the description's first paragraph as prose (the rest goes to Notes). */
 const LEAD_KINDS: readonly PageKind[] = ["style", "category", "cultivar", "vessel"]

@@ -12,12 +12,13 @@ import { peekFileName, peekFilter, type PageKind } from "@/lib/peek"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import { cn } from "@/lib/utils/cn"
 import AtAGlance from "./AtAGlance"
-import type { EntityPageData } from "./data"
+import type { EntityPageData } from "@/lib/content/entities"
 import type { DotMapPoint } from "./DotMap"
 import type { MapPoint } from "@/lib/components/map/points"
 import EntityTitle from "./EntityTitle"
 import Hero from "./Hero"
-import { buildEntityModel, liquorStops, type EntityModel } from "./model"
+import { buildEntityModel, type EntityModel } from "./model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import Related from "./Related"
 import Section from "./Section"
 import SessionsList from "./SessionsList"
@@ -119,7 +120,17 @@ export default function EntityPage({
 					aside={<span className="text-[11px] text-white/25">find all references</span>}
 					recordingKey="entity-sessions"
 				>
-					<SessionsList model={model} index={index} title={data.title} cards={cards} />
+					<SessionsList
+						sessions={model.sessions}
+						grouping={
+							model.kind === "origin" || model.kind === "category"
+								? { kind: model.kind, slug: model.node?.slug ?? model.slug }
+								: undefined
+						}
+						index={index}
+						title={data.title}
+						cards={cards}
+					/>
 				</Section>
 
 				<Section id="related" label="Related" recordingKey="entity-related">

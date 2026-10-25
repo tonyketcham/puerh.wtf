@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import StyleIndex from "@/lib/components/entity/indexes/StyleIndex"
-import { getEntityList } from "@/lib/components/entity/page/data"
+import { getEntityList } from "@/lib/content/entities.server"
 
 export const metadata: Metadata = {
 	title: "Styles · puerh.wtf",

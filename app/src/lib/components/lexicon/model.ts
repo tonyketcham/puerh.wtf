@@ -3,12 +3,12 @@
  * all references), their stats, the whole log as reference, and one blended liquor color.
  * Pure module (no React): the page, the Properties panel and the status bar share it.
  */
-import { blendColors, liftedColor, type EntityModel } from "@/lib/components/entity/page/model"
+import { blendColors, liftedColor, type SessionAnalysis } from "@/lib/sessionAnalysis"
 import { lexiconRefs, type LexiconEntry } from "@/lib/lexicon"
 import { computeStats, sessionColor, type RelationIndex } from "@/lib/relations"
 import type { ExplorerSession } from "@/lib/types/session"
 
-export type WordModel = EntityModel & { entry: LexiconEntry }
+export type WordModel = SessionAnalysis & { entry: LexiconEntry }
 
 const FALLBACK = "#d9a441"
 
@@ -17,15 +17,10 @@ export function buildWordModel(index: RelationIndex, entry: LexiconEntry): WordM
 	const stats = computeStats(sessions)
 	const accent = stats.liquor.length ? blendColors(stats.liquor) : FALLBACK
 	return {
-		// EntityModel's kind only decides whether references group under children (origins,
-		// categories); a word is flat, like a vendor
-		kind: "vendor",
-		slug: entry.slug,
-		node: null,
 		sessions,
 		direct: sessions.length,
 		stats,
-		reference: { label: "the whole log", node: null, stats: computeStats(index.sessions) },
+		reference: { label: "the whole log", stats: computeStats(index.sessions) },
 		accent,
 		accentText: liftedColor(accent, 0.32),
 		entry,

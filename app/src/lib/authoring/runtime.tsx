@@ -53,6 +53,7 @@ export interface CmsState {
 	busy: boolean
 	lastPR: CmsPullRequest | null
 	pendingOperation: PendingPush | null
+	pendingWriteId: string | null
 }
 export const cmsAtom = atom<CmsState>({
 	phase: "loading",
@@ -71,6 +72,7 @@ export const cmsAtom = atom<CmsState>({
 	busy: false,
 	lastPR: null,
 	pendingOperation: null,
+	pendingWriteId: null,
 })
 const pending = new Map<string, Promise<unknown>>()
 function namespace(s: CmsState): DraftNamespace {
@@ -276,6 +278,7 @@ export function useCms() {
 				draft = createDraft(doc, cat.head, cat.branch, pr?.number)
 				await persist(draft)
 			}
+			update({ pendingWriteId: draft.id })
 			router.push("/write/?id=" + encodeURIComponent(draft.id))
 		} catch (error) {
 			reportFailure(error)
@@ -819,8 +822,25 @@ export default function CmsRuntime() {
 		cms = useCms(),
 		pathname = usePathname(),
 		router = useRouter(),
-		handled = useRef<number | null>(null)
+		handled = useRef<number | null>(null),
+		committedPathname = useRef(pathname)
 	const [loadAttempt, setLoadAttempt] = useState(0)
+	useEffect(() => {
+		const clearPendingWrite = () =>
+			store.set(cmsAtom, (s) =>
+				s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }
+			)
+		window.addEventListener("popstate", clearPendingWrite)
+		return () => window.removeEventListener("popstate", clearPendingWrite)
+	}, [store])
+	useEffect(() => {
+		const changed = committedPathname.current !== pathname
+		committedPathname.current = pathname
+		if (state.phase !== "ready" || (changed && pathname !== "/write/" && pathname !== "/write"))
+			store.set(cmsAtom, (s) =>
+				s.pendingWriteId === null ? s : { ...s, pendingWriteId: null }
+			)
+	}, [pathname, state.phase, store])
 	useEffect(() => {
 		let alive = true
 		;(async () => {

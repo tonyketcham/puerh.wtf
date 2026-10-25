@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import { useAtomValue } from "jotai"
 import { lexiconOf } from "@/lib/lexicon"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
-import { buildWordModel } from "./model"
+import { buildWordModel } from "@/lib/components/lexicon/model"
 
 /** A word of the lexicon by slug, with its model, from the client relation index. */
 export function useLexiconWord(slug: string | null) {
