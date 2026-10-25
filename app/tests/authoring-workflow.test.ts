@@ -421,6 +421,9 @@ test("lost push response resumes exact request after reload and preserves newer 
 	await page.goto("/working-changes/")
 	await page.reload()
 	await page.getByRole("button", { name: "Resume pending push", exact: true }).click()
+	await expect(
+		page.getByRole("status").filter({ hasText: "Pushed 1 records to draft PR #101." })
+	).toBeVisible()
 	await expect(page.getByRole("button", { name: "Resume pending push", exact: true })).toHaveCount(
 		0
 	)
