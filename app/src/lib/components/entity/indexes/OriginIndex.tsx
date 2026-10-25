@@ -15,7 +15,7 @@ import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import type { ExplorerSession } from "@/lib/types/session"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils/cn"
-import type { EntityListItem } from "../page/data"
+import type { EntityListItem } from "@/lib/content/entities"
 import { EntityLink, IndexHeader } from "./IndexParts"
 
 const EASE = [0.22, 1, 0.36, 1] as const

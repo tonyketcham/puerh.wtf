@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import OriginIndex from "@/lib/components/entity/indexes/OriginIndex"
-import { getEntityList } from "@/lib/components/entity/page/data"
+import { getEntityList } from "@/lib/content/entities.server"
 import { getMapPoints } from "@/lib/components/map/points"
 
 export const metadata: Metadata = {

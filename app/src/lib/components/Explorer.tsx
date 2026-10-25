@@ -19,7 +19,7 @@ import {
 } from "react"
 import { usePathname } from "next/navigation"
 import { LayoutGroup, MotionConfig, useReducedMotion } from "motion/react"
-import { useAtom, useStore } from "jotai"
+import { useAtom, useAtomValue, useStore } from "jotai"
 import "simplebar-react/dist/simplebar.min.css"
 import {
 	EMPTY_FACETS,
@@ -34,7 +34,7 @@ import { sessionMatchesDescriptor } from "@/lib/descriptors"
 import { LEGACY_ORIGIN_SLUGS, originChain } from "@/lib/origins"
 import { buildRelationIndex, sessionsOf } from "@/lib/relations"
 import type { PageKind } from "@/lib/peek"
-import { descriptorAtom, explorerSortAtom } from "@/lib/store/sessionAtom"
+import { descriptorAtom, explorerSortAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import { sortSessions } from "@/lib/sessionSort"
 import SessionSortToggle from "@/lib/components/explorer/SessionSortToggle"
 import YearRuler from "@/lib/components/explorer/YearRuler"
@@ -241,7 +241,11 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 	const { drawerOpen, closeDrawer, drawerRef } = useDrawer(pathname)
 
 	const query = q.toLowerCase().trim()
-	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
+	const sharedIndex = useAtomValue(relationIndexAtom)
+	const index = useMemo(
+		() => (sharedIndex.sessions === sessions ? sharedIndex : buildRelationIndex(sessions)),
+		[sharedIndex, sessions]
+	)
 
 	// Reuse the non-year pool while scrubbing: relation/query matching does not change
 	// with either handle. Only membership in the selected year set needs recomputing.
@@ -335,7 +339,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			tags: new Map<string, { label: string }>(),
 			vessels: new Map<string, { label: string }>(),
 		}
-		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color ?? undefined })
 		for (const st of index.nodes.style.values())
 			map.styles.set(st.slug, { label: st.title, color: st.color ?? undefined })
 		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })

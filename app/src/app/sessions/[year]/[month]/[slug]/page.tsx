@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
-import { getSession, getSessions } from "@/lib/api"
+import { getSession, getSessionRoutes } from "@/lib/api"
 import { notFound } from "next/navigation"
-import SessionCarousel from "@/components/session/SessionCarousel"
+import SessionCarousel from "@/lib/components/session/SessionCarousel"
 import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
 import { generateSessionRotation } from "@/app/sessions/[year]/[month]/[slug]/generateSessionRotation"
 import { liquorVars } from "@/lib/liquor"
@@ -19,7 +19,7 @@ interface SessionPageProps {
 }
 
 export async function generateStaticParams() {
-	const sessions = await getSessions()
+	const sessions = await getSessionRoutes()
 	return sessions.map((session) => {
 		const date = session.date ? new Date(session.date) : null
 		return {

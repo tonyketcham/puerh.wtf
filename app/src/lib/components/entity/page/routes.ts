@@ -5,7 +5,7 @@
 import type { Metadata } from "next"
 import { ENTITY_META } from "@/lib/entities"
 import type { PageKind } from "@/lib/peek"
-import { getEntityPage, getEntitySlugs, summarize } from "./data"
+import { getEntityPage, getEntitySlugs, summarize } from "@/lib/content/entities.server"
 
 export type SlugParams = { params: Promise<{ slug: string }> }
 

@@ -1,6 +1,6 @@
 import SessionLog from "@/lib/components/home/SessionLog"
 import { getExplorerSessions, getVendors } from "@/lib/api"
-import { getEntityList } from "@/lib/components/entity/page/data"
+import { getEntityList } from "@/lib/content/entities.server"
 import type { DrawnVessel } from "@/lib/components/teaware-drawing/TeawareDrawing"
 import Hero, { type HeroStats } from "@/lib/components/home/Hero"
 

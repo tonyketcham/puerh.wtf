@@ -7,7 +7,7 @@ import { entityHref } from "@/lib/entities"
 import type { PageKind } from "@/lib/peek"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import EntityTitle from "../page/EntityTitle"
-import { liquorStops } from "../page/model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import { useMorphClick } from "../page/viewTransition"
 
 /**

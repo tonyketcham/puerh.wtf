@@ -11,6 +11,6 @@ export type TreeNode = {
 	children?: TreeNode[]
 	vendor?: { title: string }[] | null
 	style?: {
-		category: Category
-	}[]
+		category: Pick<Category, "_slug" | "title" | "color"> | null
+	}[] | null
 }

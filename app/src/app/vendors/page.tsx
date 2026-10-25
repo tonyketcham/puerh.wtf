@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import VendorIndex from "@/lib/components/entity/indexes/VendorIndex"
-import { getEntityList, getOriginPoints, getServerIndex } from "@/lib/components/entity/page/data"
+import { getEntityList, getOriginPoints, getServerIndex } from "@/lib/content/entities.server"
 import type { DotMapPoint } from "@/lib/components/entity/page/DotMap"
 import { related } from "@/lib/relations"
 

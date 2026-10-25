@@ -2,7 +2,7 @@
  * Server half of the lexicon routes: the lexicon built from the same sessions the root layout
  * hydrates (so static params, metadata and the client agree on every word and slug).
  */
-import { getServerIndex } from "@/lib/components/entity/page/data"
+import { getServerIndex } from "@/lib/content/entities.server"
 import { lexiconOf, type Lexicon } from "@/lib/lexicon"
 import type { RelationIndex } from "@/lib/relations"
 

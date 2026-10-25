@@ -27,6 +27,8 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 .flatbread-codegen-cache.json
 next-env.d.ts
