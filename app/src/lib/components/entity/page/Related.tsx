@@ -5,7 +5,7 @@ import EntityRef from "@/lib/components/entity/EntityRef"
 import { ENTITY_META, type EntityKind } from "@/lib/entities"
 import { related, type RelationIndex } from "@/lib/relations"
 import { cn } from "@/lib/utils/cn"
-import type { EntityCrumb, EntityPageData } from "./data"
+import type { EntityCrumb, EntityPageData } from "@/lib/content/entities"
 import type { EntityModel } from "./model"
 import RelatedGroup from "./RelatedGroup"
 
