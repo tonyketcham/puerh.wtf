@@ -1,53 +1,54 @@
-# puerh.wtf - Next.js Migration
+# puerh.wtf app
 
-This is the Next.js version of puerh.wtf, migrated from SvelteKit 1.0.
+The public tea notebook is a Next App Router application exported as static pages.
+Flatbread reads the canonical Markdown/frontmatter in `content/` during development/build.
+The contextual editor uses a separate trusted CMS endpoint.
 
-## Features
+## Quickstart
 
-- **Static Site Generation (SSG)** - All pages are pre-rendered at build time
-- **Flatbread CMS** - Headless CMS for content management
-- **TypeScript** - Full type safety
-- **Tailwind CSS** - Utility-first CSS framework
-- **Responsive Design** - Mobile-first approach
+Install dependencies from the repository root with `pnpm install`. Then, from `app/`:
 
-## Getting Started
+```sh
+pnpm dev
+```
 
-1. Install dependencies:
+Open `http://localhost:3000`. This command starts Flatbread as well; its GraphQL endpoint
+defaults to `http://localhost:5057/graphql`. `FLATBREAD_URL` selects an intentionally different
+content endpoint. Asset preparation runs through `predev` and `prebuild`.
 
-   ```bash
-   pnpm install
-   ```
+`pnpm build` writes `out/`. Serve that directory to inspect the exported site; it does not
+require a Next runtime server. The maintained export-test server serves its real HTML,
+Flight payloads, workers and assets.
 
-2. Start the development server:
+## Verify
 
-   ```bash
-   pnpm dev
-   ```
+```sh
+pnpm exec playwright install chromium
+pnpm test:dev
+```
 
-3. Build for production:
-   ```bash
-   pnpm build
-   ```
+Use `PW_PORT` and `PW_FLATBREAD_PORT` to isolate a checkout's test servers. For the
+production-export lane, build with fixtures explicitly enabled:
 
-## Project Structure
+```sh
+PUERH_TEST_FIXTURES=1 pnpm build
+pnpm test:export
+```
 
-- `src/app/` - Next.js App Router pages and layouts
-- `src/lib/` - Shared utilities, components, and types
-- `content/` - Flatbread CMS content (unchanged from original)
-- `static/` - Static assets (unchanged from original)
+In PowerShell set `$env:PUERH_TEST_FIXTURES="1"` before the build and remove that environment
+value afterward. Rebuild without the fixture flag before using the output for deployment.
+See [test instructions](tests/README.md) for both lanes, browser channels and report locations.
 
-## Migration Notes
+`pnpm perf:interaction [URL] [output.json] --scenario vintage|map-pan-zoom|origin-scroll`
+collects real-input frame intervals and long tasks. The default is headed; `--headless`
+validates the collector. Build/source labels supplied with `--build`/`--source` remain unverified.
 
-- Converted all Svelte components to React components
-- Replaced SvelteKit API routes with Next.js API functions
-- Maintained the same visual design and functionality
-- Preserved all content and Flatbread configuration
-- Updated build system to use Next.js instead of Vite
+## Find the owner
 
-## Environment Variables
+See the [architecture map](../docs/architecture.md) before editing content readers, generated
+files, shared session/lexicon UI, filters or map workers. Use `pnpm codegen`, `pnpm liquor`,
+`pnpm geo` and `pnpm authoring:assets` for their generated artifacts.
 
-- `FLATBREAD_URL` - URL for the Flatbread GraphQL endpoint (defaults to `http://localhost:3001/graphql`)
-
-## Development
-
-The development server will start on `http://localhost:3000` by default. Make sure Flatbread is running on port 3001 for content to load properly.
+For contextual editing, local service configuration and verified production status, follow
+[CMS setup](../docs/in-app-cms-setup.md). Public static pages and the native
+`api/cms.ts` function have separate deployment responsibilities; see [Vercel deployment](../VERCEL.md).
