@@ -3,7 +3,7 @@ import "./authoring.css"
 import { atom, useAtomValue, useStore } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { authoringBridgeAtom } from "./bridge"
+import { authoringBridgeAtom, setAuthoringActivation } from "./bridge"
 import {
 	cmsRequest,
 	fetchCatalog,
@@ -739,7 +739,7 @@ export function useCms() {
 			if (Object.values(store.get(cmsAtom).errors).some(Boolean))
 				throw new Error("Some edits could not be saved. Export local drafts before signing out.")
 			await cmsRequest("logout", { method: "POST", csrf: s.session?.csrfToken, data: {} })
-			localStorage.removeItem("puerh:editing")
+			setAuthoringActivation(false)
 			store.set(authoringBridgeAtom, (bridge) => ({
 				...bridge,
 				activated: false,
@@ -904,7 +904,7 @@ export default function CmsRuntime() {
 					}
 				} catch {}
 				store.set(cmsAtom, base)
-				localStorage.setItem("puerh:editing", "enabled")
+				setAuthoringActivation(true)
 			} catch (e) {
 				if (alive)
 					store.set(cmsAtom, (s) => ({ ...s, phase: "error", error: (e as Error).message }))
@@ -977,7 +977,7 @@ export default function CmsRuntime() {
 						throw new Error(
 							"Some edits could not be saved. Export local drafts before disabling editing."
 						)
-					localStorage.removeItem("puerh:editing")
+					setAuthoringActivation(false)
 					store.set(authoringBridgeAtom, (b) => ({
 						...b,
 						activated: false,
@@ -1073,7 +1073,7 @@ export default function CmsRuntime() {
 					)}
 					<button
 						onClick={() => {
-							localStorage.removeItem("puerh:editing")
+							setAuthoringActivation(false)
 							store.set(authoringBridgeAtom, (b) => ({ ...b, activated: false, request: null }))
 						}}
 					>
