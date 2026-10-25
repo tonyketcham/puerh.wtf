@@ -66,6 +66,8 @@ export type EntityPageData = {
 	image: string | null
 	/** full description (markdown) */
 	description: string | null
+	/** Sanitized Markdown body supplied by Flatbread, separate from the frontmatter description. */
+	contentHtml: string | null
 	/** root first, not including the entity (origin chain; style → category) */
 	ancestors: EntityCrumb[]
 	/** every child, tasted or not (origin → origins; category → styles; style → cultivars) */
@@ -121,6 +123,7 @@ type Raw = RawRef & {
 	color?: string | null
 	image?: string | null
 	description?: string | null
+	_content?: { html?: string | null } | null
 	location?: string | null
 	municipality?: string | null
 	country?: string | null
@@ -153,6 +156,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 					title
 					image
 					description
+					_content { html }
 					location
 					municipality
 					country
@@ -173,6 +177,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 			query EntityPageOrigins {
 				allOrigins(sortBy: "_slug") {
 					description
+					_content { html }
 					groups
 					geo {
 						lat
@@ -198,6 +203,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 					title
 					color
 					description
+					_content { html }
 					category {
 						_slug
 						id
@@ -218,6 +224,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 					title
 					color
 					description
+					_content { html }
 				}
 			}
 		`,
@@ -236,6 +243,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 					volume_ml
 					image
 					description
+					_content { html }
 				}
 			}
 		`,
@@ -250,6 +258,7 @@ const QUERIES: Record<PageKind, { root: string; query: string }> = {
 					title
 					hanzi
 					description
+					_content { html }
 					styles {
 						_slug
 						id
@@ -494,6 +503,7 @@ export async function getEntityPage(kind: PageKind, slug: string): Promise<Entit
 		color: text(raw.color),
 		image: text(raw.image),
 		description: text(raw.description),
+		contentHtml: text(raw._content?.html),
 		ancestors: [],
 		children: [],
 		facts: [],

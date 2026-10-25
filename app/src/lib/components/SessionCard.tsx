@@ -1,3 +1,4 @@
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import Link from "next/link"
 import type { CSSProperties, ReactNode } from "react"
 import type { ExplorerSession, SessionPreviewWithFeatureImage } from "../types/session"
@@ -323,7 +324,8 @@ function Photo({ m, className }: { m: Model; className?: string }) {
 	return (
 		<div className={cn("relative overflow-hidden border-white/[0.07]", className)}>
 			{m.photo ? (
-				<img
+				<ResponsiveImage
+				sizes="(min-width: 1280px) 40vw, (min-width: 768px) 50vw, 100vw"
 					src={m.photo.image}
 					alt={m.photo.alt}
 					className="object-cover w-full h-full image-zoom"
