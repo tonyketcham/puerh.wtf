@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -31,15 +31,19 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm --filter puerh.wtf exec playwright install --with-deps
 
-      - name: Build app for testing
+      - name: Check the static export server
+        run: pnpm --filter puerh.wtf test:server
+
+      - name: Run development Playwright tests
+        run: pnpm --filter puerh.wtf test:dev
+
+      - name: Build the static export with test fixtures
         run: pnpm --filter puerh.wtf build
         env:
-          CI: true
+          PUERH_TEST_FIXTURES: "1"
 
-      - name: Run Playwright tests
-        run: pnpm --filter puerh.wtf test
-        env:
-          CI: true
+      - name: Run static export Playwright tests
+        run: pnpm --filter puerh.wtf test:export
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
