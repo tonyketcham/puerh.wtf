@@ -8,7 +8,7 @@ function formatDate(date: Date) {
 /**
  * Generates the route to the page for a given node.
  */
-export function buildLink(node: TreeNode): string {
+export function buildLink(node: Pick<TreeNode, "_collection" | "date" | "_slug">): string {
 	const collection = node?._collection ? plur(node._collection.toLowerCase()) : null;
 
 	const date = node?.date ? formatDate(new Date(node.date)) : null;

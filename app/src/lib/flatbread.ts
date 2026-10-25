@@ -79,7 +79,7 @@ async function send<T>(query: string, variables?: Record<string, unknown>): Prom
 const results = new Map<string, Promise<unknown>>()
 
 /** Run a Flatbread query (memoized, capped and retried during a production build). */
-export async function request<T = any>(query: string, variables?: Record<string, unknown>): Promise<T> {
+export async function request<T = unknown>(query: string, variables?: Record<string, unknown>): Promise<T> {
 	if (!isProduction) return client.request<T>(query, variables)
 
 	const key = `${query}\u0000${JSON.stringify(variables ?? {})}`
