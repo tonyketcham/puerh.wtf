@@ -361,11 +361,11 @@ export default function WriteWorkspace() {
 			{state.notice && (
 				<div className="cms-notice" role="status">
 					<p>{state.notice}</p>
-					{!!state.localRecoveries.length && (
+					{!!state.undoRecoveryId && (
 						<button
 							type="button"
 							disabled={state.busy || hasPending}
-							onClick={() => void undoLocalChange()}
+							onClick={() => void undoLocalChange(state.undoRecoveryId!)}
 						>
 							Undo
 						</button>

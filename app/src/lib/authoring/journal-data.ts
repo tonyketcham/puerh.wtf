@@ -38,7 +38,19 @@ export function journalSession(
 	): (Record<string, unknown> & { id: string; _slug: string; title: string })[] =>
 		(Array.isArray(ids) ? ids : ids ? [ids] : []).flatMap((id) => {
 			const d = find(collection, id)
-			return d ? [{ ...d.data, id: d.id, _slug: recordSlug(d), title: string(d.data.title) }] : []
+			return d
+				? [
+						{
+							...d.data,
+							...(typeof d.data.image === "string"
+								? { image: urls[assetPublicPath(d.data.image)] || assetPublicPath(d.data.image) }
+								: {}),
+							id: d.id,
+							_slug: recordSlug(d),
+							title: string(d.data.title),
+						},
+				  ]
+				: []
 		})
 	const origin = (id: unknown, seen = new Set<string>()): OriginRef | null => {
 		const d = find("origins", id)
@@ -302,12 +314,25 @@ export function journalMapPoints(documents: readonly CmsDocument[]): MapPoint[] 
 		})
 }
 
-/** Include only the session cards actually rendered by the native entity page. */
+/** Include only images rendered by the session provenance or native entity page. */
 export function previewDocuments(
 	document: CmsDocument | undefined,
 	catalog: readonly CmsDocument[] = []
 ): CmsDocument[] {
 	if (!document) return []
+	if (document.collection === "tastings") {
+		const vendors = new Set(
+			Array.isArray(document.data.vendor)
+				? document.data.vendor
+				: document.data.vendor
+				? [document.data.vendor]
+				: []
+		)
+		return [
+			document,
+			...catalog.filter((doc) => doc.collection === "vendors" && vendors.has(doc.id)),
+		]
+	}
 	const entity = journalEntity(document, catalog)
 	if (!entity) return [document]
 	const sessions = catalog.filter((d) => d.collection === "tastings")

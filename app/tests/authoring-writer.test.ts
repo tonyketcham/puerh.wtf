@@ -246,3 +246,60 @@ test("one photo editor preserves order, captions, image descriptions and reversi
 	await expect(cube.locator('[aria-label="Before the water meets the leaf."]')).toBeVisible()
 	await expect(cube.locator('img[alt="Twisted dry leaf on a tea tray."]').first()).toBeAttached()
 })
+
+test("writer Undo belongs only to the current archive notice and restores its exact record", async ({
+	page,
+}) => {
+	await writerFixture(page)
+	await page.getByRole("button", { name: "Discard this draft", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Draft set aside")
+	await page.getByRole("button", { name: "Dismiss notice", exact: true }).click()
+	await page.getByLabel("New record", { exact: true }).selectOption("tastings")
+	await page
+		.getByRole("textbox", { name: /^Tea name/ })
+		.fill("Session retained during vendor creation")
+	await page.getByRole("button", { name: "New vendor", exact: true }).click()
+	const inline = page.getByRole("group", { name: "New vendor", exact: true })
+	await inline.getByRole("textbox", { name: /^Name/ }).fill("A later vendor notice")
+	await inline.getByRole("button", { name: "Create & use vendor", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Added A later vendor notice")
+	const writerNotice = page.locator(".cms-write .cms-notice")
+	await expect(writerNotice.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+
+	await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+	await page.getByText("Browse repository content", { exact: true }).click()
+	await page.getByRole("combobox", { name: "Collection", exact: true }).selectOption("vendors")
+	await page.getByRole("searchbox", { name: "Find content", exact: true }).fill("white2tea")
+	await page
+		.locator(".cms-library-list")
+		.getByRole("button")
+		.filter({ hasText: "white2tea.md" })
+		.click()
+	await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("white2tea")
+	await expect(page.locator(".cms-global-notice")).toHaveCount(0)
+	const vendorUrl = page.url(),
+		wording = "Restore this exact vendor wording without restoring the earlier discarded session."
+	await page.getByLabel("Notes", { exact: true }).fill(wording)
+	await page.getByRole("button", { name: "Revert local edits", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Local edits reverted")
+	await expect(page.getByLabel("Notes", { exact: true })).not.toHaveValue(wording)
+	await writerNotice.getByRole("button", { name: "Undo", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Restored white2tea")
+	await expect(page).toHaveURL(vendorUrl)
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(wording)
+	await expect(writerNotice.getByRole("button", { name: "Undo", exact: true })).toHaveCount(0)
+
+	await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+	await expect(
+		page.getByRole("checkbox", {
+			name: "Include Session retained during vendor creation",
+			exact: true,
+		})
+	).toBeVisible()
+	await expect(
+		page.getByRole("checkbox", { name: "Include A quiet cup", exact: true })
+	).toHaveCount(0)
+	await page.getByText("Draft recovery", { exact: true }).click()
+	await expect(page.locator(".cms-recovered-drafts")).toContainText("A quiet cup")
+	await expect(page.locator(".cms-recovered-drafts")).not.toContainText("white2tea")
+})

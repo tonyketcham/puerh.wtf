@@ -91,7 +91,7 @@ function JournalContent({
 		liquor = getLiquorColor(slug),
 		accent = radarAccent(liquor)
 	const index = useMemo(() => buildRelationIndex(sessions), [sessions])
-	const session = useMemo(() => journalSession(doc, documents), [doc, documents])
+	const session = useMemo(() => journalSession(doc, documents, urls), [doc, documents, urls])
 	const images = useMemo(
 		() =>
 			recordImages(doc).map((im) => ({

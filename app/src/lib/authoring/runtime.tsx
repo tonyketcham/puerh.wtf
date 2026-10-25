@@ -1408,7 +1408,8 @@ export default function CmsRuntime() {
 		}
 	}, [bridge.request, state.phase, state, pathname, cms, store, router])
 	if (state.phase === "ready")
-		return (state.notice || state.error) && !pathname.startsWith("/working-changes") ? (
+		return (state.notice || state.error) &&
+			!["/write", "/working-changes"].includes(pathname.replace(/\/$/, "")) ? (
 			<aside className="cms-auth-notice cms-global-notice" role={state.error ? "alert" : "status"}>
 				<p>{state.error || state.notice}</p>
 				{!!state.undoRecoveryId && (
