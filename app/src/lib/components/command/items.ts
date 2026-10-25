@@ -12,7 +12,7 @@ import type { Category } from "@/lib/types/category"
 import { ENTITY_FACET, isEntityFiltered, type FacetKey, type FilterState } from "@/lib/filters"
 import { descriptorRegex, extractDescriptors } from "@/lib/descriptors"
 import { ENTITY_META, entityHref, type EntityKind } from "@/lib/entities"
-import type { EntityDetails } from "@/lib/entityDetails"
+import { EMPTY_ENTITY_DETAILS, type EntityDetails } from "@/lib/entityDetails"
 import { getLiquorColor, type LiquorColor } from "@/lib/liquor"
 import { originSearchText } from "@/lib/origins"
 import {
@@ -88,16 +88,6 @@ export type CommandIndex = {
 const yearOf = (s: ExplorerSession) =>
 	s.production_year ? String(Math.trunc(Number(s.production_year))) : null
 
-// (a local empty value: entityDetails.ts is server code, only its types come along)
-const NO_DETAILS: EntityDetails = {
-	origin: {},
-	vendor: {},
-	style: {},
-	category: {},
-	cultivar: {},
-	vessel: {},
-}
-
 const bare = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "")
 
 /** Same name, ignoring case and tone marks ("yiwu" names Yìwǔ). */
@@ -122,7 +112,7 @@ export function buildIndex(
 	sessions: ExplorerSession[],
 	vendors: Vendor[],
 	categories: Category[],
-	details: EntityDetails = NO_DETAILS,
+	details: EntityDetails = EMPTY_ENTITY_DETAILS,
 	rel: RelationIndex = buildRelationIndex(sessions)
 ): CommandIndex {
 	const teas: TeaEntry[] = sessions.map((s) => {
