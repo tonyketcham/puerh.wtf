@@ -7,7 +7,7 @@ import FlavorGlyph from "@/lib/components/command/FlavorGlyph"
 import { computeStats, sessionsOf } from "@/lib/relations"
 import { relationIndexAtom } from "@/lib/store/sessionAtom"
 import { cn } from "@/lib/utils/cn"
-import type { EntityListItem } from "../page/data"
+import type { EntityListItem } from "@/lib/content/entities"
 import { EntityLink, IndexHeader } from "./IndexParts"
 
 const EASE = [0.22, 1, 0.36, 1] as const
