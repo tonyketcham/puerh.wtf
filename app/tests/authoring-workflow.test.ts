@@ -10,7 +10,10 @@ import { COLLECTION_NAMES } from "../src/lib/authoring/types"
 // Full editorial flows include real WASM, reloads and durable network acknowledgements.
 test.setTimeout(120_000)
 
-async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = {}) {
+async function githubFixture(
+	page: Page,
+	options: { loseFirstPush?: boolean; signedOut?: boolean } = {}
+) {
 	const records = []
 	for (const collection of COLLECTION_NAMES)
 		for (const filename of await readdir(
@@ -44,7 +47,22 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 	const publicImageRequests: { path: string; status: number }[] = []
 	const catalogRequests: string[] = []
 	let sequence = 1,
-		reads = 0
+		reads = 0,
+		authenticated = !options.signedOut,
+		providerRedirects = 0,
+		returnTo = "/"
+	await page.route("https://github.com/**", async (route) => {
+		if (new URL(route.request().url()).pathname !== "/login/oauth/authorize") return route.abort()
+		providerRedirects++
+		const callback = new URL(route.request().url()).searchParams.get("redirect_uri")!
+		return route.fulfill({
+			contentType: "text/html",
+			body:
+				"<!doctype html><script>location.replace(" +
+				JSON.stringify(callback + "&code=fixture-code&state=fixture-state") +
+				")</script>",
+		})
+	})
 	await page.route("**/api/cms*", async (route) => {
 		reads++
 		const request = route.request(),
@@ -52,11 +70,31 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 			action = url.searchParams.get("action")
 		const ok = (body: unknown) =>
 			route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) })
+		if (action === "login" && options.signedOut) {
+			returnTo = url.searchParams.get("returnTo") || "/"
+			const callback = new URL("/api/cms?action=callback", request.url()).href
+			const provider =
+				"https://github.com/login/oauth/authorize?client_id=fixture-client&redirect_uri=" +
+				encodeURIComponent(callback) +
+				"&state=fixture-state"
+			// Separate navigations let Playwright intercept every simulated provider hop.
+			return route.fulfill({
+				contentType: "text/html",
+				body: "<!doctype html><script>location.replace(" + JSON.stringify(provider) + ")</script>",
+			})
+		}
+		if (action === "callback" && options.signedOut) {
+			authenticated = true
+			return route.fulfill({
+				status: 302,
+				headers: { Location: new URL(returnTo, request.url()).href },
+			})
+		}
 		if (action === "session")
 			return ok({
 				configured: true,
-				authenticated: true,
-				user: { login: "cms-editor" },
+				authenticated,
+				...(authenticated ? { user: { login: "cms-editor" } } : {}),
 				repository: { owner: "tonyketcham", name: "puerh.wtf", defaultBranch: "main" },
 				csrfToken: "fixture-csrf",
 			})
@@ -178,6 +216,12 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 		mediaRequests,
 		publicImageRequests,
 		catalogRequests,
+		get authenticated() {
+			return authenticated
+		},
+		get providerRedirects() {
+			return providerRedirects
+		},
 		get mediaReads() {
 			return mediaRequests.length
 		},
@@ -197,7 +241,9 @@ function sha(content: string) {
 async function command(page: Page, text: string) {
 	await expect(async () => {
 		if (!(await page.getByRole("combobox", { name: "Search or run a command" }).isVisible()))
-			await page.getByRole("button", { name: "Search and commands", exact: true }).click()
+			await page
+				.getByRole("button", { name: /^Search and commands(?: \(\d+ filters active\))?$/ })
+				.click()
 		await expect(page.getByRole("combobox", { name: "Search or run a command" })).toBeVisible({
 			timeout: 1500,
 		})
@@ -529,3 +575,133 @@ test("fresh-device PR editor reads private images, reloads its branch catalog an
 	expect(await image.evaluate((element: HTMLImageElement) => element.currentSrc)).toBe(currentSrc)
 	expect(errors).toEqual([])
 })
+
+test("first GitHub sign-in restores editing after a cold OAuth return to the root page", async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 1440, height: 1000 })
+	const fixture = await githubFixture(page, { signedOut: true }),
+		errors: string[] = []
+	page.on("pageerror", (error) => errors.push(error.message))
+	await page.goto("/")
+	expect(fixture.reads).toBe(0)
+	await command(page, "Enable editing")
+	const signIn = page.getByRole("link", { name: "Continue with GitHub", exact: true })
+	await expect(signIn).toHaveAttribute("href", "/api/cms?action=login&returnTo=%2F")
+	await signIn.click()
+	await expect(page).toHaveURL(/\/$/)
+	expect(fixture.providerRedirects).toBe(1)
+	expect(fixture.authenticated).toBe(true)
+	// No second Enable editing command: a full provider navigation discarded the original Jotai state.
+	await expect(page.locator(".cms-explorer-tools")).toBeAttached({ timeout: 15000 })
+	await command(page, "Working changes")
+	await expect(page.getByRole("heading", { name: "Working changes", exact: true })).toBeVisible()
+	expect(fixture.pushes).toHaveLength(0)
+	expect(errors).toEqual([])
+})
+
+test("Keep reading cancels remembered unauthenticated activation", async ({ page }) => {
+	const fixture = await githubFixture(page, { signedOut: true })
+	await page.goto("/")
+	await command(page, "Enable editing")
+	await expect(page.getByRole("link", { name: "Continue with GitHub", exact: true })).toBeVisible()
+	await page.getByRole("button", { name: "Keep reading", exact: true }).click()
+	await expect(page.locator(".cms-auth-notice")).toHaveCount(0)
+	expect(await page.evaluate(() => localStorage.getItem("puerh:editing"))).toBeNull()
+	const reads = fixture.reads
+	await page.reload()
+	await expect(page.getByRole("button", { name: "Search and commands", exact: true })).toBeVisible()
+	await expect(page.locator(".cms-auth-notice")).toHaveCount(0)
+	expect(fixture.reads).toBe(reads)
+})
+
+test("blocked activation storage preserves reading, editing and explicit disable", async ({
+	page,
+}) => {
+	await page.addInitScript(() => {
+		for (const name of ["getItem", "setItem", "removeItem"] as const) {
+			const original = Storage.prototype[name]
+			Object.defineProperty(Storage.prototype, name, {
+				configurable: true,
+				value: function (key: string, ...args: string[]) {
+					if (key === "puerh:editing")
+						throw new DOMException("Site data is blocked", "SecurityError")
+					return Reflect.apply(original, this, [key, ...args])
+				},
+			})
+		}
+	})
+	const fixture = await githubFixture(page),
+		errors: string[] = []
+	page.on("pageerror", (error) => errors.push(error.message))
+	await page.goto("/")
+	await expect(page.getByRole("button", { name: "Search and commands", exact: true })).toBeVisible()
+	expect(fixture.reads).toBe(0)
+	await openEditor(page)
+	await command(page, "Disable editing")
+	await expect(page.locator(".cms-explorer-tools")).toHaveCount(0)
+	await expect(page.locator(".cms-auth-notice")).toHaveCount(0)
+	await expect(page.getByRole("button", { name: "Search and commands", exact: true })).toBeVisible()
+	expect(errors).toEqual([])
+})
+
+for (const entry of ["contextual", "library"] as const)
+	for (const filtered of [false, true])
+		test(
+			"editing an existing vendor after a restored unrelated tag draft uses the vendor identity " +
+				entry +
+				(filtered ? " filtered" : ""),
+			async ({ page }) => {
+				await page.setViewportSize({ width: 1440, height: 1000 })
+				const fixture = await githubFixture(page),
+					errors: string[] = []
+				// Routing mocks normally disable HTTP cache; retain the production cache behavior here.
+				const network = await page.context().newCDPSession(page)
+				await network.send("Network.enable")
+				await network.send("Network.setCacheDisabled", { cacheDisabled: false })
+				page.on("pageerror", (error) => errors.push(error.message))
+				await page.goto(filtered ? "/?q=white2tea" : "/")
+				await openEditor(page)
+				await command(page, "Working changes")
+				await page.getByLabel("New record", { exact: true }).selectOption("tags")
+				await page.getByRole("textbox", { name: /^Name/ }).fill("An unrelated local tag")
+				await expect(
+					page.getByRole("status").filter({ hasText: "Saved on this device" })
+				).toBeVisible()
+				const tagId = new URL(page.url()).searchParams.get("id")!
+				await page.reload()
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				const vendor = parseDocument(
+					fixture.records.find((record) => record.path === "app/content/vendors/white2tea.md")!
+				)
+				if (entry === "contextual") {
+					await page.getByRole("tab", { name: "Vendors", exact: true }).click()
+					await page.getByRole("link", { name: /^white2tea, vendor,/ }).click()
+					await expect(
+						page.locator("main").getByRole("heading", { name: "white2tea", exact: true })
+					).toBeVisible()
+					await page.getByRole("button", { name: "Edit this record", exact: true }).click()
+				} else {
+					await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+					await page.getByText("Browse repository content", { exact: true }).click()
+					await page.locator(".cms-library").getByRole("combobox").nth(1).selectOption("vendors")
+					await page.getByLabel("Find content", { exact: true }).fill("white2tea")
+					await page
+						.locator(".cms-library-list")
+						.getByRole("button", { name: /white2tea/ })
+						.click()
+				}
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + vendor.id + "(?:&|$)"))
+				expect(new URL(page.url()).searchParams.get("id")).not.toBe(tagId)
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("white2tea")
+				await expect(page.locator(".cms-write .cms-eyebrow")).toHaveText("Vendor · Pushed edition")
+				await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+				await expect(
+					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
+				).toBeVisible()
+				expect(fixture.pushes).toHaveLength(0)
+				expect(errors).toEqual([])
+			}
+		)

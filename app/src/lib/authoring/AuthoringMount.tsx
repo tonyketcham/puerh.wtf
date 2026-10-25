@@ -3,14 +3,14 @@ import dynamic from "next/dynamic"
 import { useAtom } from "jotai"
 import { useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { authoringBridgeAtom } from "./bridge"
+import { authoringBridgeAtom, readAuthoringActivation } from "./bridge"
 const Runtime = dynamic(() => import("./runtime"), { ssr: false })
 export default function AuthoringMount() {
 	const [state, setState] = useAtom(authoringBridgeAtom),
 		pathname = usePathname()
 	useEffect(() => {
 		if (
-			localStorage.getItem("puerh:editing") === "enabled" ||
+			readAuthoringActivation() ||
 			pathname === "/write/" ||
 			pathname === "/working-changes/" ||
 			pathname === "/write" ||
