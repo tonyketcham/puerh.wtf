@@ -21,6 +21,6 @@
     "vite": "2.9.12"
   },
   "dependencies": {
-    "nanoid": "4.0.0"
+    "nanoid": "6.0.2"
   }
 }
