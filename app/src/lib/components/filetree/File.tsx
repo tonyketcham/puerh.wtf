@@ -108,7 +108,7 @@ function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 				{liquor ? (
 					<LiquorSwatch liquor={liquor} size={12} />
 				) : (
-					<ColoredFileIcon color={category?.color} fill={categoryFill} />
+					<ColoredFileIcon color={category?.color ?? undefined} fill={categoryFill} />
 				)}
 				{/* find-references hit: a bead on the swatch's shoulder, staggered down the list */}
 				{isSession && (
@@ -146,7 +146,7 @@ function File({ node, hrefFunction, indentationLevel = 0 }: FileProps) {
 							<span
 								aria-hidden
 								className="inline-block rounded-full size-1.5 shrink-0"
-								style={{ backgroundColor: category.color }}
+								style={{ backgroundColor: category.color ?? undefined }}
 							/>
 						)}
 						<span className="truncate">{meta}</span>
