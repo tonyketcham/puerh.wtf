@@ -3,7 +3,8 @@ import type { OriginRef } from "@/lib/types/origin"
 import type { EntityPageData } from "@/lib/content/entities"
 import { SHARED, DETAILS } from "@/lib/components/map/geo"
 import type { MapPoint } from "@/lib/components/map/points"
-import { blendColors, buildEntityModel, liftedColor } from "@/lib/components/entity/page/model"
+import { buildEntityModel } from "@/lib/components/entity/page/model"
+import { blendColors, liftedColor } from "@/lib/sessionAnalysis"
 import {
 	buildRelationIndex,
 	related,
