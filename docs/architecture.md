@@ -1,8 +1,8 @@
 # Architecture and ownership
 
-This map accompanies the scoped architecture cleanup. The content and shared-component
-paths below include its agreed destinations; branches that predate those moves can still
-have the previous imports. Routes, public behavior and content identities stay the same.
+This map identifies the sources of truth for content, the owners of shared UI and state,
+and the boundaries between static pages, browser code and the CMS service. Paths beginning
+with `src/` are relative to `app/`; paths beginning with `lib/` are relative to `app/src/`.
 
 ## Content, assets and generated files
 
@@ -44,8 +44,8 @@ query is not a complete session for presentation.
 - `lib/components/session/` owns the session reading experience and photo carousel.
   The reusable cube renderer lives in `lib/components/BoxCarousel.tsx`.
 - `lib/components/entity/` owns entity references, peek presentation, page views and indexes.
-  `lib/components/lexicon/` holds the word reference and model shared with Explorer;
-  route-only lexicon composition can remain beside its routes.
+  `lib/components/lexicon/` holds the word reference and model shared with Explorer.
+  Route-only lexicon composition lives beside its routes.
 - `lib/sessionAnalysis.ts` contains the shared session-summary contract, vintage ordering
   and color math. A lexicon summary has no fabricated entity identity. Session lists receive
   an explicit origin/category grouping capability when their caller needs it.

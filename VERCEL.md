@@ -15,13 +15,17 @@ Set the matching Root Directory on each Git-backed Vercel project. Root workspac
 
 ## Link or deploy manually
 
-From the repository root, inspect the signed-in account and link the existing projects:
+From the repository root, inspect the signed-in account and link each package directory
+to its existing project:
 
 ```sh
 vercel whoami
-vercel link --repo
-vercel link add
+vercel link app
+vercel link log
 ```
+
+The [`vercel link` command](https://vercel.com/docs/cli/link) accepts the directory path
+as its optional argument.
 
 For a manual deployment, run `vercel` from the intended package directory. Use
 `vercel --prod` only for an approved production publication. Project linking and a successful

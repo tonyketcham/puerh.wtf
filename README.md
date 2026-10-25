@@ -22,7 +22,7 @@ and [test instructions](app/tests/README.md) cover development and export verifi
 
 ## Editing content
 
-The in-app CMS is implemented: open the command bar and choose **Enable editing**.
+To use the in-app CMS, open the command bar and choose **Enable editing**.
 It keeps local drafts until explicit review and push. Server-side GitHub authorization,
 the native production endpoint, sign-in and catalog loading have been verified.
 Editorial push/publication acceptance remains separate; preserve the existing `log/` CMS
