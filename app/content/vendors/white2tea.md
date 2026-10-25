@@ -5,7 +5,7 @@ image: /images/uploads/white2logo.png
 links:
   website: https://white2tea.com/
   facebook: white2tea
-  instagram: white2tea
+  instagram: https://www.instagram.com/white2tea/
 municipality: Yunnan
 country: China
 ---
