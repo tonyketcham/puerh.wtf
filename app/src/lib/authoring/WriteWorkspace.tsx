@@ -1,12 +1,17 @@
 "use client"
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useStore } from "jotai"
 import { cmsAtom, useCms } from "./runtime"
 import { fetchCatalog, type CmsSession } from "./client"
 import { usePreviewAssets } from "./use-preview-assets"
 import { SCHEMAS } from "./schema"
+import PanelSection from "@/lib/components/containers/PanelSection"
+import { FlavorEditor, BrewingEditor } from "./SessionEditorPanels"
+import CoverPreview from "./CoverPreview"
+import type { RecordImage } from "./preview-media"
+import "./writer.css"
 import { assetPublicPath } from "./documents"
 import { isDraftDirty } from "./drafts"
 import { Field } from "./Fields"
@@ -20,10 +25,20 @@ function accountIdentity(session: CmsSession | null) {
 }
 
 export default function WriteWorkspace() {
-	const { state, editDraft, newDraft, review, update } = useCms(),
+	const {
+			state,
+			editDraft,
+			newDraft,
+			createRelatedDraft,
+			review,
+			discardDraft,
+			revertDraft,
+			undoLocalChange,
+			update,
+			hasPending,
+		} = useCms(),
 		store = useStore(),
-		params = useSearchParams(),
-		router = useRouter()
+		params = useSearchParams()
 	const urlId = params.get("id"),
 		pendingWriteId = state.pendingWriteId,
 		id = pendingWriteId ?? urlId,
@@ -52,6 +67,38 @@ export default function WriteWorkspace() {
 		[processing, setProcessing] = useState(""),
 		[mediaError, setMediaError] = useState(""),
 		abort = useRef<AbortController | null>(null)
+	const writingPosition = useRef({ start: 0, end: 0, scroll: 0, page: 0 })
+	const [removedImage, setRemovedImage] = useState<{
+		draftId: string
+		image: RecordImage
+		index: number
+	} | null>(null)
+	useEffect(() => {
+		setPreview(false)
+		setRemovedImage(null)
+		writingPosition.current = { start: 0, end: 0, scroll: 0, page: 0 }
+	}, [draft?.id])
+	const togglePreview = (read: boolean) => {
+		if (read && textarea.current)
+			writingPosition.current = {
+				start: textarea.current.selectionStart,
+				end: textarea.current.selectionEnd,
+				scroll: textarea.current.scrollTop,
+				page: window.scrollY,
+			}
+		setPreview(read)
+		if (!read)
+			requestAnimationFrame(() => {
+				const el = textarea.current,
+					position = writingPosition.current
+				if (el) {
+					el.focus({ preventScroll: true })
+					el.setSelectionRange(position.start, position.end)
+					el.scrollTop = position.scroll
+				}
+				window.scrollTo({ top: position.page })
+			})
+	}
 	useEffect(() => () => abort.current?.abort(), [draft?.id])
 	const sourceBranch = draft?.branch || state.source
 	const source = state.catalogs[sourceBranch]
@@ -82,18 +129,32 @@ export default function WriteWorkspace() {
 			alive = false
 		}
 	}, [state.phase, id, hasSource, sourceBranch, account, store])
+	const documents = [...(source?.documents || [])]
+	for (const d of state.drafts)
+		if (d.branch === (draft?.branch || state.source)) {
+			const i = documents.findIndex((x) => x.id === d.id)
+			if (i >= 0) documents[i] = d.document
+			else documents.push(d.document)
+		}
 	// The editor reads current source images; its default Read view does not render Earlier images.
 	const previewMedia = usePreviewAssets(
 		draft?.document,
 		undefined,
 		state.drafts,
 		sourceBranch,
-		source?.head
+		source?.head,
+		sourceBranch,
+		source?.head,
+		{ documents }
 	)
 	const urls = useAssetUrls(previewMedia.assets)
 	const waitingForCatalog = !!draft && !hasSource && !catalogError
 	const imagesUnavailable =
-		waitingForCatalog || previewMedia.loading || !!previewMedia.error || !!catalogError
+		waitingForCatalog ||
+		previewMedia.loading ||
+		!!previewMedia.error ||
+		!!catalogError ||
+		previewMedia.assets.some((asset) => !urls[assetPublicPath(asset.path)])
 	const retryImages = async () => {
 		if (!draft || refreshingImages || state.phase !== "ready") return
 		const expectedAccount = account,
@@ -115,13 +176,7 @@ export default function WriteWorkspace() {
 			setRefreshingImages(false)
 		}
 	}
-	const documents = [...(source?.documents || [])]
-	for (const d of state.drafts)
-		if (d.branch === (draft?.branch || state.source)) {
-			const i = documents.findIndex((x) => x.id === d.id)
-			if (i >= 0) documents[i] = d.document
-			else documents.push(d.document)
-		}
+
 	if (state.phase !== "ready" && !state.session?.user)
 		return (
 			<div className="cms-state-message">
@@ -150,17 +205,74 @@ export default function WriteWorkspace() {
 		)
 	const schema = SCHEMAS[draft.document.collection],
 		data = draft.document.data
-	const primary =
-		draft.document.collection === "tastings"
-			? ["title", "date", "vendor", "style", "production_year", "excerpt"]
-			: ["title", "description", "hanzi", "kind", "parent", "category", "municipality", "country"]
+	const isSession = draft.document.collection === "tastings"
+	const hasPhotos = isSession || schema.fields.some((field) => field.type === "image")
+	const identity = isSession ? ["title", "date"] : ["title", "hanzi"]
+	const context = isSession
+		? ["vendor", "style", "origin", "cultivar", "vessel", "author", "production_year", "tags"]
+		: ["description", "kind", "parent", "category", "municipality", "country"]
+	const specialized = isSession ? ["flavor_axes", "brewing", "notes", "images"] : ["image"]
 	const change = (name: string, value: unknown) => editDraft(draft.id, { [name]: value })
-	const createRelated = (collection: Collection, field: string) =>
-		void newDraft(
+	const createRelated = async (
+		collection: Collection,
+		field: string,
+		seed: Record<string, unknown>
+	) =>
+		!!(await createRelatedDraft(
 			collection,
-			{},
-			{ id: draft.id, field, multiple: schema.fields.find((f) => f.name === field)?.multiple }
-		)
+			seed,
+			draft.id,
+			field,
+			!!schema.fields.find((f) => f.name === field)?.multiple
+		))
+	const renderField = (name: string) => {
+		const f = schema.fields.find((field) => field.name === name)
+		if (f?.name === "date" && isSession) {
+			const date = new Date(String(data.date || ""))
+			return (
+				<details key="date" className="cms-date-editor">
+					<summary>
+						<span>Session date</span>
+						<strong>
+							{Number.isFinite(date.getTime())
+								? date.toLocaleDateString(undefined, {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })
+								: "Choose a date"}
+							<span aria-hidden> ▾</span>
+						</strong>
+					</summary>
+					<div>
+						<Field
+							field={{ ...f, hint: undefined }}
+							value={data.date}
+							onChange={(v) => change("date", v)}
+							documents={documents}
+							onCreate={createRelated}
+						/>
+					</div>
+				</details>
+			)
+		}
+		return f ? (
+			<Field
+				key={f.name}
+				field={f.name === "date" ? { ...f, hint: undefined } : f}
+				value={data[f.name]}
+				onChange={(v) => change(f.name, v)}
+				documents={documents}
+				onCreate={createRelated}
+			/>
+		) : null
+	}
+	const moveImage = (from: number, to: number) => {
+		const images = recordImages(draft.document)
+		const [image] = images.splice(from, 1)
+		images.splice(to, 0, image)
+		change("images", images)
+	}
 	const upload = async (files: FileList | null) => {
 		if (!files?.length) return
 		setMediaError("")
@@ -218,255 +330,427 @@ export default function WriteWorkspace() {
 			abort.current = null
 		}
 	}
-	const back =
-		typeof window !== "undefined"
-			? sessionStorage.getItem("puerh:relation-return:" + draft.id)
-			: null
 	return (
-		<div className="cms-workspace cms-write" data-cms-write>
+		<div className="cms-workspace cms-write cms-editorial @container/log" data-cms-write>
 			<div className="cms-page-top">
 				<Link href="/working-changes/">← Working changes</Link>
-				<span>{draft.prNumber ? "Draft PR #" + draft.prNumber : "Local draft"}</span>
+				<span>
+					{draft.prNumber
+						? "Unpublished · PR #" + draft.prNumber
+						: isDraftDirty(draft)
+						? "On this device"
+						: "Published record"}
+				</span>
 			</div>
-			<header>
-				<p className="cms-eyebrow">
-					{schema.singular} · {isDraftDirty(draft) ? "Editing" : "Pushed edition"}
-				</p>
-				<h1>{String(data.title || "A new " + schema.singular.toLowerCase())}</h1>
+			<header className="cms-editor-heading">
+				<div>
+					<p className="cms-eyebrow">{schema.singular}</p>
+					<h1>{String(data.title || "A new " + schema.singular.toLowerCase())}</h1>
+				</div>
 				<p className={state.errors[draft.id] ? "cms-error" : "cms-muted"} role="status">
 					{state.errors[draft.id] ||
-						(state.saving.includes(draft.id) ? "Saving on this device…" : "Saved on this device")}
+						(state.saving.includes(draft.id)
+							? "Saving on this device…"
+							: isDraftDirty(draft)
+							? "Saved on this device"
+							: draft.prNumber
+							? "This edition is saved to GitHub."
+							: "Published · ready to write")}
 				</p>
 			</header>
-			{back && (
-				<button
-					className="cms-return"
-					onClick={() => {
-						try {
-							const target = JSON.parse(back) as { id: string; field: string; multiple: boolean }
-							const parent = state.drafts.find((d) => d.id === target.id)
-							if (parent) {
-								const value = parent.document.data[target.field]
-								editDraft(parent.id, {
-									[target.field]: target.multiple
-										? [
-												...new Set([
-													...(Array.isArray(value) ? value : value ? [value] : []),
-													draft.id,
-												]),
-										  ]
-										: draft.id,
-								})
-								sessionStorage.removeItem("puerh:relation-return:" + draft.id)
-								router.push("/write/?id=" + encodeURIComponent(parent.id))
-							}
-						} catch {
-							update({ error: "The originating draft could not be found." })
-						}
-					}}
-				>
-					Use this {schema.singular.toLowerCase()} and return to the record
-				</button>
+			{state.notice && (
+				<div className="cms-notice" role="status">
+					<p>{state.notice}</p>
+					{!!state.localRecoveries.length && (
+						<button
+							type="button"
+							disabled={state.busy || hasPending}
+							onClick={() => void undoLocalChange()}
+						>
+							Undo
+						</button>
+					)}
+					<button type="button" aria-label="Dismiss notice" onClick={() => update({ notice: "" })}>
+						×
+					</button>
+				</div>
 			)}
-			<div className="cms-edit-grid">
+			{state.error && (
+				<p className="cms-error" role="alert">
+					{state.error}
+				</p>
+			)}
+			<div className={"cms-editor-layout" + (preview || !hasPhotos ? " is-reading" : "")}>
 				<section className="cms-writing">
-					<div className="cms-fields">
-						{schema.fields
-							.filter((f) => primary.includes(f.name))
-							.map((f) => (
-								<Field
-									key={f.name}
-									field={f}
-									value={data[f.name]}
-									onChange={(v) => change(f.name, v)}
+					<div className="cms-editor-identity cms-fields" hidden={preview}>
+						{identity.map(renderField)}
+					</div>
+					<section className="cms-editor-panel surface-plate cms-notes-panel">
+						<PanelSection
+							title={isSession ? "Session notes" : "Notes & story"}
+							rightSlot={
+								<div className="cms-phase-keys">
+									<button
+										type="button"
+										aria-pressed={!preview}
+										onClick={() => togglePreview(false)}
+									>
+										Write
+									</button>
+									<button type="button" aria-pressed={preview} onClick={() => togglePreview(true)}>
+										Read
+									</button>
+								</div>
+							}
+						>
+							<div hidden={preview}>
+								<DictationControl
+									key={draft.id}
+									value={draft.document.body}
+									onChange={(body) => editDraft(draft.id, undefined, body)}
+									textareaRef={textarea}
+									label="notes"
+									active={!preview}
+								/>
+								<label className="cms-sr" htmlFor="cms-body">
+									Notes
+								</label>
+								<textarea
+									id="cms-body"
+									ref={textarea}
+									className="cms-body shadow-well"
+									value={draft.document.body}
+									onChange={(e) => editDraft(draft.id, undefined, e.target.value)}
+									placeholder={
+										isSession
+											? "The leaf, the water, and what follows. Write or dictate as the session unfolds…"
+											: "Tell the story in your own words…"
+									}
+								/>
+							</div>
+							{preview &&
+								(imagesUnavailable ? (
+									<div className="cms-reading">
+										<p className="cms-muted" role="status">
+											Image preview is{" "}
+											{waitingForCatalog || previewMedia.loading || refreshingImages
+												? "loading"
+												: "unavailable"}
+											. Your notes remain available.
+										</p>
+										<Prose source={draft.document.body} />
+									</div>
+								) : (
+									<ReadingPreview
+										document={draft.document}
+										documents={documents}
+										assets={previewMedia.assets}
+										before={draft.base}
+									/>
+								))}
+						</PanelSection>
+					</section>
+					<div hidden={preview} className="cms-editor-sections">
+						<section className="cms-editor-panel surface-plate">
+							<PanelSection
+								title={
+									isSession ? "The tea & its people" : "About this " + schema.singular.toLowerCase()
+								}
+							>
+								<div className="cms-fields">{context.map(renderField)}</div>
+							</PanelSection>
+						</section>
+						{isSession && (
+							<>
+								<FlavorEditor
+									key={draft.id + "-flavor"}
+									value={data.flavor_axes}
+									onChange={(v) => change("flavor_axes", v)}
+								/>
+								<BrewingEditor
+									key={draft.id + "-brewing"}
+									value={data.brewing}
+									onChange={(v) => change("brewing", v)}
 									documents={documents}
 									onCreate={createRelated}
 								/>
-							))}
+								<section className="cms-editor-panel surface-plate">
+									<PanelSection title="Sensory notes">
+										<p className="cms-muted">
+											From dry leaf to the empty cup. Add the impressions you want to remember.
+										</p>
+										<div className="cms-fields">
+											{schema.fields
+												.find((f) => f.name === "notes")
+												?.fields?.map((f) => (
+													<Field
+														key={f.name}
+														field={f}
+														value={(data.notes as Record<string, unknown>)?.[f.name]}
+														onChange={(v) =>
+															change("notes", {
+																...((data.notes as Record<string, unknown>) || {}),
+																[f.name]: v,
+															})
+														}
+														documents={documents}
+														onCreate={createRelated}
+													/>
+												))}
+										</div>
+									</PanelSection>
+								</section>
+							</>
+						)}
+						<details className="cms-details">
+							<summary>More details</summary>
+							<div className="cms-fields">
+								{schema.fields
+									.filter(
+										(f) =>
+											![...identity, ...context, ...specialized].includes(f.name) &&
+											f.type !== "image"
+									)
+									.map((f) => renderField(f.name))}
+							</div>
+						</details>
 					</div>
-					<div className="cms-writing-toolbar">
-						<h2>{draft.document.collection === "tastings" ? "Session notes" : "Notes & story"}</h2>
-						<div className="cms-actions">
-							<button aria-pressed={!preview} onClick={() => setPreview(false)}>
-								Write
-							</button>
-							<button aria-pressed={preview} onClick={() => setPreview(true)}>
-								Read
-							</button>
-						</div>
-					</div>
-					{!preview ? (
-						<>
-							<DictationControl
-								key={draft.id}
-								value={draft.document.body}
-								onChange={(body) => editDraft(draft.id, undefined, body)}
-								textareaRef={textarea}
-								label="notes"
-							/>
-							<label className="cms-sr" htmlFor="cms-body">
-								Notes
-							</label>
-							<textarea
-								id="cms-body"
-								ref={textarea}
-								className="cms-body"
-								value={draft.document.body}
-								onChange={(e) => editDraft(draft.id, undefined, e.target.value)}
-								placeholder="The leaf, the water, and what follows. Write or dictate as the session unfolds…"
-							/>
-						</>
-					) : imagesUnavailable ? (
-						<div className="cms-reading">
-							<p className="cms-muted" role="status">
-								Image preview is{" "}
-								{waitingForCatalog || previewMedia.loading || refreshingImages
-									? "loading"
-									: "unavailable"}
-								. Your notes remain available.
-							</p>
-							<Prose source={draft.document.body} />
-						</div>
-					) : (
-						<ReadingPreview
-							document={draft.document}
-							documents={documents}
-							assets={previewMedia.assets}
-							before={draft.base}
-						/>
-					)}
-					<details className="cms-details">
-						<summary>Record details</summary>
-						<div className="cms-fields">
-							{schema.fields
-								.filter((f) => !primary.includes(f.name))
-								.map((f) => (
-									<Field
-										key={f.name}
-										field={f}
-										value={data[f.name]}
-										onChange={(v) => change(f.name, v)}
-										documents={documents}
-										onCreate={createRelated}
-									/>
-								))}
-						</div>
-						<p className="cms-muted">
-							Existing source fields are preserved. File: {draft.document.path}
-						</p>
-					</details>
 				</section>
-				<aside className="cms-media-editor">
-					<h2>Images</h2>
-					<p className="cms-muted">
-						Optimized on this device. Uploaded only with Commit &amp; push.
-					</p>
-					<label className="cms-upload">
-						{draft.document.collection === "tastings"
-							? "Add photos"
-							: data.image
-							? "Replace image"
-							: "Add image"}
-						<input
-							type="file"
-							accept="image/jpeg,image/png,image/webp"
-							multiple={draft.document.collection === "tastings"}
-							disabled={!!processing}
-							onChange={(e) => {
-								void upload(e.target.files)
-								e.target.value = ""
-							}}
-						/>
-					</label>
-					{processing && (
-						<div className="cms-notice" role="status">
-							<p>{processing}</p>
-							<button onClick={() => abort.current?.abort()}>Cancel processing</button>
-						</div>
-					)}
-					{mediaError && (
-						<p className="cms-error" role="alert">
-							{mediaError}
-						</p>
-					)}
-					{(waitingForCatalog || previewMedia.loading || refreshingImages) && (
-						<p className="cms-muted" role="status">
-							Loading images from this repository edition… You can keep writing.
-						</p>
-					)}
-					{!waitingForCatalog && !refreshingImages && (catalogError || previewMedia.error) && (
-						<div className="cms-error" role="alert">
-							<p>{catalogError || previewMedia.error}</p>
-							<button onClick={() => void retryImages()}>Retry images</button>
-						</div>
-					)}
-					{recordImages(draft.document).map((im, i) => (
-						<div key={im.image + ":" + i} className="cms-image-entry">
-							{!imagesUnavailable ? (
-								<ContentPicture image={im} urls={urls} />
-							) : (
-								<p className="cms-muted">
-									Image preview{" "}
-									{waitingForCatalog || previewMedia.loading || refreshingImages
-										? "loading…"
-										: "unavailable"}
-								</p>
-							)}
-							<label>
-								Image description
+				{hasPhotos && (
+					<aside
+						className="cms-editor-panel surface-plate cms-photo-panel"
+						hidden={preview}
+						aria-label="Photo editor"
+					>
+						<PanelSection title={isSession ? "Photos" : "Portrait"}>
+							<p className="cms-muted">
+								Prepared on this device. Added to your edition when you commit.
+							</p>
+							<label className="cms-upload shadow-key">
+								{isSession ? "Add photos" : data.image ? "Replace image" : "Add image"}
 								<input
-									value={im.alt || ""}
+									type="file"
+									accept="image/jpeg,image/png,image/webp"
+									multiple={isSession}
+									disabled={!!processing}
 									onChange={(e) => {
-										if (draft.document.collection === "tastings") {
-											const images = recordImages(draft.document).map((x, n) =>
-												n === i ? { ...x, alt: e.target.value } : x
-											)
-											change("images", images)
-										} else change("image_alt", e.target.value)
+										void upload(e.target.files)
+										e.target.value = ""
 									}}
 								/>
 							</label>
-							{draft.document.collection === "tastings" && (
-								<label>
-									Caption
-									<input
-										value={im.caption || ""}
-										onChange={(e) =>
-											change(
-												"images",
-												recordImages(draft.document).map((x, n) =>
-													n === i ? { ...x, caption: e.target.value } : x
-												)
-											)
-										}
-									/>
-								</label>
+							{isSession && !imagesUnavailable && (
+								<CoverPreview document={draft.document} documents={documents} urls={urls} />
 							)}
-							<button
-								className="cms-quiet"
-								onClick={() => {
-									if (draft.document.collection === "tastings")
-										change(
-											"images",
-											recordImages(draft.document).filter((_, n) => n !== i)
-										)
-									else editDraft(draft.id, { image: undefined, image_variants: undefined })
-								}}
-							>
-								Remove from this record
-							</button>
-						</div>
-					))}
-				</aside>
+							{processing && (
+								<div className="cms-notice" role="status">
+									<p>{processing}</p>
+									<button type="button" onClick={() => abort.current?.abort()}>
+										Cancel processing
+									</button>
+								</div>
+							)}
+							{mediaError && (
+								<p className="cms-error" role="alert">
+									{mediaError}
+								</p>
+							)}
+							{(waitingForCatalog || previewMedia.loading || refreshingImages) && (
+								<p className="cms-muted" role="status">
+									Loading photos… You can keep writing.
+								</p>
+							)}
+							{!waitingForCatalog && !refreshingImages && (catalogError || previewMedia.error) && (
+								<div className="cms-error" role="alert">
+									<p>{catalogError || previewMedia.error}</p>
+									<button type="button" onClick={() => void retryImages()}>
+										Retry images
+									</button>
+								</div>
+							)}
+							{removedImage?.draftId === draft.id && (
+								<div className="cms-photo-undo" role="status">
+									Photo removed.{" "}
+									<button
+										type="button"
+										onClick={() => {
+											if (isSession) {
+												const images = recordImages(draft.document)
+												images.splice(
+													Math.min(removedImage.index, images.length),
+													0,
+													removedImage.image
+												)
+												change("images", images)
+											} else
+												editDraft(draft.id, {
+													image: removedImage.image.image,
+													image_variants: removedImage.image.variants,
+												})
+											setRemovedImage(null)
+										}}
+									>
+										Undo removal
+									</button>
+								</div>
+							)}
+							{recordImages(draft.document).map((im, i, images) => (
+								<div key={im.image + ":" + i} className="cms-image-entry">
+									<div className="cms-photo-heading">
+										<span>{i === 0 ? "Cover photo" : "Photo " + (i + 1)}</span>
+										{isSession && i > 0 && (
+											<button type="button" className="cms-quiet" onClick={() => moveImage(i, 0)}>
+												Make cover
+											</button>
+										)}
+									</div>
+									{!imagesUnavailable ? (
+										<ContentPicture
+											image={isSession ? im : { ...im, alt: String(data.title || "") }}
+											urls={urls}
+										/>
+									) : (
+										<p className="cms-muted">
+											Image preview{" "}
+											{waitingForCatalog || previewMedia.loading || refreshingImages
+												? "loading…"
+												: "unavailable"}
+										</p>
+									)}
+									{isSession && (
+										<label>
+											Image description
+											<input
+												value={im.alt || ""}
+												onChange={(e) =>
+													change(
+														"images",
+														recordImages(draft.document).map((x, n) =>
+															n === i ? { ...x, alt: e.target.value } : x
+														)
+													)
+												}
+											/>
+										</label>
+									)}
+									{isSession ? (
+										<small>Describe the scene for someone who cannot see it.</small>
+									) : (
+										<small>
+											The portrait is described by this {schema.singular.toLowerCase()}’s name.
+										</small>
+									)}
+									{isSession && (
+										<label>
+											Caption
+											<input
+												value={im.caption || ""}
+												placeholder="A thought to accompany this photo…"
+												onChange={(e) =>
+													change(
+														"images",
+														recordImages(draft.document).map((x, n) =>
+															n === i ? { ...x, caption: e.target.value } : x
+														)
+													)
+												}
+											/>
+										</label>
+									)}
+									{isSession && <small>Shown beside the photo in the journal.</small>}
+									<div className="cms-photo-actions">
+										{isSession && images.length > 1 && (
+											<>
+												<button
+													type="button"
+													disabled={i === 0}
+													aria-label={"Move photo " + (i + 1) + " earlier"}
+													onClick={() => moveImage(i, i - 1)}
+												>
+													← Earlier
+												</button>
+												<button
+													type="button"
+													disabled={i === images.length - 1}
+													aria-label={"Move photo " + (i + 1) + " later"}
+													onClick={() => moveImage(i, i + 1)}
+												>
+													Later →
+												</button>
+											</>
+										)}
+										<button
+											type="button"
+											className="cms-quiet"
+											onClick={() => {
+												setRemovedImage({ draftId: draft.id, image: im, index: i })
+												if (isSession)
+													change(
+														"images",
+														recordImages(draft.document).filter((_, n) => n !== i)
+													)
+												else editDraft(draft.id, { image: undefined, image_variants: undefined })
+											}}
+										>
+											Remove from this record
+										</button>
+									</div>
+								</div>
+							))}
+						</PanelSection>
+					</aside>
+				)}
 			</div>
 			<footer className="cms-commit-bar">
-				<p>{isDraftDirty(draft) ? "Your edits are local." : "This edition has been pushed."}</p>
+				<div>
+					<p>
+						{isDraftDirty(draft)
+							? "On this device"
+							: draft.prNumber
+							? "Committed edition"
+							: "Published version"}
+					</p>
+					{isDraftDirty(draft) && (
+						<div className="cms-actions">
+							{draft.base ? (
+								<button
+									type="button"
+									className="cms-quiet"
+									disabled={
+										!isDraftDirty(draft) ||
+										!!processing ||
+										state.saving.includes(draft.id) ||
+										state.busy ||
+										hasPending
+									}
+									onClick={() => void revertDraft(draft.id)}
+								>
+									Revert local edits
+								</button>
+							) : (
+								<button
+									type="button"
+									className="cms-quiet"
+									disabled={
+										!!processing || state.saving.includes(draft.id) || state.busy || hasPending
+									}
+									onClick={async () => {
+										if (await discardDraft(draft.id)) review()
+									}}
+								>
+									Discard this draft
+								</button>
+							)}
+						</div>
+					)}
+				</div>
 				<button
-					className="cms-primary"
+					type="button"
+					className="cms-primary shadow-key"
 					disabled={!!processing || !!state.errors[draft.id]}
-					onClick={() => review(draft.id)}
+					onClick={() => review(isDraftDirty(draft) ? draft.id : undefined)}
 				>
-					Review in Working changes →
+					{isDraftDirty(draft) ? "Review in Working changes →" : "Working changes →"}
 				</button>
 			</footer>
 		</div>

@@ -105,10 +105,19 @@ function useTimer() {
  * - Find references: each note reads as text, but its descriptors are tokens. Hover previews
  *   the descriptor (descriptorAtom, unpinned); click pins it (click again or Esc to unpin).
  */
-export default function NotesPanel() {
-	const notes = useAtomValue(notesAtom)
-	const session = useAtomValue(sessionAtom)
-	const liquor = useAtomValue(currentLiquorAtom)
+export default function NotesPanel({
+	previewSession,
+	previewLiquor,
+}: {
+	previewSession?: import("@/lib/types/session").SessionFull
+	previewLiquor?: import("@/lib/liquor").LiquorColor
+} = {}) {
+	const storedNotes = useAtomValue(notesAtom)
+	const storedSession = useAtomValue(sessionAtom)
+	const storedLiquor = useAtomValue(currentLiquorAtom)
+	const notes = previewSession?.notes ?? storedNotes
+	const session = previewSession ?? storedSession
+	const liquor = previewLiquor ?? storedLiquor
 	const [hoveredStage, setHoveredStage] = useAtom(hoveredNoteStageAtom)
 	const [descriptor, setDescriptor] = useAtom(descriptorAtom)
 

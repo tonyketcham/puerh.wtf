@@ -1,8 +1,15 @@
 "use client"
+import "./working.css"
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useCms, currentPlan, selectedBranch } from "./runtime"
-import { fetchCatalog, cmsRequest, type CmsCatalog, type CmsPullRequest } from "./client"
+import {
+	fetchCatalog,
+	cmsRequest,
+	type CmsCatalog,
+	type CmsPullRequest,
+	type CmsPublicationStatus,
+} from "./client"
 import { isDraftDirty } from "./drafts"
 import { SCHEMAS, COLLECTIONS } from "./schema"
 import ReadingPreview from "./ReadingPreview"
@@ -24,6 +31,10 @@ export default function WorkingWorkspace() {
 		} | null>(null),
 		[keepLocal, setKeepLocal] = useState(false),
 		[publicationError, setPublicationError] = useState("")
+	const [readiness, setReadiness] = useState<CmsPublicationStatus | null>(null)
+	const [publicationAction, setPublicationAction] = useState<
+		"review" | "status" | "update" | "publish" | null
+	>(null)
 	const [publicationLens, setPublicationLens] = useState<
 		"read" | "changes" | "media" | "connections"
 	>("read")
@@ -57,11 +68,11 @@ export default function WorkingWorkspace() {
 	const preview = unselected
 		? active.document
 		: previewDocs.find((d) => d.id === state.previewId) || previewDocs[0]
-	const before = (
+	const beforeCatalog =
 		state.scope === "pr"
 			? state.catalogs[state.session?.repository.defaultBranch || "main"]
 			: target
-	)?.documents.find((d) => d.id === preview?.id)
+	const before = beforeCatalog?.documents.find((d) => d.id === preview?.id)
 	const reconciling = state.drafts.find((draft) => draft.id === reconcilingId),
 		reconciliationCatalog = reconciling ? state.catalogs[reconciling.branch] : undefined,
 		reconciliationRemote = reconciliationCatalog?.documents.find((doc) => doc.id === reconcilingId)
@@ -91,7 +102,13 @@ export default function WorkingWorkspace() {
 		before,
 		state.drafts,
 		unselected ? active.branch : branch,
-		unselected ? state.catalogs[active.branch]?.head : target?.head
+		unselected ? state.catalogs[active.branch]?.head : target?.head,
+		beforeCatalog?.branch,
+		beforeCatalog?.head,
+		{
+			documents: plan?.documents || target?.documents || [],
+			beforeDocuments: beforeCatalog?.documents,
+		}
 	)
 	const publicationMedia = usePreviewAssets(
 		publicationPreview,
@@ -100,7 +117,8 @@ export default function WorkingWorkspace() {
 		publication?.pr.branch,
 		publication?.head,
 		publication?.base.branch,
-		publication?.base.head
+		publication?.base.head,
+		{ documents: publication?.catalog.documents, beforeDocuments: publication?.base.documents }
 	)
 	const publicationDirtyKey = localPublication
 		.map((draft) => draft.id + ":" + draft.revision)
@@ -122,7 +140,7 @@ export default function WorkingWorkspace() {
 	const openReconciliation = async (id: string) => {
 		const draft = state.drafts.find((item) => item.id === id)
 		if (!draft || cms.hasPending) return
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Opening edition…", error: "" })
 		try {
 			await cms.refreshCatalog(draft.branch)
 			setReconcilingId(id)
@@ -136,12 +154,85 @@ export default function WorkingWorkspace() {
 			cms.reportFailure(error)
 		}
 	}
+
+	const moveToPreview = () =>
+		requestAnimationFrame(() => {
+			const region = document.getElementById("cms-editorial-preview")
+			if (window.matchMedia("(max-width: 760px)").matches) {
+				region?.focus({ preventScroll: true })
+				region?.scrollIntoView({
+					behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+						? "auto"
+						: "smooth",
+					block: "start",
+				})
+			}
+		})
+	const readStatus = async (snapshot: NonNullable<typeof publication>) => {
+		const next = await cmsRequest<CmsPublicationStatus>("publication-status", {
+			method: "POST",
+			csrf: state.session?.csrfToken,
+			data: { number: snapshot.pr.number, head: snapshot.head, baseHead: snapshot.base.head },
+		})
+		setReadiness(next)
+		setPublication((current) =>
+			current?.head === snapshot.head
+				? { ...current, pr: { ...current.pr, draft: next.draft } }
+				: current
+		)
+		cms.updatePullRequest(snapshot.pr.number, { draft: next.draft })
+		return next
+	}
+	const refreshStatus = async () => {
+		if (!publication || state.busy) return
+		setPublicationAction("status")
+		setPublicationError("")
+		update({ busy: true, busyLabel: "Checking publication…", error: "" })
+		try {
+			await readStatus(publication)
+			update({ busy: false })
+		} catch (error) {
+			setPublicationError((error as Error).message)
+			cms.reportFailure(error)
+		} finally {
+			setPublicationAction(null)
+		}
+	}
+	const updateEdition = async () => {
+		if (!publication || state.busy || cms.hasPending) return
+		setPublicationAction("update")
+		setPublicationError("")
+		update({ busy: true, busyLabel: "Updating this edition…", error: "" })
+		try {
+			await cmsRequest("update-edition", {
+				method: "POST",
+				csrf: state.session?.csrfToken,
+				data: {
+					number: publication.pr.number,
+					head: publication.head,
+					baseHead: publication.base.head,
+				},
+			})
+			setReadiness(null)
+			setPublicationError(
+				"The edition is being updated. Reopen this review to read the updated content and checks before publishing."
+			)
+			update({ busy: false })
+		} catch (error) {
+			setPublicationError((error as Error).message)
+			cms.reportFailure(error)
+		} finally {
+			setPublicationAction(null)
+		}
+	}
 	const openPublication = async (pr: CmsPullRequest) => {
 		if (cms.hasPending) {
 			update({ notice: "Resume the pending push before reviewing publication." })
 			return
 		}
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Opening publication review…", error: "" })
+		setPublicationAction("review")
+		setReadiness(null)
 		setPublicationError("")
 		try {
 			const [catalog, base] = await Promise.all([
@@ -151,7 +242,15 @@ export default function WorkingWorkspace() {
 			const first = catalog.documents.find(
 				(document) => base.documents.find((old) => old.id === document.id)?.raw !== document.raw
 			)
-			setPublication({ pr, catalog, base, id: first?.id || "", head: catalog.head })
+			const snapshot = {
+				pr: catalog.pullRequests.find((item) => item.number === pr.number) || pr,
+				catalog,
+				base,
+				id: first?.id || "",
+				head: catalog.head,
+			}
+			setPublication(snapshot)
+			await readStatus(snapshot)
 			setKeepLocal(false)
 			update({ busy: false })
 			requestAnimationFrame(() =>
@@ -162,6 +261,8 @@ export default function WorkingWorkspace() {
 		} catch (error) {
 			setPublicationError((error as Error).message)
 			cms.reportFailure(error)
+		} finally {
+			setPublicationAction(null)
 		}
 	}
 	const publish = async () => {
@@ -173,7 +274,8 @@ export default function WorkingWorkspace() {
 			publicationMedia.error
 		)
 			return
-		update({ busy: true, error: "" })
+		update({ busy: true, busyLabel: "Publishing reviewed edition…", error: "" })
+		setPublicationAction("publish")
 		setPublicationError("")
 		try {
 			const result = await cmsRequest<{ merged: boolean; sha?: string; message?: string }>(
@@ -198,6 +300,11 @@ export default function WorkingWorkspace() {
 		} catch (error) {
 			setPublicationError((error as Error).message)
 			cms.reportFailure(error)
+			try {
+				await readStatus(publication)
+			} catch {}
+		} finally {
+			setPublicationAction(null)
 		}
 	}
 	return (
@@ -235,18 +342,26 @@ export default function WorkingWorkspace() {
 			{state.notice && (
 				<div className="cms-notice" role="status">
 					{state.notice}
+					{!!state.undoRecoveryId && (
+						<button
+							disabled={state.busy || cms.hasPending}
+							onClick={() => void cms.undoLocalChange(state.undoRecoveryId!)}
+						>
+							Undo
+						</button>
+					)}
 					<button aria-label="Dismiss notice" onClick={() => update({ notice: "" })}>
 						×
 					</button>
 				</div>
 			)}
-			{state.error && (
+			{state.error && !publication && (
 				<div className="cms-error" role="alert">
 					{state.error}
 				</div>
 			)}
 			{state.pendingOperation && (
-				<section className="cms-notice" role="status">
+				<section className="cms-notice cms-pending-notice" role="status">
 					<h2>
 						{state.pendingOperation.rejection
 							? "This update was not committed"
@@ -267,7 +382,7 @@ export default function WorkingWorkspace() {
 					</ul>
 				</section>
 			)}
-			<div className="cms-review-grid">
+			<div className="cms-review-grid" hidden={!!publication}>
 				<aside className="cms-selection">
 					<div className="cms-section-heading">
 						<h2>On this device</h2>
@@ -288,7 +403,9 @@ export default function WorkingWorkspace() {
 										aria-label={"Include " + String(d.document.data.title || "Untitled")}
 										checked={included.has(d.id) || state.selected.includes(d.id)}
 										disabled={required.has(d.id) && !state.selected.includes(d.id)}
-										onChange={(e) => select(d.id, e.target.checked)}
+										onChange={(e) => {
+											select(d.id, e.target.checked)
+										}}
 									/>
 									<span>
 										<button
@@ -297,6 +414,7 @@ export default function WorkingWorkspace() {
 											onClick={(e) => {
 												e.preventDefault()
 												update({ previewId: d.id, scope: "update" })
+												moveToPreview()
 											}}
 										>
 											{String(
@@ -306,7 +424,11 @@ export default function WorkingWorkspace() {
 										</button>
 										<small>
 											{SCHEMAS[d.document.collection].singular} ·{" "}
-											{d.prNumber ? "PR #" + d.prNumber : "Local draft"}
+											{d.prNumber
+												? "Newer local edits · edition #" + d.prNumber
+												: d.base
+												? "Local edits to published record"
+												: "New · on this device"}
 										</small>
 									</span>
 								</label>
@@ -326,6 +448,13 @@ export default function WorkingWorkspace() {
 								>
 									Edit draft
 								</Link>
+								<button
+									className="cms-quiet cms-revert"
+									disabled={state.busy || cms.hasPending || state.saving.includes(d.id)}
+									onClick={() => void (d.base ? cms.revertDraft(d.id) : cms.discardDraft(d.id))}
+								>
+									{d.base ? "Revert local edits" : "Discard draft"}
+								</button>
 								{state.errors[d.id] && <p className="cms-error">{state.errors[d.id]}</p>}
 							</div>
 						))
@@ -335,7 +464,12 @@ export default function WorkingWorkspace() {
 						</p>
 					)}
 				</aside>
-				<section className="cms-review-reading" aria-label="Editorial preview">
+				<section
+					className="cms-review-reading"
+					id="cms-editorial-preview"
+					tabIndex={-1}
+					aria-label="Editorial preview"
+				>
 					<div className="cms-scope-tabs" aria-label="Review scope">
 						<button
 							aria-pressed={state.scope === "update"}
@@ -467,16 +601,19 @@ export default function WorkingWorkspace() {
 					)}
 				</section>
 			)}
-			<section className="cms-prs">
+			<section className="cms-prs" hidden={!!publication}>
 				<div className="cms-section-heading">
-					<h2>Unpublished PRs</h2>
+					<h2>Saved to GitHub · unpublished</h2>
 					<span>{prs.length}</span>
 				</div>
 				{prs.length ? (
 					prs.map((pr) => (
 						<article key={pr.number} className="cms-pr-card">
 							<div>
-								<small>Draft PR #{pr.number}</small>
+								<small>
+									Saved to GitHub · unpublished edition #{pr.number}
+									{pr.draft ? " · Draft" : " · Ready for publication"}
+								</small>
 								<h3>{pr.title}</h3>
 							</div>
 							<div className="cms-actions">
@@ -504,11 +641,11 @@ export default function WorkingWorkspace() {
 			{publication && (
 				<section className="cms-publication" id="cms-publication">
 					<div className="cms-section-heading">
-						<h2>Publish the whole PR #{publication.pr.number}</h2>
+						<h2>Review publication · edition #{publication.pr.number}</h2>
 						<button onClick={() => setPublication(null)}>Back to working edits</button>
 					</div>
 					<p className="cms-muted">
-						{publicationVersions.length} cumulative records · pushed versions only
+						{publicationVersions.length} records · versions saved to GitHub
 					</p>
 					{!!localPublication.length && (
 						<label className="cms-acknowledge">
@@ -517,7 +654,7 @@ export default function WorkingWorkspace() {
 								checked={keepLocal}
 								onChange={(e) => setKeepLocal(e.target.checked)}
 							/>
-							Publish the pushed versions and keep {localPublication.length} newer local edits on
+							Publish the saved versions and keep {localPublication.length} newer local edits on
 							this device.
 						</label>
 					)}
@@ -571,32 +708,123 @@ export default function WorkingWorkspace() {
 							{publicationError}
 						</p>
 					)}
-					<button
-						className="cms-primary"
-						disabled={
-							state.phase !== "ready" ||
-							state.busy ||
-							cms.hasPending ||
-							publicationMedia.loading ||
-							!!publicationMedia.error ||
-							(!!localPublication.length && !keepLocal)
-						}
-						onClick={() => void publish()}
+
+					<section
+						className="cms-publication-readiness"
+						aria-label="Publication readiness"
+						aria-live="polite"
 					>
-						{state.busy
-							? "Checking publication…"
-							: "Publish PR #" +
-							  publication.pr.number +
-							  " · " +
-							  publicationVersions.length +
-							  " records"}
-					</button>
-					<p className="cms-muted">
-						Merges only this reviewed PR after required checks and repository rules pass.
-					</p>
+						<div className="cms-section-heading">
+							<h3>Before publication</h3>
+							<a href={publication.pr.url} target="_blank" rel="noreferrer">
+								Open edition on GitHub ↗
+							</a>
+							<button disabled={state.busy} onClick={() => void refreshStatus()}>
+								{publicationAction === "status" ? "Checking…" : "Refresh checks"}
+							</button>
+						</div>
+						{readiness ? (
+							<>
+								<p>
+									{readiness.requiresUpdate
+										? "Published content has moved forward. Bring this edition up to date, then read the refreshed version."
+										: "This edition includes the latest published content."}
+								</p>
+								{readiness.requiresUpdate && (
+									<button
+										disabled={state.busy || cms.hasPending}
+										onClick={() => void updateEdition()}
+									>
+										{publicationAction === "update"
+											? "Updating edition…"
+											: "Update edition from latest production"}
+									</button>
+								)}
+								{!readiness.protectionReady && (
+									<p className="cms-error">
+										Repository publishing safeguards need configuration.{" "}
+										<a href={publication.pr.url} target="_blank" rel="noreferrer">
+											Open GitHub
+										</a>
+									</p>
+								)}
+								<p>
+									{readiness.requiredApprovals === 0
+										? "No human review is required by this repository."
+										: readiness.requiredApprovals == null
+										? "Review policy is unavailable; GitHub will enforce it before publication."
+										: readiness.requiredApprovals +
+										  " required approval" +
+										  (readiness.requiredApprovals === 1 ? "" : "s") +
+										  " · " +
+										  (readiness.reviewState === "APPROVED"
+												? "approved"
+												: readiness.reviewState === "CHANGES_REQUESTED"
+												? "changes requested"
+												: "awaiting review")}
+								</p>
+								<ul className="cms-check-list">
+									{readiness.checks.map((check, index) => (
+										<li key={check.name + index} data-state={check.state}>
+											<span aria-hidden="true">
+												{check.state === "success" ? "✓" : check.state === "failure" ? "!" : "◌"}
+											</span>
+											<span>
+												{check.url ? (
+													<a href={check.url} target="_blank" rel="noreferrer">
+														{check.name}
+													</a>
+												) : (
+													check.name
+												)}
+												{check.required && <small>Required</small>}
+											</span>
+											<strong>
+												{check.state === "success"
+													? "Passed"
+													: check.state === "failure"
+													? "Needs attention"
+													: "In progress"}
+											</strong>
+										</li>
+									))}
+								</ul>
+								{!readiness.checks.length && (
+									<p>Waiting for GitHub to report this edition’s checks.</p>
+								)}
+								{readiness.checksTruncated && (
+									<a href={publication.pr.url + "/checks"} target="_blank" rel="noreferrer">
+										See all checks on GitHub
+									</a>
+								)}
+								{readiness.checkState !== "SUCCESS" && (
+									<p>Keep writing while checks finish. This edition will stay unpublished.</p>
+								)}
+								{readiness.checkState === "SUCCESS" &&
+									!["CLEAN", "DRAFT"].includes(readiness.mergeState) && (
+										<p>
+											GitHub reports {readiness.mergeState.toLowerCase().replace(/_/g, " ")}.{" "}
+											<a href={publication.pr.url} target="_blank" rel="noreferrer">
+												Review the edition on GitHub
+											</a>{" "}
+											before publishing.
+										</p>
+									)}
+							</>
+						) : (
+							<p>
+								{state.busy
+									? "Reading this edition’s checks…"
+									: "Refresh checks to confirm publication readiness."}
+							</p>
+						)}
+						<button disabled={state.busy} onClick={() => void openPublication(publication.pr)}>
+							Reopen review from latest edition
+						</button>
+					</section>
 				</section>
 			)}
-			<details className="cms-library">
+			<details className="cms-library" hidden={!!publication}>
 				<summary>Browse repository content</summary>
 				<div className="cms-library-controls">
 					<label>
@@ -640,6 +868,26 @@ export default function WorkingWorkspace() {
 			<details className="cms-details cms-recovery">
 				<summary>Draft recovery</summary>
 				<p>Back up the records and image variants stored for this GitHub account on this device.</p>
+				{!!state.localRecoveries.length && (
+					<section className="cms-recovered-drafts">
+						<h3>Discarded &amp; reverted drafts</h3>
+						<p>Kept on this device until you restore them.</p>
+						{state.localRecoveries.map((item) => (
+							<div key={item.id}>
+								<span>
+									{String(item.draft.document.data.title || "Untitled")} ·{" "}
+									{item.action === "revert" ? "reverted edits" : "discarded draft"}
+								</span>
+								<button
+									disabled={state.busy || cms.hasPending}
+									onClick={() => void cms.undoLocalChange(item.id)}
+								>
+									Restore draft
+								</button>
+							</div>
+						))}
+					</section>
+				)}
 				<div className="cms-actions">
 					<button onClick={() => void cms.recovery()}>Export local drafts</button>
 					<button disabled={state.busy} onClick={() => void cms.signOut()}>
@@ -659,43 +907,83 @@ export default function WorkingWorkspace() {
 				</div>
 			</details>
 			<footer className="cms-commit-bar">
-				<p role="status">
-					{cms.hasPending
-						? "Previous push: " +
-						  state.pendingOperation!.captured.length +
-						  " records · newer work stays local"
-						: (plan?.included.length || 0) +
-						  " selected · " +
-						  required.size +
-						  " required · " +
-						  (plan?.omitted.length ?? dirty.length) +
-						  " staying local"}
-				</p>
-				<button
-					className="cms-primary"
-					disabled={
-						state.phase !== "ready" ||
-						state.busy ||
-						(!cms.hasPending && (!plan?.included.length || !!plan.errors.length || !allSaved))
-					}
-					onClick={() =>
-						cms.hasPending
-							? state.pendingOperation?.rejection
-								? void cms.returnToReview()
-								: void cms.resumePending()
-							: plan && void push(plan.reviewKey)
-					}
-				>
-					{state.busy
-						? "Confirming push…"
-						: cms.hasPending
-						? state.pendingOperation?.rejection
-							? "Return to review"
-							: "Resume pending push"
-						: "Commit & push " +
-						  (plan?.included.length || 0) +
-						  (plan?.included.length === 1 ? " record" : " records")}
-				</button>
+				{publication ? (
+					<>
+						<p role="status">
+							{publicationAction && state.busy
+								? state.busyLabel
+								: "Publish " +
+								  publicationVersions.length +
+								  " saved records · newer local work stays here"}
+						</p>
+						<button
+							className="cms-primary"
+							disabled={
+								state.phase !== "ready" ||
+								state.busy ||
+								cms.hasPending ||
+								!readiness ||
+								readiness.requiresUpdate ||
+								!readiness.protectionReady ||
+								readiness.checkState !== "SUCCESS" ||
+								!["CLEAN", "DRAFT"].includes(readiness.mergeState) ||
+								["REVIEW_REQUIRED", "CHANGES_REQUESTED"].includes(readiness.reviewState) ||
+								publicationMedia.loading ||
+								!!publicationMedia.error ||
+								(!!localPublication.length && !keepLocal)
+							}
+							onClick={() => void publish()}
+						>
+							{publicationAction === "publish" && state.busy
+								? "Publishing edition…"
+								: "Publish PR #" +
+								  publication.pr.number +
+								  " · " +
+								  publicationVersions.length +
+								  " records"}
+						</button>
+					</>
+				) : (
+					<>
+						<p role="status">
+							{cms.hasPending
+								? "Previous push: " +
+								  state.pendingOperation!.captured.length +
+								  " records · newer work stays local"
+								: (plan?.included.length || 0) +
+								  " selected · " +
+								  required.size +
+								  " required · " +
+								  (plan?.omitted.length ?? dirty.length) +
+								  " staying local"}
+						</p>
+						<button
+							className="cms-primary"
+							disabled={
+								state.phase !== "ready" ||
+								state.busy ||
+								(!cms.hasPending && (!plan?.included.length || !!plan.errors.length || !allSaved))
+							}
+							onClick={() =>
+								cms.hasPending
+									? state.pendingOperation?.rejection
+										? void cms.returnToReview()
+										: void cms.resumePending()
+									: plan && void push(plan.reviewKey)
+							}
+						>
+							{state.busy
+								? state.busyLabel || "Opening edition…"
+								: cms.hasPending
+								? state.pendingOperation?.rejection
+									? "Return to review"
+									: "Resume pending push"
+								: "Commit & push " +
+								  (plan?.included.length || 0) +
+								  (plan?.included.length === 1 ? " record" : " records")}
+						</button>
+					</>
+				)}
 			</footer>
 		</div>
 	)

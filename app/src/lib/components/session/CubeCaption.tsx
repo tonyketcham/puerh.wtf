@@ -70,6 +70,7 @@ interface CubeCaptionProps {
 	stages: readonly (NoteStage | null)[]
 	/** fallback label for photos with no stage */
 	alts: readonly (string | undefined)[]
+	captions?: readonly (string | undefined)[]
 	accent: string
 }
 
@@ -86,7 +87,7 @@ interface CubeCaptionProps {
  * first word, fades out through a feathered edge before "n/N" (pinned right), and after a beat
  * under the pointer scrolls along to its end; leaving scrolls it back.
  */
-function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
+function CubeCaption({ store, stages, alts, captions, accent }: CubeCaptionProps) {
 	const reduce = useReducedMotion() ?? false
 
 	// Face changes arrive mid-scroll: render them as a transition, off the scroll frame
@@ -123,7 +124,9 @@ function CubeCaption({ store, stages, alts, accent }: CubeCaptionProps) {
 	const stage = stages[index] ?? null
 	const linked = stage != null && hoveredStage === stage
 	const color = linked ? accent : "rgb(255 255 255 / 0.6)"
-	const caption = stage ? NOTE_STAGE_META[stage].title : alts[index] || `Photo ${index + 1}`
+	const caption =
+		captions?.[index]?.trim() ||
+		(stage ? NOTE_STAGE_META[stage].title : alts[index] || `Photo ${index + 1}`)
 
 	// [icon gap] label gap digits"/"N — centered on the box
 	const digits = String(count).length

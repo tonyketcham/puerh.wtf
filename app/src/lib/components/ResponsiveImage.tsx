@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react"
 import authoredImages from "@/generated/authoring-images.json"
 
-interface ResponsiveVariant {
+export interface ResponsiveVariant {
 	src: string
 	mime: "image/webp"
 	width: number
@@ -12,14 +12,21 @@ const variantsByImage = authoredImages as Record<string, readonly ResponsiveVari
 type ResponsiveImageProps = Omit<ComponentProps<"img">, "src"> & {
 	src?: string | null
 	alt: string
+	variants?: readonly ResponsiveVariant[]
 }
 
 /**
  * Ordinary assets retain their exact img markup. Authored variants use a native picture;
  * display:contents preserves the existing image's layout, 3D cells, styles and event target.
  */
-export default function ResponsiveImage({ src, alt, sizes, ...props }: ResponsiveImageProps) {
-	const variants = typeof src === "string" ? variantsByImage[src] : undefined
+export default function ResponsiveImage({
+	src,
+	alt,
+	sizes,
+	variants: supplied,
+	...props
+}: ResponsiveImageProps) {
+	const variants = supplied ?? (typeof src === "string" ? variantsByImage[src] : undefined)
 	if (!variants?.length) {
 		// eslint-disable-next-line @next/next/no-img-element
 		return <img {...props} src={src ?? undefined} alt={alt} sizes={sizes} />

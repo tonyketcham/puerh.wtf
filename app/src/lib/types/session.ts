@@ -90,6 +90,8 @@ export type SessionTag = { _slug: string; title: string; color?: string | null }
 export type SessionImage = {
 	image: string
 	alt: string
+	/** Visible editorial caption, independent of the accessible description. */
+	caption?: string
 }
 
 /** Brewing parameters. temperature is °F, material_amount grams, liquid_amount ml, durations seconds. */
