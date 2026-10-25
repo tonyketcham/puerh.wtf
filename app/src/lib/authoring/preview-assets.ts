@@ -77,3 +77,26 @@ export function previewAssetRequests(
 			.map((detail) => ({ ...detail, branch: beforeBranch, head: beforeHead })),
 	]
 }
+
+/** Bounded to one hook instance; text edits keep the exact path/Blob bindings and object URLs. */
+export function createLocalPreviewAssetCache() {
+	let previous: CmsAsset[] = []
+	return (paths: readonly PreviewAssetPath[], drafts: readonly CmsDraft[]) => {
+		const next = localPreviewAssets(paths, drafts)
+		if (
+			next.length === previous.length &&
+			next.every((asset, index) => {
+				const prior = previous[index]
+				return (
+					asset.path === prior.path &&
+					asset.blob === prior.blob &&
+					asset.width === prior.width &&
+					asset.height === prior.height
+				)
+			})
+		)
+			return previous
+		previous = next
+		return previous
+	}
+}

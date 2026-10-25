@@ -1,7 +1,11 @@
 "use client"
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { fetchPreviewMedia } from "./client"
-import { asPreviewAsset, localPreviewAssets, previewAssetRequests } from "./preview-assets"
+import {
+	asPreviewAsset,
+	createLocalPreviewAssetCache,
+	previewAssetRequests,
+} from "./preview-assets"
 import type { CmsAsset, CmsDocument, CmsDraft } from "./types"
 
 export function usePreviewAssets(
@@ -13,29 +17,39 @@ export function usePreviewAssets(
 	beforeBranch = branch,
 	beforeHead = head
 ) {
-	const paths = useMemo(
-		() => previewAssetRequests(document, before, branch, head, beforeBranch, beforeHead),
-		[document, before, branch, head, beforeBranch, beforeHead]
+	// Serialize only path/context/dimensions. Body, descriptions and document object identity do not change requests.
+	const planIdentity = JSON.stringify(
+		previewAssetRequests(document, before, branch, head, beforeBranch, beforeHead)
 	)
-	const local = useMemo(() => localPreviewAssets(paths, drafts), [paths, drafts])
+	const paths = useMemo(
+		() => JSON.parse(planIdentity) as ReturnType<typeof previewAssetRequests>,
+		[planIdentity]
+	)
+	const [readLocal] = useState(createLocalPreviewAssetCache)
+	const local = readLocal(paths, drafts)
 	const missing = useMemo(
 		() => paths.filter((detail) => !local.some((asset) => asset.path === detail.path)),
 		[paths, local]
 	)
 	const key = JSON.stringify(missing.map(({ path, branch, head }) => ({ path, branch, head })))
-	const [remote, setRemote] = useState<{ key: string; assets: CmsAsset[]; error: string }>({
-		key: "",
-		assets: [],
-		error: "",
-	})
+	const [attempt, setAttempt] = useState(0)
+	const [remote, setRemote] = useState<{
+		key: string
+		attempt: number
+		assets: CmsAsset[]
+		error: string
+	}>({ key: "", attempt: -1, assets: [], error: "" })
+	const retry = useCallback(() => setAttempt((current) => current + 1), [])
 	useEffect(() => {
-		if (!missing.length) return
+		if (!missing.length || (remote.key === key && remote.attempt === attempt)) return
 		const controller = new AbortController()
 		if (missing.some((detail) => !detail.branch || !detail.head)) {
 			setRemote({
 				key,
+				attempt,
 				assets: [],
-				error: "This image is missing from local storage. Restore its draft backup before pushing.",
+				error:
+					"The image edition is not loaded yet. Retry images after reconnecting to the repository.",
 			})
 			return
 		}
@@ -48,26 +62,28 @@ export function usePreviewAssets(
 			)
 		)
 			.then((assets) => {
-				if (!controller.signal.aborted) setRemote({ key, assets, error: "" })
+				if (!controller.signal.aborted) setRemote({ key, attempt, assets, error: "" })
 			})
 			.catch((error: Error) => {
 				if (!controller.signal.aborted)
 					setRemote({
 						key,
+						attempt,
 						assets: [],
-						error: error.message + " Reopen this edition’s review to refresh it.",
+						error: error.message + " Retry images to refresh this edition.",
 					})
 			})
 		return () => controller.abort()
-	}, [key, missing])
-	const loaded = !missing.length || remote.key === key
+	}, [key, missing, attempt, remote.key, remote.attempt])
+	const settled = remote.key === key && remote.attempt === attempt
 	const assets = useMemo(
 		() => [...local, ...(remote.key === key ? remote.assets : [])],
 		[local, remote.key, remote.assets, key]
 	)
 	return {
 		assets,
-		loading: !loaded,
-		error: missing.length && remote.key === key ? remote.error : "",
+		loading: !!missing.length && !settled,
+		error: missing.length && settled ? remote.error : "",
+		retry,
 	}
 }

@@ -312,3 +312,53 @@ test("replaced earlier images load from their reviewed base while current and sh
 		defaults.every((request) => request.branch === "main" && request.head === "current-head")
 	).toBe(true)
 })
+
+test("preview asset bindings stay stable across text edits and distinguish different Blob objects", async () => {
+	const { createLocalPreviewAssetCache, previewAssetPaths } = await import(
+		"../src/lib/authoring/preview-assets"
+	)
+	const read = createLocalPreviewAssetCache(),
+		imagePath = "app/public/images/uploads/authoring/photo/640.webp"
+	const image = serializeDocument(source, {
+		image: "/images/uploads/authoring/photo/640.webp",
+		image_alt: "Original description",
+	})
+	const paths = previewAssetPaths([image]),
+		draft = createDraft(image, "head", "main")
+	const empty = read(paths, [draft])
+	expect(
+		read(previewAssetPaths([image]), [
+			{ ...draft, revision: 2, document: serializeDocument(image, undefined, "New notes") },
+		])
+	).toBe(empty)
+	const bytes = new Blob(["same bytes"], { type: "image/webp" })
+	const withImage = {
+		...draft,
+		assets: [
+			{
+				id: "photo",
+				path: imagePath,
+				filename: "640.webp",
+				width: 640,
+				height: 480,
+				mime: "image/webp",
+				blob: bytes,
+			},
+		],
+	}
+	const first = read(paths, [withImage])
+	const edited = {
+		...withImage,
+		revision: 3,
+		document: serializeDocument(image, { image_alt: "New description" }, "New notes"),
+	}
+	expect(read(previewAssetPaths([edited.document]), [edited])).toBe(first)
+	const differentBlob = {
+		...edited,
+		assets: [{ ...edited.assets[0], blob: new Blob(["same bytes"], { type: "image/webp" }) }],
+	}
+	const replaced = read(paths, [differentBlob])
+	expect(replaced).not.toBe(first)
+	expect(replaced[0].blob).toBe(differentBlob.assets[0].blob)
+	expect(first[0].blob).toBe(bytes)
+})

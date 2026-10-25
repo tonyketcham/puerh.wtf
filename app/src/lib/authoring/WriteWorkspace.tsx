@@ -2,18 +2,26 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { useCms } from "./runtime"
+import { useStore } from "jotai"
+import { cmsAtom, useCms } from "./runtime"
+import { fetchCatalog, type CmsSession } from "./client"
+import { usePreviewAssets } from "./use-preview-assets"
 import { SCHEMAS } from "./schema"
 import { assetPublicPath } from "./documents"
 import { isDraftDirty } from "./drafts"
 import { Field } from "./Fields"
-import ReadingPreview, { ContentPicture, recordImages, useAssetUrls } from "./ReadingPreview"
+import ReadingPreview, { ContentPicture, Prose, recordImages, useAssetUrls } from "./ReadingPreview"
 import DictationControl from "./voice/DictationControl"
 import { optimizeImage } from "./media"
 import type { CmsAsset, Collection } from "./types"
 
+function accountIdentity(session: CmsSession | null) {
+	return [session?.repository.owner, session?.repository.name, session?.user?.login].join("\u0000")
+}
+
 export default function WriteWorkspace() {
 	const { state, editDraft, newDraft, review, update } = useCms(),
+		store = useStore(),
 		params = useSearchParams(),
 		router = useRouter()
 	const id = params.get("id"),
@@ -28,8 +36,68 @@ export default function WriteWorkspace() {
 		[mediaError, setMediaError] = useState(""),
 		abort = useRef<AbortController | null>(null)
 	useEffect(() => () => abort.current?.abort(), [draft?.id])
-	const urls = useAssetUrls(draft?.assets)
-	const source = state.catalogs[draft?.branch || state.source]
+	const sourceBranch = draft?.branch || state.source
+	const source = state.catalogs[sourceBranch]
+	const account = accountIdentity(state.session)
+	const [catalogFailure, setCatalogFailure] = useState<{ branch: string; error: string } | null>(
+		null
+	)
+	const [refreshingImages, setRefreshingImages] = useState(false)
+	const catalogError = catalogFailure?.branch === sourceBranch ? catalogFailure.error : ""
+	const hasSource = !!source
+	useEffect(() => {
+		if (state.phase !== "ready" || !id || hasSource) return
+		let alive = true
+		setCatalogFailure(null)
+		fetchCatalog(sourceBranch)
+			.then((catalog) => {
+				if (!alive) return
+				store.set(cmsAtom, (current) =>
+					current.phase === "ready" && accountIdentity(current.session) === account
+						? { ...current, catalogs: { ...current.catalogs, [catalog.branch]: catalog } }
+						: current
+				)
+			})
+			.catch((error: Error) => {
+				if (alive) setCatalogFailure({ branch: sourceBranch, error: error.message })
+			})
+		return () => {
+			alive = false
+		}
+	}, [state.phase, id, hasSource, sourceBranch, account, store])
+	// The editor reads current source images; its default Read view does not render Earlier images.
+	const previewMedia = usePreviewAssets(
+		draft?.document,
+		undefined,
+		state.drafts,
+		sourceBranch,
+		source?.head
+	)
+	const urls = useAssetUrls(previewMedia.assets)
+	const waitingForCatalog = !!draft && !hasSource && !catalogError
+	const imagesUnavailable =
+		waitingForCatalog || previewMedia.loading || !!previewMedia.error || !!catalogError
+	const retryImages = async () => {
+		if (!draft || refreshingImages || state.phase !== "ready") return
+		const expectedAccount = account,
+			branch = sourceBranch
+		setRefreshingImages(true)
+		setCatalogFailure(null)
+		try {
+			const catalog = await fetchCatalog(branch)
+			if (accountIdentity(store.get(cmsAtom).session) !== expectedAccount) return
+			store.set(cmsAtom, (current) =>
+				current.phase === "ready" && accountIdentity(current.session) === expectedAccount
+					? { ...current, catalogs: { ...current.catalogs, [catalog.branch]: catalog } }
+					: current
+			)
+			previewMedia.retry()
+		} catch (error) {
+			setCatalogFailure({ branch, error: (error as Error).message })
+		} finally {
+			setRefreshingImages(false)
+		}
+	}
 	const documents = [...(source?.documents || [])]
 	for (const d of state.drafts)
 		if (d.branch === (draft?.branch || state.source)) {
@@ -231,11 +299,22 @@ export default function WriteWorkspace() {
 								placeholder="The leaf, the water, and what follows. Write or dictate as the session unfolds…"
 							/>
 						</>
+					) : imagesUnavailable ? (
+						<div className="cms-reading">
+							<p className="cms-muted" role="status">
+								Image preview is{" "}
+								{waitingForCatalog || previewMedia.loading || refreshingImages
+									? "loading"
+									: "unavailable"}
+								. Your notes remain available.
+							</p>
+							<Prose source={draft.document.body} />
+						</div>
 					) : (
 						<ReadingPreview
 							document={draft.document}
 							documents={documents}
-							assets={draft.assets}
+							assets={previewMedia.assets}
 							before={draft.base}
 						/>
 					)}
@@ -293,9 +372,29 @@ export default function WriteWorkspace() {
 							{mediaError}
 						</p>
 					)}
+					{(waitingForCatalog || previewMedia.loading || refreshingImages) && (
+						<p className="cms-muted" role="status">
+							Loading images from this repository edition… You can keep writing.
+						</p>
+					)}
+					{!waitingForCatalog && !refreshingImages && (catalogError || previewMedia.error) && (
+						<div className="cms-error" role="alert">
+							<p>{catalogError || previewMedia.error}</p>
+							<button onClick={() => void retryImages()}>Retry images</button>
+						</div>
+					)}
 					{recordImages(draft.document).map((im, i) => (
 						<div key={im.image + ":" + i} className="cms-image-entry">
-							<ContentPicture image={im} urls={urls} />
+							{!imagesUnavailable ? (
+								<ContentPicture image={im} urls={urls} />
+							) : (
+								<p className="cms-muted">
+									Image preview{" "}
+									{waitingForCatalog || previewMedia.loading || refreshingImages
+										? "loading…"
+										: "unavailable"}
+								</p>
+							)}
 							<label>
 								Image description
 								<input

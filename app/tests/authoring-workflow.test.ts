@@ -3,8 +3,12 @@ import { readFile, readdir } from "node:fs/promises"
 import path from "node:path"
 import { createHash } from "node:crypto"
 import { PNG } from "pngjs"
+
 import { parseDocument, serializeDocument } from "../src/lib/authoring/documents"
 import { COLLECTION_NAMES } from "../src/lib/authoring/types"
+
+// Full editorial flows include real WASM, reloads and durable network acknowledgements.
+test.setTimeout(120_000)
 
 async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = {}) {
 	const records = []
@@ -36,6 +40,9 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 	const pushes: Record<string, unknown>[] = [],
 		images: Record<string, string> = {}
 	const receipts = new Map<string, unknown>()
+	const mediaRequests: { branch: string; head: string; path: string; status: number }[] = []
+	const publicImageRequests: { path: string; status: number }[] = []
+	const catalogRequests: string[] = []
 	let sequence = 1,
 		reads = 0
 	await page.route("**/api/cms*", async (route) => {
@@ -54,8 +61,55 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 				csrfToken: "fixture-csrf",
 			})
 		if (action === "catalog") {
+			catalogRequests.push(url.searchParams.get("branch") || "main")
 			const catalog = catalogs.get(url.searchParams.get("branch") || "main")
 			return ok({ ...catalog, pullRequests: prs })
+		}
+		if (action === "media") {
+			const branch = url.searchParams.get("branch") || "",
+				head = url.searchParams.get("head") || "",
+				imagePath = url.searchParams.get("path") || ""
+			const catalog = catalogs.get(branch),
+				publicPath = imagePath.slice("app/public".length)
+			const allowedBranch =
+				branch === "main" ||
+				prs.some((pr) => pr.branch === branch && branch.startsWith("cms/authoring/7/"))
+			const validPath =
+				/^app\/public\/images\/uploads\/authoring\/[a-f0-9]{64}\/[1-9][0-9]{0,4}\.webp$/.test(
+					imagePath
+				)
+			const referenced = catalog?.records.some(
+				(record) => record.content.includes(publicPath) && parseDocument(record)
+			)
+			const status =
+				request.method() !== "GET"
+					? 405
+					: !allowedBranch
+					? 403
+					: !/^[a-f0-9]{40}$/.test(head) || !validPath
+					? 422
+					: catalog?.head !== head
+					? 409
+					: !referenced || !images[publicPath]
+					? 422
+					: 200
+			mediaRequests.push({ branch, head, path: imagePath, status })
+			return status === 200
+				? route.fulfill({
+						contentType: "image/webp",
+						headers: { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" },
+						body: Buffer.from(images[publicPath], "base64"),
+				  })
+				: route.fulfill({
+						status,
+						contentType: "application/json",
+						body: JSON.stringify({
+							error: {
+								code: status === 409 ? "head_conflict" : "media_scope",
+								message: "The reviewed image is unavailable in this exact fixture branch and head.",
+							},
+						}),
+				  })
 		}
 		if (action === "push") {
 			expect(request.headers()["x-csrf-token"]).toBe("fixture-csrf")
@@ -107,7 +161,12 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 		return ok({ authenticated: false })
 	})
 	await page.route("**/images/uploads/authoring/**", (route) => {
-		const bytes = images[new URL(route.request().url()).pathname]
+		const publicPath = new URL(route.request().url()).pathname
+		const published = catalogs
+			.get("main")!
+			.records.some((record) => record.content.includes(publicPath) && parseDocument(record))
+		const bytes = published ? images[publicPath] : undefined
+		publicImageRequests.push({ path: publicPath, status: bytes ? 200 : 404 })
 		return bytes
 			? route.fulfill({ contentType: "image/webp", body: Buffer.from(bytes, "base64") })
 			: route.fulfill({ status: 404 })
@@ -116,6 +175,15 @@ async function githubFixture(page: Page, options: { loseFirstPush?: boolean } = 
 		records,
 		catalogs,
 		pushes,
+		mediaRequests,
+		publicImageRequests,
+		catalogRequests,
+		get mediaReads() {
+			return mediaRequests.length
+		},
+		get publicImageReads() {
+			return publicImageRequests.length
+		},
 		get reads() {
 			return reads
 		},
@@ -365,4 +433,99 @@ test("remote content conflict is reconciled in reading view before an explicit n
 	await expect.poll(() => fixture.pushes.length).toBe(1)
 	expect(JSON.stringify(fixture.pushes[0])).toContain("Remote description retained.")
 	expect(JSON.stringify(fixture.pushes[0])).toContain("My local editorial wording.")
+})
+
+test("fresh-device PR editor reads private images, reloads its branch catalog and caches while typing", async ({
+	page,
+}) => {
+	const fixture = await githubFixture(page),
+		errors: string[] = []
+	page.on("pageerror", (error) => errors.push(error.message))
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await page.getByLabel("New record", { exact: true }).selectOption("tastings")
+	const title = "A fresh-device tea session"
+	await page.getByRole("textbox", { name: /^Tea name/ }).fill(title)
+	await page.getByLabel("Notes", { exact: true }).fill("Pushed from the first device.")
+	const id = new URL(page.url()).searchParams.get("id")!
+	await page
+		.locator('input[type="file"][accept^="image/"]')
+		.setInputFiles({ name: "fresh-device-tea.png", mimeType: "image/png", buffer: png() })
+	await expect(page.locator(".cms-image-entry img")).toBeVisible({ timeout: 30000 })
+	await page
+		.getByLabel("Image description", { exact: true })
+		.fill("Amber tea photographed on the first device.")
+	await page.getByRole("button", { name: "Review in Working changes →" }).click()
+	await page.getByRole("button", { name: "Commit & push 1 record", exact: true }).click()
+	await expect(page.locator(".cms-notice")).toContainText("Pushed 1 records")
+	const branch = [...fixture.catalogs.keys()].find((key) => key !== "main")!
+	const catalog = fixture.catalogs.get(branch)!
+	const record = catalog.records.map(parseDocument).find((document) => document.id === id)!
+	const photo = (record.data.images as { image: string }[])[0].image
+	// Pushed bytes must not accidentally exist on the public deployment before merge.
+	expect(await page.evaluate(async (image) => (await fetch(image)).status, photo)).toBe(404)
+	expect(fixture.publicImageRequests.at(-1)).toEqual({ path: photo, status: 404 })
+	const origin = new URL(page.url()).origin
+	await page.goto("about:blank")
+	const cdp = await page.context().newCDPSession(page)
+	await cdp.send("Storage.clearDataForOrigin", { origin, storageTypes: "indexeddb,local_storage" })
+	await cdp.detach()
+	await page.goto("/")
+	await openEditor(page)
+	await command(page, "Working changes")
+	await expect(page.getByRole("heading", { name: "Working changes", exact: true })).toBeVisible()
+	await page.getByRole("button", { name: "Browse edition", exact: true }).click()
+	await page.getByText("Browse repository content", { exact: true }).click()
+	await expect(page.getByRole("combobox", { name: "Edition", exact: true })).toHaveValue(branch)
+	await page.getByRole("combobox", { name: "Collection", exact: true }).selectOption("tastings")
+	await page.getByLabel("Find content", { exact: true }).fill(title)
+	await page.locator(".cms-library-list button").filter({ hasText: title }).click()
+	await expect(page).toHaveURL(new RegExp("id=" + id))
+	const image = page.locator(".cms-media-editor .cms-image-entry img")
+	await expect
+		.poll(() =>
+			image.evaluate(
+				(element: HTMLImageElement) =>
+					element.complete && element.naturalWidth > 0 && element.currentSrc.startsWith("blob:")
+			)
+		)
+		.toBe(true)
+	expect(fixture.mediaReads).toBeGreaterThan(0)
+	expect(
+		fixture.mediaRequests.every(
+			(request) =>
+				request.branch === branch && request.head === catalog.head && request.status === 200
+		)
+	).toBe(true)
+	const catalogReadCount = fixture.catalogRequests.length
+	await page.reload()
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue(
+		"Pushed from the first device."
+	)
+	await expect
+		.poll(() =>
+			image.evaluate(
+				(element: HTMLImageElement) =>
+					element.complete && element.naturalWidth > 0 && element.currentSrc.startsWith("blob:")
+			)
+		)
+		.toBe(true)
+	expect(fixture.catalogRequests.slice(catalogReadCount)).toContain(branch)
+	const mediaReads = fixture.mediaReads,
+		currentSrc = await image.evaluate((element: HTMLImageElement) => element.currentSrc)
+	await page.getByLabel("Notes", { exact: true }).fill("Fresh-device notes.")
+	await page
+		.getByLabel("Notes", { exact: true })
+		.pressSequentially(" The image remains visible while I write.")
+	await expect(page.getByRole("status").filter({ hasText: "Saved on this device" })).toBeVisible()
+	await page.evaluate(
+		() =>
+			new Promise<void>((resolve) =>
+				requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+			)
+	)
+	expect(fixture.mediaReads).toBe(mediaReads)
+	expect(await image.evaluate((element: HTMLImageElement) => element.currentSrc)).toBe(currentSrc)
+	expect(errors).toEqual([])
 })

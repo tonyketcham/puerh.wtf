@@ -387,9 +387,10 @@ export default function WorkingWorkspace() {
 					{previewMedia.loading ? (
 						<p role="status">Loading images from this reviewed edition…</p>
 					) : previewMedia.error ? (
-						<p className="cms-error" role="alert">
-							{previewMedia.error}
-						</p>
+						<div className="cms-error" role="alert">
+							<p>{previewMedia.error}</p>
+							<button onClick={previewMedia.retry}>Retry images</button>
+						</div>
 					) : (
 						<ReadingPreview
 							document={preview}
@@ -546,9 +547,10 @@ export default function WorkingWorkspace() {
 					{publicationMedia.loading ? (
 						<p role="status">Loading images from this reviewed edition…</p>
 					) : publicationMedia.error ? (
-						<p className="cms-error" role="alert">
-							{publicationMedia.error}
-						</p>
+						<div className="cms-error" role="alert">
+							<p>{publicationMedia.error}</p>
+							<button onClick={publicationMedia.retry}>Retry images</button>
+						</div>
 					) : (
 						<ReadingPreview
 							document={publicationPreview}
