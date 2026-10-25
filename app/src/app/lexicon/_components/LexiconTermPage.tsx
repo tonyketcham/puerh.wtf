@@ -36,8 +36,8 @@ import { descriptorAtom } from "@/lib/store/sessionAtom"
 import type { NoteStage } from "@/lib/types/session"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils"
-import LexiconWord from "./LexiconWord"
-import type { WordModel } from "./model"
+import LexiconWord from "@/lib/components/lexicon/LexiconWord"
+import type { WordModel } from "@/lib/components/lexicon/model"
 import { useLexiconWord } from "./useLexiconWord"
 
 const EASE = [0.22, 1, 0.36, 1] as const
