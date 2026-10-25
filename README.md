@@ -1,36 +1,38 @@
 # puerh.wtf
 
-A personal tea logbook for learning puer and other teas.
+A personal tea logbook for learning puer and other teas: tasting notes, brewing observations,
+origins, vendors, storage and the questions that connect them.
 
-The site is meant to collect tasting notes, brewing observations, references, and evolving thoughts as I learn by drinking. It is less a polished guide than a working notebook: a place to track what I tried, what I noticed, what changed over time, and what I want to understand next.
+## Working on the site
 
-Over time, it can become a map of teas, sessions, vendors, storage, preparation methods, and the questions that make tea interesting.
+Install the pnpm workspace from the repository root:
 
-## Development
-
-This is a pnpm monorepo. Install dependencies from the repo root:
-
-```bash
+```sh
 pnpm install
-```
-
-Run the main site locally:
-
-```bash
 pnpm dev
 ```
 
-Build everything:
+The main site is `app/`: Next starts on `http://localhost:3000` and Flatbread on :5057.
+From `app/`, `pnpm build` produces the static export in `out/`.
+Root `pnpm build` also builds the retained `log/` CMS fallback.
 
-```bash
-pnpm build
-```
+Start with the [architecture and ownership map](docs/architecture.md) for source content,
+generated assets, state, shared components and server boundaries. The [app quickstart](app/README.md)
+and [test instructions](app/tests/README.md) cover development and export verification.
 
-Run the app test suite:
+## Editing content
 
-```bash
-pnpm test
-```
+To use the in-app CMS, open the command bar and choose **Enable editing**.
+It keeps local drafts until explicit review and push. Server-side GitHub authorization,
+the native production endpoint, sign-in and catalog loading have been verified.
+Editorial push/publication acceptance remains separate; preserve the existing `log/` CMS
+and deployment until that checklist is complete.
+
+[CMS setup and activation evidence](docs/in-app-cms-setup.md) is the current operational
+guide. [Vercel deployment](VERCEL.md) describes the static frontend, its native CMS API
+and the retained standalone fallback.
+
+## Verification
 
 Playwright needs its browser once per machine: `npx playwright install chromium` (from `app/`).
 Tests start this checkout's own dev server on :3000 and Flatbread on :5057. Occupied ports
@@ -42,12 +44,3 @@ the existing server's checkout.
 From `app/`, `pnpm test:dev` runs the development lane and `pnpm test:export` tests an
 existing `out/` build. The export suite needs a build with `PUERH_TEST_FIXTURES=1` to include
 the radar and Explorer fixtures. See [testing instructions](app/tests/README.md) for both lanes.
-
-## Rough Stack
-
-- Next.js, React, and TypeScript for the main site in `app/`
-- [Flatbread](https://flatbread.dev/) as a just-in-time relational database and GraphQL provider
-- Netlify CMS for content editing, pending migration to a custom tool
-- Tailwind CSS for styling
-- Playwright for app tests
-- Vite-based `log/` package for the CMS/admin log tooling

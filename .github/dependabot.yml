@@ -7,9 +7,6 @@ updates:
     time: "11:00"
   open-pull-requests-limit: 10
   ignore:
-  - dependency-name: simplebar-vue
-    versions:
-    - 1.6.2
   - dependency-name: tailwindcss
     versions:
     - 2.1.2
@@ -28,9 +25,6 @@ updates:
     - 2.10.91
     - 2.10.95
     - 2.10.98
-  - dependency-name: eslint-plugin-vue
-    versions:
-    - 7.9.0
   - dependency-name: chart.js
     versions:
     - 3.0.2
