@@ -421,6 +421,9 @@ test("lost push response resumes exact request after reload and preserves newer 
 	await page.goto("/working-changes/")
 	await page.reload()
 	await page.getByRole("button", { name: "Resume pending push", exact: true }).click()
+	await expect(
+		page.getByRole("status").filter({ hasText: "Pushed 1 records to draft PR #101." })
+	).toBeVisible()
 	await expect(page.getByRole("button", { name: "Resume pending push", exact: true })).toHaveCount(
 		0
 	)
@@ -701,6 +704,35 @@ for (const entry of ["contextual", "library"] as const)
 				await expect(
 					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
 				).toBeVisible()
+				await page
+					.locator(".cms-record-row")
+					.filter({
+						has: page.getByRole("checkbox", {
+							name: "Include An unrelated local tag",
+							exact: true,
+						}),
+					})
+					.getByRole("link", { name: "Edit draft", exact: true })
+					.click()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				await page.goBack()
+				await expect(page).toHaveURL(/\/working-changes\/(?:\?|$)/)
+				await expect(
+					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
+				).toBeVisible()
+				await page.goForward()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				await page.reload()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
 				expect(fixture.pushes).toHaveLength(0)
 				expect(errors).toEqual([])
 			}

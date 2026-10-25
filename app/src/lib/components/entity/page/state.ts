@@ -9,7 +9,7 @@
 import { useSyncExternalStore } from "react"
 import { atom } from "jotai"
 import type { PageKind } from "@/lib/peek"
-import type { EntityPageData } from "./data"
+import type { EntityPageData } from "@/lib/content/entities"
 
 export type EntityPageState = { kind: PageKind; slug: string; data: EntityPageData }
 

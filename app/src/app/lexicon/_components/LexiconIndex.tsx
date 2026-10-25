@@ -6,7 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
 import { Search, X as Clear } from "lucide-react"
 import EntityTitle from "@/lib/components/entity/page/EntityTitle"
-import { liquorStops } from "@/lib/components/entity/page/model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import {
 	LEXICON_GROUP_META,
 	LEXICON_GROUPS,
@@ -17,8 +17,8 @@ import {
 import { descriptorAtom, relationIndexAtom } from "@/lib/store/sessionAtom"
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils"
-import LexiconWord from "./LexiconWord"
-import { wordColor } from "./model"
+import LexiconWord from "@/lib/components/lexicon/LexiconWord"
+import { wordColor } from "@/lib/components/lexicon/model"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 const SPRING = { type: "spring", stiffness: 520, damping: 38 } as const
