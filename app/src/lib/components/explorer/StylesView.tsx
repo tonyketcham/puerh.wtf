@@ -20,7 +20,7 @@ type Row =
 			kind: "category"
 			slug: string
 			title: string
-			color: string
+			color?: string
 			sessions: ExplorerSession[]
 			total: number
 			open: boolean
@@ -30,7 +30,7 @@ type Row =
 			kind: "style"
 			slug: string
 			title: string
-			color: string
+			color?: string
 			sessions: ExplorerSession[]
 			total: number
 			parent: string
@@ -86,7 +86,7 @@ function StylesView({
 				kind: "category",
 				slug: c._slug,
 				title: c.title,
-				color: c.color,
+				color: c.color ?? undefined,
 				sessions,
 				total: index.nodes.category.get(c._slug)?.all.length ?? 0,
 				open,
@@ -98,7 +98,7 @@ function StylesView({
 					kind: "style",
 					slug: node!.slug,
 					title: node!.title,
-					color: node!.color || c.color,
+					color: node!.color || c.color || undefined,
 					sessions: ss,
 					total: node!.all.length,
 					parent: c._slug,

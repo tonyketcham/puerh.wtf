@@ -15,6 +15,9 @@ export type BaseSession = {
 	_slug: NonNullable<GqlSession["_slug"]>
 }
 
+/** The session routing query has no presentation fields. */
+export type SessionRoute = { _slug: string; date: string }
+
 export type SessionPreview = BaseSession & {
 	_collection: NonNullable<GqlSession["_collection"]>
 	title: NonNullable<GqlSession["title"]>
@@ -22,21 +25,23 @@ export type SessionPreview = BaseSession & {
 	date: NonNullable<GqlSession["date"]>
 	production_year: GqlSession["production_year"]
 	excerpt: NonNullable<GqlSession["excerpt"]>
-	style: {
-		id: string
-		_slug: string
-		title: string
-		color: string
-		category: Category
-	}[]
+	style:
+		| {
+				id: string
+				_slug: string
+				title: string
+				color: string | null
+				category: Pick<Category, "_slug" | "title" | "color"> | null
+		  }[]
+		| null
 	vendor?:
 		| {
 				_slug: string
 				title: string
-				image: string
+				image: string | null
 		  }[]
 		| null
-	cultivar?: Cultivar[]
+	cultivar?: Cultivar[] | null
 	tags?: SessionTag[] | null
 	origin?: OriginRef[] | null
 	/** why there's no origin (blends, undisclosed sourcing) */
@@ -137,20 +142,7 @@ export type SessionFull = SessionPreviewWithFeatureImage & {
 	aging_conditions: GqlSession["aging_conditions"]
 	rating: NonNullable<GqlSession["rating"]>
 	purchase_link: GqlSession["purchase_link"]
-	vendor:
-		| {
-				_slug: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["_slug"]
-				>
-				title: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["title"]
-				>
-				image: NonNullable<
-					NonNullObject<NonNullable<NonNullable<GqlSession["vendor"]>[number]>>["image"]
-				>
-		  }[]
-		| null
-	cultivar: Cultivar[]
+	cultivar: Cultivar[] | null
 	picking: GqlSession["picking"]
 	notes: SessionNotes
 	flavor_axes: SessionFlavorAxes
