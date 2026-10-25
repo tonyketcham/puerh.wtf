@@ -53,7 +53,7 @@ export default function GenreLegend({ categories }: GenreLegendProps) {
 										<div
 											className="w-3 h-3 rounded-full"
 											style={{
-												backgroundColor: category.color,
+												backgroundColor: category.color ?? undefined,
 											}}
 										/>
 										<span className="ml-2 font-mono text-sm truncate transition-colors grow text-white/60 group-hover:text-white/90">
