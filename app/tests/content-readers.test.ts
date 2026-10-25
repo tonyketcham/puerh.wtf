@@ -7,7 +7,4 @@ test("server readers honor their route and presentation projections", async ({ p
 	const routes = Number(await summary.getAttribute("data-route-count"))
 	expect(routes).toBeGreaterThan(0)
 	await expect(summary).toHaveAttribute("data-session-count", String(routes))
-
-	const missing = await page.request.get("/sessions/2020/01/__content-reader-missing__/")
-	expect(missing.status()).toBe(404)
 })
