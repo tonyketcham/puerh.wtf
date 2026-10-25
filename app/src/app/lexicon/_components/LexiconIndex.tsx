@@ -6,7 +6,7 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react"
 import { Search, X as Clear } from "lucide-react"
 import EntityTitle from "@/lib/components/entity/page/EntityTitle"
-import { liquorStops } from "@/lib/components/entity/page/model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import {
 	LEXICON_GROUP_META,
 	LEXICON_GROUPS,

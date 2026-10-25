@@ -11,7 +11,7 @@ import { FLAVOR_AXES, type FlavorAxis, type SessionFlavorAxes } from "@/lib/type
 import { buildLink } from "@/lib/utils/BuildLinkToGivenCollectionNode"
 import { cn } from "@/lib/utils/cn"
 import CentroidRadar from "./CentroidRadar"
-import { byVintage, type EntityModel } from "./model"
+import { byVintage, type SessionAnalysis } from "@/lib/sessionAnalysis"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 const CREAM = "#fff2ca"
@@ -26,7 +26,7 @@ export default function AtAGlance({
 	index,
 	title,
 }: {
-	model: EntityModel
+	model: SessionAnalysis
 	index: RelationIndex
 	title: string
 }) {
@@ -200,7 +200,7 @@ function Stat({ label, value, sub }: { label: string; value: ReactNode; sub?: st
  * Sessions per vintage across the whole log's span: this entity's bars in its liquor over the
  * log's own bars as hairline ghosts, so a cluster of old teas reads at once.
  */
-function VintageStrip({ model, index }: { model: EntityModel; index: RelationIndex }) {
+function VintageStrip({ model, index }: { model: SessionAnalysis; index: RelationIndex }) {
 	const reduce = useReducedMotion() ?? false
 	const { years, counts, all, max } = useMemo(() => {
 		const yearOf = (y: unknown) => {
@@ -278,7 +278,7 @@ function VintageStrip({ model, index }: { model: EntityModel; index: RelationInd
 }
 
 /** One swatch per session, oldest vintage first; each opens its session. */
-function LiquorTimeline({ model }: { model: EntityModel }) {
+function LiquorTimeline({ model }: { model: SessionAnalysis }) {
 	const reduce = useReducedMotion() ?? false
 	const ordered = useMemo(() => byVintage(model.sessions), [model.sessions])
 	return (
