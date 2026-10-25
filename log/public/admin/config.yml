@@ -591,6 +591,11 @@ collections:
         name: 'title'
         widget: 'string'
 
+      - label: 'Hanzi'
+        name: 'hanzi'
+        widget: 'string'
+        required: false
+
       - label: 'Related Styles'
         name: 'styles'
         widget: relation
@@ -742,6 +747,11 @@ collections:
 
           - label: 'Instagram'
             name: 'instagram'
+            widget: 'string'
+            required: false
+
+          - label: 'X / Twitter'
+            name: 'twitter'
             widget: 'string'
             required: false
 

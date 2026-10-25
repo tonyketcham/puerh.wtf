@@ -200,8 +200,16 @@ class FakeGitHub {
 				return this.response({ data: { repository } })
 			}
 			if (body.query.includes("CmsCommit")) {
-				const input = body.variables.input,
-					branch = input.branch.refName
+				const input = body.variables.input
+				// GitHub CommittableBranch input, verified by live schema introspection 2026-10-25.
+				// https://docs.github.com/en/graphql/reference/git#committablebranch
+				const fields = new Set(["id", "repositoryNameWithOwner", "branchName"])
+				const unsupported = Object.keys(input.branch).find((field) => !fields.has(field))
+				if (unsupported)
+					return this.response({
+						errors: [{ message: `Field '${unsupported}' is not defined on CommittableBranch` }],
+					})
+				const branch = input.branch.branchName
 				if (this.refs[branch] !== input.expectedHeadOid)
 					return this.response({
 						errors: [{ message: "expectedHeadOid does not match latest head" }],
@@ -429,6 +437,96 @@ test("push creates one atomic commit and draft PR; exact retries create neither 
 	assert.equal(changed.status, 409)
 	assert.equal(changed.value.error.code, "operation_reused")
 })
+test("commit transport follows GitHub's CommittableBranch input schema", async () => {
+	const { github, handler } = setup(),
+		body = pushBody(github),
+		result = await call(handler, "push", { method: "POST", body })
+	assert.equal(result.status, 200, result.text)
+	const request = github.calls.find(
+		(request) => request.path === "/graphql" && request.body.query.includes("CmsCommit")
+	)
+	assert.deepEqual(request.body.variables.input.branch, {
+		repositoryNameWithOwner: "tonyketcham/puerh.wtf",
+		branchName: result.value.branch,
+	})
+	// Negative control: the previous provider-invalid field must fail before any commit.
+	const invalid = clone(request.body)
+	invalid.variables.input.branch.refName = invalid.variables.input.branch.branchName
+	delete invalid.variables.input.branch.branchName
+	const rejected = await github.fetch("https://api.github.com/graphql", {
+		method: "POST",
+		body: JSON.stringify(invalid),
+	})
+	assert.match((await rejected.json()).errors[0].message, /refName.*not defined/)
+	assert.equal(github.refs[result.value.branch], result.value.head)
+})
+
+test("an exact pending push resumes its existing branch after main advances", async () => {
+	const { github, handler } = setup(),
+		body = pushBody(github),
+		captured = clone(body),
+		branch = `cms/authoring/${USER.id}/${body.operationId}`
+	// A previous attempt created the branch but failed before committing content.
+	github.refs[branch] = body.target.head
+	const currentMain = github.makeCommit("main", { "README.md": "Service fix" }, "Deploy fix")
+	const first = await call(handler, "push", { method: "POST", body })
+	assert.equal(first.status, 200, first.text)
+	assert.deepEqual(body, captured)
+	assert.equal(github.commits[first.value.head].parents[0].sha, captured.target.head)
+	assert.equal(github.refs.main, currentMain)
+	assert.equal(first.value.pullRequest.baseHead, currentMain)
+	const requests = () =>
+		github.calls.filter(
+			(request) => request.path === "/graphql" && request.body.query.includes("CmsCommit")
+		)
+	const input = requests()[0].body.variables.input
+	assert.equal(input.expectedHeadOid, captured.target.head)
+	assert.equal(input.clientMutationId, captured.operationId)
+	const digest = createHash("sha256")
+		.update(
+			JSON.stringify({
+				target: { ...captured.target, pullRequestNumber: null },
+				documents: captured.documents,
+				assets: captured.assets,
+			})
+		)
+		.digest("hex")
+	assert(input.message.body.includes(`CMS-Operation: ${captured.operationId}`))
+	assert(input.message.body.includes(`CMS-Payload-SHA256: ${digest}`))
+	const repeated = await call(handler, "push", { method: "POST", body: captured })
+	assert.equal(repeated.status, 200, repeated.text)
+	assert.equal(repeated.value.head, first.value.head)
+	assert.equal(requests().length, 1)
+	assert.equal(github.pulls.length, 1)
+	assert.equal(
+		github.calls.filter(
+			(request) => request.path.endsWith("/git/refs") && request.method === "POST"
+		).length,
+		0
+	)
+})
+
+test("a pending push cannot replace a moved operation branch after main advances", async () => {
+	const { github, handler } = setup(),
+		body = pushBody(github),
+		branch = `cms/authoring/${USER.id}/${body.operationId}`
+	github.refs[branch] = body.target.head
+	const movedHead = github.makeCommit(branch, { [PATH]: vendor("Other edit") }, "Other work")
+	github.makeCommit("main", { "README.md": "Service fix" }, "Deploy fix")
+	const result = await call(handler, "push", { method: "POST", body })
+	assert.equal(result.status, 409, result.text)
+	assert.equal(result.value.error.code, "head_conflict")
+	assert.equal(result.value.error.details?.operationStatus, "not_committed")
+	assert.equal(github.refs[branch], movedHead)
+	assert.equal(github.pulls.length, 0)
+	assert.equal(
+		github.calls.filter(
+			(request) => request.path === "/graphql" && request.body.query.includes("CmsCommit")
+		).length,
+		0
+	)
+})
+
 test("a lost commit response or PR response reconciles without duplicate writes", async () => {
 	for (const failure of ["lostCommit", "lostPr"]) {
 		const { github, handler } = setup(),

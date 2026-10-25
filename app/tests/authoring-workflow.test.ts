@@ -241,7 +241,9 @@ function sha(content: string) {
 async function command(page: Page, text: string) {
 	await expect(async () => {
 		if (!(await page.getByRole("combobox", { name: "Search or run a command" }).isVisible()))
-			await page.getByRole("button", { name: "Search and commands", exact: true }).click()
+			await page
+				.getByRole("button", { name: /^Search and commands(?: \(\d+ filters active\))?$/ })
+				.click()
 		await expect(page.getByRole("combobox", { name: "Search or run a command" })).toBeVisible({
 			timeout: 1500,
 		})
@@ -642,3 +644,64 @@ test("blocked activation storage preserves reading, editing and explicit disable
 	await expect(page.getByRole("button", { name: "Search and commands", exact: true })).toBeVisible()
 	expect(errors).toEqual([])
 })
+
+for (const entry of ["contextual", "library"] as const)
+	for (const filtered of [false, true])
+		test(
+			"editing an existing vendor after a restored unrelated tag draft uses the vendor identity " +
+				entry +
+				(filtered ? " filtered" : ""),
+			async ({ page }) => {
+				await page.setViewportSize({ width: 1440, height: 1000 })
+				const fixture = await githubFixture(page),
+					errors: string[] = []
+				// Routing mocks normally disable HTTP cache; retain the production cache behavior here.
+				const network = await page.context().newCDPSession(page)
+				await network.send("Network.enable")
+				await network.send("Network.setCacheDisabled", { cacheDisabled: false })
+				page.on("pageerror", (error) => errors.push(error.message))
+				await page.goto(filtered ? "/?q=white2tea" : "/")
+				await openEditor(page)
+				await command(page, "Working changes")
+				await page.getByLabel("New record", { exact: true }).selectOption("tags")
+				await page.getByRole("textbox", { name: /^Name/ }).fill("An unrelated local tag")
+				await expect(
+					page.getByRole("status").filter({ hasText: "Saved on this device" })
+				).toBeVisible()
+				const tagId = new URL(page.url()).searchParams.get("id")!
+				await page.reload()
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				const vendor = parseDocument(
+					fixture.records.find((record) => record.path === "app/content/vendors/white2tea.md")!
+				)
+				if (entry === "contextual") {
+					await page.getByRole("tab", { name: "Vendors", exact: true }).click()
+					await page.getByRole("link", { name: /^white2tea, vendor,/ }).click()
+					await expect(
+						page.locator("main").getByRole("heading", { name: "white2tea", exact: true })
+					).toBeVisible()
+					await page.getByRole("button", { name: "Edit this record", exact: true }).click()
+				} else {
+					await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+					await page.getByText("Browse repository content", { exact: true }).click()
+					await page.locator(".cms-library").getByRole("combobox").nth(1).selectOption("vendors")
+					await page.getByLabel("Find content", { exact: true }).fill("white2tea")
+					await page
+						.locator(".cms-library-list")
+						.getByRole("button", { name: /white2tea/ })
+						.click()
+				}
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + vendor.id + "(?:&|$)"))
+				expect(new URL(page.url()).searchParams.get("id")).not.toBe(tagId)
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue("white2tea")
+				await expect(page.locator(".cms-write .cms-eyebrow")).toHaveText("Vendor · Pushed edition")
+				await page.getByRole("link", { name: "← Working changes", exact: true }).click()
+				await expect(
+					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
+				).toBeVisible()
+				expect(fixture.pushes).toHaveLength(0)
+				expect(errors).toEqual([])
+			}
+		)

@@ -3,5 +3,5 @@ export type Vendor = {
 	_collection: string
 	_slug: string
 	title: string
-	image: string
+	image: string | null
 }
