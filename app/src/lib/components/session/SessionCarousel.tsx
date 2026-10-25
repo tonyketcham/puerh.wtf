@@ -10,7 +10,7 @@ import BoxCarousel, {
 	type BoxCarouselSnapshot,
 	type CarouselItem,
 	type RotationDirection,
-} from "@/components/fancy/carousel/box-carousel"
+} from "@/lib/components/BoxCarousel"
 import { currentLiquorAtom, hoveredNoteStageAtom } from "@/lib/store/sessionAtom"
 import { liftLiquor, rgbCss } from "@/lib/liquor"
 import { buildStageImageMap } from "@/lib/noteStages"
