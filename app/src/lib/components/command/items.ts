@@ -30,7 +30,7 @@ export type TeaEntry = {
 	title: string
 	year: string | null
 	vendor: string | null
-	category: { title: string; color: string } | null
+	category: { title: string; color?: string } | null
 	liquor: LiquorColor
 	/** secondary search text (vendor, styles, tags, origin) */
 	meta: string
@@ -127,7 +127,7 @@ export function buildIndex(
 			title: s.title,
 			year: yearOf(s),
 			vendor: s.vendor?.[0]?.title ?? null,
-			category: cat ? { title: cat.title, color: cat.color } : null,
+			category: cat ? { title: cat.title, color: cat.color ?? undefined } : null,
 			liquor: getLiquorColor(s._slug),
 			meta: [
 				s.tea_name,
@@ -192,7 +192,7 @@ export function buildIndex(
 			if (!n?.all.length) return null
 			const styles = rel.children.category.get(c._slug)?.length ?? 0
 			return entry("category", n, {
-				color: c.color,
+				color: c.color ?? undefined,
 				sub: `category · ${styles} ${styles === 1 ? "style" : "styles"}`,
 			})
 		})

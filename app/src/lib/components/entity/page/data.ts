@@ -283,7 +283,7 @@ function memo<A extends string | void, T>(fn: (arg: A) => Promise<T>): (arg: A) 
 
 const loadAll = memo(async (kind: PageKind): Promise<Raw[]> => {
 	const { root, query } = QUERIES[kind]
-	const data: Record<string, Raw[] | null> = await flatbread.request(query)
+	const data = await flatbread.request<Record<string, Raw[] | null>>(query)
 	return (data[root] || []).filter((r): r is Raw => !!r?._slug)
 })
 

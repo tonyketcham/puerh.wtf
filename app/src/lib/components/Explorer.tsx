@@ -334,7 +334,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 			tags: new Map<string, { label: string }>(),
 			vessels: new Map<string, { label: string }>(),
 		}
-		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color })
+		for (const c of categories) map.styles.set(c._slug, { label: c.title, color: c.color ?? undefined })
 		for (const st of index.nodes.style.values())
 			map.styles.set(st.slug, { label: st.title, color: st.color ?? undefined })
 		for (const v of vendors) map.vendors.set(v._slug, { label: v.title })
