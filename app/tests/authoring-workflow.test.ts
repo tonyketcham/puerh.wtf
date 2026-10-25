@@ -701,6 +701,35 @@ for (const entry of ["contextual", "library"] as const)
 				await expect(
 					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
 				).toBeVisible()
+				await page
+					.locator(".cms-record-row")
+					.filter({
+						has: page.getByRole("checkbox", {
+							name: "Include An unrelated local tag",
+							exact: true,
+						}),
+					})
+					.getByRole("link", { name: "Edit draft", exact: true })
+					.click()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				await page.goBack()
+				await expect(page).toHaveURL(/\/working-changes\/(?:\?|$)/)
+				await expect(
+					page.getByRole("checkbox", { name: "Include An unrelated local tag", exact: true })
+				).toBeVisible()
+				await page.goForward()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
+				await page.reload()
+				await expect(page).toHaveURL(new RegExp("/write/\\?id=" + tagId + "(?:&|$)"))
+				await expect(page.getByRole("textbox", { name: /^Name/ })).toHaveValue(
+					"An unrelated local tag"
+				)
 				expect(fixture.pushes).toHaveLength(0)
 				expect(errors).toEqual([])
 			}
