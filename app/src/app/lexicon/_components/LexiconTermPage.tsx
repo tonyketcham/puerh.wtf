@@ -10,7 +10,7 @@ import Hatch from "@/lib/components/entity/Hatch"
 import AtAGlance from "@/lib/components/entity/page/AtAGlance"
 import DotMap, { type DotMapPoint } from "@/lib/components/entity/page/DotMap"
 import EntityTitle from "@/lib/components/entity/page/EntityTitle"
-import { liquorStops } from "@/lib/components/entity/page/model"
+import { liquorStops } from "@/lib/sessionAnalysis"
 import Section from "@/lib/components/entity/page/Section"
 import RelatedGroup, { type RelatedGroupData } from "@/lib/components/entity/page/RelatedGroup"
 import SessionsList from "@/lib/components/entity/page/SessionsList"
@@ -119,7 +119,7 @@ export default function LexiconTermPage({
 					aside={<span className="text-[11px] text-white/25">find all references</span>}
 					recordingKey="entity-sessions"
 				>
-					<SessionsList model={model} index={index} title={title} cards={cards} />
+					<SessionsList sessions={model.sessions} index={index} title={title} cards={cards} />
 				</Section>
 
 				<Section id="related" label="Related" recordingKey="entity-related">
