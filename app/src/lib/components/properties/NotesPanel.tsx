@@ -1,5 +1,6 @@
 "use client"
 
+import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import {
 	memo,
 	useCallback,
@@ -260,7 +261,8 @@ function PhotoThumb({ src, alt, lit }: { src: string; alt: string; lit: boolean 
 					: { type: "spring", stiffness: 500, damping: 30, filter: { duration: 0.2 } }
 			}
 		>
-			<img
+			<ResponsiveImage
+				sizes="20px"
 				src={src}
 				alt=""
 				draggable={false}

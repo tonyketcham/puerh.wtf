@@ -4,3 +4,8 @@
 .DS_Store
 .vercel
 test-results/.last-run.json
+
+# Local authoring build/test artifacts
+/app/public/authoring-codecs/
+/app/test-results/
+/app/playwright-report/

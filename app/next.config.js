@@ -8,6 +8,7 @@ export default (phase) => {
 
 	return {
 		output: "export",
+		...(isDev && process.env.CMS_DEV_URL ? { async rewrites() { return [{ source: "/api/cms", destination: process.env.CMS_DEV_URL + "/api/cms" }] } } : {}),
 		trailingSlash: true,
 		images: {
 			unoptimized: true,

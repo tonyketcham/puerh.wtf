@@ -1,5 +1,6 @@
 "use client"
 
+import AuthoringNav from "@/lib/authoring/AuthoringNav"
 import SiteHeader from "./SiteHeader"
 import FileTree from "./filetree/FileTree"
 import type { ExplorerSession } from "../types/session"
@@ -584,6 +585,7 @@ export default function Explorer({ sessions, vendors, categories, recordingKey }
 							</div>
 						</div>
 						<div className="p-4">
+							<AuthoringNav view={view} />
 							<YearRuler
 								sessions={sessions}
 								filteredSessions={sessionsExceptYears}
