@@ -105,12 +105,12 @@ test("a word returns to its unmounted parent and scrolling preserves keyboard fo
 	await page.getByRole("tab", { name: "Lexicon", exact: true }).click()
 	const list = page.locator("#explorer-view-panel [data-virtual-list]")
 	const group = list.locator('[data-lexicon-row="group"][data-group="fruits"]')
-	const collapsedTotal = Number(await list.getAttribute("data-virtual-total"))
-	const groupIndex = Number(await group.locator("..").getAttribute("data-virtual-index"))
+	await expect(group).toBeVisible()
 	await group.focus()
 	await page.keyboard.press("ArrowRight")
 	await expect(group).toHaveAttribute("aria-expanded", "true")
-	const words = Number(await list.getAttribute("data-virtual-total")) - collapsedTotal
+	const groupIndex = Number(await group.locator("..").getAttribute("data-virtual-index"))
+	const words = Number((await group.getAttribute("aria-label"))?.match(/^fruits, (\d+) words?$/)?.[1])
 	expect(words).toBeGreaterThan(0)
 	const wordAt = (index: number) =>
 		list.locator(
