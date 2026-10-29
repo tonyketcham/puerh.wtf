@@ -32,6 +32,8 @@ export default defineConfig({
 				cultivar: "Varietal",
 				origin: "Origin",
 				vendor: "Vendor",
+				// the vendor's own supplier, when they resold someone else's tea
+				sourced_from: "Vendor",
 				tags: "Tags",
 				// top-level on purpose: refs on nested fields are unverified in Flatbread, so
 				// brewing.vessel stays as the free-text note

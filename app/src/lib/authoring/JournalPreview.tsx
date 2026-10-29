@@ -16,7 +16,7 @@ import EntityPage from "@/lib/components/entity/page/EntityPage"
 import ResponsiveImage from "@/lib/components/ResponsiveImage"
 import SessionCard from "@/lib/components/SessionCard"
 import { explorerSessionsAtom } from "@/lib/store/sessionAtom"
-import { buildRelationIndex, sessionsOf } from "@/lib/relations"
+import { buildRelationIndex, sessionsOf, sourcedThrough } from "@/lib/relations"
 import { getLiquorColor, liquorVars } from "@/lib/liquor"
 import { formatTemp, ratio, formatSeconds } from "@/lib/steeps"
 import { generateSessionRotation } from "@/app/sessions/[year]/[month]/[slug]/generateSessionRotation"
@@ -130,6 +130,14 @@ function JournalContent({
 								<SessionCard key={s.id} session={s} now={now} />,
 							])
 						)}
+						supplied={
+							entity.kind === "vendor"
+								? sourcedThrough(index, entity.slug).map((s) => ({
+										slug: s._slug,
+										card: <SessionCard key={s.id} session={s} now={now} />,
+								  }))
+								: undefined
+						}
 						lead={
 							hasLead && paragraphs[0] ? (
 								<ReactMarkdown remarkPlugins={[remarkGfm]}>{paragraphs[0]}</ReactMarkdown>

@@ -176,6 +176,9 @@ export function buildRelationIndex(sessions: readonly ExplorerSession[]): Relati
 			}
 		}
 		for (const v of s.vendor || []) ensure("vendor", v._slug, { title: v.title, image: v.image })
+		// a supplier gets a node (peeks, chips) but no sessions: it didn't sell them; see sourcedThrough
+		for (const v of s.sourced_from || [])
+			ensure("vendor", v._slug, { title: v.title, image: v.image })
 		for (const st of s.style || []) {
 			const slug = st._slug || st.id
 			const category = st.category
@@ -249,6 +252,11 @@ export function sessionsOf(
 	return (rollup ? node.all : node.direct)
 		.map((slug) => index.bySlug.get(slug))
 		.filter((s): s is ExplorerSession => !!s)
+}
+
+/** Sessions a vendor supplied to another vendor, who sold them on (`sourced_from`). */
+export function sourcedThrough(index: RelationIndex, vendor: string): ExplorerSession[] {
+	return index.sessions.filter((s) => (s.sourced_from || []).some((v) => v._slug === vendor))
 }
 
 /** Ancestors of an origin or style, root first (China › Yunnan › …), not including the node itself. */

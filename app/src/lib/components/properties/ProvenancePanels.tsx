@@ -356,6 +356,7 @@ function TerraIncognita({ label }: { label: string }) {
 
 function Source({ session, index, row }: SectionProps) {
 	const vendors = session.vendor || []
+	const suppliers = session.sourced_from || []
 	const listing = session.purchase_link ? parseListing(session.purchase_link) : null
 	const vessels = (session.vessel || []).filter((v) => !!v?._slug)
 	// the free-text note, for a session whose vessel isn't in the collection
@@ -368,20 +369,12 @@ function Source({ session, index, row }: SectionProps) {
 				<dl className="space-y-1.5">
 					{vendors.length > 0 && (
 						<Prop label="vendor" row={row}>
-							<Refs>
-								{vendors.map((v) => (
-									<span key={v._slug} className="inline-flex items-center max-w-full gap-2">
-										<VendorLogo src={v.image} title={v.title} />
-										<EntityRef
-											kind="vendor"
-											slug={v._slug}
-											label={v.title}
-											count={countOf(index, "vendor")(v._slug)}
-											recordingKey="source-vendor"
-										/>
-									</span>
-								))}
-							</Refs>
+							<VendorRefs vendors={vendors} index={index} recordingKey="source-vendor" />
+						</Prop>
+					)}
+					{suppliers.length > 0 && (
+						<Prop label="supplier" row={row}>
+							<VendorRefs vendors={suppliers} index={index} recordingKey="source-supplier" />
 						</Prop>
 					)}
 					{listing && (
@@ -424,6 +417,34 @@ function Source({ session, index, row }: SectionProps) {
 				</dl>
 			</Stagger>
 		</PanelSection>
+	)
+}
+
+/** Vendors as logo + chip, for the vendor and sourced-from rows. */
+function VendorRefs({
+	vendors,
+	index,
+	recordingKey,
+}: {
+	vendors: NonNullable<SectionProps["session"]["vendor"]>
+	index: SectionProps["index"]
+	recordingKey: string
+}) {
+	return (
+		<Refs>
+			{vendors.map((v) => (
+				<span key={v._slug} className="inline-flex items-center max-w-full gap-2">
+					<VendorLogo src={v.image} title={v.title} />
+					<EntityRef
+						kind="vendor"
+						slug={v._slug}
+						label={v.title}
+						count={countOf(index, "vendor")(v._slug)}
+						recordingKey={recordingKey}
+					/>
+				</span>
+			))}
+		</Refs>
 	)
 }
 
