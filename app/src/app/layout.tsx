@@ -12,6 +12,7 @@ import EntityPeekHost from "@/lib/components/entity/peek/EntityPeekHost"
 import AuthoringMount from "@/lib/authoring/AuthoringMount"
 import ScrollReset from "@/lib/components/ScrollReset"
 import { getEntityDetails } from "@/lib/entityDetails.server"
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/siteMetadata"
 
 const inter = Inter({
 	subsets: ["latin"],
@@ -28,10 +29,14 @@ const rock3d = localFont({
 	variable: "--font-rock-3d",
 })
 
+// Defaults for routes without their own metadata. No canonical here: it would point every
+// such route (the 404 among them) at the homepage. Pages build theirs with pageMetadata().
 export const metadata: Metadata = {
-	title: "puerh.wtf - a tea log",
-	description:
-		"A tea log for documenting tea sessions to learn complexities like terroir in retrospect while focusing more on an individual tea.",
+	metadataBase: new URL(SITE_URL),
+	title: SITE_TITLE,
+	description: SITE_DESCRIPTION,
+	openGraph: { title: SITE_TITLE, description: SITE_DESCRIPTION, siteName: SITE_NAME, locale: "en_US", type: "website" },
+	twitter: { card: "summary", title: SITE_TITLE, description: SITE_DESCRIPTION },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

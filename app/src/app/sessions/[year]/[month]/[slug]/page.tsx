@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react"
+import type { Metadata } from "next"
+import { pageMetadata, sessionPath } from "@/lib/siteMetadata"
 import { getSession, getSessionRoutes } from "@/lib/api"
 import { notFound } from "next/navigation"
 import SessionCarousel from "@/lib/components/session/SessionCarousel"
@@ -27,6 +29,37 @@ export async function generateStaticParams() {
 			month: date ? String(date.getMonth() + 1).padStart(2, "0") : "",
 			slug: session._slug,
 		}
+	})
+}
+
+export async function generateMetadata(props: SessionPageProps): Promise<Metadata> {
+	const session = await getSession((await props.params).slug)
+	if (!session) return {}
+
+	const name = [session.production_year, session.title].filter(Boolean).join(" ")
+	const style = session.style?.[0]?.title
+	const origin = session.origin?.[0]?.title
+	const vendor = session.vendor?.[0]?.title
+	const day = session.date ? session.date.slice(0, 10) : null
+	// Excerpts can be a few words ("yea it's nice"), so the description always says what the tea is.
+	const facts = [
+		[style, origin && `from ${origin}`].filter(Boolean).join(" "),
+		vendor && `via ${vendor}`,
+		day && `tasted ${day}`,
+	]
+		.filter(Boolean)
+		.join(", ")
+	const excerpt = session.excerpt.trim().replace(/[.!?]*$/, "")
+	const lead = excerpt ? excerpt.charAt(0).toUpperCase() + excerpt.slice(1) : ""
+	const photo = session.images?.[0]
+
+	return pageMetadata({
+		title: `${name} · session · puerh.wtf`,
+		description: [lead, facts && `${name}: ${facts}`].filter(Boolean).join(". ") + ".",
+		path: sessionPath(session),
+		image: photo ? { url: photo.image, alt: photo.alt } : null,
+		type: "article",
+		publishedTime: session.date,
 	})
 }
 

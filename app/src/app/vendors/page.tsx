@@ -1,13 +1,15 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/siteMetadata"
 import VendorIndex from "@/lib/components/entity/indexes/VendorIndex"
 import { getEntityList, getOriginPoints, getServerIndex } from "@/lib/content/entities.server"
 import type { DotMapPoint } from "@/lib/components/entity/page/DotMap"
 import { related } from "@/lib/relations"
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
 	title: "Vendors · puerh.wtf",
 	description: "Every vendor in the tea log, by sessions, with the origins they source from.",
-}
+	path: "/vendors/",
+})
 
 export default async function VendorsPage() {
 	const [vendors, index, origins] = await Promise.all([

@@ -1,8 +1,26 @@
 import SessionLog from "@/lib/components/home/SessionLog"
-import { getExplorerSessions, getVendors } from "@/lib/api"
+import type { Metadata } from "next"
+import { getExplorerSessions, getSession, getSessionRoutes, getVendors } from "@/lib/api"
+import { pageMetadata, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/siteMetadata"
 import { getEntityList } from "@/lib/content/entities.server"
 import type { DrawnVessel } from "@/lib/components/teaware-drawing/TeawareDrawing"
 import Hero, { type HeroStats } from "@/lib/components/home/Hero"
+
+/** The share card carries the newest session's first photo. */
+export async function generateMetadata(): Promise<Metadata> {
+	const routes = await getSessionRoutes()
+	let photo = null
+	for (const route of routes.slice(0, 5)) {
+		photo = (await getSession(route._slug))?.images?.[0] ?? null
+		if (photo) break
+	}
+	return pageMetadata({
+		title: SITE_TITLE,
+		description: SITE_DESCRIPTION,
+		path: "/",
+		image: photo ? { url: photo.image, alt: photo.alt } : null,
+	})
+}
 
 export default async function HomePage() {
 	const [all, vessels, origins, vendors] = await Promise.all([

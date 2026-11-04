@@ -3,7 +3,8 @@
  * which stay thin: static params for the export and per-entity metadata.
  */
 import type { Metadata } from "next"
-import { ENTITY_META } from "@/lib/entities"
+import { ENTITY_META, entityHref } from "@/lib/entities"
+import { pageMetadata } from "@/lib/siteMetadata"
 import type { PageKind } from "@/lib/peek"
 import { getEntityPage, getEntitySlugs, summarize } from "@/lib/content/entities.server"
 
@@ -26,10 +27,11 @@ export function decodeSlug(slug: string): string {
 export async function entityMetadata(kind: PageKind, { params }: SlugParams): Promise<Metadata> {
 	const data = await getEntityPage(kind, decodeSlug((await params).slug))
 	if (!data) return {}
-	return {
+	return pageMetadata({
 		title: `${data.title} · ${ENTITY_META[kind].label} · puerh.wtf`,
 		description:
 			summarize(data.description, 200) ??
 			`${data.title}, a ${ENTITY_META[kind].label} in the puerh.wtf tea log.`,
-	}
+		path: entityHref(kind, data.slug) ?? "/",
+	})
 }

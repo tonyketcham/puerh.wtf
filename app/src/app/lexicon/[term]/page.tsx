@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/siteMetadata"
 import { notFound } from "next/navigation"
 import SessionCard from "@/lib/components/SessionCard"
 import { getOriginPoints } from "@/lib/content/entities.server"
@@ -34,10 +35,11 @@ export async function generateMetadata({ params }: TermParams): Promise<Metadata
 	if (!entry) return {}
 	const refs = lexiconRefs(index.sessions, entry).length
 	const group = LEXICON_GROUP_META[entry.group].label
-	return {
+	return pageMetadata({
 		title: `‘${entry.term}’ · lexicon · puerh.wtf`,
 		description: `‘${entry.term}’ in the puerh.wtf tea log: ${refs} sessions mention it (${group}). Where it turns up, at which stage, and what it's said with.`,
-	}
+		path: `/lexicon/${encodeURIComponent(entry.slug)}/`,
+	})
 }
 
 export default async function LexiconTerm({ params }: TermParams) {
