@@ -117,6 +117,11 @@ export async function getExplorerSessions(options?: {
 					title
 					image
 				}
+				sourced_from {
+					_slug
+					title
+					image
+				}
 				cultivar {
 					id
 					_slug
@@ -257,6 +262,11 @@ export async function getSession(slug: string): Promise<SessionFull | null> {
 					}
 				}
 				vendor {
+					_slug
+					title
+					image
+				}
+				sourced_from {
 					_slug
 					title
 					image

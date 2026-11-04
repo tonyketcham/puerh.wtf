@@ -351,6 +351,8 @@ export type Session = {
   purchase_link?: Maybe<Scalars['String']['output']>;
   rating?: Maybe<Scalars['Float']['output']>;
   season_note?: Maybe<Scalars['String']['output']>;
+  /** All Vendors that are referenced by this Session */
+  sourced_from?: Maybe<Array<Maybe<Vendor>>>;
   storage?: Maybe<Array<Maybe<Session_Storage>>>;
   /** All Styles that are referenced by this Session */
   style?: Maybe<Array<Maybe<Style>>>;
@@ -382,6 +384,14 @@ export type SessionCultivarArgs = {
 
 
 export type SessionOriginArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Order>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type SessionSourced_FromArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Order>;
   skip?: InputMaybe<Scalars['Int']['input']>;

@@ -11,6 +11,7 @@ import {
 	entityKeys,
 	sessionsOf,
 	sessionColor,
+	sourcedThrough,
 	type RelationIndex,
 } from "@/lib/relations"
 import type { DotMapPoint } from "@/lib/components/entity/page/DotMap"
@@ -87,6 +88,7 @@ export function journalSession(
 		production_year: number(data.production_year),
 		style: styles,
 		vendor: refs("vendors", data.vendor),
+		sourced_from: refs("vendors", data.sourced_from),
 		origin: origins,
 		origin_note: data.origin_note ?? null,
 		cultivar: refs("cultivars", data.cultivar),
@@ -321,12 +323,11 @@ export function previewDocuments(
 ): CmsDocument[] {
 	if (!document) return []
 	if (document.collection === "tastings") {
+		// the vendor and supplier rows draw these vendors' logos
 		const vendors = new Set(
-			Array.isArray(document.data.vendor)
-				? document.data.vendor
-				: document.data.vendor
-				? [document.data.vendor]
-				: []
+			[document.data.vendor, document.data.sourced_from].flatMap((ids) =>
+				Array.isArray(ids) ? ids : ids ? [ids] : []
+			)
 		)
 		return [
 			document,
@@ -337,6 +338,11 @@ export function previewDocuments(
 	if (!entity) return [document]
 	const sessions = catalog.filter((d) => d.collection === "tastings")
 	const index = buildRelationIndex(sessions.map((d) => journalSession(d, catalog)))
-	const ids = new Set(sessionsOf(index, entity.kind, entity.slug).map((s) => s.id))
+	const ids = new Set(
+		[
+			...sessionsOf(index, entity.kind, entity.slug),
+			...(entity.kind === "vendor" ? sourcedThrough(index, entity.slug) : []),
+		].map((s) => s.id)
+	)
 	return [document, ...sessions.filter((d) => ids.has(d.id))]
 }

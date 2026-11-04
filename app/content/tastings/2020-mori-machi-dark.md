@@ -15,6 +15,8 @@ season_note: Spring (first and second harvests)
 production_year: 2020
 vendor:
   - 6247aeca-512f-4a22-8352-67551cfa92ad
+sourced_from:
+  - 16a95eab-4fa4-487c-9d74-5fa92f5eb5bd
 purchase_link: https://www.denstea.com/dark-tea-c-1031_1015/morimachi-dark-tea-p-2041.html
 excerpt: A sake-like fermented tea with a funky sour candy-like, toast-like range
 date: 2021-03-11T18:41:52.237Z

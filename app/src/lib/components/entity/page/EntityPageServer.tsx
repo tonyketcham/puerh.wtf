@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { notFound } from "next/navigation"
 import SessionCard from "@/lib/components/SessionCard"
 import type { PageKind } from "@/lib/peek"
-import { entityKeys, related, sessionColor, sessionsOf } from "@/lib/relations"
+import { entityKeys, related, sessionColor, sessionsOf, sourcedThrough } from "@/lib/relations"
 import { getEntityPage, getOriginPoints, getServerIndex } from "@/lib/content/entities.server"
 import type { DotMapPoint } from "./DotMap"
 import EntityPage from "./EntityPage"
@@ -33,6 +33,15 @@ export default async function EntityPageServer({ kind, slug }: { kind: PageKind;
 	for (const s of sessionsOf(index, kind, slug)) {
 		cards[s._slug] = <SessionCard session={s} now={now} />
 	}
+
+	// vendors: teas they supplied to another vendor, who sold them on
+	const supplied =
+		kind === "vendor"
+			? sourcedThrough(index, slug).map((s) => ({
+					slug: s._slug,
+					card: <SessionCard session={s} now={now} />,
+			  }))
+			: []
 
 	// vendors and cultivars: where their teas grew, as dots in the page's accent
 	let points: DotMapPoint[] = []
@@ -84,6 +93,7 @@ export default async function EntityPageServer({ kind, slug }: { kind: PageKind;
 			notes={notes}
 			points={points}
 			mapPoints={mapPoints}
+			supplied={supplied}
 		/>
 	)
 }
