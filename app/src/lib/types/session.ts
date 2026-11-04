@@ -112,6 +112,14 @@ export type SessionBrewing = {
 	infusion_increment?: number | null
 }
 
+/** Steep number is explicit so omitted cups and multi-day sessions retain their order. */
+export type SessionInfusion = {
+	number?: number
+	duration_seconds?: number
+	note?: string
+	at?: string
+}
+
 export type SessionAuthor = {
 	_slug: string
 	title: string
@@ -145,12 +153,14 @@ export type SessionHarvest = {
 }
 
 export type SessionFull = SessionPreviewWithFeatureImage & {
+	infusions?: SessionInfusion[]
+	previous_session?: string
 	harvest: SessionHarvest | null
 	season_note: GqlSession["season_note"]
 	/** meters */
 	elevation: GqlSession["elevation"]
 	aging_conditions: GqlSession["aging_conditions"]
-	rating: NonNullable<GqlSession["rating"]>
+	rating: GqlSession["rating"]
 	purchase_link: GqlSession["purchase_link"]
 	cultivar: Cultivar[] | null
 	picking: GqlSession["picking"]

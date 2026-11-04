@@ -744,6 +744,65 @@ test("existing Unicode filenames and legacy NanoIDs survive server parsing witho
 	assert.equal(record.data.id, "67kM9WrWVFbDylg4smBnK")
 	assert.equal(record.content, content)
 })
+
+test("structured steep and color validation rejects invalid source before remote writes", async () => {
+	for (const fields of [
+		"infusions:\n  - number: 1\n  - number: 1\n",
+		"infusions:\n  - number: 2\n    duration_seconds: -1\n",
+	]) {
+		const { github, handler } = setup(),
+			body = pushBody(github)
+		body.documents.push({
+			path: "app/content/tastings/invalid-steeps.md",
+			expectedBlobSha: null,
+			content:
+				"---\nid: 44444444-4444-4444-8444-444444444444\ntitle: Cup\ndate: 2026-11-04T08:00:00Z\n" +
+				fields +
+				"---\n",
+		})
+		const result = await call(handler, "push", { method: "POST", body })
+		assert.equal(result.status, 422)
+		assert(
+			!github.calls.some(
+				(request) => request.path.endsWith("/git/refs") && request.method === "POST"
+			)
+		)
+	}
+	const { github, handler } = setup(),
+		body = pushBody(github)
+	body.documents.push({
+		path: "app/content/tags/invalid-color.md",
+		expectedBlobSha: null,
+		content: "---\nid: 44444444-4444-4444-8444-444444444444\ntitle: Mood\ncolor: invalid\n---\n",
+	})
+	assert.equal((await call(handler, "push", { method: "POST", body })).status, 422)
+})
+
+test("a revisit commits a scalar previous-session reference and refuses cyclic lineage", async () => {
+	for (const cyclic of [false, true]) {
+		const { github, handler } = setup(),
+			body = pushBody(github)
+		const first = "44444444-4444-4444-8444-444444444444",
+			second = "55555555-5555-4555-8555-555555555555"
+		body.documents.push(
+			{
+				path: "app/content/tastings/first.md",
+				expectedBlobSha: null,
+				content: `---\nid: ${first}\ntitle: Tea\ndate: 2026-11-03T08:00:00Z\n${
+					cyclic ? "previous_session: " + second + "\n" : ""
+				}---\n`,
+			},
+			{
+				path: "app/content/tastings/revisit.md",
+				expectedBlobSha: null,
+				content: `---\nid: ${second}\ntitle: Tea again\ndate: 2026-11-04T08:00:00Z\nprevious_session: ${first}\ninfusions:\n  - number: 1\n    duration_seconds: 15\n    note: Honey\n---\n`,
+			}
+		)
+		const result = await call(handler, "push", { method: "POST", body })
+		assert.equal(result.status, cyclic ? 422 : 200, result.text)
+		if (cyclic) assert.equal(result.value.error.code, "session_cycle")
+	}
+})
 test("logout verifies origin even without a currently valid session cookie", async () => {
 	const { handler } = setup()
 	const forged = await call(handler, "logout", {

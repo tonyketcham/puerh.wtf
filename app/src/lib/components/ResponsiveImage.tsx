@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react"
 import authoredImages from "@/generated/authoring-images.json"
+import legacyImages from "@/generated/legacy-images.json"
 
 export interface ResponsiveVariant {
 	src: string
@@ -7,7 +8,10 @@ export interface ResponsiveVariant {
 	width: number
 	height: number
 }
-const variantsByImage = authoredImages as Record<string, readonly ResponsiveVariant[]>
+const variantsByImage = { ...legacyImages, ...authoredImages } as Record<
+	string,
+	readonly ResponsiveVariant[]
+>
 
 type ResponsiveImageProps = Omit<ComponentProps<"img">, "src"> & {
 	src?: string | null

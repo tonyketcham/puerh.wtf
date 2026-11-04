@@ -61,9 +61,9 @@ export default function AuthoringNav({ view }: { view?: string }) {
 			>
 				+ New {singular}
 			</button>
-			{contextual && collection !== "tastings" && (
+			{contextual && (
 				<button onClick={() => request({ action: "session", pathname })}>
-					+ Log a session here
+					{collection === "tastings" ? "+ New session of this tea" : "+ Log a session here"}
 				</button>
 			)}
 			{contextual && (

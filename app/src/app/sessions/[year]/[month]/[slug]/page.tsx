@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
 import type { Metadata } from "next"
 import { pageMetadata, sessionPath } from "@/lib/siteMetadata"
-import { getSession, getSessionRoutes } from "@/lib/api"
+import { getSession, getSessionRoutes, getExplorerSessions } from "@/lib/api"
 import { notFound } from "next/navigation"
 import SessionCarousel from "@/lib/components/session/SessionCarousel"
 import { SetSessionState } from "@/app/sessions/[year]/[month]/[slug]/SetSessionState"
@@ -11,6 +11,8 @@ import SessionTitle from "@/lib/components/session/SessionTitle"
 import SteepGutter from "@/lib/components/session/SteepGutter"
 import DescriptorHighlighter from "@/lib/components/session/DescriptorHighlighter"
 import FlowAroundArticle from "@/lib/components/session/FlowAroundArticle"
+import SessionContinuation from "@/lib/components/session/SessionContinuation"
+import { infusionHtml } from "@/lib/session-journal.mjs"
 
 interface SessionPageProps {
 	params: Promise<{
@@ -65,7 +67,7 @@ export async function generateMetadata(props: SessionPageProps): Promise<Metadat
 
 export default async function SessionPage(props: SessionPageProps) {
 	const params = await props.params
-	const session = await getSession(params.slug)
+	const [session, sessions] = await Promise.all([getSession(params.slug), getExplorerSessions()])
 
 	if (!session) {
 		notFound()
@@ -92,12 +94,17 @@ export default async function SessionPage(props: SessionPageProps) {
 			/>
 
 			{/* keyed: a fresh gutter (mentions, measurements, arbitration refs) per session */}
-			<SteepGutter key={`gutter-${session._slug}`} slug={session._slug} brewing={session.brewing}>
+			<SteepGutter
+				key={`gutter-${session._slug}`}
+				slug={session._slug}
+				brewing={session.brewing}
+				infusions={session.infusions}
+			>
 				{/* The cube sits inside the notes; the prose flows around both sides of it.
 				    Only FlowAroundArticle rebuilds the article's DOM: everyone else measures it and
 				    highlights via the CSS Custom Highlight API */}
 				<FlowAroundArticle
-					html={session._content.html}
+					html={session._content.html + infusionHtml(session.infusions)}
 					obstacle={
 						session.images && session.images.length > 0 ? (
 							<SessionCarousel
@@ -111,6 +118,11 @@ export default async function SessionPage(props: SessionPageProps) {
 			</SteepGutter>
 
 			<DescriptorHighlighter />
+			<SessionContinuation
+				session={session}
+				sessions={sessions}
+				recordingKey="session-continuation"
+			/>
 		</div>
 	)
 }

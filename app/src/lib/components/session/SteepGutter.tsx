@@ -11,7 +11,7 @@ import {
 } from "react"
 import { useAtomValue, useStore } from "jotai"
 import { animate, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react"
-import type { SessionBrewing } from "@/lib/types/session"
+import type { SessionBrewing, SessionInfusion } from "@/lib/types/session"
 import {
 	activeSteepAtom,
 	commandBarAtom,
@@ -44,6 +44,7 @@ export interface SteepGutterProps {
 	slug: string
 	/** brewing params for the planned schedule (computeSteepSchedule) */
 	brewing: SessionBrewing | null
+	infusions?: readonly SessionInfusion[]
 }
 
 // ---------------------------------------------------------------------------
@@ -152,7 +153,8 @@ function collectLogItems(article: Element): { items: FoundMention[]; lists: Elem
 					range.selectNodeContents(li)
 					const text = (li.textContent ?? "").replace(/\s+/g, " ").trim()
 					const match = text.length > 28 ? `${text.slice(0, 27)}…` : text
-					items.push({ mention: { n: start + i, index: 0, match }, range, pos, block: true })
+					const n = Number(li.getAttribute("data-steep-number")) || start + i
+					items.push({ mention: { n, index: 0, match }, range, pos, block: true })
 				})
 		}
 	}
@@ -314,6 +316,7 @@ type ActivateOpts = { phase?: boolean; hash?: boolean; force?: boolean }
 export default function SteepGutter({
 	slug,
 	brewing,
+	infusions,
 	children,
 }: PropsWithChildren<SteepGutterProps>) {
 	const store = useStore()
@@ -330,6 +333,15 @@ export default function SteepGutter({
 	const [hovered, setHovered] = useState<number | null>(null)
 
 	const schedule = useMemo(() => computeSteepSchedule(brewing, SCHEDULE_CHIPS), [brewing])
+	const measured = useMemo(
+		() =>
+			new Map(
+				infusions
+					?.filter((s) => s.number != null && s.duration_seconds != null)
+					.map((s) => [s.number!, s.duration_seconds!])
+			),
+		[infusions]
+	)
 
 	// --- refs mirrored for event handlers (no re-render per scroll frame) ---
 	const foundRef = useRef<FoundMention[] | null>(null)
@@ -524,7 +536,7 @@ export default function SteepGutter({
 			next.push({
 				n: mention.n,
 				nEnd: mention.nEnd,
-				seconds: steepSeconds(brewing, mention.n) ?? 0,
+				seconds: measured.get(mention.n) ?? steepSeconds(brewing, mention.n) ?? 0,
 				match: mention.match,
 				lineY,
 				top,
@@ -560,7 +572,12 @@ export default function SteepGutter({
 		const prevSteeps = store.get(steepsAtom)
 		if (
 			prevSteeps.length !== steeps.length ||
-			prevSteeps.some((s, i) => s.n !== steeps[i].n || s.hasAnchor !== steeps[i].hasAnchor)
+			prevSteeps.some(
+				(s, i) =>
+					s.n !== steeps[i].n ||
+					s.seconds !== steeps[i].seconds ||
+					s.hasAnchor !== steeps[i].hasAnchor
+			)
 		) {
 			store.set(steepsAtom, steeps)
 		}
@@ -579,7 +596,7 @@ export default function SteepGutter({
 			const src = store.get(flavorPhaseSourceAtom)
 			if (src === "scroll" || src === "auto") resync({ force: true, hash: false })
 		}
-	}, [brewing, resync, schedule, slug, store])
+	}, [brewing, measured, resync, schedule, slug, store])
 
 	/** First settle: deep link, else sync to the scroll position / pick a sensible default. */
 	const initialize = useCallback(() => {

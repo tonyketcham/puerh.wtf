@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import type { CmsDocument, CmsField, Collection } from "./types"
 import { SCHEMAS } from "./schema"
 import { ENTITY_META, type EntityKind } from "@/lib/entities"
+import { STORAGE_PLACES } from "@/lib/storage"
 export type CreateRelated = (
 	collection: Collection,
 	field: string,
@@ -23,6 +24,8 @@ export function Field({
 	onCreate: CreateRelated
 }) {
 	const id = useId()
+	if (field.type === "storage-place")
+		return <StoragePlaceField id={id} field={field} value={value} onChange={onChange} />
 	const label = (
 		<label htmlFor={id}>
 			{field.label}
@@ -183,6 +186,60 @@ export function Field({
 				/>
 			)}
 			{field.hint && <small>{field.hint}</small>}
+		</div>
+	)
+}
+function StoragePlaceField({
+	id,
+	field,
+	value,
+	onChange,
+}: {
+	id: string
+	field: CmsField
+	value: unknown
+	onChange: (value: unknown) => void
+}) {
+	const current = typeof value === "string" ? value : ""
+	const [custom, setCustom] = useState(false)
+	const known = Object.prototype.hasOwnProperty.call(STORAGE_PLACES, current)
+	const other = custom || (!!current && !known)
+	return (
+		<div className="cms-field">
+			<label htmlFor={id}>
+				{field.label}
+				{field.required ? " *" : ""}
+			</label>
+			<select
+				id={id}
+				value={other ? "__other__" : current}
+				onChange={(e) => {
+					setCustom(e.target.value === "__other__")
+					onChange(e.target.value === "__other__" ? "" : e.target.value)
+				}}
+			>
+				<option value="">Choose a place</option>
+				{Object.values(STORAGE_PLACES).map((place) => (
+					<option key={place.key} value={place.key}>
+						{place.title}
+					</option>
+				))}
+				<option value="__other__">Other place…</option>
+			</select>
+			{other && (
+				<label>
+					Other storage place
+					<input
+						value={current}
+						required={field.required}
+						onChange={(e) => onChange(e.target.value)}
+					/>
+				</label>
+			)}
+			<small>
+				Known places appear on the storage map. Other places keep their name without an assumed
+				location.
+			</small>
 		</div>
 	)
 }

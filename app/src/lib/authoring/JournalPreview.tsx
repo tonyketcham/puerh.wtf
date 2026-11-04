@@ -30,9 +30,18 @@ import {
 } from "./journal-data"
 import { recordImages } from "./preview-media"
 import type { CmsDocument } from "./types"
+import { infusionHtml } from "@/lib/session-journal.mjs"
 
 /** Only ReactMarkdown's sanitized, inert DOM is copied into the visitor's flow renderer. */
-function PreviewArticle({ source, photos }: { source: string; photos: React.ReactNode }) {
+function PreviewArticle({
+	source,
+	photos,
+	infusions,
+}: {
+	source: string
+	photos: React.ReactNode
+	infusions?: unknown
+}) {
 	const template = useRef<HTMLDivElement>(null)
 	const [html, setHtml] = useState("")
 	useLayoutEffect(() => {
@@ -43,7 +52,7 @@ function PreviewArticle({ source, photos }: { source: string; photos: React.Reac
 			<div ref={template} hidden aria-hidden="true">
 				<ReactMarkdown remarkPlugins={[remarkGfm]}>{source}</ReactMarkdown>
 			</div>
-			<FlowAroundArticle html={html} obstacle={photos} />
+			<FlowAroundArticle html={html + infusionHtml(infusions)} obstacle={photos} />
 		</>
 	)
 }
@@ -191,7 +200,13 @@ function JournalContent({
 					</p>
 					<h2 className="cms-journal-title font-rock-3d text-shadow-2xl">{session.title}</h2>
 					<PreviewArticle
-						source={doc.body || "Your session notes will appear here."}
+						source={
+							doc.body ||
+							(Array.isArray(doc.data.infusions) && doc.data.infusions.length
+								? ""
+								: "Your session notes will appear here.")
+						}
+						infusions={doc.data.infusions}
 						photos={
 							images.length ? (
 								<SessionCarousel

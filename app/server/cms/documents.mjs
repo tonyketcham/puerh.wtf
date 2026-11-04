@@ -3,6 +3,7 @@ import YAML from "yaml"
 import { assert, sha256 } from "./security.mjs"
 import { contentPath, assetPath } from "./github.mjs"
 import { SCHEMAS } from "../../src/lib/authoring/schema-data.mjs"
+import { infusionIssues } from "../../src/lib/session-journal.mjs"
 
 export const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
 export const OID = /^[a-f0-9]{40}$/i
@@ -16,6 +17,7 @@ const relations = {
 		sourced_from: "vendors",
 		tags: "tags",
 		vessel: "vessels",
+		previous_session: "tastings",
 	},
 	origins: { parent: "origins" },
 	styles: { category: "categories" },
@@ -93,6 +95,13 @@ function strings(value, result = [], depth = 0) {
 	return result
 }
 function validateFields(record) {
+	if (record.collection === "tastings") {
+		const issues = infusionIssues(record.data.infusions)
+		assert(!issues.length, 422, "field", issues.join(" "), {
+			path: record.path,
+			field: "infusions",
+		})
+	}
 	function walk(values, fields, prefix = "") {
 		for (const field of fields) {
 			const value = values[field.name],
@@ -151,6 +160,8 @@ function validateFields(record) {
 					fail(field.options.includes(value), field.label + " has an unsupported choice.")
 				if (field.type === "datetime")
 					fail(Number.isFinite(Date.parse(value)), field.label + " must be a valid date/time.")
+				if (field.type === "color")
+					fail(/^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(value), field.label + " must be a hex color.")
 				if (field.type === "image")
 					fail(
 						value.startsWith("/images/") || /^https:\/\//.test(value),
@@ -223,7 +234,8 @@ export function validateDocuments(documents, catalog, tree, assets = [], maxDocu
 		for (const [field, collection] of Object.entries(relations[record.collection] || {})) {
 			const value = record.data[field]
 			if (value === undefined || value === null || value === "") continue
-			const scalar = record.collection === "origins" || record.collection === "styles"
+			const scalar = !SCHEMAS[record.collection].fields.find((entry) => entry.name === field)
+				?.multiple
 			assert(
 				scalar ? typeof value === "string" : Array.isArray(value),
 				422,
@@ -251,19 +263,23 @@ export function validateDocuments(documents, catalog, tree, assets = [], maxDocu
 				{ path }
 			)
 		}
-		if (record.collection === "origins") {
+		if (record.collection === "origins" || record.collection === "tastings") {
+			const origin = record.collection === "origins"
+			const field = origin ? "parent" : "previous_session"
 			const seen = new Set([record.data.id])
-			let parent = record.data.parent,
+			let parent = record.data[field],
 				depth = 1
 			while (parent) {
 				assert(
-					!seen.has(parent) && ++depth <= 6,
+					!seen.has(parent) && (!origin || ++depth <= 6),
 					422,
-					"origin_cycle",
-					"Origin parent relationships must be acyclic and bounded."
+					origin ? "origin_cycle" : "session_cycle",
+					origin
+						? "Origin parent relationships must be acyclic and bounded."
+						: "Previous sessions must not form a cycle."
 				)
 				seen.add(parent)
-				parent = byId.get(parent)?.data.parent
+				parent = byId.get(parent)?.data[field]
 			}
 		}
 	}

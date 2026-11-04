@@ -1,6 +1,51 @@
 .cms-editorial {
 	max-width: 78rem;
 }
+.cms-steep-log {
+	margin-top: 1rem;
+}
+.cms-steep-log > summary,
+.cms-steep-date > summary {
+	min-height: 44px;
+	padding-block: 0.7rem;
+	cursor: pointer;
+}
+.cms-steep-entry {
+	padding: 0.9rem 0;
+	border-top: 1px solid rgb(255 255 255 / 0.1);
+	min-width: 0;
+}
+.cms-steep-entry legend {
+	padding-right: 0.65rem;
+}
+.cms-steep-entry label {
+	display: grid;
+	gap: 0.4rem;
+	min-width: 0;
+}
+.cms-steep-entry input,
+.cms-steep-entry textarea {
+	width: 100%;
+	min-width: 0;
+	min-height: 44px;
+	padding: 0.6rem 0.7rem;
+	font: 13px var(--font-fira-code), monospace;
+	color: inherit;
+	background: rgb(0 0 0 / 0.23);
+	border: 1px solid rgb(0 0 0 / 0.35);
+	border-radius: 9px;
+}
+.cms-steep-entry label {
+	font: 500 0.7rem var(--font-fira-code), monospace;
+	color: rgb(230 217 228 / 0.8);
+}
+.cms-editorial .cms-steep-timing {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-bottom: 0.65rem;
+}
+.cms-steep-log > button {
+	min-height: 44px;
+}
 .cms-editorial .cms-page-top {
 	margin-bottom: 1rem;
 }

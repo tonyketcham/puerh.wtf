@@ -68,6 +68,7 @@ export type CmsFieldType =
 	| "object"
 	| "image"
 	| "color"
+	| "storage-place"
 
 export interface CmsField {
 	name: string

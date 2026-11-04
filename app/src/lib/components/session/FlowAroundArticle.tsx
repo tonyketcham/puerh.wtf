@@ -21,12 +21,25 @@ export const ARTICLE_REFLOW_EVENT = "session-article-reflow"
 const GAP_X = 28
 const GAP_Y = 14
 /** A column beside the cube narrower than this is left empty instead of holding a sliver of text. */
-const MIN_SLOT = 140
+const MIN_SLOT = 240
 /** Below this width per side, the cube stacks above the notes instead of sitting inside them. */
-const MIN_COLUMN = 180
+const MIN_COLUMN = 280
 const BLOCK_SELECTOR = "p,li,h1,h2,h3,h4,h5,h6,blockquote,td,th,dd,dt,figcaption,pre"
 /** Inline elements a flowed block may contain; anything else (img, code…) keeps its block whole. */
-const FLOWABLE_INLINE = new Set(["A", "STRONG", "EM", "B", "I", "SPAN", "U", "S", "DEL", "MARK", "ABBR", "BR"])
+const FLOWABLE_INLINE = new Set([
+	"A",
+	"STRONG",
+	"EM",
+	"B",
+	"I",
+	"SPAN",
+	"U",
+	"S",
+	"DEL",
+	"MARK",
+	"ABBR",
+	"BR",
+])
 
 type Mode = "pending" | "wrap" | "stack"
 type Point = { x: number; y: number }
@@ -354,15 +367,14 @@ export default function FlowAroundArticle({ html, obstacle }: FlowAroundArticleP
 				if (top + rect.height < exTop) continue
 				if (top > exBottom) break
 				const nodes = Array.from(block.childNodes)
-				if (
-					isFlowable(block) &&
-					flowBlock(block, top, rect.left - articleRect.left, blocked)
-				) {
+				if (isFlowable(block) && flowBlock(block, top, rect.left - articleRect.left, blocked)) {
 					originals.set(block, nodes)
 				} else if (blocked(top, top + rect.height)) {
 					// can't split it (code, images, tables): clear the cube instead
 					originals.set(block, nodes)
-					block.style.marginTop = `${exBottom - top + parseFloat(getComputedStyle(block).marginTop)}px`
+					block.style.marginTop = `${
+						exBottom - top + parseFloat(getComputedStyle(block).marginTop)
+					}px`
 				}
 			}
 

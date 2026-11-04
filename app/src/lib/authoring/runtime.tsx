@@ -15,6 +15,7 @@ import {
 } from "./client"
 import { validateDocument, RELATION_FIELDS } from "./schema"
 import { createDocument, serializeDocument } from "./documents"
+import { sessionSeed } from "./session-seed"
 import {
 	createDraft,
 	listDraftRecoveries,
@@ -1388,7 +1389,12 @@ export default function CmsRuntime() {
 				cultivars: "cultivar",
 				vessels: "vessel",
 			}
-			const data = doc && field[doc.collection] ? { [field[doc.collection]]: [doc.id] } : {}
+			const data =
+				doc?.collection === "tastings"
+					? sessionSeed(doc)
+					: doc && field[doc.collection]
+					? { [field[doc.collection]]: [doc.id] }
+					: {}
 			void cms.newDraft("tastings", data)
 			return
 		}
