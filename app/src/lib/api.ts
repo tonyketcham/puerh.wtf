@@ -1,5 +1,6 @@
 import { withPhotoCaptions, type PhotoCaption } from "./photo-captions"
 import photoCaptions from "@/generated/authoring-captions.json"
+import sessionJournal from "@/generated/session-journal.json"
 import { gql } from "graphql-request"
 import * as flatbread from "./flatbread"
 import {
@@ -321,12 +322,14 @@ export async function getSession(slug: string): Promise<SessionFull | null> {
 	})
 	if (!Session) return null
 	const captions = (photoCaptions as Record<string, PhotoCaption[]>)[Session.id]
-	return captions
-		? {
-				...Session,
-				images: withPhotoCaptions(Session.images, captions),
-		  }
-		: Session
+	const journal = (
+		sessionJournal as Record<string, Pick<SessionFull, "infusions" | "previous_session">>
+	)[Session.id]
+	return {
+		...Session,
+		...journal,
+		images: captions ? withPhotoCaptions(Session.images, captions) : Session.images,
+	}
 }
 
 export async function getOrigins(): Promise<Origin[]> {

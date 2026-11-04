@@ -1,5 +1,6 @@
 import type { CmsDocument, CmsField, CmsIssue, Collection, CollectionDefinition } from "./types"
 import { COLLECTION_NAMES } from "./types"
+import { infusionIssues } from "@/lib/session-journal.mjs"
 import {
 	COLLECTIONS as definitions,
 	SCHEMAS as definitionsByName,
@@ -86,9 +87,13 @@ export function validateDocument(
 				add(path, field.label + " has an unknown value.")
 			else if (field.type === "datetime" && !Number.isFinite(Date.parse(value)))
 				add(path, field.label + " must be a valid date and time.")
+			else if (field.type === "color" && !/^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(value))
+				add(path, field.label + " must be a hex color, such as #a9ce54.")
 		}
 	}
 	walk(document.data, SCHEMAS[document.collection].fields)
+	if (document.collection === "tastings")
+		for (const issue of infusionIssues(document.data.infusions)) add("infusions", issue)
 	for (const ref of documentRelations(document)) {
 		if (
 			!documents.some(
@@ -108,25 +113,32 @@ export function validateDocument(
 			})
 		}
 	}
-	if (document.collection === "origins") {
+	if (document.collection === "origins" || document.collection === "tastings") {
+		const origin = document.collection === "origins"
+		const field = origin ? "parent" : "previous_session"
 		const seen = new Set<string>()
 		let current: CmsDocument | undefined = document
 		let depth = 0
 		while (current) {
 			if (seen.has(current.id)) {
-				add("parent", "Origin parents must not form a cycle.")
+				add(
+					field,
+					origin
+						? "Origin parents must not form a cycle."
+						: "Previous sessions must not form a cycle."
+				)
 				break
 			}
 			seen.add(current.id)
-			if (++depth > 6) {
+			if (origin && ++depth > 6) {
 				add("parent", "This origin hierarchy exceeds the six levels supported by the site.")
 				break
 			}
-			const parent: unknown = current.data.parent
+			const parent: unknown = current.data[field]
 			current =
 				typeof parent === "string"
 					? documents.find(
-							(candidate) => candidate.collection === "origins" && candidate.id === parent
+							(candidate) => candidate.collection === document.collection && candidate.id === parent
 					  )
 					: undefined
 		}

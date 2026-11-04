@@ -1,6 +1,6 @@
 import { createServer } from "node:http"
 import { access, readFile, stat } from "node:fs/promises"
-import { extname, resolve, sep } from "node:path"
+import { basename, dirname, extname, resolve, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const types = {
@@ -8,6 +8,7 @@ const types = {
 	".js": "text/javascript; charset=utf-8",
 	".css": "text/css; charset=utf-8",
 	".json": "application/json",
+	".xml": "application/xml; charset=utf-8",
 	// Next's exported router loads Flight payloads from index.txt and accepts text/plain.
 	".txt": "text/plain; charset=utf-8",
 	".svg": "image/svg+xml",
@@ -36,6 +37,16 @@ export function createExportServer(root) {
 			if (file !== directory && !file.startsWith(directory + sep)) {
 				response.writeHead(403).end("Forbidden")
 				return
+			}
+			// Windows exports dynamic Flight segments as folders; the router requests dotted names.
+			if (basename(file).startsWith("__next.") && file.endsWith(".txt")) {
+				try {
+					await access(file)
+				} catch {
+					const parts = basename(file).slice(0, -4).split(".")
+					if (parts.length > 2 && parts.every((part) => /^[a-zA-Z0-9_$~-]+$/.test(part)))
+						file = resolve(dirname(file), parts.slice(0, 2).join("."), ...parts.slice(2)) + ".txt"
+				}
 			}
 			if ((await stat(file)).isDirectory()) {
 				if (!url.pathname.endsWith("/")) {

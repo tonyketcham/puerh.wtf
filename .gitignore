@@ -9,3 +9,4 @@ test-results/.last-run.json
 /app/public/authoring-codecs/
 /app/test-results/
 /app/playwright-report/
+/app/public/images/derived/

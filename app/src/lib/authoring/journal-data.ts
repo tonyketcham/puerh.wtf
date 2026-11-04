@@ -100,7 +100,7 @@ export function journalSession(
 		season_note: data.season_note ?? null,
 		elevation: data.elevation ?? null,
 		aging_conditions: data.aging_conditions ?? null,
-		rating: number(data.rating) ?? 0,
+		rating: number(data.rating) ?? null,
 		purchase_link: data.purchase_link ?? null,
 		picking: data.picking ?? null,
 		notes: Object.fromEntries(NOTE_STAGES.map((key) => [key, string(object(data.notes)[key])])),

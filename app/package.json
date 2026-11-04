@@ -26,7 +26,7 @@
 		"format": "prettier --write --plugin-search-dir=. .",
 		"cms:dev": "node server/cms/dev.mjs",
 		"cms:test": "node --test server/cms/*.test.mjs",
-		"authoring:assets": "node src/lib/authoring/media/prepare-codecs.mjs && node scripts/authoring-images.mjs",
+		"authoring:assets": "node src/lib/authoring/media/prepare-codecs.mjs && node scripts/authoring-images.mjs && node scripts/session-journal.mjs && node scripts/legacy-images.mjs",
 		"predev": "pnpm authoring:assets",
 		"prebuild": "pnpm authoring:assets"
 	},

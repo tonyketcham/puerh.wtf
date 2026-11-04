@@ -7,6 +7,109 @@ import { parseDocument } from "../src/lib/authoring/documents"
 
 test.setTimeout(90_000)
 
+for (const mobile of [false, true])
+	test(
+		"steep log survives reload and reaches the reading preview and selected push " +
+			(mobile ? "mobile" : "desktop"),
+		async ({ page }) => {
+			await page.setViewportSize(
+				mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 }
+			)
+			const fixture = await writerFixture(page)
+			const prose = mobile ? "" : "A quiet afternoon with this tea."
+			await page.getByLabel("Notes", { exact: true }).fill(prose)
+			await page.locator(".cms-steep-log > summary").click()
+			await page.getByRole("button", { name: "Add steep", exact: true }).click()
+			const first = page.getByRole("group", { name: "Steep 1", exact: true })
+			await first.getByLabel("Duration (s)", { exact: true }).fill("15")
+			await first
+				.getByLabel("Steep note", { exact: true })
+				.fill("Honey, warm stone and a soft finish.")
+			await page.getByRole("button", { name: "Add steep", exact: true }).click()
+			const second = page.getByRole("group", { name: "Steep 2", exact: true })
+			await second.getByLabel("Duration (s)", { exact: true }).fill("20")
+			await second
+				.getByLabel("Steep note", { exact: true })
+				.fill("More floral; the sweetness stays.")
+			await expect(page.getByText("Saved on this device", { exact: true })).toBeVisible()
+			await page.reload()
+			await page.locator(".cms-steep-log > summary").click()
+			await expect(first.getByLabel("Duration (s)", { exact: true })).toHaveValue("15")
+			await expect(first.getByLabel("Steep note", { exact: true })).toHaveValue(
+				"Honey, warm stone and a soft finish."
+			)
+			await first.scrollIntoViewIfNeeded()
+			await page.screenshot({
+				path: test.info().outputPath("steep-editor-" + (mobile ? "mobile" : "desktop") + ".png"),
+				fullPage: true,
+			})
+			await page.locator(".cms-steep-log").screenshot({
+				path: test.info().outputPath("steep-log-" + (mobile ? "mobile" : "desktop") + ".png"),
+			})
+			expect(
+				await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)
+			).toBe(true)
+			await page.getByRole("button", { name: "Read", exact: true }).click()
+			await expect(page.locator("[data-infusion-log] li")).toHaveCount(2)
+			await expect(page.locator("[data-infusion-log]")).toContainText("Honey, warm stone")
+			await expect(
+				page.locator('[data-journal-preview] [data-recording-key="record-rating"]')
+			).toHaveCount(0)
+			if (!prose)
+				await expect(
+					page.getByText("Your session notes will appear here.", { exact: true })
+				).toHaveCount(0)
+			await page.getByRole("button", { name: "Review in Working changes →", exact: true }).click()
+			await page.getByRole("button", { name: "Commit & push 1 record", exact: true }).click()
+			await expect.poll(() => fixture.pushes.length).toBe(1)
+			const pushedDocument = parseDocument({ ...fixture.pushes[0].documents[0], sha: null })
+			expect(pushedDocument.data.infusions).toEqual([
+				{ number: 1, duration_seconds: 15, note: "Honey, warm stone and a soft finish." },
+				{ number: 2, duration_seconds: 20, note: "More floral; the sweetness stays." },
+			])
+			expect(pushedDocument.body).toBe(prose)
+			expect(pushedDocument.data.rating).toBeUndefined()
+		}
+	)
+
+test("New session of this tea uses the page context and clears the old tasting", async ({
+	page,
+}) => {
+	await writerFixture(page)
+	await page.goto("/sessions/2022/07/2018-zsl-yi-shan-mo/")
+	await page.getByRole("button", { name: "+ New session of this tea", exact: true }).click()
+	await expect(page.getByRole("textbox", { name: /^Tea name/ })).toHaveValue("ZSL Yi Shan Mo")
+	await expect(page.getByLabel("Notes", { exact: true })).toHaveValue("")
+	await expect(page.getByLabel("Water temperature (°C)", { exact: true })).toHaveValue("")
+	await expect(page.getByRole("button", { name: /Remove Tea Encounter/ })).toBeVisible()
+	await page.getByText("More details", { exact: true }).click()
+	await expect(
+		page.getByRole("button", { name: "Remove ZSL Yi Shan Mo", exact: true })
+	).toBeVisible()
+	await page.getByLabel("Preference rating", { exact: true }).fill("82")
+	await expect(page.getByText(/Personal enjoyment out of 100/)).toBeVisible()
+})
+
+test("storage offers mapped places and preserves a custom name after reload", async ({ page }) => {
+	await writerFixture(page)
+	await page.getByText("More details", { exact: true }).click()
+	const storage = page
+		.locator("details.cms-property-group")
+		.filter({ has: page.locator("summary", { hasText: /^Storage history/ }) })
+	await storage.locator(":scope > summary").click()
+	await storage.getByRole("button", { name: "Add storage history item", exact: true }).click()
+	await storage.getByRole("combobox", { name: /^Place/ }).selectOption("kunming")
+	await storage.getByRole("combobox", { name: /^Place/ }).selectOption({ label: "Other place…" })
+	await storage.getByLabel("Other storage place", { exact: true }).fill("My tea cupboard")
+	await expect(page.getByText("Saved on this device", { exact: true })).toBeVisible()
+	await page.reload()
+	await page.getByText("More details", { exact: true }).click()
+	await storage.locator(":scope > summary").click()
+	await expect(storage.getByLabel("Other storage place", { exact: true })).toHaveValue(
+		"My tea cupboard"
+	)
+})
+
 async function writerFixture(page: Page) {
 	const records: { path: string; content: string; sha: string }[] = []
 	for (const collection of COLLECTION_NAMES)

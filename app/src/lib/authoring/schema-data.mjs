@@ -91,6 +91,7 @@ export const COLLECTIONS = [
 			relation("vendor", "Vendors", "vendors"),
 			relation("sourced_from", "Supplier", "vendors"),
 			relation("vessel", "Vessels", "vessels"),
+			relation("previous_session", "Previous session of this tea", "tastings", false),
 			relation("tags", "Tags", "tags"),
 			number("production_year", "Production year", { min: 1, step: 1 }),
 			object("harvest", "Harvest", [
@@ -101,13 +102,16 @@ export const COLLECTIONS = [
 			text("season_note", "Harvest note"),
 			text("picking", "Picking"),
 			number("elevation", "Elevation (m)"),
-			text("aging_conditions", "Aging note", { type: "textarea" }),
+			text("aging_conditions", "Additional storage notes", {
+				type: "textarea",
+				hint: "Use Storage history for places and dates. Add uncertainty or other context here.",
+			}),
 			{
 				name: "storage",
 				label: "Storage history",
 				type: "list",
 				fields: [
-					text("place", "Place", { required: true }),
+					text("place", "Place", { type: "storage-place", required: true }),
 					number("from", "From year", { step: 1 }),
 					number("to", "To year", { step: 1 }),
 					select("humidity", "Humidity", ["dry", "natural", "wet"]),
@@ -115,7 +119,12 @@ export const COLLECTIONS = [
 				],
 			},
 			text("purchase_link", "Purchase link"),
-			number("rating", "Preference rating", { min: 0, max: 100, step: 0.5 }),
+			number("rating", "Preference rating", {
+				min: 0,
+				max: 100,
+				step: 0.5,
+				hint: "Personal enjoyment out of 100; higher means you enjoyed it more. Leave blank when unscored.",
+			}),
 			object("brewing", "Brewing", [
 				number("temperature", "Water temperature (°F)", {
 					min: 0,
@@ -126,8 +135,21 @@ export const COLLECTIONS = [
 				number("liquid_amount", "Water (mL)", { min: 0 }),
 				number("first_infusion_duration", "First infusion (s)", { min: 0 }),
 				number("infusion_increment", "Infusion increment (s)", { min: 0 }),
-				text("vessel", "Vessel note"),
+				text("vessel", "Additional vessel notes", {
+					hint: "Choose the teaware under Vessels; add capacity, setup or uncertainty here.",
+				}),
 			]),
+			{
+				name: "infusions",
+				label: "Steep log",
+				type: "list",
+				fields: [
+					number("number", "Steep number", { min: 1, step: 1, required: true }),
+					number("duration_seconds", "Duration (s)", { min: 0 }),
+					text("note", "Steep note", { type: "textarea" }),
+					text("at", "Steep date", { type: "datetime" }),
+				],
+			},
 			object(
 				"notes",
 				"Tasting notes",
@@ -262,6 +284,7 @@ export const RELATION_FIELDS = {
 		sourced_from: "vendors",
 		tags: "tags",
 		vessel: "vessels",
+		previous_session: "tastings",
 	},
 	origins: { parent: "origins" },
 	styles: { category: "categories" },

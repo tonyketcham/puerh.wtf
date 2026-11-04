@@ -15,6 +15,13 @@ before(async () => {
 	await writeFile(join(root, "index.html"), "<h1>Home</h1>")
 	await writeFile(join(root, "vendors", "index.html"), "<h1>Vendors</h1>")
 	await writeFile(join(root, "vendors", "index.txt"), "exported flight payload")
+	await mkdir(join(root, "vendors", "__next.vendors", "$d$slug"), { recursive: true })
+	await writeFile(
+		join(root, "vendors", "__next.vendors", "$d$slug", "__PAGE__.txt"),
+		"nested dynamic payload"
+	)
+	await writeFile(join(root, "vendors", "__next.vendors.static.txt"), "flat payload")
+	await writeFile(join(root, "vendors", "__next.vendors", "static.txt"), "nested static payload")
 	await writeFile(join(root, "worker.js"), "self.onmessage = () => {}")
 	await writeFile(join(temporary, "outside.txt"), "outside the export")
 	server = createExportServer(root).listen(0, "127.0.0.1")
@@ -56,6 +63,15 @@ test("supports HEAD and rejects writes", async () => {
 	const post = await fetch(`${baseURL}/`, { method: "POST" })
 	assert.equal(post.status, 405)
 	assert.equal(post.headers.get("allow"), "GET, HEAD")
+})
+
+test("dotted Flight requests support Windows nested segments and prefer existing flat files", async () => {
+	const nested = await fetch(`${baseURL}/vendors/__next.vendors.$d$slug.__PAGE__.txt?_rsc=example`)
+	assert.equal(nested.status, 200)
+	assert.match(nested.headers.get("content-type"), /^text\/plain/)
+	assert.equal(await nested.text(), "nested dynamic payload")
+	const flat = await fetch(`${baseURL}/vendors/__next.vendors.static.txt`)
+	assert.equal(await flat.text(), "flat payload")
 })
 
 test("missing assets stay missing and encoded paths cannot leave the export", async () => {

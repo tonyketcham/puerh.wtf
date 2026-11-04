@@ -11,6 +11,11 @@ async function modules(page: Page) {
 		const pathname = new URL(route.request().url()).pathname
 		if (pathname.startsWith("/modules/")) {
 			const filename = pathname.slice("/modules/".length).replace(/\.js$/, ".ts")
+			if (filename === "session-journal.mjs")
+				return route.fulfill({
+					contentType: "text/javascript",
+					body: await readFile(path.join(appRoot, "src/lib/session-journal.mjs"), "utf8"),
+				})
 			if (filename === "schema-data.mjs")
 				return route.fulfill({
 					contentType: "text/javascript",
@@ -25,6 +30,7 @@ async function modules(page: Page) {
 				})
 				.outputText.replace(/from "\.\/(\w+)"/g, 'from "./$1.js"')
 				.replace(/from "yaml"/g, 'from "/yaml/index.js"')
+				.replace(/from "@\/lib\/session-journal.mjs"/g, 'from "/modules/session-journal.mjs"')
 			return route.fulfill({ contentType: "text/javascript", body: output })
 		}
 		if (pathname.startsWith("/yaml/")) {

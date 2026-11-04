@@ -9,6 +9,7 @@ import { usePreviewAssets } from "./use-preview-assets"
 import { SCHEMAS } from "./schema"
 import PanelSection from "@/lib/components/containers/PanelSection"
 import { FlavorEditor, BrewingEditor } from "./SessionEditorPanels"
+import InfusionEditor from "./InfusionEditor"
 import CoverPreview from "./CoverPreview"
 import type { RecordImage } from "./preview-media"
 import "./writer.css"
@@ -211,7 +212,9 @@ export default function WriteWorkspace() {
 	const context = isSession
 		? ["vendor", "style", "origin", "cultivar", "vessel", "author", "production_year", "tags"]
 		: ["description", "kind", "parent", "category", "municipality", "country"]
-	const specialized = isSession ? ["flavor_axes", "brewing", "notes", "images"] : ["image"]
+	const specialized = isSession
+		? ["flavor_axes", "brewing", "notes", "images", "infusions"]
+		: ["image"]
 	const change = (name: string, value: unknown) => editDraft(draft.id, { [name]: value })
 	const createRelated = async (
 		collection: Collection,
@@ -427,6 +430,14 @@ export default function WriteWorkspace() {
 											: "Tell the story in your own words…"
 									}
 								/>
+								{isSession && (
+									<InfusionEditor
+										key={draft.id}
+										value={data.infusions}
+										onChange={(v) => change("infusions", v)}
+										recordingKey="session-steep-editor"
+									/>
+								)}
 							</div>
 							{preview &&
 								(imagesUnavailable ? (
