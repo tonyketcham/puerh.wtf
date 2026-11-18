@@ -61,7 +61,7 @@
 		"hast-util-parse-selector": "3.1.0",
 		"hast-util-select": "5.0.2",
 		"mapshaper": "0.6.113",
-		"next": "16.2.5",
+		"next": "16.4.5",
 		"plur": "5.1.0",
 		"pngjs": "7.0.0",
 		"postcss": "^8.4.16",
